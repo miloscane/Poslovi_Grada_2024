@@ -77,7 +77,7 @@ function addRow(json){
 		var obrisi = document.createElement("DIV");
 		obrisi.setAttribute("class","elem obrisi");
 		obrisi.setAttribute("onclick","deleteRow(this)");
-		obrisi.innerHTML = "<img src=\"/images/deleteRow.png\">";
+		obrisi.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/deleteRow.png\">";
 		row.appendChild(obrisi);
 	obracunElem.appendChild(row);
 }
