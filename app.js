@@ -1907,7 +1907,7 @@ server.get('/nalog/:broj/:accesscode/:user',async (req,res)=>{
 });
 
 server.post('/izvestaj-sa-mobilnog', async (req, res)=> {
-		upload(req, res, function (error) {
+		uploadSlika(req, res, function (error) {
 		    if (error) {
 		      logError(error);
 		      return res.render("messageNotLoggedIn",{pageTitle: "Програмска грешка",message: "<div class=\"text\">Дошло је до грешке у обради фотографија.</div>"});
