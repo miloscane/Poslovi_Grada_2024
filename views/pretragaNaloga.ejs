@@ -1,0 +1,38 @@
+<%- include ("partials/header") -%>
+	<div class="pageWidth">
+		<div class="pretragaNaloga">
+			<div class="pageWidth">
+				<div class="blueWrap">
+					<div class="imageWrap" style="text-align:center">
+						<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/searchIcon.png" width="70">
+					</div>
+					<div class="inputWrap">
+						<div class="title">Број налога</div>
+						<div class="inputWrapper">
+							<input type="text" id="broj-naloga" class="textInput">
+						</div>
+					</div>
+					<div class="inputWrap" style="margin-top:30px">
+						<div class="button" onclick="nadjiNalog()">Пронађи</div>
+						<script>
+							function nadjiNalog(){
+								var brojNaloga = document.getElementById('broj-naloga').value;
+								if(brojNaloga.length<7 || brojNaloga.length>7){
+									alert("Број налога делује неисправно. Потребно је да има 7 цифри.")
+								}else{
+									loadGif();
+									window.location.href='/nalog/'+brojNaloga;
+								}
+							}
+							document.getElementById("broj-naloga").addEventListener('keypress', function(event) {
+								if (event.keyCode == 13) {
+									nadjiNalog();
+								}
+							});
+						</script>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

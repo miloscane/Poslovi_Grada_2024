@@ -1,0 +1,72 @@
+<%- include ("partials/header-nl") -%>
+			<div class="pageWidth">
+				<div class="blueWrap">
+					<div class="imageWrap">
+						<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/userIcon.svg" width="70">
+					</div>
+					<div class="inputWrap">
+						<div class="title">Лозинка</div>
+						<div class="note">Лозинка мора садржати минимум 12 карактера и има барем једно велико слово.</div>
+						<div class="inputWrapper">
+							<input type="password" id="password" class="textInput">
+							<div class="show" onclick="showPassword(this)" data-hidden="1">ПРИКАЖИ</div>
+							<script>
+								function showPassword(elem){
+									if(elem.dataset.hidden=="1"){
+										elem.dataset.hidden = "0";
+										elem.parentElement.getElementsByClassName("textInput")[0].type = "text";
+										elem.innerHTML = "САКРИЈ";
+									}else{
+										elem.dataset.hidden = "1";
+										elem.parentElement.getElementsByClassName("textInput")[0].type = "password";
+										elem.innerHTML = "ПРИКАЖИ";
+									}
+								}
+							</script>
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Потврда лозинке</div>
+						<div class="inputWrapper">
+							<input type="password" id="password2" class="textInput">
+							<div class="show" onclick="showPassword(this)" data-hidden="1">ПРИКАЖИ</div>
+						</div>
+					</div>
+					<div class="inputWrap" style="margin-top:30px">
+						<div class="button" onclick="submitLogin()">Ресетуј</div>
+					</div>	
+				</div>
+			</div>
+		</div>
+		<form style="display:none" method="POST" action="/reset-lozinke" id="form"><input type="text" name="json" id="submit-info"></form>
+		<script>
+			var resetId = "<%=resetId%>";
+			function submitLogin(){
+				var password	=	document.getElementById("password").value;
+				var password2	=	document.getElementById("password2").value;
+				if(password==password2){
+					if(password!=password.toLowerCase() && password.length<12 && /\d/.test(password)){
+						var submitJson	=	{};
+						submitJson.password = password;
+						submitJson.password2 = password2;
+						submitJson.resetId = resetId;
+						document.getElementById("submit-info").value = JSON.stringify(submitJson);
+						loadGif();
+						document.getElementById("form").submit();
+					}else{
+						alert("Лозинка мора имати минимум 12 карактера и барем једно велико слово");
+					}
+				}else{
+					alert("Лозинке се не подударају");
+				}
+				
+			}
+
+			document.getElementById("password2").addEventListener('keypress', function(event) {
+				if (event.keyCode == 13) {
+					submitLogin();
+				}
+			});
+		</script>
+		
+<%- include ("partials/footer") -%>

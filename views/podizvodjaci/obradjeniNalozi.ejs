@@ -1,0 +1,130 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+	</script>
+	<div class="pageWidth podizvodjaci">
+		<div class="zavrseniNalozi">
+			<div class="boxesWrap">
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/sumIcon.png"></div>
+					<div class="info">
+						<div class="title">Укупно налога</div>
+						<div class="text"><%=nalozi.length%></div>
+					</div> 
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Износ</div>
+						<div class="text"><span id="ukupan-iznos"></span></div>
+					</div>
+				</div>
+			</div>
+			<div class="lightBlueBox">
+				<div class="tableWrap">
+					<div class="tableHeader">
+						<table>
+							<tr>
+								<td><div class="value redniBroj">Редни број</div></td>
+								<td><div class="value brojNaloga">Број налога</div></td>
+								<td><div class="value ikonica"></div></td>
+								<td><div class="value datumNaloga">Датум налога</div></td>
+								<td><div class="value radnaJedinica">Радна јединица</div></td>
+								<td><div class="value adresa">Адреса</div></td>
+								<td><div class="value status">Статус</div></td>
+								<td><div class="value iznos">Износ</div></td>
+								<td><div class="value link">Линк</div></td>
+							</tr>
+						</table>
+					</div>
+					<div class="table" id="table"></div>
+				</div>
+			</div>
+			<script>
+				function getPriceByCode(code){
+					for(var i=0;i<cenovnik.length;i++){
+						if(cenovnik[i].code==code){
+							return cenovnik[i].price;
+						}
+					}
+				}
+				var naloziToShow = [];
+				function generateTable(){
+					naloziToShow = nalozi;
+					document.getElementById("table").innerHTML = "";
+					var table = document.createElement("TABLE");
+					var ukupanIznos = 0;
+					for(var i=0;i<naloziToShow.length;i++){
+						var obracunatIznos = 0;
+						for(var j=0;j<naloziToShow[i].obracun.length;j++){
+							obracunatIznos = obracunIznos + getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity)
+						}
+						naloziToShow[i].ukupanIznos = obracunatIznos;
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1)+".";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojNaloga");
+								div.innerHTML = naloziToShow[i].broj;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value ikonica");
+								div.innerHTML = "<img src=''>";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value datumNaloga");
+								div.innerHTML = naloziToShow[i].datum.datum;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value radnaJedinica");
+								div.innerHTML = naloziToShow[i].radnaJedinica;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value adresa");
+								div.innerHTML = naloziToShow[i].adresa;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value status");
+								div.innerHTML = "Можете фактурисати";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value link");
+								div.innerHTML = "<a href='/nalog/"+naloziToShow[i].broj+"' target='_blank'>Види налог</a>";
+								td.appendChild(div);
+							tr.appendChild(td);
+
+						table.appendChild(tr);
+					}
+					document.getElementById("table").appendChild(table);
+					document.getElementById("ukupan-iznos").innerHTML = brojSaRazmacima(ukupanIznos)+ " дин.";
+				}
+
+				generateTable();
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

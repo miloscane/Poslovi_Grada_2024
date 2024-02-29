@@ -1,0 +1,131 @@
+<% if (typeof user!="undefined") { %>
+	
+		<div id="menu">
+			<div class="topBlueBar">
+				<div class="pageWidth">
+					<script>
+						var user = <%-JSON.stringify(user)%>;
+					</script>
+					<div class="user">
+						<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/userIconWhite.svg"></div>
+						<div class="name"><%-user.name%></div>
+					</div>
+					<div class="logout">
+						<div class="wrap">
+							<a href="/logout"><img class="white" src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logoutWhite.png"></a>
+							<img class="red" src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logoutColored.png">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="header">
+				<div class="identity">
+					<div class="pageWidth">
+						<div class="logo">
+							<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png" width="50">
+						</div>
+						<div class="naslov">
+							<div class="title">Послови Града</div>
+							<div class="subTitle">ВиК Портал</div>
+						</div>
+					</div>
+				</div>
+				<div class="menuWrap">
+					<div class="pageWidth">
+						<% if(Number(user.role)==10){ %>
+							<div class="menuItem"><a href="/" onclick="loadGif()">Насловна</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="#">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/digitalizacijaNaloga" onclick="loadGif()">Дигитализација налога</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/sviNalozi" onclick="loadGif()">Сви налози</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/fakturisaniNalozi" onclick="loadGif()">Фактурисани налози</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/spremniNalozi" onclick="loadGif()">Спремни за фактурисање</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/cekajuValidaciju" onclick="loadGif()">Чекају валидацију</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/neobracunatiNalozi" onclick="loadGif()">Необрачунати налози</a><div class="bottomBorder"></div></div>
+								</div>
+							</div>
+							<div class="menuItem"><a href="#">Претрага <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/pretragaNaloga" onclick="loadGif()">Претрага налога</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/pretragaFaktura" onclick="loadGif()">Претрага фактура</a></div>
+								</div>
+							</div>
+							<div class="menuItem"><a href="/dispeceri" onclick="loadGif()">Диспечери</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="#">Мајстори <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/administracijaMajstora" onclick="loadGif()">Администрација</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/ucinakMajstora" onclick="loadGif()">Учинак</a></div>
+								</div>
+							</div>
+							<div class="menuItem"><a href="#">Подизвођачи <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/ucinakPodizvodjaca" onclick="loadGif()">Учинак</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/fakturePodizvodjaca" onclick="loadGif()">Фактуре</a></div>
+								</div>
+							</div>
+						<% }else if(Number(user.role)==20){ %>
+							<div class="menuItem"><a href="#">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/dispecer/otvoreniNalozi" onclick="loadGif()">Отворени налози</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/dispecer/zavrseniNalozi" onclick="loadGif()">Завршени налози</a></div>
+									<div class="subMenuItem"><a href="/digitalizacijaNaloga" onclick="loadGif()">Дигитализација налога</a><div class="bottomBorder"></div></div>
+								</div>
+							</div>
+							<div class="menuItem"><a href="/dispecer/pretragaNaloga" onclick="loadGif()">Претрага налога</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/dispecer/mojUcinak" onclick="loadGif()">Мој учинак</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/ucinakMajstora" onclick="loadGif()">Учинак мајстора</a><div class="rightBorder"></div></div>
+						<% }else if(Number(user.role)==30){ %>
+							<div class="menuItem"><a href="#">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/podizvodjac/otvoreniNalozi" onclick="loadGif()">Отворени налози</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/podizvodjac/zavrseniNalozi" onclick="loadGif()">Завршени налози</a></div>
+									<div class="subMenuItem"><a href="/podizvodjac/obradjeniNalozi" onclick="loadGif()">Обрађени налози</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/podizvodjac/fakturisaniNalozi" onclick="loadGif()">Фактурисани налози</a><div class="bottomBorder"></div></div>
+								</div>
+							</div>
+							<div class="menuItem"><a href="/podizvodjac/specifikacije" onclick="loadGif()">Спецификације</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/podizvodjac/ucinak" onclick="loadGif()">Учинак</a><div class="rightBorder"></div></div>
+						<% }else if(Number(user.role)==40){ %>
+							<div class="menuItem"><a href="/spremniNalozi" onclick="loadGif()">Спремни налози</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/fakturisaniNalozi" onclick="loadGif()">Фактурисани налози</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/pretragaNaloga" onclick="loadGif()">Претрага налога</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/pretragaFaktura" onclick="loadGif()">Претрага фактура</a><div class="rightBorder"></div></div>
+						<% }else if(Number(user.role)==50){ %>
+							<div class="menuItem"><a href="/magacioner/stanje" onclick="loadGif()">Стање</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/magacioner/noviRevers" onclick="loadGif()">Нови реверс</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="#">Реверси <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/magacioner/danasnjiReversi" onclick="loadGif()">Данашњи реверси</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/magacioner/jucerasnjiReversi" onclick="loadGif()">Јучерашњи реверси</a></div>
+									<div class="subMenuItem"><a href="/magacioner/prekojucerasnjiReversi" onclick="loadGif()">Прекојучерашњи реверси</a><div class="bottomBorder"></div></div>
+								</div>
+							</div>
+							<div class="menuItem"><a href="/magacioner/pretragaReversa" onclick="loadGif()">Претрага реверса</a><div class="rightBorder"></div></div>
+						<% } %>
+					</div>
+				</div>
+				<div class="pageTitle">
+					<div class="pageWidth"><div class="title" id="page-title"><%-pageTitle%></div></div>
+					<script>
+						var menuItems = document.getElementById("menu").getElementsByClassName("menuItem");
+						for(var i=0;i<menuItems.length;i++){
+							if(menuItems[i].getElementsByTagName("a")[0].innerHTML=="<%=pageTitle%>"){
+								menuItems[i].classList.add("menuItemActive")
+							}
+						}
+
+						var subMenus = document.getElementById("menu").getElementsByClassName("subMenu");
+						for(var i=0;i<subMenus.length;i++){
+							var subMenuItems = subMenus[i].getElementsByClassName("subMenuItem");
+							for(var j=0;j<subMenuItems.length;j++){
+								if(subMenuItems[j].getElementsByTagName("a")[0].innerHTML=="<%=pageTitle%>"){
+									subMenuItems[j].classList.add("menuItemActive");
+									subMenuItems[j].parentElement.parentElement.getElementsByTagName("a")[0].style.fontWeight="700";
+								}
+							}
+						}
+					</script>
+				</div>
+			</div>
+		</div>
+<% } %>

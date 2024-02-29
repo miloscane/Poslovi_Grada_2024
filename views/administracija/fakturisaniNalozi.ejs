@@ -1,0 +1,222 @@
+<%- include ("partials/header") -%>
+	<div class="pageWidth">
+		<div class="listaNalogaAdministracija">
+			<div class="darkBlue">
+				<div class="infoTableWrap">
+					<table>
+						<tr>
+							<td><div class="value">Укупно приказаних налога:</div></td>
+							<td><div class="value"><span id="ukupno-naloga"></span></div></td>
+						</tr>
+						<tr>
+							<td><div class="value">Укупно износ налога:</div></td>
+							<td><div class="value"><span id="ukupan-iznos-naloga"></span></div></td>
+						</tr>
+						<tr>
+							<td><div class="value">ПДВ за фактурисане налоге:</div></td>
+							<td><div class="value"><span id="ukupan-pdv-naloga"></span></div></td>
+						</tr>
+						<tr>
+							<td><div class="value">Број фактура преко пола милиона:</div></td>
+							<td><div class="value"><span id="fakture-preko-pola-mil"></span></div></td>
+						</tr>
+					</table>
+					<script>
+						
+					</script>
+				</div>
+			</div>
+			<div class="filters">
+				<div class="filterWrap">
+					<div class="inputWrap">
+						<div class="label">Од датума налога:</div>
+						<div class="inputWrapper"><input type="date" id="od-datuma"></div>
+					</div>
+					<div class="inputWrap">
+						<div class="label">До датума налога:</div>
+						<div class="inputWrapper"><input type="date" id="do-datuma"></div>
+					</div>
+					<div class="inputWrap" onclick="updateTableFromDates()">
+						<div class="button">Повуци налоге</div>
+					</div>
+				</div>
+				<div class="filterWrap">
+					<div class="inputWrap">
+						<div class="label">Од броја фактуре:</div>
+						<div class="inputWrapper"><input type="number" min="1" id="od-fakture"></div>
+					</div>
+					<div class="inputWrap">
+						<div class="label">До броја фактуре:</div>
+						<div class="inputWrapper"><input type="number" min="1" id="do-fakture"></div>
+					</div>
+					<div class="inputWrap" onclick="updateTableFromFaktura()">
+						<div class="button">Повуци налоге</div>
+					</div>
+				</div>
+			</div>
+			<div class="tableWrap" id="table-wrap">
+				<div class="tableHeader" id="table-header">
+					<table>
+						<tr>
+							<td><div class="value redniBroj">Редни<br>број</div></td>
+							<td><div class="value brojNaloga">Број<br>налога</div></td>
+							<td><div class="value brojFakture">Број<br>фактуре</div></td>
+							<td><div class="value datumNaloga">Датум<br>фактуре</div></td>
+							<td><div class="value radnaJedinica">Радна<br>јединица</div></td>
+							<td><div class="value iznos">Износ<br>налога</div></td>
+							<td><div class="value pogledajNalog"></div></td>
+						</tr>
+					</table>
+				</div>
+				<div id="table-height">
+					<div id="table" style="position:sticky;top:0;">
+						<div class="inputWrap" style="margin-top:200px">
+							<div class="button" onclick="document.getElementById('table').innerHTML = '<img id=\'wait\' src=\'https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/loadGif.gif\'>';socket.emit('listaFakturisanihNaloga','','','','')">Повуци све налоге</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<script>
+				var nalozi = [];
+				function updateTableFromDates(){
+					if(document.getElementById("od-datuma").value && document.getElementById("do-datuma").value){
+						document.getElementById("od-fakture").value="";
+						document.getElementById("do-fakture").value="";
+						document.getElementById("table").innerHTML = "<img id='wait' src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/loadGif.gif'>";
+						document.getElementById("ukupno-naloga").innerHTML = "-";
+						document.getElementById("ukupan-iznos-naloga").innerHTML = "-";
+						document.getElementById("ukupan-pdv-naloga").innerHTML = "-";
+						document.getElementById("fakture-preko-pola-mil").innerHTML = "-";
+						socket.emit("listaFakturisanihNaloga",Number(new Date(document.getElementById("od-datuma").value).getTime()),Number(new Date(document.getElementById("do-datuma").value).getTime()),"","");	
+					}else{
+						alert("Нисте дефинисали датуме лепо.")
+					}
+				}
+
+				function updateTableFromFaktura(){
+					document.getElementById("od-datuma").value="";
+					document.getElementById("do-datuma").value="";
+					var startNumber = document.getElementById("od-fakture").value;
+					var endNumber = document.getElementById("do-fakture").value;
+					if(startNumber && endNumber && endNumber>startNumber){
+						document.getElementById("table").innerHTML = "<img id='wait' src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/loadGif.gif'>";
+						document.getElementById("ukupno-naloga").innerHTML = "-";
+						document.getElementById("ukupan-iznos-naloga").innerHTML = "-";
+						document.getElementById("ukupan-pdv-naloga").innerHTML = "-";
+						document.getElementById("fakture-preko-pola-mil").innerHTML = "-";
+						socket.emit("listaFakturisanihNaloga","","",startNumber,endNumber);	
+					}else{
+						alert("Нисте дефинисали бројеве лепо.")
+					}
+				}
+				
+				socket.on("listaFakturisanihNalogaOdgovor",function(status,statistika,naloziFromServer,data,warnings){
+		          if(status==1){
+		          	nalozi = naloziFromServer;
+		          	scrollTable(1);
+		          	placeInformation(statistika);
+		          	console.log(data);
+		          	if(warnings.length>0){
+		          		console.log("Warnings:");
+		          		console.log(warnings)
+		          	}
+		          	
+		          }else if(status==0){
+		          	document.getElementById("table").innerHTML = "<div class=\"infoError\">Дошло је до грешке приликом преузимања налога.</div><div class=\"error\">"+data+"</div>"
+		          }else{
+		          	console.log("Couldn't figure out status response");
+		          }
+		        });
+				var rowHeight			=	40;
+				var scrollableElement 	=	document.getElementById("table-wrap");
+				scrollableElement.style.height = "800px";
+				var numberOfElements	=	800/rowHeight;//800 is the height of the wrap
+				scrollableElement.addEventListener("scroll", (event) => {
+					scrollTable();
+					var scrollLeft		=	scrollableElement.scrollLeft;
+					document.getElementById("table-header").style.left = 0-scrollLeft + "px";
+				});
+
+				function placeInformation(json){
+					document.getElementById("ukupno-naloga").innerHTML = brojSaRazmacimaBezDecimala(json.ukupnoNaloga);
+					document.getElementById("ukupan-iznos-naloga").innerHTML = brojSaRazmacima(json.ukupanIznos);
+					document.getElementById("ukupan-pdv-naloga").innerHTML = brojSaRazmacima(json.ukupanPdv);
+					document.getElementById("fakture-preko-pola-mil").innerHTML = brojSaRazmacimaBezDecimala(json.ukupnoPrekoPolaMil);
+				}
+
+				function scrollTable(reset){
+					var scrollHeight	=	nalozi.length*rowHeight-58;//58 is the height of the table header
+					document.getElementById("table-height").scrollTop	=	0;
+					document.getElementById("table-height").style.height	=	scrollHeight + "px";
+					if(reset==1){
+						scrollableElement.scrollTop = 0;
+					}
+					var scrollValue			=	scrollableElement.scrollTop;
+					var startIndex		=	Math.floor(scrollValue / rowHeight);
+					var endIndex		=	startIndex + numberOfElements;
+					document.getElementById("table").innerHTML = "";
+					var table = document.createElement("TABLE");
+					for(var i=startIndex;i<endIndex;i++){
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1)+".";
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojNaloga");
+								div.innerHTML = nalozi[i].broj;
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojFakture");
+								div.innerHTML = nalozi[i].faktura.broj ? nalozi[i].faktura.broj : " ";
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value datumNaloga");
+								div.innerHTML = nalozi[i].faktura.datum;
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value radnaJedinica");
+								div.innerHTML = nalozi[i].radnaJedinica;
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value iznos");
+								var iznosNaloga = isNaN(parseFloat(nalozi[i].ukupanIznos)) ? 0 : parseFloat(nalozi[i].ukupanIznos);
+								div.innerHTML = brojSaRazmacima(iznosNaloga);
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value pogledajNalog");
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+nalozi[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("class","tableButton");
+									a.innerHTML = "Погледај налог"
+									div.appendChild(a)
+								td.appendChild(div);
+							tr.appendChild(td);
+						table.appendChild(tr)
+					}
+					document.getElementById("table").appendChild(table);
+				}
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

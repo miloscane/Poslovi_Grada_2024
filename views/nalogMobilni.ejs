@@ -1,0 +1,91 @@
+<%- include ("partials/header-nl") -%>
+		<script>
+			var nalog = <%-JSON.stringify(nalog)%>;
+			var korisnik = <%-JSON.stringify(korisnik)%>;
+		</script>
+		<div class="nalogMobilni">
+			<div class="pageWidth">
+				<div class="mobileBoxes">
+					<div class="box">
+						<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/radnaJedinicaIcon.png"></div>
+						<div class="info">
+							<div class="title">Радна Јединица</div>
+							<div class="text"><%=nalog.radnaJedinica%></div>
+						</div>
+					</div>
+					<div class="box" style="cursor:pointer;" onclick="window.open('https://www.google.com/maps/search/?api=1&query='+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+'),'_blank')">
+						<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/locationIcon.png"></div>
+						<div class="info">
+							<div class="title">Адреса</div>
+							<div class="text"><span id="adresa-naloga"></span></div>
+							<script>
+								document.getElementById("adresa-naloga").innerHTML = nalog.adresa;
+							</script>
+							<div class="note">Кликни да видиш на мапи</div>
+						</div>
+					</div>
+				</div>
+				<div class="blueWrap">
+					<div class="izvestajTitle">Направи извештај</div>
+					<div class="inputWrap">
+						<textarea id="komentar" placeholder="Текст извештаја"></textarea>
+					</div>
+					<div class="previewImages" id="preview-images"></div>
+					<div class="inputWrap buttonWrap" onclick="document.getElementById('slike-input').click()">
+						<div class="button">
+							<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/addImageIcon.png"></div>
+							<div class="label">Додај слике</div>
+							<form method="POST" action="/izvestaj-sa-mobilnog" id="form" enctype="multipart/form-data" style="display:none;">
+								<input type="text" name="json" id="json">
+								<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
+							</form>
+							<script>
+								document.getElementById("slike-input").onchange = evt => {
+									document.getElementById("preview-images").innerHTML = "";
+									for(var i=0;i<document.getElementById("slike-input").files.length;i++){
+										var imagePreview =	document.createElement("DIV");
+										imagePreview.setAttribute("class","imagePreview");
+										imagePreview.setAttribute("onclick","previewImage(this)");
+											var image = document.createElement("IMG");
+											image.setAttribute("class","image");
+											image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
+											imagePreview.appendChild(image)
+										document.getElementById("preview-images").appendChild(imagePreview);
+									}
+									if(document.getElementById("slike-input").files.length>10){
+										alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 10 слика по извештају. Уколико желите да окачите више од 10 слика направите два извештаја.");
+										document.getElementById("preview-images").innerHTML = "";
+										document.getElementById("slike-input").value = "";
+									}
+								}
+								function previewImage(elem){
+									var url = elem.getElementsByTagName("IMG")[0].src;
+									document.getElementById("image-lightbox").style.display="block";
+									document.getElementById("image-lightbox").getElementsByClassName("image")[0].src = url;
+								}
+							</script>
+						</div>
+					</div>
+					<div class="saveNalog">
+						<div class="inputWrapper">
+							<div class="inputWrap">
+								<div class="button" onclick="saveNalog()">САЧУВАЈ ИЗВЕШТАЈ</div>
+							</div>
+						</div>
+					</div>
+					<script>
+						function saveNalog(){
+							var json = {};
+							json.izvestaj = document.getElementById("komentar").value;
+							json.korisnik = korisnik;
+							json.broj = nalog.broj;
+							document.getElementById("json").value = JSON.stringify(json);
+							loadGif();
+							document.getElementById("form").submit();
+						}
+					</script>
+				</div>
+			</div>
+		</div>
+	</div><!--page wrap-->
+<%- include ("partials/footer") -%>

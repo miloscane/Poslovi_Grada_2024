@@ -1,0 +1,178 @@
+<div class="ucinakMajstora">
+	<div class="title">Учинак мајстора</div>
+	<div class="ucinci" id="ucinci"></div>
+	<script>
+		var table = document.createElement("TABLE");
+		for(var i=0;i<ucinci.length;i++){
+			var tr = document.createElement("TR");
+				var td = document.createElement("TD");
+				td.innerHTML = "<div class=\"value\">"+getMajstorByCode(ucinci[i].majstor).ime+"</div>"
+				tr.appendChild(td);
+
+				var td = document.createElement("TD");
+				td.innerHTML = "<div class=\"value\">"+reshuffleDate(ucinci[i].datum)+"</div>"
+				tr.appendChild(td);
+
+				var td = document.createElement("TD");
+				td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ucinci[i].ukupanIznos)+"</div>"
+				tr.appendChild(td);
+				
+				<%if(Number(user.role)==10){%>				
+					var td = document.createElement("TD");
+					td.innerHTML = "<div class=\"value\" onclick=\"izmeniUcinak(\'"+ucinci[i].uniqueId+"\')\">Измени</div>"
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					td.innerHTML = "<img class=\"icon\" src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/deleteRow.png\" onclick=\"obrisiUcinak(\'"+ucinci[i].uniqueId+"\')\">"
+					tr.appendChild(td);
+
+				<%}%>
+			table.appendChild(tr);
+		}
+		document.getElementById("ucinci").appendChild(table);
+
+		function izmeniUcinak(ucinakId){
+			var ucinak;
+			for(var i=0;i<ucinci.length;i++){
+				if(ucinci[i].uniqueId==ucinakId){
+					ucinak = ucinci[i];
+					break;
+				}
+			}
+			if(ucinak){
+				document.getElementById("id-ucinka").value = ucinak.uniqueId;
+				document.getElementById("majstor-ucinak").value = ucinak.majstor;
+				document.getElementById("datum-ucinka").value = ucinak.datum;
+				document.getElementById("ucinak-wrap").innerHTML = "";
+				for(var i=0;i<ucinak.obracun.length;i++){
+					addUcinakRow(ucinak.obracun[i]);
+				}
+				addUcinakRow();
+				calculateUcinakTable();
+				document.getElementById("obracun-ucinka-wrap").style.display="block";
+			}else{
+				console.log("Couldn't figure out ucinak");
+			}
+		}
+
+		function noviUcinak(){
+			document.getElementById("id-ucinka").value = "new";
+			document.getElementById("datum-ucinka").value = getDateAsStringForInputObject(new Date());
+			document.getElementById("ucinak-wrap").innerHTML = "";
+			document.getElementById("tabela-ucinak-iznos").innerHTML = "";
+			addUcinakRow();
+			document.getElementById("obracun-ucinka-wrap").style.display="block";
+		}
+
+		function obrisiUcinak(ucinakId){
+			var json = {};
+			json.id = ucinakId;
+			json.brojNaloga = nalog.broj;//needed for server redirection
+			document.getElementById("delete-ucinak-json").value = JSON.stringify(json);
+			loadGif();
+			document.getElementById("delete-ucinak-form").submit();
+		}
+	</script>
+	<form method="POST" action="/obrisiUcinakMajstora" id="delete-ucinak-form" style="display:none">
+		<input type="text" name="json" id="delete-ucinak-json">
+	</form>
+	<div class="inputWrap noviUcinak">
+		<div class="button" onclick="noviUcinak()">
+			Нови учинак
+		</div>
+	</div>
+	<div class="obracunWrap" id="obracun-ucinka-wrap" style="display:none">
+		<div class="header2">
+			<div class="inputWrapper">
+				<div class="label">Мајстор:</div>
+				<div class="inputWrap">
+					<select id="majstor-ucinak"></select>
+					<script>
+						for(var i=0;i<majstori.length;i++){
+							if(!majstori[i].inactive && podizvodjaci.indexOf(majstori[i].uniqueId)<0){
+								var option = document.createElement("OPTION");
+								option.setAttribute("value",majstori[i].uniqueId);
+								option.innerHTML	=	majstori[i].ime;
+								document.getElementById("majstor-ucinak").appendChild(option);
+							}
+						}
+					</script>
+				</div>
+			</div>
+			<div class="inputWrapper">
+				<div class="label">Датум учинка:</div>
+				<div class="inputWrap">
+					<input type="date" id="datum-ucinka">
+					<script>
+						document.getElementById("datum-ucinka").value = getDateAsStringForInputObject(new Date());
+					</script>
+				</div>
+			</div>
+			<input id="id-ucinka" type="text" value="new" style="display: none;">
+		</div>
+		<div class="header elems">
+			<div class="row">
+				<div class="elem redniBroj">Бр.</div>
+				<div class="elem sifra">Шифра</div>
+				<div class="elem naziv">Назив</div>
+				<div class="elem jedinica">Јед.</div>
+				<div class="elem cena">Цена</div>
+				<div class="elem kolicina">Кол.</div>
+				<div class="elem ukupno">Укупно</div>
+				<div class="elem obrisi"> </div>
+			</div>
+			
+		</div>
+		<div id="ucinak-wrap" class="elems"></div>
+		<div class="buttonWrap" onclick="addUcinakRow()">
+			<div class="button">Додај ред</div>
+		</div>
+		<div class="total">
+			Укупно обрачунат износ учинка: <span id="tabela-ucinak-iznos"></span>
+		</div>
+		<div class="saveNalog">
+			<div class="inputWrapper">
+				<div class="inputWrap">
+					<div class="button" onclick="saveUcinak()">САЧУВАЈ УЧИНАК МАЈСТОРА</div>
+					<script>
+						function saveUcinak(){
+							var ucinakJson = {};
+							ucinakJson.uniqueId = document.getElementById("id-ucinka").value;
+							ucinakJson.datum = document.getElementById("datum-ucinka").value;
+							ucinakJson.brojNaloga = nalog.broj;
+							ucinakJson.majstor = document.getElementById("majstor-ucinak").value;
+							ucinakJson.obracun = [];
+							var ucinci = document.getElementById("ucinak-wrap").getElementsByClassName("row");
+							var ukupanIznos = 0;
+							for(var i=0;i<ucinci.length;i++){
+								var ucinakElem = ucinci[i];
+								
+								if(ucinakElem.getElementsByClassName("sifra")[0].getElementsByTagName("INPUT")[0].value){
+									var ucinakTemp = {};
+									ucinakTemp.sifraArtikla		= 	ucinakElem.getElementsByClassName("sifra")[0].getElementsByTagName("INPUT")[0].value;
+									ucinakTemp.izvedenaKolicina	= 	ucinakElem.getElementsByClassName("kolicina")[0].getElementsByTagName("INPUT")[0].value;
+									var iznosStavke = parseFloat(getPriceByUcinakCode(ucinakTemp.sifraArtikla).price)*parseFloat(ucinakTemp.izvedenaKolicina);
+									ucinakTemp.iznos = iznosStavke;
+									ukupanIznos = ukupanIznos + iznosStavke;
+									ucinakJson.obracun.push(ucinakTemp);
+								}
+							}
+							ucinakJson.ukupanIznos = ukupanIznos;
+							console.log(ucinakJson)
+							document.getElementById("ucinak-json").value = JSON.stringify(ucinakJson);
+							loadGif();
+							document.getElementById("ucinak-form").submit();
+						}
+					</script>
+				</div>
+			</div>
+		</div>
+		<script src="/js/obracunUcinka.js"></script>
+		<script>
+			addUcinakRow();
+		</script>
+		<form method="POST" action="/ucinakMajstora" id="ucinak-form" style="display:none">
+			<input type="text" name="json" id="ucinak-json">
+		</form>
+	</div>
+</div>

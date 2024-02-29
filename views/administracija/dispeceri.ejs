@@ -1,0 +1,105 @@
+<%- include ("partials/header") -%>
+	<script>
+		var dispeceri = <%-JSON.stringify(dispeceri)%>;
+	</script>
+	<div class="administracijaDispecera">
+		<div class="pageWidth">
+			<div class="lightBlueBox inlines">
+				<div class="dispecerList" id="dispeceri"></div>
+				<div class="radneJedinice">
+					<div id="radne-jedinice"></div>
+					<div class="inputWrap">
+						<div class="button" onclick="sacuvajIzmene()">Сачувај измене</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<form method="POST" action="/izmena-dispecera" id="form" style="display:none">
+		<input type="text" name="json" id="json">
+	</form>
+	<script>
+		for(var i=0;i<dispeceri.length;i++){
+			var dispecerName = document.createElement("DIV");
+			dispecerName.setAttribute("class","name");
+			dispecerName.setAttribute("onclick","dispecerPick(this)");
+			dispecerName.setAttribute("data-json",JSON.stringify(dispeceri[i]));
+			dispecerName.innerHTML = dispeceri[i].name;
+			document.getElementById("dispeceri").appendChild(dispecerName);
+		}
+
+		for(var i=0;i<radneJedinice.length;i++){
+			var checkboxWrapper = document.createElement("DIV");
+			checkboxWrapper.setAttribute("class","checkboxWrapper");
+				var checkboxWrap = document.createElement("DIV");
+				checkboxWrap.setAttribute("class","checkboxWrap");
+					var input = document.createElement("INPUT");
+					input.setAttribute("value",radneJedinice[i]);
+					input.setAttribute("type","checkbox");
+					input.setAttribute("class","radnaJedinicaCheckbox");
+					checkboxWrap.appendChild(input);
+				checkboxWrapper.appendChild(checkboxWrap);
+
+				var label = document.createElement("DIV");
+				label.setAttribute("class","label");
+				label.setAttribute("onclick","checkboxLabelClick(this)");
+				label.innerHTML = radneJedinice[i];
+				checkboxWrapper.appendChild(label)
+			document.getElementById("radne-jedinice").appendChild(checkboxWrapper);
+		}
+
+		function checkboxLabelClick(elem){
+			if(elem.parentElement.getElementsByTagName("INPUT")[0].checked){
+				elem.parentElement.getElementsByTagName("INPUT")[0].checked = false;
+			}else{
+				elem.parentElement.getElementsByTagName("INPUT")[0].checked = true;
+			}
+		}
+
+		function dispecerPick(elem){
+			var dispecerJson = JSON.parse(elem.dataset.json);
+			var dispecerElems = document.getElementById("dispeceri").getElementsByClassName("name");
+			for(var i=0;i<dispecerElems.length;i++){
+				dispecerElems[i].classList.remove("selected");
+			}
+			elem.classList.add("selected");
+
+			var opstineBoxes = document.getElementById("radne-jedinice").getElementsByClassName("radnaJedinicaCheckbox");
+			for(var i=0;i<opstineBoxes.length;i++){
+				opstineBoxes[i].checked = false;
+			}
+			if(dispecerJson.opstine){
+				for(var i=0;i<dispecerJson.opstine.length;i++){
+					for(var j=0;j<opstineBoxes.length;j++){
+						if(opstineBoxes[j].value==dispecerJson.opstine[i]){
+							opstineBoxes[j].checked = true;
+						}
+					}
+				}
+			}
+		}
+
+		dispecerPick(document.getElementById("dispeceri").getElementsByClassName("name")[0]);
+
+		function sacuvajIzmene(){
+			var opstineBoxes = document.getElementById("radne-jedinice").getElementsByClassName("radnaJedinicaCheckbox");
+			var dispecerElems = document.getElementById("dispeceri").getElementsByClassName("name");
+			var json = {};
+			json.opstine = [];
+			for(var i=0;i<opstineBoxes.length;i++){
+				if(opstineBoxes[i].checked){
+					json.opstine.push(opstineBoxes[i].value)
+				}
+			}
+			for(var i=0;i<dispecerElems.length;i++){
+				if(dispecerElems[i].classList.contains("selected")){
+					var dispecerJson = JSON.parse(dispecerElems[i].dataset.json);
+					json.dispecer = dispecerJson.email;
+				}
+			}
+			document.getElementById("json").value = JSON.stringify(json);
+			loadGif();
+			document.getElementById("form").submit();
+		}
+	</script>
+<%- include ("partials/footer") -%>

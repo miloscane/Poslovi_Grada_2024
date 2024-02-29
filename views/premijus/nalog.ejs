@@ -1,0 +1,111 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalog = <%-JSON.stringify(nalog)%>;
+	</script>
+	<div class="pageWidth">
+		<div class="administracijaNalog nalog premijusNalog">
+			<div class="boxesWrap">
+				<div class="box" style="cursor:pointer;">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/locationIcon.png"></div>
+					<div class="info">
+						<div class="title"><%=nalog.radnaJedinica%></div>
+						<div class="text"></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/statusIcon.png"></div>
+					<div class="info">
+						<div class="title">Статус</div>
+						<div class="text"><span id="status-naloga"><%=nalog.statusNaloga%></span></div>
+						<div class="note"></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturisanoIcon.png"></div>
+					<div class="info">
+						<div class="title">Број фактуре</div>
+						<div class="text"><input type="text" id="broj-fakture" value="<%=nalog.brojFakture%>"></div>
+						<div class="note">Кликни да скинеш еФактуру</div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumIcon.png"></div>
+					<div class="info">
+						<div class="title">Датум налога</div>
+						<div class="text"><span id="datum-naloga"></span></div>
+						<script>
+							document.getElementById("datum-naloga").innerHTML = nalog.datum.datum;
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/prijemnicaIcon.png"></div>
+					<div class="info">
+						<div class="title">Пријемница</div>
+						<div class="text"><span id="datum-prijemnice"></span></div>
+						<div class="note" id="prijemnica-note"></div>
+						<script>
+							if(nalog.prijemnica.broj!=""){
+								document.getElementById("datum-prijemnice").value = nalog.prijemnica.datum.datum;
+								document.getElementById("prijemnica-note").innerHTML = "<a href=\""+nalog.prijemnica.lokacija+"\" target=\"_blank\">Кликни да скинеш пријемницу.</a>";
+							}
+						</script>
+						<div class="note">Кликни да скинеш пријемницу</div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Износ налога</div>
+						<div class="text"><span id="iznos-naloga"></span></div>
+						<script>
+							document.getElementById("iznos-naloga").innerHTML = brojSaRazmacima(nalog.ukupanIznos);
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumFakturisanjaIcon.png"></div>
+					<div class="info">
+						<div class="title">Датум фактурe</div>
+						<div class="text"><%=nalog.faktura.broj%></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumFakturisanjaIcon.png"></div>
+					<div class="info">
+						<div class="title">ПДВ Обрачун</div>
+						<div class="text">
+							<select id="pdv-obracun">
+								<option value="35" default>Датум промета (пријемнице)</option>
+								<option value="3">Датум слања</option>
+							</select>
+							<script>
+								if(nalog.faktura.pdv!=""){
+									document.getElementById("pdv-obracun").value = nalog.faktura.pdv;
+								}
+							</script>
+						</div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Износ са ПДВ</div>
+						<div class="text"><span id="iznos-naloga-sa-pdv"></span></div>
+						<script>
+							var iznosNaloga = parseFloat(nalog.ukupanIznos);
+							document.getElementById("iznos-naloga-sa-pdv").innerHTML = iznosNaloga>=500000 ? brojSaRazmacima(iznosNaloga) : brojSaRazmacima(iznosNaloga*1.2);
+						</script>
+					</div>
+				</div>
+			</div>
+			<div class="saveNalog">
+				<div class="inputWrapper">
+					<div class="inputWrap">
+						<div class="button" onclick="fakturisi()">Фактуриши</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+<%- include ("partials/footer") -%>

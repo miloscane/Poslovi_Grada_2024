@@ -1,0 +1,45 @@
+<%- include ("partials/header") -%>
+<div class="digitalizacijaNaloga">
+	<div class="pageWidth">
+		<div class="blueWrap">
+			<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/digitalizacijaIcon.png"></div>
+			<div class="inputWrapper">
+				<div class="inputWrap buttonWrap izvestajInputWrap">
+					<div id="preview-files"></div>
+					<div class="buttonWrap" onclick="document.getElementById('file-input').click()">
+						<div class="button addButton">
+							<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/addFileIcon.png"></div>
+							<div class="label">Додај налог</div>
+							<form method="POST" action="/digitalizacijaNaloga" id="form" enctype="multipart/form-data" style="display:none;">
+								<input type="file" id="file-input" name="nalog"  accept="application/pdf">
+							</form>
+							<script>
+								document.getElementById("file-input").onchange = evt => {
+									document.getElementById("preview-files").innerHTML = document.getElementById("file-input").files[0].name;
+									
+								}
+							</script>
+						</div>
+					</div>
+				</div>
+				<div class="separator"></div>
+				<div class="inputWrap">
+					<div class="button" onclick="uploadNalog()">Пошаљи на сервер</div>
+					<script>
+						function uploadNalog(){
+							if(document.getElementById("file-input").files.length==0){
+								alert("Нисте одабрали фајл.")
+							}else if(document.getElementById("file-input").files.length>1){
+								alert("Тренутно можете обрадити само један налог, ви сте одабрали више од једног.")
+							}else{
+								loadGif();
+								document.getElementById("form").submit();
+							}
+						}
+					</script>
+				</div>
+			</div>	
+		</div>
+	</div>
+</div>
+<%- include ("partials/footer") -%>

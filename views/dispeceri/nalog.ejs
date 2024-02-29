@@ -1,0 +1,431 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalog = <%-JSON.stringify(nalog)%>;
+		var cenovnik = <%-JSON.stringify(cenovnik)%>;
+		var istorijat = <%-JSON.stringify(istorijat)%>;
+		var izvestaji = <%-JSON.stringify(izvestaji)%>; 
+		var ucinci = <%-JSON.stringify(ucinci)%>; 
+		var notAllowed = ["Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
+	</script>
+	<div class="pageWidth">
+		<div class="administracijaNalog nalog">
+			<div class="boxesWrap">
+				<div class="box" style="cursor:pointer;" onclick="window.open('https://www.google.com/maps/search/?api=1&query='+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+'),'_blank')">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/locationIcon.png"></div>
+					<div class="info">
+						<div class="title"><%=nalog.radnaJedinica%></div>
+						<div class="text"><span id="adresa-naloga"></span></div>
+						<script>
+							document.getElementById("adresa-naloga").innerHTML = nalog.adresa;
+						</script>
+						<div class="note">Кликни да видиш на мапи</div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/statusIcon.png"></div>
+					<div class="info">
+						<div class="title">Статус</div>
+						<div class="text">
+							<select id="status-naloga">
+								<option value="Primljen" default="default">Примљен</option>
+								<option value="Dodeljen majstoru">Додељен мајстору</option>
+								<option value="Zakazan">Заказан</option>
+								<option value="Radovi u toku">Радови у току</option>
+								<option value="Potrebna WOMA">Потребна ВОМА</option>
+								<option value="Zamena">Замена</option>
+								<option value="Kopanje">Копање</option>
+								<option value="Finalizacija">Финализација</option>
+								<option value="Betonaža">Бетонажа</option>
+								<option value="Vraćen">Враћен</option>
+								<option value="Završeno">Завршено</option>
+								<option value="Spreman za obračun">Спреман за обрачун</option>
+								<option value="Nalog u Stambenom">Налог у стамбеном</option>
+								<option value="Spreman za fakturisanje">Спреман за фактурисање</option>
+								<option value="Fakturisan">Фактурисан</option>
+								<option value="Storniran">Сторниран</option>
+							</select>
+							<script>
+								if(notAllowed.indexOf(nalog.statusNaloga)>=0){
+									document.getElementById("status-naloga").setAttribute("onmousedown","(function(e){ e.preventDefault(); })(event, this)")
+									document.getElementById("status-naloga").setAttribute("onclick","alert('Не можете мењати тренутни статус')")
+								}
+							</script>
+						</div>
+						<div class="note"></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstorIcon.png"></div>
+					<div class="info">
+						<div class="title">Мајстор</div>
+						<div class="text">
+							<select id="majstor-naloga">
+								<optgroup label="Poslovi Grada" id="majstori-pg">
+									<option value="Nijedan" default="default">Nijedan</option>
+								</optgroup>
+								<optgroup label="Podizvodjaci" id="majstori-podizvodjaci"></optgroup>
+							</select>
+
+							<script>
+								var majstori = <%-JSON.stringify(majstori)%>;
+								for(var i=0;i<majstori.length;i++){
+									if(!majstori[i].inactive){
+										var option = document.createElement("OPTION");
+										option.setAttribute("value",majstori[i].uniqueId);
+										option.innerHTML	=	majstori[i].ime;
+										if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
+											document.getElementById("majstori-podizvodjaci").appendChild(option);
+										}else{
+											document.getElementById("majstori-pg").appendChild(option);
+										}
+									}
+								}
+							</script>
+						</div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumIcon.png"></div>
+					<div class="info">
+						<div class="title">Датум налога</div>
+						<div class="text"><span id="datum-naloga"></span></div>
+						<script>
+							document.getElementById("datum-naloga").innerHTML = nalog.datum.datum;
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Износ налога</div>
+						<div class="text"><span id="iznos-naloga"></span></div>
+					</div>
+				</div>
+				<div style="width:100%"></div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/historyIcon.png"></div>
+					<div class="info">
+						<div class="title">Историјат налога</div>
+						<div class="istorija" id="istorija"></div>
+						<div class="note">Историја памти статус налога, додељене мајсторе, категорије радова и обрачун.</div>
+						<script>
+							for(var i=0;i<istorijat.length;i++){
+								var historyWrap = document.createElement("DIV");
+								historyWrap.setAttribute("class","historyWrap");
+								historyWrap.setAttribute("onclick","pickHistory(this)");
+									var historyDate = document.createElement("DIV");
+									historyDate.setAttribute("class","date");
+									historyDate.innerHTML = getDateAsStringForDisplay(new Date(Number(istorijat[i].datetime)));
+									historyWrap.appendChild(historyDate);
+
+									var historyPerson = document.createElement("DIV");
+									historyPerson.setAttribute("class","name");
+									historyPerson.innerHTML = istorijat[i].izmenio.name;
+									historyWrap.appendChild(historyPerson);
+								document.getElementById("istorija").appendChild(historyWrap);
+							}
+
+							var historyWrap = document.createElement("DIV");
+							historyWrap.setAttribute("class","historyWrap historyActive");
+							historyWrap.setAttribute("onclick","pickHistory(this)");
+								var historyDate = document.createElement("DIV");
+								historyDate.setAttribute("class","date");
+								historyDate.innerHTML = getDateAsStringForDisplay(new Date());
+								historyWrap.appendChild(historyDate);
+
+								var historyPerson = document.createElement("DIV");
+								historyPerson.setAttribute("class","name");
+								historyPerson.innerHTML = "Актуелни";
+								historyWrap.appendChild(historyPerson);
+							document.getElementById("istorija").appendChild(historyWrap);
+
+							function pickHistory(elem){
+								var index = -1;
+								var historyElems = elem.parentElement.getElementsByClassName(elem.classList[0]);
+								for(var i=0;i<historyElems.length;i++){
+									if(historyElems[i]==elem){
+										index = i;
+									}
+									historyElems[i].classList.remove("historyActive");
+								}
+								if(index>=0){
+									if(index==historyElems.length-1){
+										showNalog(nalog);
+									}else{
+										showNalog(istorijat[index])
+									}
+									historyElems[index].classList.add("historyActive");
+								}else{
+									console.log("Couldnt figure out history elem index");
+								}
+							}
+						</script>
+					</div>
+				</div>
+			</div>
+			<div class="detalji">
+				<div class="title">Оператива</div>
+				<div class="boxesWrap">
+					<div class="box">
+						<div class="info">
+							<div class="title">Опис квара</div>
+							<div class="text"><%=nalog.opis%></div>
+						</div>
+						<div class="boxMore"><%=nalog.vrstaRada%></div>
+					</div>
+					<div class="box noHover">
+						<div class="info">
+							<div class="title">Категорије радова</div>
+							<div class="text">
+								<div class="inline50s">
+									<div class="inline50">
+										<div class="checkboxWrapper">
+											<div class="checkboxWrap"><input value="Zamena" type="checkbox" class="kategorijeRadova"></div>
+											<div class="label" onclick="checkboxLabelClick(this)">Замена</div>
+										</div>
+										<div class="checkboxWrapper">
+											<div class="checkboxWrap"><input value="Sajla" type="checkbox" class="kategorijeRadova"></div>
+											<div class="label" onclick="checkboxLabelClick(this)">Сајла</div>
+										</div>
+										<div class="checkboxWrapper">
+											<div class="checkboxWrap"><input value="Woma" type="checkbox" class="kategorijeRadova"></div>
+											<div class="label" onclick="checkboxLabelClick(this)">Вома</div>
+										</div>
+										<div class="checkboxWrapper">
+											<div class="checkboxWrap"><input value="Crpljenje" type="checkbox" class="kategorijeRadova"></div>
+											<div class="label" onclick="checkboxLabelClick(this)">Црпљење</div>
+										</div>
+									</div>
+									<div class="inline50">
+										<div class="checkboxWrapper">
+											<div class="checkboxWrap"><input value="Кopanje" type="checkbox" class="kategorijeRadova"></div>
+											<div class="label" onclick="checkboxLabelClick(this)">Копање</div>
+										</div>
+										<div class="checkboxWrapper">
+											<div class="checkboxWrap"><input value="Rov" type="checkbox" class="kategorijeRadova"></div>
+											<div class="label" onclick="checkboxLabelClick(this)">Ров</div>
+										</div>
+										<div class="checkboxWrapper">
+											<div class="checkboxWrap"><input value="Betoniranje" type="checkbox" class="kategorijeRadova"></div>
+											<div class="label" onclick="checkboxLabelClick(this)">Бетонирање</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="note">Обележити СВЕ категорије радова које су извршене на налогу.</div>
+							<script>
+								function checkboxLabelClick(elem){
+									if(elem.parentElement.getElementsByTagName("INPUT")[0].checked){
+										elem.parentElement.getElementsByTagName("INPUT")[0].checked = false;
+									}else{
+										elem.parentElement.getElementsByTagName("INPUT")[0].checked = true;
+									}
+								}
+							</script>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="izvestaji">
+				<div class="title">Извештаји</div>
+				<%if(user.opstine.indexOf(nalog.radnaJedinica)>=0){%>
+					<div class="qrWrap">
+						<div id="qr"></div>
+						<div class="sticker"><div class="relative"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png"></div></div>
+						<div class="note"><div>Скенирајте како би додали слике са вашег телефона.</div></div>
+					</div>
+					<script src="/js/qr.js"></script>
+					<script>
+						function generateQr(accessCode){
+							document.getElementById("qr").innerHTML = "";
+							document.getElementById("qr").title = "";
+							var qrcode = new QRCode("qr", {
+							    text: "https://vik2024.poslovigrada.rs/nalog/<%=nalog.broj%>/"+accessCode+"/"+encodeURIComponent(user.email),
+							    width: 150,
+							    height: 150,
+							    colorDark : "#000000",
+							    colorLight : "#ffffff",
+							    correctLevel : QRCode.CorrectLevel.M
+							});
+						}
+						generateQr("<%=phoneAccessCode%>")
+						socket.on("phoneAccessCode",function(code){
+							generateQr(code);
+						})
+					</script>
+				<%}%>
+				<div id="komentari"></div>
+				<%if(user.opstine.indexOf(nalog.radnaJedinica)<0){%>
+					<script>
+						document.getElementById("komentari").style.marginTop = "0px";
+					</script>
+				<%}%>
+				<script>
+					for(var i=0;i<izvestaji.length;i++){
+						var izvestajBox = document.createElement("DIV");
+						if(izvestaji[i].user.email == "<%=user.email%>"){
+							izvestajBox.setAttribute("class","izvestajBox izvestajUser");
+						}else{
+							izvestajBox.setAttribute("class","izvestajBox");
+						}
+							var izvestajName = document.createElement("DIV");
+							izvestajName.setAttribute("class","name");
+							izvestajName.innerHTML = izvestaji[i].user.name + " <span>"+datetimeToReadable(izvestaji[i].datetime)+"</span>";
+							izvestajBox.appendChild(izvestajName);
+
+							var izvestajText = document.createElement("DIV");
+							izvestajText.setAttribute("class","text");
+							izvestajText.innerHTML = izvestaji[i].izvestaj;
+							izvestajBox.appendChild(izvestajText);
+
+							var izvestajPhotos = document.createElement("DIV");
+							izvestajPhotos.setAttribute("class","previewImages");
+							for(var j=0;j<izvestaji[i].photos.length;j++){
+								var izvestajPhoto = document.createElement("DIV");
+								izvestajPhoto.setAttribute("class","imagePreview")
+								izvestajPhoto.setAttribute("onclick","previewImage(this)");;
+									var izvestajImage = document.createElement("IMG");
+									izvestajImage.setAttribute("class","image");
+									izvestajImage.setAttribute("src",izvestaji[i].photos[j])
+									izvestajPhoto.appendChild(izvestajImage);
+								izvestajPhotos.appendChild(izvestajPhoto);
+							}
+							izvestajBox.appendChild(izvestajPhotos);
+						document.getElementById("komentari").appendChild(izvestajBox);
+
+					}
+				</script>
+				<div class="inputWrapper">
+					<div class="inputWrap buttonWrap izvestajInputWrap">
+						<%if(user.opstine.indexOf(nalog.radnaJedinica)>=0){%>
+							<textarea id="komentar" placeholder="Текст извештаја"></textarea>
+							<div class="previewImages" id="preview-images"></div>
+							<div class="buttonWrap" onclick="document.getElementById('slike-input').click()">
+								<div class="button">
+									<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/addImageIcon.png"></div>
+									<div class="label">Додај слике</div>
+									<form method="POST" action="/edit-nalog" id="form" enctype="multipart/form-data" style="display:none;">
+										<input type="text" name="json" id="json">
+										<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
+									</form>
+									<script>
+										document.getElementById("slike-input").onchange = evt => {
+											document.getElementById("preview-images").innerHTML = "";
+											for(var i=0;i<document.getElementById("slike-input").files.length;i++){
+												var imagePreview =	document.createElement("DIV");
+												imagePreview.setAttribute("class","imagePreview");
+												imagePreview.setAttribute("onclick","previewImage(this)");
+													var image = document.createElement("IMG");
+													image.setAttribute("class","image");
+													image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
+													imagePreview.appendChild(image)
+												document.getElementById("preview-images").appendChild(imagePreview);
+											}
+											if(document.getElementById("slike-input").files.length>10){
+												alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 10 слика по извештају. Уколико желите да окачите више од 10 слика направите два извештаја.");
+												document.getElementById("preview-images").innerHTML = "";
+												document.getElementById("slike-input").value = "";
+											}
+										}
+									</script>
+								</div>
+							</div>
+						<%}%>
+					</div>
+				</div>
+				<div class="saveNalog">
+					<div class="inputWrapper">
+						<div class="inputWrap">
+							<%if(user.opstine.indexOf(nalog.radnaJedinica)>=0){%>
+								<div class="button" onclick="saveNalog()">САЧУВАЈ ИЗМЕНЕ НА НАЛОГУ</div>
+							<%}else{%>
+								<div class="buttonDisabled">НЕ МОЖЕТЕ МЕЊАТИ НАЛОГ КОЈИ НА ВАШИМ ОПШТИНАМА</div>
+							<%}%>
+						</div>
+					</div>
+				</div>
+			</div>
+			<%- include ("partials/obracunNaloga") -%>
+			<%if(user.opstine.indexOf(nalog.radnaJedinica)<0){%>
+				<script>
+					document.getElementsByClassName("obracunWrap")[0].style.display="none";
+				</script>
+			<%}%>
+			<%- include ("partials/obracunUcinka") -%>
+			<script>
+				document.getElementsByClassName("noviUcinak")[0].style.display="none";
+			</script>
+			<script>
+				function showNalog(nalogJson){
+					//prikazuju se samo stavke koju su relevatne u istoriji
+					document.getElementById("status-naloga").value		=	nalogJson.statusNaloga;
+					document.getElementById("majstor-naloga").value		=	nalogJson.majstor;
+					document.getElementById("obracun-wrap").innerHTML = "";
+					if(nalogJson.obracun){
+						for(var i=0;i<nalogJson.obracun.length;i++){
+							addRow({code:nalogJson.obracun[i].code,quantity:nalogJson.obracun[i].quantity})
+						}
+						calculateTable();
+					}
+					addRow();
+
+					if(nalogJson.kategorijeRadova){
+						var kategorije = document.getElementsByClassName("kategorijeRadova");
+						for(var j=0;j<kategorije.length;j++){
+							kategorije[j].checked = false;
+						}
+						for(var i=0;i<nalogJson.kategorijeRadova.length;i++){
+							for(var j=0;j<kategorije.length;j++){
+								if(kategorije[j].value==nalogJson.kategorijeRadova[i]){
+									kategorije[j].checked = true;
+								}
+							}
+						}
+					}
+
+				}
+				showNalog(nalog);
+
+				function saveNalog(){
+					var nalogJson = {};
+					nalogJson.broj = nalog.broj;
+					nalogJson.status = document.getElementById("status-naloga").value;
+					nalogJson.majstor = document.getElementById("majstor-naloga").value;
+					nalogJson.obracun = [];
+					var obracuni = document.getElementById("obracun-wrap").getElementsByClassName("row");
+					var ukupanIznos = 0;
+					for(var i=0;i<obracuni.length;i++){
+						var obracunElem = obracuni[i];
+						
+						if(obracunElem.getElementsByClassName("sifra")[0].getElementsByTagName("INPUT")[0].value){
+							var obracunJson = {};
+							obracunJson.code		= 	obracunElem.getElementsByClassName("sifra")[0].getElementsByTagName("INPUT")[0].value;
+							obracunJson.quantity	= 	obracunElem.getElementsByClassName("kolicina")[0].getElementsByTagName("INPUT")[0].value;
+							var iznosStavke = getPriceByCode(obracunJson.code) ? parseFloat(getPriceByCode(obracunJson.code).price)*obracunJson.quantity : 0;
+							ukupanIznos = ukupanIznos + iznosStavke;
+							nalogJson.obracun.push(obracunJson);
+						}
+					}
+					nalogJson.ukupanIznos = ukupanIznos;
+					nalogJson.kategorijeRadova = [];
+					for(var i=0;i<document.getElementsByClassName("kategorijeRadova").length;i++){
+						if(document.getElementsByClassName("kategorijeRadova")[i].checked){
+							nalogJson.kategorijeRadova.push(document.getElementsByClassName("kategorijeRadova")[i].value);
+						}
+					}
+					nalogJson.izvestaj = document.getElementById("komentar").value;
+					nalogJson.stariNalog 					=	{};
+					nalogJson.stariNalog.broj 				=	nalog.broj;
+					nalogJson.stariNalog.statusNaloga 		=	nalog.statusNaloga;
+					nalogJson.stariNalog.majstor 			=	nalog.majstor;
+					nalogJson.stariNalog.obracun 			=	nalog.obracun;
+					nalogJson.stariNalog.kategorijeRadova	=	nalog.kategorijeRadova ? nalog.kategorijeRadova : [];
+					document.getElementById("json").value = JSON.stringify(nalogJson);
+					loadGif();
+					document.getElementById("form").submit();
+				}
+			</script>
+			
+		</div>
+	</div>	
+<%- include ("partials/footer") -%>

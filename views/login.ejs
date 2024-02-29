@@ -1,0 +1,71 @@
+<%- include ("partials/header-nl") -%>
+			<div class="pageWidth">
+				<div class="blueWrap">
+					<div class="imageWrap">
+						<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/userIcon.svg" width="70">
+					</div>
+					<div class="inputWrap">
+						<div class="title">Електронска пошта</div>
+						<div class="inputWrapper">
+							<input type="text" id="username" class="textInput">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Лозинка</div>
+						<div class="inputWrapper">
+							<input type="password" id="password" class="textInput">
+							<div class="show" onclick="showPassword(this)" data-hidden="1">ПРИКАЖИ</div>
+							<script>
+								function showPassword(elem){
+									if(elem.dataset.hidden=="1"){
+										elem.dataset.hidden = "0";
+										document.getElementById("password").type = "text";
+										elem.innerHTML = "САКРИЈ";
+									}else{
+										elem.dataset.hidden = "1";
+										document.getElementById("password").type = "password"
+										elem.innerHTML = "ПРИКАЖИ";
+									}
+								}
+							</script>
+						</div>
+					</div>
+					<div class="inputWrap" style="margin-top:30px">
+						<div class="button" onclick="submitLogin()">Пријавите се</div>
+						<div class="forgotPass">
+							<a href="/zaboravljena-lozinka">Заборављена лозинка?</a>
+						</div>
+					</div>	
+					<input type="text" style="display:none" id="url">
+					<script>
+						<% if (typeof url!="undefined") { %>
+							document.getElementById("url").value="<%- url %>";
+						<% } %>
+					</script>
+				</div>
+			</div>
+		</div>
+		<form style="display:none" method="POST" action="/login" id="form"><input type="text" name="json" id="submit-info"></form>
+		<script>
+			function submitLogin(){
+				var password = document.getElementById("password").value;
+				var username = document.getElementById("username").value;
+				var url	=	document.getElementById("url").value;
+				var submitJson	=	{};
+				submitJson.username = username;
+				submitJson.password = password;
+				submitJson.url = url;
+				document.getElementById("submit-info").value = JSON.stringify(submitJson);
+				loadGif();
+				document.getElementById("form").submit();
+			}
+
+			document.getElementById("password").addEventListener('keypress', function(event) {
+				if (event.keyCode == 13) {
+					loadGif();
+					submitLogin();
+				}
+			});
+		</script>
+		
+<%- include ("partials/footer") -%>

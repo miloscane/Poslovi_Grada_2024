@@ -1,0 +1,236 @@
+<%- include ("partials/header") -%>
+<script src="/js/plot.js" charset="utf-8"></script>
+<script>
+	var ucinak = <%-JSON.stringify(ucinak)%>;
+	console.log(ucinak)
+	var meseci = [{"mesec":"2023-12","name":"Децембар 2023"},{"mesec":"2024-01","name":"Јануар 2024"},{"mesec":"2024-02","name":"Фебруар 2024"},{"mesec":"2024-03","name":"Март 2024"},{"mesec":"2024-04","name":"Април 2024"}];
+	var currentMonth = eval(new Date().getMonth()+1).toString().length == 1 ? "0"+eval(new Date().getMonth()+1).toString():eval(new Date().getMonth()+1).toString()
+	var previousMonth = new Date().getMonth().toString().length == 1 ? "0"+new Date().getMonth().toString():eval(new Date().getMonth()+1).toString()
+	var currentMesec = new Date().getFullYear()+"-"+currentMonth;
+	var previousMesec = new Date().getFullYear()+"-"+previousMonth;
+	function getMonthName(str){
+		for(var i=0;i<meseci.length;i++){
+			if(meseci[i].mesec==str){
+				return meseci[i].name;
+			}
+		}
+		return 0;
+	}
+
+</script>
+<div class="prikazUcinka">
+	<div class="pageWidth">
+		<div class="blueWrap">
+			<div id="ucinci"></div>
+			<script>
+				for(var i=0;i<ucinak.length;i++){
+					var row = document.createElement("DIV");
+					row.setAttribute("class","row");
+						var infoWrap = document.createElement("DIV");
+						infoWrap.setAttribute("class","infoWrap");
+							var name2 = document.createElement("DIV");
+							name2.setAttribute("class","name");
+							name2.innerHTML = ucinak[i].name;
+							infoWrap.appendChild(name2);
+
+							
+							var rowTitle = document.createElement("DIV");
+							rowTitle.setAttribute("class","rowTitle");
+							rowTitle.innerHTML = "Укупна статистика";
+							infoWrap.appendChild(rowTitle);
+
+							var displayRow = document.createElement("DIV");
+							displayRow.setAttribute("class","displayRow");
+								var displayWrap = document.createElement("DIV");
+								displayWrap.setAttribute("class","displayWrap");
+									var label = document.createElement("DIV");
+									label.setAttribute("class","label");
+									label.innerHTML = "Укупно налога:";
+									displayWrap.appendChild(label);
+
+									var value = document.createElement("DIV");
+									value.setAttribute("class","value");
+									value.innerHTML = ucinak[i].ukupnoNaloga;
+									displayWrap.appendChild(value);
+								displayRow.appendChild(displayWrap);
+
+								var displayWrap = document.createElement("DIV");
+								displayWrap.setAttribute("class","displayWrap");
+									var label = document.createElement("DIV");
+									label.setAttribute("class","label");
+									label.innerHTML = "Укупан износ:";
+									displayWrap.appendChild(label);
+
+									var value = document.createElement("DIV");
+									value.setAttribute("class","value");
+									value.innerHTML = brojSaRazmacima(ucinak[i].ukupanUcinak);
+									displayWrap.appendChild(value);
+								displayRow.appendChild(displayWrap);
+
+								var displayWrap = document.createElement("DIV");
+								displayWrap.setAttribute("class","displayWrap");
+									var label = document.createElement("DIV");
+									label.setAttribute("class","label");
+									label.innerHTML = "Просек:";
+									displayWrap.appendChild(label);
+
+									var value = document.createElement("DIV");
+									value.setAttribute("class","value");
+									value.innerHTML = brojSaRazmacima(ucinak[i].ukupanUcinak/ucinak[i].ukupnoNaloga);
+									displayWrap.appendChild(value);
+								displayRow.appendChild(displayWrap);
+							infoWrap.appendChild(displayRow);
+
+							var rowTitle = document.createElement("DIV");
+							rowTitle.setAttribute("class","rowTitle");
+							rowTitle.innerHTML = getMonthName(previousMesec);
+							infoWrap.appendChild(rowTitle);
+
+							for(var j=0;j<ucinak[i].mesecno.length;j++){
+								if(ucinak[i].mesecno[j].mesec==previousMesec){
+									var displayRow = document.createElement("DIV");
+									displayRow.setAttribute("class","displayRow");
+										var displayWrap = document.createElement("DIV");
+										displayWrap.setAttribute("class","displayWrap");
+											var label = document.createElement("DIV");
+											label.setAttribute("class","label");
+											label.innerHTML = "Укупно налога:";
+											displayWrap.appendChild(label);
+
+											var value = document.createElement("DIV");
+											value.setAttribute("class","value");
+											value.innerHTML = ucinak[i].mesecno[j].ukupnoNaloga;
+											displayWrap.appendChild(value);
+										displayRow.appendChild(displayWrap);
+
+										var displayWrap = document.createElement("DIV");
+										displayWrap.setAttribute("class","displayWrap");
+											var label = document.createElement("DIV");
+											label.setAttribute("class","label");
+											label.innerHTML = "Укупан износ:";
+											displayWrap.appendChild(label);
+
+											var value = document.createElement("DIV");
+											value.setAttribute("class","value");
+											value.innerHTML = brojSaRazmacima(ucinak[i].mesecno[j].ukupanIznos);
+											displayWrap.appendChild(value);
+										displayRow.appendChild(displayWrap);
+
+										var displayWrap = document.createElement("DIV");
+										displayWrap.setAttribute("class","displayWrap");
+											var label = document.createElement("DIV");
+											label.setAttribute("class","label");
+											label.innerHTML = "Просек:";
+											displayWrap.appendChild(label);
+
+											var value = document.createElement("DIV");
+											value.setAttribute("class","value");
+											value.innerHTML = brojSaRazmacima(ucinak[i].mesecno[j].ukupanIznos/ucinak[i].mesecno[j].ukupnoNaloga);
+											displayWrap.appendChild(value);
+										displayRow.appendChild(displayWrap);
+									infoWrap.appendChild(displayRow);		
+								}
+							}
+
+
+							var rowTitle = document.createElement("DIV");
+							rowTitle.setAttribute("class","rowTitle");
+							rowTitle.innerHTML = getMonthName(currentMesec);
+							infoWrap.appendChild(rowTitle);
+
+							for(var j=0;j<ucinak[i].mesecno.length;j++){
+								if(ucinak[i].mesecno[j].mesec==currentMesec){
+									var displayRow = document.createElement("DIV");
+									displayRow.setAttribute("class","displayRow");
+										var displayWrap = document.createElement("DIV");
+										displayWrap.setAttribute("class","displayWrap");
+											var label = document.createElement("DIV");
+											label.setAttribute("class","label");
+											label.innerHTML = "Укупно налога:";
+											displayWrap.appendChild(label);
+
+											var value = document.createElement("DIV");
+											value.setAttribute("class","value");
+											value.innerHTML = ucinak[i].mesecno[j].ukupnoNaloga;
+											displayWrap.appendChild(value);
+										displayRow.appendChild(displayWrap);
+
+										var displayWrap = document.createElement("DIV");
+										displayWrap.setAttribute("class","displayWrap");
+											var label = document.createElement("DIV");
+											label.setAttribute("class","label");
+											label.innerHTML = "Укупан износ:";
+											displayWrap.appendChild(label);
+
+											var value = document.createElement("DIV");
+											value.setAttribute("class","value");
+											value.innerHTML = brojSaRazmacima(ucinak[i].mesecno[j].ukupanIznos);
+											displayWrap.appendChild(value);
+										displayRow.appendChild(displayWrap);
+
+										var displayWrap = document.createElement("DIV");
+										displayWrap.setAttribute("class","displayWrap");
+											var label = document.createElement("DIV");
+											label.setAttribute("class","label");
+											label.innerHTML = "Просек:";
+											displayWrap.appendChild(label);
+
+											var value = document.createElement("DIV");
+											value.setAttribute("class","value");
+											value.innerHTML = brojSaRazmacima(ucinak[i].mesecno[j].ukupanIznos/ucinak[i].mesecno[j].ukupnoNaloga);
+											displayWrap.appendChild(value);
+										displayRow.appendChild(displayWrap);
+									infoWrap.appendChild(displayRow);		
+								}
+							}
+							
+
+
+						row.appendChild(infoWrap);
+
+						var plots = document.createElement("DIV");
+						plots.setAttribute("class","plots");
+							var plot = document.createElement("DIV");
+							plot.setAttribute("class","plot");
+							var plotMeseci = [];
+							var plotIznosa = [];
+							for(var j=0;j<meseci.length;j++){
+								plotMeseci.push(meseci[j].name)
+							}
+							for(var j=0;j<ucinak[i].mesecno.length;j++){
+								plotIznosa.push(ucinak[i].mesecno[j].ukupanIznos)
+							}
+							var plotData = [{
+								x: plotMeseci,
+								y: plotIznosa,
+								type: 'bar'
+							}];
+
+							var layout = {
+								xaxis:{'fixedrange':true},
+								yaxis:{'fixedrange':true,'range': [0, 5000000]},
+								shapes: [
+								    {
+								        type: 'line',
+								        x0: -1,
+								        y0: 2000000.0,
+								        x1: 5,
+								        y1: 2000000.0,
+								        line:{
+								            color: 'rgb(255, 0, 0)',
+								            width: 4,
+								            dash:'dot'
+								        }
+								    }
+								 ]
+							}
+							Plotly.newPlot(plot, plotData,layout,{displayModeBar: false});
+							plots.appendChild(plot);
+						row.appendChild(plots);
+					document.getElementById("ucinci").appendChild(row);
+				}
+			</script>		
+		</div>
+	</div>
+</div>
+<%- include ("partials/footer") -%>

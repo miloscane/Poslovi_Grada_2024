@@ -1,0 +1,101 @@
+<%- include ("partials/header") -%>
+	<script>
+		var informacije = <%-JSON.stringify(informacije)%>;
+		console.log(informacije)
+	</script>
+	<div class="pageWidth">
+		<div class="administracija">
+			<div class="boxesWrap">
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/sumIcon.png"></div>
+					<div class="info">
+						<div class="title">Укупно налога</div>
+						<div class="text"><span id="ukupno-naloga"></span><br><span id="ukupno-obracunata-vrednost"></span></div>
+						<script>
+							document.getElementById("ukupno-naloga").innerHTML = brojSaRazmacimaBezDecimala(informacije.ukupnoNaloga);
+							document.getElementById("ukupno-obracunata-vrednost").innerHTML = brojSaRazmacima(informacije.ukupnoObracunataVrednostNaloga) + " дин.";
+						</script>
+						<div class="note">Укупно налога на порталу</div>
+					</div>
+					<div class="boxMore">
+						<a href="/sviNalozi">Погледај налоге</a>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/unfinishedIcon.png"></div>
+					<div class="info">
+						<div class="title">Незавршено</div>
+						<div class="text"><span id="ukupno-nezavrsenih-naloga"></span></div>
+						<script>
+							document.getElementById("ukupno-nezavrsenih-naloga").innerHTML = brojSaRazmacimaBezDecimala(informacije.ukupnoNezavrsenihNaloga);
+						</script>
+						<div class="note">Укупно налога који немају статус Завршено, Спреман за фактурисање и Фактурисан</div>
+					</div>
+					<div class="boxMore">
+						<a href="">Погледај налоге</a>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturisanoIcon.png"></div>
+					<div class="info">
+						<div class="title">Фактурисано</div>
+						<div class="text"><span id="ukupno-fakturisanih-naloga"></span><br><span id="iznos-fakturisanih-naloga"></span></div>
+						<script>
+							document.getElementById("ukupno-fakturisanih-naloga").innerHTML = brojSaRazmacimaBezDecimala(informacije.ukupnoFakturisanihNaloga);
+							document.getElementById("iznos-fakturisanih-naloga").innerHTML = brojSaRazmacima(informacije.ukupnoFakturisanIznos) + " дин.";
+						</script>
+						<div class="note">Налози са статусом Фактурисан</div>
+					</div>
+					<div class="boxMore">
+						<a href="">Погледај налоге</a>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/neobracunatoIcon.png"></div>
+					<div class="info">
+						<div class="title">Необрачунати налози</div>
+						<div class="text"><span id="ukupno-neobracunatih-naloga"></span></div>
+						<script>
+							document.getElementById("ukupno-neobracunatih-naloga").innerHTML = brojSaRazmacimaBezDecimala(informacije.ukupnoNeobracunatihNaloga);
+						</script>
+						<div class="note">Налози без обрачуна или са износом нула.</div>
+					</div>
+					<div class="boxMore">
+						<a href="">Погледај налоге</a>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nefakturisanoIcon.png"></div>
+					<div class="info">
+						<div class="title">Нефактурисано</div>
+						<div class="text"><span id="ukupno-nefakturisanih-naloga"></span><br><span id="iznos-nefakturisanih-naloga"></span></div>
+						<script>
+							document.getElementById("ukupno-nefakturisanih-naloga").innerHTML = brojSaRazmacimaBezDecimala(informacije.ukupnoNefakturisanihNaloga);
+							document.getElementById("iznos-nefakturisanih-naloga").innerHTML = brojSaRazmacima(informacije.ukupnoNefakturisanIznos) + " дин.";
+						</script>
+						<div class="note">Налози са статусом Завршено, Налог у стамбеном и Спреман за фактурисање</div>
+					</div>
+					<div class="boxMore">
+						<a href="">Погледај налоге</a>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/obracunatoIcon.png"></div>
+					<div class="info">
+						<div class="title">Спремно за фактурисање</div>
+						<div class="text"><span id="ukupno-spremnih-naloga"></span><br><span id="iznos-spremnih-naloga"></span></div>
+						<script>
+							document.getElementById("ukupno-spremnih-naloga").innerHTML = brojSaRazmacimaBezDecimala(informacije.ukupnoSpremnihNaloga);
+							document.getElementById("iznos-spremnih-naloga").innerHTML = brojSaRazmacima(informacije.ukupnoSpremnihIznos) + " дин.";
+						</script>
+						<div class="note">Налози са статусом Спреман за фактурисање (налози који су у Премијусу)</div>
+					</div>
+					<div class="boxMore">
+						<a href="">Погледај налоге</a>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>	
+<%- include ("partials/footer") -%>

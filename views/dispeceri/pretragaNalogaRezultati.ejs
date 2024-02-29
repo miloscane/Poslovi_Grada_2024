@@ -1,0 +1,50 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+		nalozi = nalozi.sort((a, b) => {
+			if (a.datum.datetime > b.datum.datetime) {
+				return -1;
+			}
+		});
+	</script>
+	<div class="pageWidth">
+		<div class="pretragaNaloga">
+			<div class="pageWidth">
+				<div class="blueWrap">
+					<div id="nalozi"></div>
+					<script>
+						var table = document.createElement("TABLE");
+						for(var i=0;i<nalozi.length;i++){
+							var tr = document.createElement("TR");
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+eval(i+1)+".</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+nalozi[i].broj+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+nalozi[i].datum.datum+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+nalozi[i].adresa+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+nalozi[i].statusNaloga+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\"><a href=\"/nalog/"+nalozi[i].broj+"\" target=\"_blank\">Погледај налог</a></div>";
+								tr.appendChild(td);
+							table.appendChild(tr);
+						}
+						document.getElementById("nalozi").appendChild(table);
+					</script>
+				</div>
+			</div>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

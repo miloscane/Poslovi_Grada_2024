@@ -1,0 +1,41 @@
+<%- include ("partials/header-nl") -%>
+			<div class="pageWidth">
+				<div class="blueWrap">
+					<div class="imageWrap">
+						<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/userIcon.svg" width="70">
+					</div>
+					<div class="inputWrap">
+						<div class="title">Електронска пошта</div>
+						<div class="inputWrapper">
+							<input type="text" id="username" class="textInput">
+						</div>
+					</div>
+					<div class="inputWrap" style="margin-top:30px">
+						<div class="button" onclick="submitLogin()">Пошаљи e-mail</div>
+					</div>	
+				</div>
+			</div>
+		</div>
+		<form style="display:none" method="POST" action="/zaboravljena-lozinka" id="form"><input type="text" name="json" id="submit-info"></form>
+		<script>
+			function submitLogin(){
+				var username = document.getElementById("username").value;
+				if(checkEmail(username)){
+					var submitJson	=	{};
+					submitJson.username = username;
+					document.getElementById("submit-info").value = JSON.stringify(submitJson);
+					loadGif();
+					document.getElementById("form").submit();
+				}else{
+					alert("Неправилно унет e-mail");
+				}
+			}
+
+			document.getElementById("username").addEventListener('keypress', function(event) {
+				if (event.keyCode == 13) {
+					submitLogin();
+				}
+			});
+		</script>
+		
+<%- include ("partials/footer") -%>
