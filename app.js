@@ -2610,37 +2610,86 @@ server.get('/dispecer/pretragaNaloga',async (req,res)=>{
 	}
 });
 
+server.get('/podizvodjac/pretragaNaloga',async (req,res)=>{
+	if(req.session.user){
+		res.render("dispeceri/pretragaNaloga",{ // KORISTIM ISTO DA NE IDEM COPY PASTE JER JE ISTI INTERFEJS
+			pageTitle:"Претрага налога",
+			user: req.session.user
+		});
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.post('/pretragaNalogaPoAdresi', async (req, res)=> {
 	if(req.session.user){
-		naloziDB.find({adresa:{$regex:req.body.adresa}}).toArray()
-		.then((nalozi) => {
-			for(var i=0;i<nalozi.length;i++){
-				delete nalozi[i]._id;
-				delete nalozi[i].uniqueId;
-				delete nalozi[i].digitalizacija;
-				delete nalozi[i].opis;
-				delete nalozi[i].vrstaRada;
-				delete nalozi[i].kategorijeRadova;
-				delete nalozi[i].punaAdresa;
-				delete nalozi[i].obracun;
-				delete nalozi[i].ukupanIznos;
-				delete nalozi[i].faktura;
-				delete nalozi[i].prijemnica;
-			}
-			res.render("dispeceri/pretragaNalogaRezultati",{
-				pageTitle:"Резултати претраге за \""+req.body.adresa+"\"",
-				user: req.session.user,
-				nalozi: nalozi
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
+			naloziDB.find({adresa:{$regex:req.body.adresa}}).toArray()
+			.then((nalozi) => {
+				for(var i=0;i<nalozi.length;i++){
+					delete nalozi[i]._id;
+					delete nalozi[i].uniqueId;
+					delete nalozi[i].digitalizacija;
+					delete nalozi[i].opis;
+					delete nalozi[i].vrstaRada;
+					delete nalozi[i].kategorijeRadova;
+					delete nalozi[i].punaAdresa;
+					delete nalozi[i].obracun;
+					delete nalozi[i].ukupanIznos;
+					delete nalozi[i].faktura;
+					delete nalozi[i].prijemnica;
+				}
+				res.render("dispeceri/pretragaNalogaRezultati",{
+					pageTitle:"Резултати претраге за \""+req.body.adresa+"\"",
+					user: req.session.user,
+					nalozi: nalozi
+				})
 			})
-		})
-		.catch((error)=>{
-			logError(error);
-			res.render("message",{
-				pageTitle: "Програмска грешка",
-				user: req.session.user,
-				message: "<div class=\"text\">Дошло је до грешке у бази податка 940.</div>"
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 940.</div>"
+				});
 			});
-		});
+		}else if(Number(req.session.user.role)==30){
+			naloziDB.find({majstor:req.session.user.nalozi,adresa:{$regex:req.body.adresa}}).toArray()
+			.then((nalozi) => {
+				for(var i=0;i<nalozi.length;i++){
+					delete nalozi[i]._id;
+					delete nalozi[i].uniqueId;
+					delete nalozi[i].digitalizacija;
+					delete nalozi[i].opis;
+					delete nalozi[i].vrstaRada;
+					delete nalozi[i].kategorijeRadova;
+					delete nalozi[i].punaAdresa;
+					delete nalozi[i].obracun;
+					delete nalozi[i].ukupanIznos;
+					delete nalozi[i].faktura;
+					delete nalozi[i].prijemnica;
+				}
+				res.render("podizvodjaci/pretragaNalogaRezultati",{
+					pageTitle:"Резултати претраге за \""+req.body.adresa+"\"",
+					user: req.session.user,
+					nalozi: nalozi
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 940.</div>"
+				});
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
 	}else{
 		res.redirect("/login");	
 	}
@@ -2868,6 +2917,25 @@ server.get('/podizvodjac/ucinak',async (req,res)=>{
 		if(Number(req.session.user.role)==30){
 			res.render("podizvodjaci/ucinak",{
 				pageTitle:"Учинак",
+				user: req.session.user
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/podizvodjac/specifikacije',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==30){
+			res.render("podizvodjaci/specifikacije",{
+				pageTitle:"Спецификације",
 				user: req.session.user
 			})
 		}else{
