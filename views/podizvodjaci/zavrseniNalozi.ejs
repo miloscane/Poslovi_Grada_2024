@@ -1,6 +1,7 @@
 <%- include ("partials/header") -%>
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
+		console.log(nalozi);
 		var cenovnik = <%-JSON.stringify(cenovnik)%>;
 	</script>
 	<div class="pageWidth podizvodjaci">
@@ -34,7 +35,6 @@
 								<td><div class="value adresa">Адреса</div></td>
 								<td><div class="value status">Статус</div></td>
 								<td><div class="value iznos">Износ</div></td>
-								<td><div class="value link">Линк</div></td>
 							</tr>
 						</table>
 					</div>
@@ -59,7 +59,7 @@
 					for(var i=0;i<naloziToShow.length;i++){
 						var obracunatIznos = 0;
 						for(var j=0;j<naloziToShow[i].obracun.length;j++){
-							obracunatIznos = obracunIznos + getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity)
+							obracunatIznos = obracunatIznos + getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity)
 						}
 						naloziToShow[i].ukupanIznos = obracunatIznos;
 						var tr = document.createElement("TR");
@@ -73,7 +73,7 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojNaloga");
-								div.innerHTML = naloziToShow[i].broj;
+								div.innerHTML = "<a href='/nalog/"+naloziToShow[i].broj+"' target='_blank'>"+naloziToShow[i].broj+"</a>";
 								td.appendChild(div);
 							tr.appendChild(td);
 							
@@ -116,13 +116,6 @@
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value iznos");
 								div.innerHTML = brojSaRazmacima(naloziToShow[i].ukupanIznos);
-								td.appendChild(div);
-							tr.appendChild(td);
-							
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value link");
-								div.innerHTML = "<a href='/nalog/"+naloziToShow[i].broj+"' target='_blank'>Види налог</a>";
 								td.appendChild(div);
 							tr.appendChild(td);
 

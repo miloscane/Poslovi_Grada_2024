@@ -33,7 +33,6 @@
 								<td><div class="value adresa">Адреса</div></td>
 								<td><div class="value status">Статус</div></td>
 								<td><div class="value iznos">Износ</div></td>
-								<td><div class="value link">Линк</div></td>
 							</tr>
 						</table>
 					</div>
@@ -71,7 +70,7 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojNaloga");
-								div.innerHTML = naloziToShow[i].broj;
+								div.innerHTML = "<a href='/nalog/"+naloziToShow[i].broj+"' target='_blank'>"+naloziToShow[i].broj+"</a>";
 								td.appendChild(div);
 							tr.appendChild(td);
 							
@@ -107,13 +106,6 @@
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value status");
 								div.innerHTML = "Можете фактурисати";
-								td.appendChild(div);
-							tr.appendChild(td);
-							
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value link");
-								div.innerHTML = "<a href='/nalog/"+naloziToShow[i].broj+"' target='_blank'>Види налог</a>";
 								td.appendChild(div);
 							tr.appendChild(td);
 

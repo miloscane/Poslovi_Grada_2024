@@ -1601,7 +1601,7 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 						    pdfParse(pdfFile)
 						    .then(function(data) {
 									var nalogJson = parseNalog(data.text,req.session.user,req.file.location);
-									//fs.unlinkSync("./processing/"+filename+".pdf");
+									fs.unlinkSync("./processing/"+filename+".pdf");
 									naloziDB.find({broj:nalogJson.broj}).toArray()
 									.then((nalozi)=>{
 										if(nalozi.length==0){
@@ -2723,7 +2723,6 @@ server.get('/podizvodjac/zavrseniNalozi',async (req,res)=>{
 					delete nalozi[i].vrstaRada;
 					delete nalozi[i].kategorijeRadova;
 					delete nalozi[i].punaAdresa;
-					delete nalozi[i].obracun;
 					delete nalozi[i].ukupanIznos;
 					delete nalozi[i].faktura;
 					delete nalozi[i].prijemnica;
@@ -2781,11 +2780,11 @@ server.get('/podizvodjac/obradjeniNalozi',async (req,res)=>{
 					delete nalozi[i].vrstaRada;
 					delete nalozi[i].kategorijeRadova;
 					delete nalozi[i].punaAdresa;
-					delete nalozi[i].obracun;
 					delete nalozi[i].ukupanIznos;
 					delete nalozi[i].faktura;
 					delete nalozi[i].prijemnica;
 					delete nalozi[i].ukupanIznos;
+					nalozi[i].statusNaloga = "Možete fakturisati";
 				}
 				var cenovnikZaPrikaz = [];
 				if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507"){

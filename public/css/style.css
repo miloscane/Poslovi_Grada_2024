@@ -2535,6 +2535,13 @@ input[type=number] {
     overflow: hidden;
 }
 
+.zavrseniNalozi .tableWrap table td .iznos{
+    width:150px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 
 .zavrseniNalozi .tableWrap table td .link{
     width:149px;

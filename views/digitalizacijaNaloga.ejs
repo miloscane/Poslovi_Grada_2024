@@ -36,6 +36,11 @@
 								document.getElementById("form").submit();
 							}
 						}
+						window.addEventListener('keypress', function(event) {
+							if (event.keyCode == 13) {
+								uploadNalog();
+							}
+						});
 					</script>
 				</div>
 			</div>	
