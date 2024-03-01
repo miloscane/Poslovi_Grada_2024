@@ -58,10 +58,19 @@
 					var ukupnoObracunatih =0;
 					for(var i=0;i<naloziToShow.length;i++){
 						var obracunatIznos = 0;
-						for(var j=0;j<naloziToShow[i].obracun.length;j++){
-							obracunatIznos = obracunatIznos + getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity)
+						if(naloziToShow[i].obracun.length>0){
+							
+							for(var j=0;j<naloziToShow[i].obracun.length;j++){
+								obracunatIznos = obracunatIznos + getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity);
+							}
 						}
+						
 						naloziToShow[i].ukupanIznos = obracunatIznos;
+						if(!isNaN(obracunatIznos) && obracunatIznos>0){
+							ukupanIznos = ukupanIznos + obracunatIznos;
+							ukupnoObracunatih++;
+						}
+						
 						var tr = document.createElement("TR");
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");

@@ -56,9 +56,10 @@
 					for(var i=0;i<naloziToShow.length;i++){
 						var obracunatIznos = 0;
 						for(var j=0;j<naloziToShow[i].obracun.length;j++){
-							obracunatIznos = obracunIznos + getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity)
+							obracunatIznos = obracunIznos + getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity);
 						}
 						naloziToShow[i].ukupanIznos = obracunatIznos;
+						ukupanIznos = ukupanIznos + obracunatIznos;
 						var tr = document.createElement("TR");
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
