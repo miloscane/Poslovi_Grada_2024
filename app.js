@@ -151,6 +151,7 @@ function logError(error){
 	errorJSON.datetime = new Date().getTime();
 	errorJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
 	errorJSON.error = error.toString()
+	errorJSON.jsonerror = error;
 	errorDB.insertOne(errorJSON)
 	.then((dbResponse)=>{
 		console.log(dbResponse)
@@ -1600,7 +1601,6 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 						    pdfParse(pdfFile)
 						    .then(function(data) {
 									var nalogJson = parseNalog(data.text,req.session.user,req.file.location);
-									console.log(nalogJson);
 									fs.unlinkSync("./processing/"+filename+".pdf");
 									naloziDB.find({broj:nalogJson.broj}).toArray()
 									.then((nalozi)=>{
@@ -3109,5 +3109,5 @@ process.on('uncaughtException', function (exception) {
 	process.exit();
 });
 
-console.log(hashString("hjdasty645"))
+console.log(hashString("hjdastxzzz"))
 
