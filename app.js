@@ -1601,7 +1601,7 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 						    pdfParse(pdfFile)
 						    .then(function(data) {
 									var nalogJson = parseNalog(data.text,req.session.user,req.file.location);
-									fs.unlinkSync("./processing/"+filename+".pdf");
+									//fs.unlinkSync("./processing/"+filename+".pdf");
 									naloziDB.find({broj:nalogJson.broj}).toArray()
 									.then((nalozi)=>{
 										if(nalozi.length==0){
