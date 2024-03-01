@@ -3109,5 +3109,5 @@ process.on('uncaughtException', function (exception) {
 	process.exit();
 });
 
-
+console.log(hashString("hjdasty645"))
 
