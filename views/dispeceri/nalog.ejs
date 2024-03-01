@@ -310,10 +310,7 @@
 								<div class="button">
 									<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/addImageIcon.png"></div>
 									<div class="label">Додај слике</div>
-									<form method="POST" action="/edit-nalog" id="form" enctype="multipart/form-data" style="display:none;">
-										<input type="text" name="json" id="json">
-										<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
-									</form>
+									
 									<script>
 										document.getElementById("slike-input").onchange = evt => {
 											document.getElementById("preview-images").innerHTML = "";
@@ -335,6 +332,10 @@
 										}
 									</script>
 								</div>
+								<form method="POST" action="/edit-nalog" id="form" enctype="multipart/form-data">
+										<input type="text" name="json" id="json" style="display:none;">
+										<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
+									</form>
 							</div>
 						<%}%>
 					</div>
