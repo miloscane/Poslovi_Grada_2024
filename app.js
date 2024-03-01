@@ -147,6 +147,16 @@ function hashString(string){
 
 function logError(error){
 	console.log(error)
+	var errorJSON = {};
+	errorJSON.datetime = new Date().getTime();
+	errorJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
+	errorJSON.error = error.toString()
+	errorDB.insertOne(errorJSON)
+	.then((dbResponse)=>{
+		console.log(dbResponse)
+	}).catch((err)=>{
+		console.log(err);
+	})
 }
 
 function generateId(length) {
@@ -429,6 +439,7 @@ function parsePrijemnica(textdata){
 	return prijemnicaJson
 }
 
+
 var cenovnik;
 var cenovnikHigh;
 var cenovnikLow;
@@ -442,6 +453,7 @@ var pricesHighDB;
 var pricesLowDB;
 var proizvodiDB;
 var ucinakMajstoraDB;
+var errorDB;
 
 http.listen(process.env.PORT, function(){
 	console.log("Poslovi Grada 2024");
@@ -470,6 +482,7 @@ http.listen(process.env.PORT, function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		magacinReversiDB			=	client.db("Poslovi_Grada_2024").collection('magacinReversi');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
+		errorDB								=	client.db("Poslovi_Grada_2024").collection('errors');
 
 		pricesDB.find({}).toArray()
 		.then((prices)=>{
@@ -1723,7 +1736,6 @@ server.get('/nalog/:broj',async (req,res)=>{
 												user: req.session.user
 											});
 										}else{
-											logError(error);
 											res.render("message",{
 												pageTitle: "Грешка",
 												message: "<div class=\"text\">Налог није додељен вама.</div>",
@@ -1731,7 +1743,6 @@ server.get('/nalog/:broj',async (req,res)=>{
 											});
 										}
 									}else{
-										logError(error);
 										res.render("message",{
 											pageTitle: "Програмска грешка",
 											message: "<div class=\"text\">Није дефинисан ниво корисника.</div>",
