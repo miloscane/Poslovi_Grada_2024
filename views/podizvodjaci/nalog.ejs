@@ -8,10 +8,14 @@
 	</script>
 	<div class="pageWidth"> 
 		<div class="administracijaNalog nalog">
-			<div class="inputWrap printButton">
-				<div class="button" onclick="window.open('<%=nalog.digitalizacija.lokacija%>','_blank')">
+			<div class="inputWrap printButton" style="width:400px">
+				<div class="button" onclick="window.open('<%=nalog.digitalizacija.lokacija%>','_blank')" style="display:inline-block;vertical-align: top;width:150px">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
 					<div class="label">Штампај налог</div>
+				</div>
+				<div class="button" onclick="printObracun()" style="display:inline-block;vertical-align: top;width:200px">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
+					<div class="label">Штампај обрачун</div>
 				</div>
 			</div>
 			<div class="boxesWrap">
@@ -380,7 +384,48 @@
 					document.getElementById("form").submit();
 				}
 			</script>
-			
 		</div>
+		<%- include ("partials/printer") -%>
+		<script>
+			function printObracun(){
+				doc.setFontSize(14);
+			    doc.setFontType("bold");
+			    var xOffset = 10;
+			    doc.text("Obracun po nalogu broj: "+nalog.broj,xOffset,yPos);
+			    doc.setFontSize(10);
+			    yPos= yPos+10;
+			    doc.setFontType("normal");
+			    for(var i=0;i<nalog.obracun.length;i++){
+			    	xOffset = 10;
+				    doc.text(eval(i+1).toString()+".",xOffset,yPos);
+				    xOffset = xOffset + 7;
+				    doc.text(nalog.obracun[i].code,xOffset,yPos);
+				    xOffset = xOffset + 25;
+				    var nameString = stringArray(getPriceByCode(nalog.obracun[i].code).name,33);
+				    doc.text(nameString,xOffset,yPos);
+				    xOffset = xOffset + 90;
+				    doc.text(nalog.obracun[i].quantity+" "+getPriceByCode(nalog.obracun[i].code).unit,xOffset,yPos);
+				    xOffset = xOffset + 15;
+				    doc.text(brojSaRazmacima(parseFloat(getPriceByCode(nalog.obracun[i].code).price)*parseFloat(nalog.obracun[i].quantity)),xOffset,yPos);
+				    yPos= yPos+7*(nameString.length);
+				    if(yPos>=285){
+				    	doc.addPage();
+				    	yPos = 12;
+				    	xOffset = 10;
+
+					    yPos = yPos + 7;
+				    }
+			    }
+
+			    doc.setFontSize(14);
+			    doc.setFontType("bold");
+			    var xOffset = 10;
+			    doc.text("Укупно: "+document.getElementById("iznos-naloga").innerHTML,xOffset,yPos);
+
+
+
+		        window.open(doc.output('bloburl'), '_blank');
+			}
+		</script>
 	</div>	
 <%- include ("partials/footer") -%>

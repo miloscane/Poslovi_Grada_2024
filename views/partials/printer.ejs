@@ -22,4 +22,8 @@
 
 	doc.setFont('PTSans'); // set font
 	doc.getFontList("PTSans");
+
+	function stringArray(string,count){
+		return string.match(new RegExp('.{1,' + count + '}', 'g'));
+	}
 </script>
