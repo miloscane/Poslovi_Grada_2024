@@ -43,9 +43,9 @@
 								<option value="Betonaža">Бетонажа</option>
 								<option value="Vraćen">Враћен</option>
 								<option value="Završeno">Завршено</option>
-								<option value="U obradi">У обради</option>
-								<option value="Možete fakturisati">Можете фактурисати</option>
-								<option value="Fakturisan">Фактурисан</option>
+								<option value="U obradi" disabled="disabled">У обради</option>
+								<option value="Možete fakturisati" disabled="disabled">Можете фактурисати</option>
+								<option value="Fakturisan" disabled="disabled">Фактурисан</option>
 							</select>
 							<script>
 								if(notAllowed.indexOf(nalog.statusNaloga)>=0){
@@ -339,7 +339,12 @@
 				function saveNalog(){
 					var nalogJson = {};
 					nalogJson.broj = nalog.broj;
-					nalogJson.status = document.getElementById("status-naloga").value;
+					if(notAllowed.indexOf(nalog.statusNaloga)>=0){
+						nalogJson.status = nalog.statusNaloga;
+					}else{
+						nalogJson.status = document.getElementById("status-naloga").value;
+					}
+					
 					nalogJson.majstor = nalog.majstor;
 					nalogJson.obracun = [];
 					var obracuni = document.getElementById("obracun-wrap").getElementsByClassName("row");
