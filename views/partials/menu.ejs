@@ -30,7 +30,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="menuWrap">
+				<div class="menuWrap" id="site-meni">
 					<div class="pageWidth">
 						<% if(Number(user.role)==10){ %>
 							<div class="menuItem"><a href="/" onclick="loadGif()">Насловна</a><div class="rightBorder"></div></div>
@@ -105,6 +105,27 @@
 						<% } %>
 					</div>
 				</div>
+				<div class="responsiveHandle" onclick="openMenu(this)">
+					<div class="wrap">
+						<div class="topBar bar"></div>
+						<div class="middleBar bar"></div>
+						<div class="bottomBar bar"></div>
+					</div>
+				</div>
+				<script>
+					function openMenu(elem){
+						var menu = elem.parentElement;
+						if(menu.dataset.opened==1){
+							//zatvori meni
+							menu.classList.remove("menuOpened");
+							menu.dataset.opened = 0;
+						}else{
+							//Otvori meni
+							menu.classList.add("menuOpened");
+							menu.dataset.opened = 1;
+						}
+					}
+				</script>
 				<div class="pageTitle">
 					<div class="pageWidth"><div class="title" id="page-title"><%-pageTitle%></div></div>
 					<script>
