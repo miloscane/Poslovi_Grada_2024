@@ -3165,6 +3165,10 @@ input[type=number] {
         padding-left:10px;
         padding-right:10px;
     }
+    
+    #menu .topBlueBar .logout{
+        right:10px;
+    }
 }
 
 @media screen and (max-width: 970px) {
@@ -3225,9 +3229,6 @@ input[type=number] {
 
     #menu .menuWrap .menuItem .carret{
         display:none;
-    }
-    #menu .topBlueBar .logout{
-        right:10px;
     }
 
     .nalog .obracunWrap{
