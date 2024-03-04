@@ -585,7 +585,7 @@ http.listen(process.env.PORT, function(){
 		.catch((error)=>{
 			logError(error);
 		});
-
+ 
 		//Ubacivanje novih naloga
 		/*var user = {};
 		user.name = "Милош Иванковић";
