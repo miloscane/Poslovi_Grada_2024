@@ -104,6 +104,21 @@ function getMajstorByCode(majstorId){
   return majstor
 }
 
+function getPriceItemByCode(code){
+  var json = {};
+  if(cenovnik){
+    for(var i=0;i<cenovnik.length;i++){
+      if(cenovnik[i].code==code){
+        json = cenovnik[i];
+        break;
+      }
+    }
+  }else{
+    console.log("No cenovnik defined");
+  }
+  return json
+}
+
 function vremePrijema(datetime){
   var date    = new Date(Number(datetime));
   var yearString  = date.getFullYear();
