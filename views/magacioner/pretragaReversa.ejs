@@ -1,0 +1,43 @@
+<%- include ("partials/header") -%>
+	<div class="pageWidth">
+		<div class="pretragaNaloga">
+			<div class="pageWidth">
+				<div class="blueWrap">
+					<div class="imageWrap" style="text-align:center">
+						<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/searchIcon.png" width="70">
+					</div>
+					<div class="inputWrap">
+						<div class="title">Број налога</div>
+						<div class="inputWrapper">
+							<input type="text" id="broj-naloga" class="textInput">
+						</div>
+					</div>
+					<form method="POST" action="/pretraga-reversa" style="display:none" id="form">
+						<input type="text" name="brojnaloga" id="broj-naloga-za-pretragu">
+					</form>
+					<div class="inputWrap" style="margin-top:30px">
+						<div class="button" onclick="nadjiReverse()">Пронађи</div>
+						<script>
+							function nadjiReverse(){
+								var brojNaloga = document.getElementById('broj-naloga').value;
+								if(brojNaloga.length<7 || brojNaloga.length>7){
+									alert("Број налога делује неисправно. Потребно је да има 7 цифри.")
+								}else{
+									loadGif();
+									document.getElementById("broj-naloga-za-pretragu").value = brojNaloga;
+									loadGif();
+									document.getElementById("form").submit()
+								}
+							}
+							document.getElementById("broj-naloga").addEventListener('keypress', function(event) {
+								if (event.keyCode == 13) {
+									nadjiReverse();
+								}
+							});
+						</script>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

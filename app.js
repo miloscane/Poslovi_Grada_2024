@@ -466,24 +466,26 @@ http.listen(process.env.PORT, function(){
 		console.log("Connected to database in " + eval(new Date().getTime()/1000-dbConnectionStart/1000).toFixed(2)+"s")
 		usersDB								=	client.db("Poslovi_Grada_2024").collection('Users');
 		naloziDB							=	client.db("Poslovi_Grada_2024").collection('Nalozi');
-		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
 		istorijaNalogaDB			=	client.db("Poslovi_Grada_2024").collection('istorijaNaloga');
 		majstoriDB						=	client.db("Poslovi_Grada_2024").collection('Majstori');
 		izvestajiDB						=	client.db("Poslovi_Grada_2024").collection('Izvestaji');
-		stariIzvestajiDB			=	client.db("Poslovi-Grada").collection('izvestaji-sa-terena');
 		pricesDB							=	client.db("Poslovi_Grada_2024").collection('Cenovnik');
-		stariCenovnikDB				=	client.db("Poslovi-Grada").collection('Cenovnik');
 		pricesHighDB					=	client.db("Poslovi_Grada_2024").collection('CenovnikHigh');
 		pricesLowDB						=	client.db("Poslovi_Grada_2024").collection('CenovnikLow');
-		stariUcinakMajstoraDB	=	client.db("Poslovi-Grada").collection('UcinakMajstora');
 		ucinakMajstoraDB			=	client.db("Poslovi_Grada_2024").collection('ucinakMajstora');
-		stariProizvodiDB			=	client.db("Poslovi-Grada").collection('magacin-proizvodi-4');
 		proizvodiDB						=	client.db("Poslovi_Grada_2024").collection('magacinProizvodi');
 		magacinUlaziDB				=	client.db("Poslovi_Grada_2024").collection('magacinUlazi');
-		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		magacinReversiDB			=	client.db("Poslovi_Grada_2024").collection('magacinReversi');
-		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 		errorDB								=	client.db("Poslovi_Grada_2024").collection('errors');
+
+
+		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
+		stariIzvestajiDB			=	client.db("Poslovi-Grada").collection('izvestaji-sa-terena');
+		stariCenovnikDB				=	client.db("Poslovi-Grada").collection('Cenovnik');
+		stariUcinakMajstoraDB	=	client.db("Poslovi-Grada").collection('UcinakMajstora');
+		stariProizvodiDB			=	client.db("Poslovi-Grada").collection('magacin-proizvodi-4');
+		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
+		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
 		pricesDB.find({}).toArray()
 		.then((prices)=>{
@@ -892,133 +894,7 @@ http.listen(process.env.PORT, function(){
 		})*/
 		
 
-		//User transfer
-		/*var users = [
-			{
-				email: "milica.radun@poslovigrada.rs",
-				password: "c0d1a8c4a141dabc7cd188875e8d336a",
-				role: "10",
-				ime: "Милица Радун",
-				kontakt: ["milica.radun@poslovigrada.rs"]
-			},
-			{
-				email: "anja.stefanovic@poslovigrada.rs",
-				password: "04c02d4e0b19223e35869bd36af29982",
-				role: "10",
-				ime: "Ања Стефановић",
-				kontakt: ["anja.stefanovic@poslovigrada.rs"]
-			},
-			{
-				email: "hermina.sehic@poslovigrada.rs",
-				password: "d8c3dda8c82fd9c01f283f10a5998335",
-				role: "10",
-				ime: "Хермина Шехић",
-				kontakt: ["hermina.sehic@poslovigrada.rs"]
-			},
-			{
-				email: "marija.slijepcevic@poslovigrada.rs",
-				password: "e52a48227851f3b835e989b04f82e3c0",
-				role: "10",
-				ime: "Марија Слијепчевић",
-				kontakt: ["marija.slijepcevic@poslovigrada.rs"]
-			},
-			{
-				email: "marija.boskovic@poslovigrada.rs",
-				password: "8b8ab6c017b2176faa8e86327ad91877",
-				role: "10",
-				ime: "Mарија Бошковић",
-				kontakt: ["marija.boskovic@poslovigrada.rs"]
-			},
-			{
-				email: "mirjana.korac@poslovigrada.rs",
-				password: "e862baba91108180f28ef6e0c10053a3",
-				role: "20",
-				ime: "Мирјана Кораћ",
-				opstine:["ZVEZDARA","PALILULA"],
-				kontakt: ["mirjana.korac@poslovigrada.rs"]
-			},
-			{
-				email: "jeca.obradovic@poslovigrada.rs",
-				password: "5bffb29d98cfbc748b2b5fc7ab9cc8ab",
-				role: "20",
-				ime: "Јелена Обрадовић",
-				opstine:["STARI GRAD","ČUKARICA","RAKOVICA"],
-				kontakt: ["jeca.obradovic@poslovigrada.rs"]
-			},
-			{
-				email: "dragica.garotic@poslovigrada.rs",
-				password: "85cc52bd941cff2ee337bab84223a291",
-				role: "20",
-				ime: "Драгица Гаротић",
-				opstine:["NOVI BEOGRAD","ZEMUN"],
-				kontakt: ["dragica.garotic@poslovigrada.rs"]
-			},
-			{
-				email: "aleksandar.varagic@poslovigrada.rs",
-				password: "d5ae81dea90394a675a6ab7b02a51e8e",
-				role: "20",
-				ime: "Александар Варагић",
-				opstine:["VOŽDOVAC","VRAČAR","SAVSKI VENAC"],
-				kontakt: ["aleksandar.varagic@poslovigrada.rs"]
-			},
-			{
-				email: "balkan@poslovigrada.rs",
-				password: "ec9fa3ac912b8171d7dde2fb862ea69e",
-				role: "30",
-				ime: "Балкан",
-				nalozi:"SeHQZ--1672650353244",
-				kontakt: ["balkan@poslovigrada.rs"]
-			},
-			{
-				email: "koliks@poslovigrada.rs",
-				password: "022c1f6c827fa6391d83e81b185b8b85",
-				role: "30",
-				ime: "Коликс",
-				nalozi:"IIwY4--1672650358507",
-				kontakt: ["koliks@poslovigrada.rs"]
-			},
-			{
-				email: "alp@poslovigrada.rs",
-				password: "9d151d4e0e7edeb436528a4970ce7311",
-				role: "30",
-				ime: "Алп Комплете",
-				nalozi:"e3MHS--1675759749849",
-				kontakt: ["office@alp-complete.rs"]
-			},
-			{
-				email: "plavavoda@poslovigrada.rs",
-				password: "2bcdc84586dbf52b73defa6c4fe5def1",
-				role: "30",
-				ime: "Плава вода",
-				nalozi:"S5mdP--1677669290493",
-				kontakt: ["p.ulamovic@gmail.com"]
-			},
-			{
-				email: "merso@poslovigrada.rs",
-				password: "b80edb8c13965d2dba09d1849073cd68",
-				role: "30",
-				ime: "Мерсо",
-				nalozi:"eupy8--1676039178890",
-				kontakt: ["vodoinstalaterzlaja2015@gmail.com"]
-			},
-			{
-				email: "premijus@poslovigrada.rs",
-				password: "605acd2eeef7bb4795b04b9ecb43aa3d",
-				role: "40",
-				ime: "Премијус",
-				nalozi:"IIwY4--1672650358507",
-				kontakt: ["premijus@poslovigrada.rs"]
-			}
-		]
-
-		usersDB.insertMany(users)
-		.then((dbResponse)=>{
-			console.log(dbResponse)
-		})
-		.catch((error)=>{
-			console.log("INSERT FAILED!!!!!!!!!!!!!!!!!!!!!!!");
-		})*/
-
+		
 
 
 
@@ -3018,6 +2894,411 @@ server.get('/magacioner/stanje',async (req,res)=>{
 	}
 });
 
+
+
+server.post('/izmeni-proizvod', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			var json = JSON.parse(req.body.json);
+			if(json.popis){
+				var setObj	=	{ $set: {
+										alarm:json.alarm,
+										stanje:json.popis,
+										price:json.price,
+										datumPopisa:getDateAsStringForDisplay(new Date()),
+										datetimePopisa: new Date().getTime()
+									}
+							};
+			}else{
+				var setObj	=	{ $set: {
+										alarm:json.alarm,
+										price:json.price
+									}
+							};
+			}
+			
+			proizvodiDB.updateOne({uniqueId:json.uniqueId},setObj)
+			.then((dbResponse)=>{
+				res.redirect("/magacioner/stanje");
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2929.</div>"
+				})
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.post('/sacuvaj-ulaz', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			var json = JSON.parse(req.body.json);
+			var insertJson = {};
+			insertJson.uniqueId = generateId(7)+"--"+new Date().getTime();
+			insertJson.productUniqueId = json.uniqueId;
+			insertJson.quantity = json.kolicina;
+			insertJson.datum = getDateAsStringForDisplay(new Date());
+			insertJson.datetime = new Date().getTime();
+
+			magacinUlaziDB.insertOne(insertJson)
+			.then((dbResponse)=>{
+				res.redirect("/magacioner/stanje");
+			}).catch((err)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2929.</div>"
+				})
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.post('/obrisi-ulaz', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+
+			magacinUlaziDB.deleteOne({uniqueId:req.body.id})
+			.then((dbResponse)=>{
+				res.redirect("/magacioner/stanje");
+			}).catch((err)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3022.</div>"
+				})
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.get('/magacioner/noviRevers',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			proizvodiDB.find({}).toArray()
+			.then((proizvodi)=>{
+				majstoriDB.find({}).toArray()
+				.then((majstori)=>{
+					res.render("magacioner/noviRevers",{
+						pageTitle:"Нови реверс",
+						proizvodi: proizvodi,
+						majstori: majstori,
+						user: req.session.user
+					})
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 3026.</div>"
+					})
+				})	
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3035.</div>"
+				})
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+
+server.post('/novi-revers', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			var json = JSON.parse(req.body.json);
+			json.uniqueId = generateId(7)+"--"+new Date().getTime();
+			json.datum = getDateAsStringForDisplay(new Date());
+			json.datetime = new Date().getTime();
+			magacinReversiDB.insertOne(json)
+			.then((dbResponse)=>{
+				res.redirect("/magacioner/revers/"+json.uniqueId);
+			}).catch((err)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3062.</div>"
+				})
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.post('/izmeni-revers', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			var json = JSON.parse(req.body.json);
+			var setObj	=	{ $set: {
+				majstor: json.majstor,
+				zaduzenje: json.zaduzenje,
+				nalog: json.nalog
+			}};
+			magacinReversiDB.updateOne({uniqueId:json.uniqueId},setObj)
+			.then((dbResponse)=>{
+				res.redirect("/magacioner/revers/"+json.uniqueId);
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3094.</div>"
+				})
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.post('/obrisi-revers', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			magacinReversiDB.deleteOne({uniqueId:req.body.id})
+			.then((dbResponse)=>{
+				res.render("message",{
+					pageTitle: "Обрисан реверс",
+					user: req.session.user,
+					message: "<div class=\"text\">Успешно сте обрисали реверс.</div>"
+				});
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3134.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.get('/magacioner/revers/:uniqueId',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			proizvodiDB.find({}).toArray()
+			.then((proizvodi)=>{
+				majstoriDB.find({}).toArray()
+				.then((majstori)=>{
+					magacinReversiDB.find({uniqueId:req.params.uniqueId}).toArray()
+					.then((reversi)=>{
+						if(reversi.length>0){
+							naloziDB.find({broj:reversi[0].nalog}).toArray()
+							.then((nalozi)=>{
+								var nalog = {};
+								if(nalozi.length>0){
+									nalog = nalozi[0]
+								}
+								res.render("magacioner/revers",{
+									pageTitle:"Rеверс по налогу "+reversi[0].nalog,
+									proizvodi: proizvodi,
+									majstori: majstori,
+									nalog: nalog,
+									revers: reversi[0],
+									user: req.session.user
+								})
+							})
+							.catch((error)=>{
+								logError(error);
+								res.render("message",{
+									pageTitle: "Програмска грешка",
+									user: req.session.user,
+									message: "<div class=\"text\">Дошло је до грешке у бази податка 3097.</div>"
+								})
+							})
+							
+						}else{
+							res.render("message",{
+								pageTitle: "Грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">Реверс није у бази података или је обрисан.</div>"
+							});
+						}
+						
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 3095.</div>"
+						})
+					})
+					
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 3026.</div>"
+					})
+				})	
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3035.</div>"
+				})
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/magacioner/pretragaReversa',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			res.render("magacioner/pretragaReversa",{
+				pageTitle:"Претрага реверса",
+				user: req.session.user
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+
+server.post('/pretraga-reversa', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			magacinReversiDB.find({nalog:req.body.brojnaloga}).toArray()
+			.then((reversi)=>{
+				naloziDB.find({broj:req.body.brojnaloga.toString()}).toArray()
+				.then((nalozi)=>{
+					majstoriDB.find({}).toArray()
+					.then((majstori)=>{
+						res.render("magacioner/rezultatPretrage",{
+							pageTitle: "Резлтати претраге реверса по налогу "+req.body.brojnaloga,
+							user: req.session.user,
+							reversi: reversi,
+							majstori: majstori,
+							nalozi: nalozi
+						});
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 3261.</div>"
+						});
+					})
+					
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 3264.</div>"
+					});
+				})
+				
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3261.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
 io.on('connection', function(socket){
 	socket.on('listaNalogaAdministracija', function(startTime,endTime){
 		var dbFindStart	=	new Date().getTime();
@@ -3151,6 +3432,19 @@ io.on('connection', function(socket){
 			socket.emit('listaFakturisanihNalogaOdgovor',0,{},[],"Greska u pretrazi naloga",error);
 		});
 	});
+
+	socket.on('adresaPoBroju', function(broj){
+		naloziDB.find({broj:broj.toString()}).toArray()
+		.then((nalozi) => {
+			if(nalozi.length>0){
+				socket.emit('adresaPoBrojuOdgovor',nalozi[0].adresa)
+			}
+		})
+		.catch((error)=>{
+			logError(error)
+		})
+	})
+
 });
 
 process.on('SIGINT', function(){

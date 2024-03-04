@@ -1,0 +1,236 @@
+<%- include ("partials/header") -%>
+	<script>
+		var proizvodi	=	<%-JSON.stringify(proizvodi)%>;
+		proizvodi = proizvodi.sort((a, b) => {
+			if (a.code < b.code) {
+				return -1;
+			}
+		});
+	</script>
+	<div class="magacinStanje magacinRevers">
+		<div class="pageWidth">
+			<div class="lightBlueBox">
+				<div class="inlines">
+					<div class="proizvodiWrap">
+						<div class="buttons" id="kategorije"></div>
+						<script>
+							for(var i=0;i<definicijeProizvoda.length;i++){
+								var mainButton = document.createElement("DIV");
+								mainButton.setAttribute("class","productButton");
+								mainButton.setAttribute("onclick","categoryPick(this)");
+								mainButton.setAttribute("data-code",definicijeProizvoda[i].startCode);
+								mainButton.innerHTML = "<div class=\"value\">"+definicijeProizvoda[i].name+"<br><span class='code'>"+definicijeProizvoda[i].startCode+"</span></div>"
+								document.getElementById("kategorije").appendChild(mainButton);
+							}
+
+							function categoryPick(elem){
+								document.getElementById("kategorije").style.display="none";
+								document.getElementById("proizvodi-lista").innerHTML = "";
+								var code = elem.dataset.code;
+								for(var i=0;i<proizvodi.length;i++){
+									if(proizvodi[i].code.startsWith(code)){
+										var mainButton = document.createElement("DIV");
+										mainButton.setAttribute("class","productButton");
+										mainButton.setAttribute("onclick","productPick(this)");
+										mainButton.setAttribute("data-uniqueid",proizvodi[i].uniqueId);
+										mainButton.innerHTML = "<div class=\"value\">"+proizvodi[i].name+"<br><span class='code'>"+proizvodi[i].code+"</span></div>"
+										document.getElementById("proizvodi-lista").appendChild(mainButton);
+									}
+								}
+								document.getElementById("proizvodi").style.display="block";
+							}
+
+							function goBackToCategories(){
+								document.getElementById("kategorije").style.display="flex";
+								document.getElementById("proizvodi").style.display = "none";
+							}
+
+							function productPick(elem){
+								var productId = elem.dataset.uniqueid;
+								var productJson = {};
+								for(var i=0;i<proizvodi.length;i++){
+									if(proizvodi[i].uniqueId==productId){
+										productJson = JSON.parse(JSON.stringify(proizvodi[i]));
+										break;
+									}
+								}
+								if(productJson.uniqueId){
+									var postojeceStavke = document.getElementById("revers-stavke").getElementsByClassName("uniqueId");
+									var stavkaNaListi = -1;
+									for(var i=0;i<postojeceStavke.length;i++){
+										if(postojeceStavke[i].value == productJson.uniqueId){
+											stavkaNaListi = i;
+											break;
+										}
+									}
+									if(stavkaNaListi>=0){
+										postojeceStavke[stavkaNaListi].parentElement.getElementsByClassName("quantityInput")[0].value = parseFloat(postojeceStavke[i].parentElement.getElementsByClassName("quantityInput")[0].value) + 1; 
+									}else{
+										var stavkaWrap = document.createElement("DIV");
+										stavkaWrap.setAttribute("class","stavkaWrap");
+											var idElem = document.createElement("INPUT");
+											idElem.setAttribute("class","uniqueId");
+											idElem.setAttribute("style","display:none");
+											idElem.setAttribute("type","text")
+											idElem.setAttribute("value",productJson.uniqueId)
+											stavkaWrap.appendChild(idElem);
+
+											var div = document.createElement("DIV");
+												var rBr = document.createElement("DIV");
+												rBr.setAttribute("class","number");
+												rBr.innerHTML = postojeceStavke.length+1+".";
+												div.appendChild(rBr);
+
+												var itemName = document.createElement("DIV");
+												itemName.setAttribute("class","name");
+												itemName.innerHTML = productJson.name;
+												div.appendChild(itemName);
+											stavkaWrap.appendChild(div);
+											
+
+											var div = document.createElement("DIV");
+												var quantity = document.createElement("DIV");
+												quantity.setAttribute("class","quantity");
+												quantity.innerHTML = "<input type=\"number\" class=\"quantityInput\" min=\"0\" value=\"1\"><div class=\"unit\">"+productJson.unit+"</div>";
+												stavkaWrap.appendChild(quantity);
+
+												var quantity2 = document.createElement("DIV");
+												quantity2.setAttribute("class","quantity2");
+												quantity2.innerHTML = "<input type=\"number\" class=\"quantity2Input\" min=\"0\" value=\"0\"><div class=\"unit\">"+productJson.unit+"</div>";
+												stavkaWrap.appendChild(quantity2);
+
+												var deleteElem = document.createElement("DIV");
+												deleteElem.setAttribute("class","delete");
+												deleteElem.setAttribute("onclick","deleteStavkaRow(this)");
+												deleteElem.innerHTML = "<img src=\"\https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/deleteRow.png\">";
+												stavkaWrap.appendChild(deleteElem);
+											stavkaWrap.appendChild(div);
+											
+
+										document.getElementById("revers-stavke").appendChild(stavkaWrap);
+									}
+								}else{
+									console.log("Nisam mogao da nadjem prozivod")
+								}
+							}
+
+							function deleteStavkaRow(elem){
+								elem.parentElement.remove();
+								var postojeceStavke = document.getElementById("revers-stavke").getElementsByClassName("stavkaWrap");
+								for(var i=0;i<postojeceStavke.length;i++){
+									postojeceStavke[i].getElementsByClassName("number")[0].innerHTML = eval(i+1)+"."
+								}
+							}
+						</script>
+						<div id="proizvodi">
+							<div class="inputWrap">
+								<div class="button" onclick="goBackToCategories()">
+									<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/backIcon.png"></div>
+									<div class="label">Назад</div>
+								</div>
+							</div>
+							<div class="buttons" id="proizvodi-lista"></div>
+						</div>
+					</div>
+					<div class="proizvodForm">
+						<div id="form">
+							<div class="title">Реверс</div>
+							<div id="form-content">
+								<div class="inputWrap">
+									<div class="inputTitle">Мајстор:</div>
+									<div class="inputWrapper">
+										<select id="majstor-reversa"></select>
+										<script>
+											var majstori	=	<%-JSON.stringify(majstori)%>;
+											var option = document.createElement("OPTION");
+											option.setAttribute("value","fantom");
+											option.innerHTML	=	"Фантомски мајстор";
+											document.getElementById("majstor-reversa").appendChild(option);
+											console.log(podizvodjaci)
+											for(var i=0;i<majstori.length;i++){
+												if(!majstori[i].inactive){
+													var option = document.createElement("OPTION");
+													option.setAttribute("value",majstori[i].uniqueId);
+													option.innerHTML	=	majstori[i].ime;
+													if(podizvodjaci.indexOf(majstori[i].uniqueId)<0){
+														document.getElementById("majstor-reversa").appendChild(option);
+													}
+													
+												}
+											}
+										</script>
+									</div>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Број налога:</div>
+									<input type="number" id="broj-naloga" oninput="brojNaloga()">
+									<script>
+										function brojNaloga(){
+											var brojNaloga = document.getElementById("broj-naloga").value.toString();
+											if(brojNaloga.length==7){
+												socket.emit("adresaPoBroju",brojNaloga)
+											}else{
+												document.getElementById("adresa-naloga").value = "";
+											}
+										}
+
+										socket.on("adresaPoBrojuOdgovor",function(adresa){
+											var brojNaloga = document.getElementById("broj-naloga").value.toString();
+											if(brojNaloga.length==7){
+												document.getElementById("adresa-naloga").value = adresa;
+											}
+										});
+									</script>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Адреса:</div>
+									<input type="text" id="adresa-naloga" disabled>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Ставке:</div>
+									<div id="revers-stavke"></div>
+								</div>
+								<div class="inputWrap">
+									<div class="button" onclick="saveRevers()">Сачувај</div>
+									<form method="POST" action="/novi-revers" style="display:none" id="novi-revers-form">
+										<input type="text" name="json" id="novi-revers-json">
+									</form>
+									<script>
+										function saveRevers(){
+											var zaduzenjeElems = document.getElementById("revers-stavke").getElementsByClassName("stavkaWrap");
+											if(zaduzenjeElems.length>0){
+												if(document.getElementById("broj-naloga").value){
+													var json = {};
+													json.majstor = document.getElementById("majstor-reversa").value;
+													json.nalog = document.getElementById("broj-naloga").value;
+													json.zaduzenje = [];
+													for(var i=0;i<zaduzenjeElems.length;i++){
+														var zaduzenjeJson = {};
+														zaduzenjeJson.uniqueId = zaduzenjeElems[i].getElementsByClassName("uniqueId")[0].value;
+														zaduzenjeJson.quantity = zaduzenjeElems[i].getElementsByClassName("quantityInput")[0].value;
+														zaduzenjeJson.quantity2 = zaduzenjeElems[i].getElementsByClassName("quantity2Input")[0].value;
+														json.zaduzenje.push(zaduzenjeJson)
+													}
+													document.getElementById("novi-revers-json").value = JSON.stringify(json);
+													loadGif();
+													document.getElementById("novi-revers-form").submit();
+												}else{
+													alert("Нисте унели број налога")
+												}
+											}else{
+												alert("Нисте унели ниједну ставку");
+											}
+											
+
+										}
+									</script>
+								</div>
+							</div>
+						</div>
+					</div>	
+				</div>
+				
+			</div>		
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

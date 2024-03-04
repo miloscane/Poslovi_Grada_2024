@@ -104,6 +104,20 @@ function getMajstorByCode(majstorId){
   return majstor
 }
 
+function vremePrijema(datetime){
+  var date    = new Date(Number(datetime));
+  var yearString  = date.getFullYear();
+  var month   = eval(date.getMonth()+1);
+  var monthString = (month<10) ? "0" + month : month;
+  var day     = date.getDate();
+  var dayString = (day<10) ? "0" + day : day;
+  var hour    = date.getHours();
+  var hourString  = (hour<10) ? "0" + hour : hour;
+  var minute    = date.getMinutes();
+  var minuteString= (minute<10) ? "0" + minute : minute;
+  return  dayString+"."+monthString+"."+yearString+". "+hourString+":"+minuteString;
+}
+
 var definicijeProizvoda = [
                     {
                       "startCode":"01.01",

@@ -18,14 +18,17 @@
 				for(var i=0;i<proizvodi.length;i++){
 					proizvodi[i].realnoStanje = parseFloat(proizvodi[i].stanje);
 					proizvodi[i].obracunStanja = [];
-					proizvodi[i].obracunStanja.push("Stanje na popisu "+reshuffleDate(proizvodi[i].datumPopisa)+" : "+proizvodi[i].stanje);
+					proizvodi[i].obracunStanja.push("<p>Стање на попису " + proizvodi[i].datumPopisa + " : " + proizvodi[i].stanje + "</p>");
+					proizvodi[i].ukupnoDodato = 0;
+					proizvodi[i].ukupnoUzeto = 0;
 					for(var j=0;j<ulazi.length;j++){
 						var datetimeUlaza = new Date(ulazi[j].datum).getTime();
 						var datetimePopisa = new Date(proizvodi[i].datumPopisa).getTime();
 						if(ulazi[j].productUniqueId==proizvodi[i].uniqueId){
 							if(datetimeUlaza>=datetimePopisa){
 								proizvodi[i].realnoStanje = proizvodi[i].realnoStanje + parseFloat(ulazi[j].quantity);
-								proizvodi[i].obracunStanja.push("Ulaz za proizvod dana "+reshuffleDate(ulazi[j].datum)+" : "+ulazi[j].quantity);
+								proizvodi[i].ukupnoDodato = proizvodi[i].ukupnoDodato + parseFloat(ulazi[j].quantity);
+								proizvodi[i].obracunStanja.push("<p>Улаз за производ дана "+reshuffleDate(ulazi[j].datum)+" : "+ulazi[j].quantity+"</p>");
 							}
 							
 						}
@@ -38,14 +41,21 @@
 								var datetimePopisa = new Date(proizvodi[i].datumPopisa).getTime()+1;//+1 dodato zbog toga jer se popis radi isti dan kad se izdaje materijal ujutru pa se izdati materijal racuna
 								if(datetimeReversa>=datetimePopisa){
 									var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
+									proizvodi[i].ukupnoUzeto = proizvodi[i].ukupnoUzeto + uzeto;
 									var vraceno = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity2);
+									proizvodi[i].ukupnoDodato = proizvodi[i].ukupnoDodato + vraceno;
 									proizvodi[i].realnoStanje = proizvodi[i].realnoStanje - uzeto + vraceno;
-									proizvodi[i].obracunStanja.push("Revers za "+getMajstorByCode(reversi[j].majstor).ime+" po nalogu broj "+reversi[j].nalog+" dana "+reshuffleDate(reversi[j].date)+" uzeto "+uzeto+",  vracno "+vraceno);
+									var imeMajstora = getMajstorByCode(reversi[j].majstor).ime ? getMajstorByCode(reversi[j].majstor).ime : "Фантомског мајстора";
+									proizvodi[i].obracunStanja.push("<p>Реверс за "+imeMajstora+" по налогу број "+reversi[j].nalog+" дана "+reshuffleDate(reversi[j].date)+" узето "+uzeto+",  враћено "+vraceno+"</p>");
 								}
 								
 							}
 						}
 					}
+					proizvodi[i].obracunStanja.push("<div style=\"border-bottom:2px solid rgb(37,57,101);\"></div>");
+					proizvodi[i].obracunStanja.push("<p>Стање: <b>"+proizvodi[i].stanje+"</b></p>");
+					proizvodi[i].obracunStanja.push("<p>Улаз и враћено: <b>"+proizvodi[i].ukupnoDodato+"</b></p>");
+					proizvodi[i].obracunStanja.push("<p>Издато: <b>"+proizvodi[i].ukupnoUzeto+"</b></p>");
 					var cenaProizvoda = isNaN(parseFloat(proizvodi[i].price)) ? 0 : parseFloat(proizvodi[i].price);
 					ukupnaVrednostMagacina = ukupnaVrednostMagacina + proizvodi[i].realnoStanje*cenaProizvoda;
 					document.getElementById("vrednost-magacina").innerHTML = brojSaRazmacima(ukupnaVrednostMagacina) + " дин.";
@@ -112,8 +122,6 @@
 									document.getElementById("product-stanje").value = productJson.realnoStanje;
 									document.getElementById("product-kriticno-stanje").value = productJson.alarm;
 									document.getElementById("product-stanje-popis").value = "";
-									document.getElementById("product-datum-popisa").value = getDateAsStringForInputObject(new Date());
-									document.getElementById("product-ulaz-datum").value = getDateAsStringForInputObject(new Date());
 									document.getElementById("product-unit").innerHTML = productJson.unit;
 									document.getElementById("product-unit2").innerHTML = productJson.unit;
 									document.getElementById("product-unit3").innerHTML = productJson.unit;
@@ -134,7 +142,7 @@
 
 													var datum = document.createElement("DIV");
 													datum.setAttribute("class","datum");
-													datum.innerHTML = reshuffleDate(ulazi[i].datum);
+													datum.innerHTML = ulazi[i].datum;
 													item.appendChild(datum);
 
 													var kolicina = document.createElement("DIV");
@@ -169,8 +177,6 @@
 								document.getElementById("product-kriticno-stanje").value = "";
 								document.getElementById("product-stanje-popis").value = "";
 								document.getElementById("obracun-stanja").innerHTML = "";
-								document.getElementById("product-datum-popisa").value = getDateAsStringForInputObject(new Date());
-								document.getElementById("product-ulaz-datum").value = getDateAsStringForInputObject(new Date());
 								document.getElementById("product-ulaz-kolicina").value = "";
 								document.getElementById("lista-ulaza").innerHTML = ""
 								document.getElementById("product-unit").innerHTML = "";
@@ -223,7 +229,7 @@
 									<div class="inputWrapper">
 										<input type="text" id="product-stanje" disabled><span class="unit" id="product-unit"></span>
 									</div>
-									<div class="prikaziStanje" onclick="document.getElementById('obracun-stanja').style.display='block'">Прикажи обрачун стања</div>
+									<div class="prikaziStanje" style="text-decoration: underline;margin-bottom:5px" onclick="document.getElementById('obracun-stanja').style.display='block'">Прикажи обрачун стања</div>
 									<div id="obracun-stanja" style="display:none"></div>
 								</div>
 								<div class="inputWrap">
@@ -240,15 +246,6 @@
 									</div>
 								</div>
 								<div class="inputWrap">
-									<div class="inputTitle">Датум новог пописа:</div>
-									<div class="inputWrapper">
-										<input type="date" id="product-datum-popisa">
-										<script>
-											document.getElementById("product-datum-popisa").value = getDateAsStringForInputObject(new Date());
-										</script>
-									</div>
-								</div>
-								<div class="inputWrap">
 									<div class="button" onclick="saveProduct()">Сачувај</div>
 									<form method="POST" action="/izmeni-proizvod" style="display:none" id="izmeni-proizvod-form">
 										<input type="text" name="json" id="izmeni-proizvod-json">
@@ -257,12 +254,10 @@
 										function saveProduct(){
 											var json = {};
 											json.uniqueId = document.getElementById("product-id").value;
-											json.pricelistCode = document.getElementById("product-pricelist-code").value ? document.getElementById("product-pricelist-code").value  : "";
 											json.alarm = document.getElementById("product-kriticno-stanje").value;
 											json.price = document.getElementById("product-price").value;
 											if(document.getElementById("product-stanje-popis").value){
 												json.popis = document.getElementById("product-stanje-popis").value;
-												json.datumPopisa = document.getElementById("product-datum-popisa").value;
 											}
 											document.getElementById("izmeni-proizvod-json").value = JSON.stringify(json);
 											loadGif();
@@ -273,15 +268,6 @@
 								</div>
 								<div style="margin-top:3px;margin-bottom:3px;border-bottom:3px solid rgb(50,50,50)"></div>
 								<div class="title">Podesi ulaz:</div>
-								<div class="inputWrap">
-									<div class="inputTitle">Датум улаза:</div>
-									<div class="inputWrapper">
-										<input type="date" id="product-ulaz-datum">
-										<script>
-											document.getElementById("product-ulaz-datum").value = getDateAsStringForInputObject(new Date());
-										</script>
-									</div>
-								</div>
 								<div class="inputWrap">
 									<div class="inputTitle">Количина:</div>
 									<div class="inputWrapper">
@@ -299,7 +285,6 @@
 										if(document.getElementById("product-ulaz-kolicina").value){
 											var json = {};
 											json.kolicina = document.getElementById("product-ulaz-kolicina").value;
-											json.datum = document.getElementById("product-ulaz-datum").value;
 											json.uniqueId = document.getElementById("product-id").value;
 											document.getElementById("sacuvaj-ulaz-json").value = JSON.stringify(json);
 											loadGif();
@@ -313,6 +298,16 @@
 								<div class="title">Улази:</div>
 								<div class="inputWrap"><div class="note">Приказани су само улази од последњег пописа</div></div>
 								<div id="lista-ulaza"></div>
+								<script>
+									function deleteUlaz(id){
+										document.getElementById("obrisi-ulaz-input").value = id;
+										loadGif();
+										document.getElementById("obrisi-ulaz-form").submit();
+									}
+								</script>
+								<form method="POST" style="display:none" action="/obrisi-ulaz" id="obrisi-ulaz-form">
+									<input type="text" name="id" id="obrisi-ulaz-input">
+								</form>
 							</div>
 						</div>
 					</div>	
