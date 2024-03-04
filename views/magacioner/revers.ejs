@@ -292,6 +292,7 @@
 											var logoLogoBlob;
 											function make_base3(){
 											  base_image3 = new Image();
+											  base_image3.crossOrigin="anonymous"
 											  base_image3.src = 'https://portal.poslovigrada.rs/images/fakturaLogo.png';
 											  base_image3.onload = function(){
 											    logoCanvasContext.drawImage(base_image3, 0, 0);
