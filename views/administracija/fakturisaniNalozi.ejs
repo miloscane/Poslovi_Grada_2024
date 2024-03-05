@@ -111,6 +111,7 @@
 				}
 				
 				socket.on("listaFakturisanihNalogaOdgovor",function(status,statistika,naloziFromServer,data,warnings){
+					console.log(naloziFromServer)
 		          if(status==1){
 		          	nalozi = naloziFromServer;
 		          	scrollTable(1);
@@ -120,6 +121,7 @@
 		          		console.log("Warnings:");
 		          		console.log(warnings)
 		          	}
+
 		          	
 		          }else if(status==0){
 		          	document.getElementById("table").innerHTML = "<div class=\"infoError\">Дошло је до грешке приликом преузимања налога.</div><div class=\"error\">"+data+"</div>"
@@ -182,7 +184,7 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value datumNaloga");
-								div.innerHTML = nalozi[i].faktura.datum;
+								div.innerHTML = nalozi[i].faktura.datum.datum;
 								td.appendChild(div);
 							tr.appendChild(td);
 

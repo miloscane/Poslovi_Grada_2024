@@ -3547,7 +3547,7 @@ io.on('connection', function(socket){
 					if(nalogToPush.samoBroj == 0){
 						warnings.push("Nije moguce odrediti broj fakture za nalog "+nalogToPush.broj+", broj fakture"+nalogToPush.brojFakture);
 					}else{
-						if(Number(nalogToPush.samoBroj)>=Number(odBroja) && Number(nalogToPush.samoBroj)<=Number(doBroja)){
+						if(Number(nalogToPush.faktura.samoBroj)>=Number(odBroja) && Number(nalogToPush.faktura.samoBroj)<=Number(doBroja)){
 							naloziToSend.push(nalogToPush)
 						}
 					}

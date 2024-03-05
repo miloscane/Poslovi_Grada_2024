@@ -174,7 +174,7 @@ function generatePremijusSaPenalom(info){
 	    '<cbc:InvoicedQuantity unitCode="H87">-1</cbc:InvoicedQuantity>'+
 	    '<cbc:LineExtensionAmount currencyID="RSD">-'+eval(parseFloat(info.iznos)*penal/100).toFixed(2)+'</cbc:LineExtensionAmount>'+
 	    '<cac:Item>'+
-	      '<cbc:Name>'+'HITNI I NEODLOŽNI RADOVI I TEKUĆE POPRAVKE-VIK RADOVI-'+info.adresa+' NARUDŽBENICA BR. '+info.broj+'</cbc:Name>'+
+	      '<cbc:Name>'+'HITNI I NEODLOŽNI RADOVI I TEKUĆE POPRAVKE-VIK RADOVI-'+info.adresa+' NARUDŽBENICA BR. '+info.brojNaloga+'</cbc:Name>'+
 	      '<cac:ClassifiedTaxCategory>'+
 	        '<cbc:ID>N</cbc:ID>'+
 	        '<cbc:Percent>0</cbc:Percent>'+
@@ -325,7 +325,7 @@ function generatePremijusBezPenala(info){
 	      '<cbc:InvoicedQuantity unitCode="H87">1</cbc:InvoicedQuantity>'+
 	      '<cbc:LineExtensionAmount currencyID="RSD">'+parseFloat(info.iznos).toFixed(2)+'</cbc:LineExtensionAmount>'+
 	      '<cac:Item>'+
-	         '<cbc:Name>HITNI I NEODLOŽNI RADOVI I TEKUĆE POPRAVKE-VIK RADOVI-'+info.adresa+'-NARUDŽBENICA BR.'+info.broj+'</cbc:Name>'+
+	         '<cbc:Name>HITNI I NEODLOŽNI RADOVI I TEKUĆE POPRAVKE-VIK RADOVI-'+info.adresa+'-NARUDŽBENICA BR.'+info.brojNaloga+'</cbc:Name>'+
 	         '<cac:ClassifiedTaxCategory>'+
 	            '<cbc:ID>S</cbc:ID>'+
 	            '<cbc:Percent>20</cbc:Percent>'+
