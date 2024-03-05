@@ -154,7 +154,7 @@ function logError(error){
 	errorJSON.jsonerror = error;
 	errorDB.insertOne(errorJSON)
 	.then((dbResponse)=>{
-		console.log(dbResponse)
+		//console.log(dbResponse)
 	}).catch((err)=>{
 		console.log(err);
 	})
@@ -522,12 +522,12 @@ http.listen(process.env.PORT, function(){
 									"prijemnica.datum.datum": prijemnicaJson.datum,
 									"prijemnica.datum.datetime": prijemnicaJson.datetime,
 									"prijemnica.validanObracun": prijemnicaJson.validanObracun,
-									status: "Spreman za fakturisanje",
+									statusNaloga: "Spreman za fakturisanje",
 									"prijemnica.lokacija": "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/prijemnice/"+value
 								}};
 								naloziDB.updateOne({broj:prijemnicaJson.nalog.toString()},setObj)
 								.then((dbResponse)=>{
-									console.log(index+". success")
+									console.log(index+"/"+prijemnice.length+". success")
 								})
 								.catch((error)=>{
 									console.log(error);
@@ -3349,6 +3349,111 @@ server.post('/pretraga-reversa', async (req, res)=> {
 		res.redirect("/login");	
 	}
 });
+
+server.post('/fakturisi', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==40){
+			var json = JSON.parse(req.body.json);
+			var samoBroj = 0;
+			try{
+				samoBroj = json.brojFakture.toLowerCase().split(".").join("").split("s-")[1].split("/202")[0];
+			}catch(err){
+				logError(err)
+			}
+			var setObj	=	{ $set: {
+											"faktura.broj": 	json.brojFakture,
+											"faktura.samoBroj": samoBroj,
+											"faktura.pdv": 	json.pdv
+										}};
+			naloziDB.updateOne({broj:json.brojNaloga.toString()},setObj)
+			.then((dbResponse)=>{
+				const worker 		=	new Worker("./fakturaWorker.js",{ env:SHARE_ENV});
+				worker.postMessage(req.body.json);
+				worker.on("message",(data)=>{
+					try{
+						var fakturaResponse = JSON.parse(data);
+						if(fakturaResponse.error>0){
+							//Greska
+							res.render("message",{
+								pageTitle: "Грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">"+fakturaResponse.message+"<br>&nbsp;<br>"+fakturaResponse.messageString+"</div>"
+							});
+						}else{
+							var setObj	=	{ $set: {
+												statusNaloga: 		"Fakturisan",
+												"faktura.premijus": 	fakturaResponse.faktura,
+												"faktura.datum.datetime": new Date().getTime(),
+												"faktura.datum.datum": getDateAsStringForDisplay(new Date()),
+											}};
+							naloziDB.updateOne({broj:json.brojNaloga.toString()},setObj)
+							.then((dbResponse2)=>{
+								res.redirect("/nalog/"+json.brojNaloga);
+							})
+							.catch((error)=>{
+								logError(error)
+								res.render("message",{
+									pageTitle: "Грешка",
+									user: req.session.user,
+									message: "<div class=\"text\">Грешка на порталу. Фактура је окачена на СЕФ али статус налога није промењен у Фактурисан.</div>"
+								});
+							})
+							
+						}
+						
+					}catch(err){
+						logError(err);
+						res.render("message",{
+							pageTitle: "Грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Грешка на порталу 3410. Није могуће утврдити шта се десило на СЕФ-у, проверите шта се десило.</div>"
+						});
+					}
+				});
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка на порталу, база података 3369. Није ништа посалто на СЕФ.</div>"
+				});
+			})
+
+
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.get('/uspesnoFakturisano',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==40){
+			res.render("message",{
+				pageTitle: "Успешно фактурисано",
+				user: req.session.user,
+				message: "<div class=\"text\">Успешно фактурисан налог.</div>"
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 
 io.on('connection', function(socket){
 	socket.on('listaNalogaAdministracija', function(startTime,endTime){

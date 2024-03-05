@@ -58,6 +58,12 @@
 							}
 						</script>
 					</div>
+					<div class="filter">
+						<div class="label">Филтер Броја Налога:</div>
+						<div class="checkboxes">
+							<input type="text" id="nalog-filter" oninput="nalogFilter(this)">
+						</div>
+					</div>
 				</div>
 				<div class="tableWrap">
 					<div class="tableHeader">
@@ -134,7 +140,8 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value ikonica");
-								if(naloziToShow[i].faktura.broj!=""){
+								if(naloziToShow[i].brojFakture!=""){
+
 									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
 								}
 								td.appendChild(div);
@@ -143,7 +150,7 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojFakture");
-								div.innerHTML = naloziToShow[i].faktura.broj;
+								div.innerHTML = naloziToShow[i].brojFakture;
 								td.appendChild(div);
 							tr.appendChild(td);
 							
@@ -183,6 +190,96 @@
 				}
 
 				generateTable();
+
+				function nalogFilter(elem){
+					naloziToShow = [];
+					for(var i=0;i<nalozi.length;i++){
+						//isfiltriraj ovde
+						if(nalozi[i].broj.includes(elem.value)){
+							var nalogToPush = {};
+							nalogToPush.broj = nalozi[i].broj;
+							nalogToPush.datum = nalozi[i].datum.datum;
+							nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
+							nalogToPush.adresa = nalozi[i].adresa;
+							nalogToPush.statusNaloga = nalozi[i].statusNaloga;	
+							nalogToPush.brojFakture = nalozi[i].faktura.broj ? nalozi[i].faktura.broj : "";
+							nalogToPush.ukupanIznos = nalozi[i].ukupanIznos;							
+							naloziToShow.push(nalogToPush);	
+						}
+						
+					}
+
+					document.getElementById("table").innerHTML = "";
+					var table = document.createElement("TABLE");
+					var ukupanIznos = 0;
+					for(var i=0;i<naloziToShow.length;i++){
+						ukupanIznos = ukupanIznos + parseFloat(naloziToShow[i].ukupanIznos);
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1)+".";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojNaloga");
+								div.innerHTML = naloziToShow[i].broj;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value ikonica");
+								if(naloziToShow[i].brojFakture!=""){
+
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
+								}
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojFakture");
+								div.innerHTML = naloziToShow[i].brojFakture;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value datumNaloga");
+								div.innerHTML = naloziToShow[i].datum;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value radnaJedinica");
+								div.innerHTML = naloziToShow[i].radnaJedinica;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value iznos");
+								div.innerHTML = brojSaRazmacima(naloziToShow[i].ukupanIznos);
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value link");
+								div.innerHTML = "<a href='/nalog/"+naloziToShow[i].broj+"' target='_blank'>Види налог</a>";
+								td.appendChild(div);
+							tr.appendChild(td);
+
+						table.appendChild(tr);
+					}
+					document.getElementById("table").appendChild(table);
+					document.getElementById("ukupno-naloga").innerHTML = naloziToShow.length;
+					document.getElementById("iznos-prikazanih-naloga").innerHTML = brojSaRazmacima(ukupanIznos);
+				}
 
 				function printTable(){
 					doc.setFontSize(10);

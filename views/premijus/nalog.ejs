@@ -24,7 +24,7 @@
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturisanoIcon.png"></div>
 					<div class="info">
 						<div class="title">Број фактуре</div>
-						<div class="text"><input type="text" id="broj-fakture" value="<%=nalog.brojFakture%>"></div>
+						<div class="text"><input type="text" id="broj-fakture" value="<%=nalog.faktura.broj%>"></div>
 						<div class="note">Кликни да скинеш еФактуру</div>
 					</div>
 				</div>
@@ -46,7 +46,7 @@
 						<div class="note" id="prijemnica-note"></div>
 						<script>
 							if(nalog.prijemnica.broj!=""){
-								document.getElementById("datum-prijemnice").value = nalog.prijemnica.datum.datum;
+								document.getElementById("datum-prijemnice").innerHTML = nalog.prijemnica.datum.datum;
 								document.getElementById("prijemnica-note").innerHTML = "<a href=\""+nalog.prijemnica.lokacija+"\" target=\"_blank\">Кликни да скинеш пријемницу.</a>";
 							}
 						</script>
@@ -67,7 +67,7 @@
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumFakturisanjaIcon.png"></div>
 					<div class="info">
 						<div class="title">Датум фактурe</div>
-						<div class="text"><%=nalog.faktura.broj%></div>
+						<div class="text"><%=nalog.faktura.datum.datum%></div>
 					</div>
 				</div>
 				<div class="box">
@@ -99,6 +99,9 @@
 					</div>
 				</div>
 			</div>
+			<form method="POST" action="/fakturisi" id="form" style="display:none">
+				<input type="text" name="json" id="json">
+			</form>
 			<div class="saveNalog">
 				<div class="inputWrapper">
 					<div class="inputWrap">
@@ -106,6 +109,21 @@
 					</div>
 				</div>
 			</div>
+			<script>
+				function fakturisi(){
+					var json = {};
+					json.brojNaloga = nalog.broj;
+					json.adresa = nalog.punaAdresa;
+					json.brojFakture = document.getElementById("broj-fakture").value;
+					json.datumPrometa = nalog.prijemnica.datum.datum;
+					json.pdv = document.getElementById("pdv-obracun").value;
+					json.penal = nalog.faktura.penal;
+					json.iznos = nalog.ukupanIznos;
+					document.getElementById("json").value = JSON.stringify(json);
+					loadGif();
+					document.getElementById("form").submit();
+				}
+			</script>
 		</div>
 	</div>	
 <%- include ("partials/footer") -%>
