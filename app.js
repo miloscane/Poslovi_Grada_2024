@@ -3347,7 +3347,7 @@ server.post('/pretraga-reversa', async (req, res)=> {
 		}
 	}else{
 		res.redirect("/login");	
-	}
+	} 
 });
 
 server.post('/fakturisi', async (req, res)=> {
