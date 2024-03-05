@@ -1886,7 +1886,7 @@ server.post('/edit-nalog', async (req, res)=> {
 							//ima izvestaja
 							izvestajiDB.insertOne(izvestajJson)
 							.then((dbResponse)=>{
-								if(Number(req.session.user.role)==30){
+								//if(Number(req.session.user.role)==30){
 									var ukupanIznos = 0;
 									for(var i=0;i<nalogJson.obracun;i++){
 										for(var j=0;j<cenovnik.length;j++){
@@ -1904,9 +1904,7 @@ server.post('/edit-nalog', async (req, res)=> {
 										ukupanIznos: ukupanIznos,
 										izmenio: req.session.user
 									}};
-								}else{
 
-								}
 								
 								naloziDB.updateOne({broj:nalogJson.broj},setObj)
 								.then((dbResponse2) => {
