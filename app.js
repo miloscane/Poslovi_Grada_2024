@@ -3861,13 +3861,65 @@ io.on('connection', function(socket){
 					statistika.ukupanPdv = statistika.ukupanPdv + iznosNaloga*0.2;
 				}
 			}
-
 			naloziToSend = naloziToSend.sort((a, b) => {
-				if (a.samoBroj < b.samoBroj) {
+				if (a.faktura.samoBroj < b.faktura.samoBroj) {
 					return -1;
 				}
 			});
 			socket.emit('listaFakturisanihNalogaOdgovor',1,statistika,naloziToSend,"Found "+naloziToSend.length+" in " + eval(new Date().getTime()/1000-dbFindStart/1000).toFixed(2)+"s",warnings);	
+			
+		})
+		.catch((error)=>{
+			logError(error);
+			socket.emit('listaFakturisanihNalogaOdgovor',0,{},[],"Greska u pretrazi naloga",error);
+		});
+	});
+
+	socket.on('listaFakturisanihNalogaPoBroju', function(odBroja,doBroja){
+		var dbFindStart	=	new Date().getTime();
+		var warnings = [];
+		naloziDB.find({statusNaloga:"Fakturisan"}).toArray()
+		.then((nalozi) => {
+			var naloziToSend	=	[];
+			for(var i=0;i<nalozi.length;i++){
+				var nalogToPush = {};
+				nalogToPush.broj = nalozi[i].broj;
+				nalogToPush.faktura = nalozi[i].faktura;
+				nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
+				nalogToPush.ukupanIznos = nalozi[i].ukupanIznos;
+				if(nalogToPush.faktura.samoBroj==0 || isNaN(Number(nalogToPush.faktura.samoBroj))){
+					warnings.push("Nije moguce odrediti broj fakture za nalog "+nalogToPush.broj+", broj fakture"+nalogToPush.brojFakture);
+				}else{
+					if(Number(nalogToPush.faktura.samoBroj)>=Number(odBroja) && Number(nalogToPush.faktura.samoBroj)<=Number(doBroja)){
+						naloziToSend.push(nalogToPush)
+					}
+				}
+			}
+
+			var statistika	=	{};
+			statistika.ukupnoNaloga					=	naloziToSend.length;
+			statistika.ukupanIznos					=	0;
+			statistika.ukupanPdv						=	0;
+			statistika.ukupnoPrekoPolaMil		=	0;
+
+			for(var i=0;i<naloziToSend.length;i++){
+				if(isNaN(parseFloat(naloziToSend[i].ukupanIznos))){
+					warnings.push("Nalog "+ naloziToSend.broj +" nema definisan iznos ("+naloziToSend[i].ukupanIznos+").")
+				}
+				var iznosNaloga = isNaN(parseFloat(naloziToSend[i].ukupanIznos)) ? 0 : parseFloat(naloziToSend[i].ukupanIznos);
+				statistika.ukupanIznos = statistika.ukupanIznos + iznosNaloga
+				if(iznosNaloga>=500000){
+					statistika.ukupnoPrekoPolaMil++;
+				}else{
+					statistika.ukupanPdv = statistika.ukupanPdv + iznosNaloga*0.2;
+				}
+			}
+			naloziToSend = naloziToSend.sort((a, b) => {
+				if (a.faktura.samoBroj < b.faktura.samoBroj) {
+					return -1;
+				}
+			});
+			socket.emit('listaFakturisanihNalogaPoBrojuOdgovor',1,statistika,naloziToSend,"Found "+naloziToSend.length+" in " + eval(new Date().getTime()/1000-dbFindStart/1000).toFixed(2)+"s",warnings);	
 			
 		})
 		.catch((error)=>{
@@ -3912,4 +3964,5 @@ process.on('uncaughtException', function (exception) {
 	console.log("Database Closed [EXIT]");
 	process.exit();
 });
+
 

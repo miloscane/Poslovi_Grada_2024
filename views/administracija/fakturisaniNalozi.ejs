@@ -29,11 +29,11 @@
 			<div class="filters">
 				<div class="filterWrap">
 					<div class="inputWrap">
-						<div class="label">Од датума налога:</div>
+						<div class="label">Од датума фактуре:</div>
 						<div class="inputWrapper"><input type="date" id="od-datuma"></div>
 					</div>
 					<div class="inputWrap">
-						<div class="label">До датума налога:</div>
+						<div class="label">До датума фактуре:</div>
 						<div class="inputWrapper"><input type="date" id="do-datuma"></div>
 					</div>
 					<div class="inputWrap" onclick="updateTableFromDates()">
@@ -104,7 +104,7 @@
 						document.getElementById("ukupan-iznos-naloga").innerHTML = "-";
 						document.getElementById("ukupan-pdv-naloga").innerHTML = "-";
 						document.getElementById("fakture-preko-pola-mil").innerHTML = "-";
-						socket.emit("listaFakturisanihNaloga","","",startNumber,endNumber);	
+						socket.emit("listaFakturisanihNalogaPoBroju",startNumber,endNumber);	
 					}else{
 						alert("Нисте дефинисали бројеве лепо.")
 					}
@@ -121,6 +121,29 @@
 
 		          	placeInformation(statistika);
 		          	console.log(data);
+		          	if(warnings.length>0){
+		          		console.log("Warnings:");
+		          		console.log(warnings)
+		          	}
+
+		          	
+		          }else if(status==0){
+		          	document.getElementById("table").innerHTML = "<div class=\"infoError\">Дошло је до грешке приликом преузимања налога.</div><div class=\"error\">"+data+"</div>"
+		          }else{
+		          	console.log("Couldn't figure out status response");
+		          }
+		        });
+				
+				socket.on("listaFakturisanihNalogaPoBrojuOdgovor",function(status,statistika,naloziFromServer,data,warnings){
+		          if(status==1){
+		          	nalozi = naloziFromServer;
+		          	try{
+		          		scrollTable(1);
+		          	}catch(err){
+		          		console.log(err)	
+		          	}
+
+		          	placeInformation(statistika);
 		          	if(warnings.length>0){
 		          		console.log("Warnings:");
 		          		console.log(warnings)
