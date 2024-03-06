@@ -228,7 +228,12 @@
 					<div class="box">
 						<div class="info">
 							<div class="title">Опис квара</div>
-							<div class="text"><%=nalog.opis%></div>
+							<div class="text"><%=nalog.opis%><br>&nbsp;<br><span id="zahtevalac"></span></div>
+							<script>
+								if(nalog.zahtevalac){
+									document.getElementById("zahtevalac").innerHTML = nalog.zahtevalac;
+								}
+							</script>
 						</div>
 						<div class="boxMore"><%=nalog.vrstaRada%></div>
 					</div>

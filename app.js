@@ -324,6 +324,19 @@ function parseNalog(data,user,lokacija){
 			}
 		}
 
+		//Zahtevalac
+		if(line.startsWith("Zahtevalac:")){
+			nalogJson.zahtevalac	=	"";
+			for(var j=1;j<5;j++){
+				if(!nalogArray[i+j].startsWith("Broj zaht")){
+					nalogJson.zahtevalac += nalogArray[i+j].replace(/(\r\n|\n|\r)/gm, "");
+				}else{
+					break;
+				}
+			}
+			//console.log("Zahtevalac: " + nalogJson.zahtevalac);
+		}
+
 	}
 	return nalogJson;
 }
@@ -629,6 +642,34 @@ http.listen(process.env.PORT, function(){
 		    		console.log(value)
 						console.log("FAILED TO FIND!!!!!!!!!!!!!!!!!!!!!!!");
 					})
+		    })
+		    .catch((error)=>{
+		    	console.log(error)
+		    	console.log(value)
+		    	console.log("FAILED PARSE!!!!!!!!!!!!!!!!!!!!!!!");
+		    })
+				
+			}, index*200)
+		)*/
+
+		//Testiranje citanja naloga
+		/*var user = {};
+		user.name = "Милош Иванковић";
+		user.email = "miloscane@gmail.com";
+		var imenaNaloga = fs.readdirSync("./novo");
+		for(var i=0;i<imenaNaloga.length;i++){
+			if(!imenaNaloga[i].includes(".pd")){
+				imenaNaloga.splice(i,1);
+				i--;
+			}
+		}
+		imenaNaloga.forEach((value, index) =>
+			setTimeout(() => {
+				var fileContents = fs.readFileSync("./novo/"+value);
+		    pdfParse(fileContents)
+		    .then((data)=>{
+		    	var nalogJson = parseNalog(data.text,user,"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/nalozi/"+value);
+		    	console.log(nalogJson.zahtevalac)
 		    })
 		    .catch((error)=>{
 		    	console.log(error)

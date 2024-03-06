@@ -55,7 +55,7 @@
 				document.getElementById("image-lightbox").style.display="block";
 				document.getElementById("image-lightbox").getElementsByClassName("image")[0].src = url;
 				document.getElementById("image-lightbox").getElementsByTagName("A")[0].href = url;
-				document.getElementById("image-lightbox").getElementsByTagName("A")[0].download = name+"."+url.split(".")[url.split(".").length-1];
+				document.getElementById("image-lightbox").getElementsByTagName("A")[0].setAttribute("download","nalog")//name+"."+url.split(".")[url.split(".").length-1];
 			}
 			function showNextImage(){
 				var imageUrl = document.getElementById("image-lightbox").getElementsByClassName("image")[0].src;
