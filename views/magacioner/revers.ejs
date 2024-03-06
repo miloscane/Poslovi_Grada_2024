@@ -198,7 +198,8 @@
 									<div class="inputTitle" id="date"></div>
 									<script>
 										var datumReversa = new Date(Number(revers.datetime));
-										document.getElementById("date").innerHTML = revers.datum + " "+ datumReversa.getHours()+":"+datumReversa.getMinutes();
+										var datum = revers.datum ? revers.datum : reshuffleDate(revers.date);
+										document.getElementById("date").innerHTML = datum + " "+ datumReversa.getHours()+":"+datumReversa.getMinutes();
 									</script>
 								</div>
 								<div class="inputWrap">
@@ -232,7 +233,8 @@
 									<div class="inputTitle">Број налога:</div>
 									<input type="number" id="broj-naloga" oninput="brojNaloga()">
 									<script>
-										document.getElementById("broj-naloga").value = nalog.broj;
+
+										document.getElementById("broj-naloga").value = nalog.broj ? nalog.broj : revers.nalog;
 										function brojNaloga(){
 											var brojNaloga = document.getElementById("broj-naloga").value.toString();
 											if(brojNaloga.length==7){
@@ -254,7 +256,7 @@
 									<div class="inputTitle">Адреса:</div>
 									<input type="text" id="adresa-naloga" disabled>
 									<script>
-										document.getElementById("adresa-naloga").value = nalog.adresa;
+										document.getElementById("adresa-naloga").value = nalog.adresa ? nalog.adresa : "";
 									</script>
 								</div>
 								<div class="inputWrap">
