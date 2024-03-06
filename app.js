@@ -548,6 +548,8 @@ http.listen(process.env.PORT, function(){
 					
 				}, index*200)
 			)*/
+
+
 		})
 		.catch((error)=>{
 			logError(error);
@@ -1550,6 +1552,25 @@ server.get('/nalog/:broj',async (req,res)=>{
 								ucinakMajstoraDB.find({brojNaloga:req.params.broj.toString()}).toArray()
 								.then((ucinci)=>{
 									if(Number(req.session.user.role)==10){
+										var podizvodjac = 0;
+										var cenovnikPodizvodjaca = [];
+										if(podizvodjaci.indexOf(nalozi[0].majstor)>=0){
+											podizvodjac = 1;
+											if(nalozi[0].majstor=="SeHQZ--1672650353244" || nalozi[0].majstor=="IIwY4--1672650358507"){
+												cenovnikPodizvodjaca = cenovnikHigh;
+											}else{
+												cenovnikPodizvodjaca = cenovnikLow;
+											}
+											for(var i=0;i<cenovnik.length;i++){
+												for(var j=0;j<cenovnikPodizvodjaca.length;j++){
+													if(cenovnik[i].code==cenovnikPodizvodjaca[j].code){
+														cenovnik[i].podizvodjacPrice = cenovnikPodizvodjaca[j].price;
+														break;
+													}
+												}
+											}
+										}
+										
 										res.render("administracija/nalog",{
 											pageTitle:"Налог број " + req.params.broj,
 											nalog: nalozi[0],
@@ -1560,6 +1581,7 @@ server.get('/nalog/:broj',async (req,res)=>{
 											izvestaji: izvestaji,
 											ucinci: ucinci,
 											phoneAccessCode: phoneAccessCode,
+											podizvodjac: podizvodjac,
 											user: req.session.user
 										});
 									}else if(Number(req.session.user.role)==20){
@@ -3463,20 +3485,6 @@ io.on('connection', function(socket){
 				for(var i=0;i<nalozi.length;i++){
 					var nalogDate	=	new Date(Number(nalozi[i].uniqueId.split("--")[1]));
 					var nalogTime	=	new Date(getDateAsStringForInputObject(nalogDate)).getTime();
-					delete nalozi[i].zahtevalac;
-					delete nalozi[i].vrstaRada;
-					delete nalozi[i].rokPocetkaIzvodjenjaRadova;
-					delete nalozi[i].fakturisanje;
-					delete nalozi[i].radIzvrsen;
-					delete nalozi[i].radPregledan;
-					delete nalozi[i].datumIspostavljanjaNarudzbenice;
-					delete nalozi[i].brojNarudzbenice;
-					delete nalozi[i].datumOdlaganja;
-					delete nalozi[i].razlogOdlaganja;
-					delete nalozi[i].opisKvara;
-					delete nalozi[i].opisRadova;
-					delete nalozi[i].opisRadovaArr;
-					delete nalozi[i].statusOdMajstora;
 					delete nalozi[i]._id;
 					delete nalozi[i].uniqueId;
 					if(nalogTime>=startTime && nalogTime<=endTime){

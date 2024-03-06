@@ -111,10 +111,14 @@
 				}
 				
 				socket.on("listaFakturisanihNalogaOdgovor",function(status,statistika,naloziFromServer,data,warnings){
-					console.log(naloziFromServer)
 		          if(status==1){
 		          	nalozi = naloziFromServer;
-		          	scrollTable(1);
+		          	try{
+		          		scrollTable(1);
+		          	}catch(err){
+		          		console.log(err)	
+		          	}
+
 		          	placeInformation(statistika);
 		          	console.log(data);
 		          	if(warnings.length>0){
@@ -157,66 +161,72 @@
 					var startIndex		=	Math.floor(scrollValue / rowHeight);
 					var endIndex		=	startIndex + numberOfElements;
 					document.getElementById("table").innerHTML = "";
-					var table = document.createElement("TABLE");
+					var table = document.createElement("TABLE")
 					for(var i=startIndex;i<endIndex;i++){
-						var tr = document.createElement("TR");
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value redniBroj");
-								div.innerHTML = eval(i+1)+".";
-								td.appendChild(div);
-							tr.appendChild(td);
+						if(nalozi[i]){
+							var tr = document.createElement("TR");
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value redniBroj");
+									div.innerHTML = eval(i+1)+".";
+									td.appendChild(div);
+								tr.appendChild(td);
 
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value brojNaloga");
-								div.innerHTML = nalozi[i].broj;
-								td.appendChild(div);
-							tr.appendChild(td);
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value brojNaloga");
+									div.innerHTML = nalozi[i].broj;
+									td.appendChild(div);
+								tr.appendChild(td);
 
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value brojFakture");
-								div.innerHTML = nalozi[i].faktura.broj ? nalozi[i].faktura.broj : " ";
-								td.appendChild(div);
-							tr.appendChild(td);
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value brojFakture");
+									div.innerHTML = nalozi[i].faktura.broj ? nalozi[i].faktura.broj : " ";
+									td.appendChild(div);
+								tr.appendChild(td);
 
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value datumNaloga");
-								div.innerHTML = nalozi[i].faktura.datum.datum;
-								td.appendChild(div);
-							tr.appendChild(td);
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value datumNaloga");
+									div.innerHTML = nalozi[i].faktura.datum.datum;
+									td.appendChild(div);
+								tr.appendChild(td);
 
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value radnaJedinica");
-								div.innerHTML = nalozi[i].radnaJedinica;
-								td.appendChild(div);
-							tr.appendChild(td);
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value radnaJedinica");
+									div.innerHTML = nalozi[i].radnaJedinica;
+									td.appendChild(div);
+								tr.appendChild(td);
 
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value iznos");
-								var iznosNaloga = isNaN(parseFloat(nalozi[i].ukupanIznos)) ? 0 : parseFloat(nalozi[i].ukupanIznos);
-								div.innerHTML = brojSaRazmacima(iznosNaloga);
-								td.appendChild(div);
-							tr.appendChild(td);
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value iznos");
+									var iznosNaloga = isNaN(parseFloat(nalozi[i].ukupanIznos)) ? 0 : parseFloat(nalozi[i].ukupanIznos);
+									div.innerHTML = brojSaRazmacima(iznosNaloga);
+									td.appendChild(div);
+								tr.appendChild(td);
 
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value pogledajNalog");
-									var a = document.createElement("A");
-									a.setAttribute("href","/nalog/"+nalozi[i].broj);
-									a.setAttribute("target","_blank");
-									a.setAttribute("class","tableButton");
-									a.innerHTML = "Погледај налог"
-									div.appendChild(a)
-								td.appendChild(div);
-							tr.appendChild(td);
-						table.appendChild(tr)
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value pogledajNalog");
+										var a = document.createElement("A");
+										a.setAttribute("href","/nalog/"+nalozi[i].broj);
+										a.setAttribute("target","_blank");
+										a.setAttribute("class","tableButton");
+										a.innerHTML = "Погледај налог"
+										div.appendChild(a)
+									td.appendChild(div);
+								tr.appendChild(td);
+							table.appendChild(tr);	
+						}
+						
+
+						
 					}
 					document.getElementById("table").appendChild(table);
+					
 				}
 			</script>
 		</div>

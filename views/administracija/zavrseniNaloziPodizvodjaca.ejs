@@ -25,29 +25,32 @@
 			<div class="lightBlueBox">
 				<div class="filters">
 					<div class="filter">
-						<div class="label">Приказане радне јединице:</div>
+						<div class="label">Приказани подизвоћачи:</div>
 						<div class="checkboxes" id="filter-opstine-checkboxes"></div>
 						<script>
-							for(var i=0;i<radneJedinice.length;i++){
-								var checkboxWrapper = document.createElement("DIV");
-								checkboxWrapper.setAttribute("class","checkboxWrapper");
-									var checkboxWrap = document.createElement("DIV");
-									checkboxWrap.setAttribute("class","checkboxWrap");
-										var input = document.createElement("INPUT");
-										input.setAttribute("type","checkbox");
-										input.setAttribute("class","radnaJedinicaCheckbox");
-										input.setAttribute("value",radneJedinice[i]);
-										input.setAttribute("oninput","generateTable()");
-										input.checked = true;
-										checkboxWrap.appendChild(input);
-									checkboxWrapper.appendChild(checkboxWrap);
+							for(var i=0;i<podizvodjaci.length;i++){
+								if(!getMajstorByCode(podizvodjaci[i]).inactive){
+									var checkboxWrapper = document.createElement("DIV");
+									checkboxWrapper.setAttribute("class","checkboxWrapper");
+										var checkboxWrap = document.createElement("DIV");
+										checkboxWrap.setAttribute("class","checkboxWrap");
+											var input = document.createElement("INPUT");
+											input.setAttribute("type","checkbox");
+											input.setAttribute("class","radnaJedinicaCheckbox");
+											input.setAttribute("value",podizvodjaci[i]);
+											input.setAttribute("oninput","generateTable()");
+											input.checked = true;
+											checkboxWrap.appendChild(input);
+										checkboxWrapper.appendChild(checkboxWrap);
 
-									var label = document.createElement("DIV");
-									label.setAttribute("class","label");
-									label.setAttribute("onclick","checkboxLabelClick(this)")
-									label.innerHTML	=	radneJedinice[i];
-									checkboxWrapper.appendChild(label);
-								document.getElementById("filter-opstine-checkboxes").appendChild(checkboxWrapper);
+										var label = document.createElement("DIV");
+										label.setAttribute("class","label");
+										label.setAttribute("onclick","checkboxLabelClick(this)")
+										label.innerHTML	=	getMajstorByCode(podizvodjaci[i]).ime;
+										checkboxWrapper.appendChild(label);
+									document.getElementById("filter-opstine-checkboxes").appendChild(checkboxWrapper);
+								}
+								
 							}
 
 							function checkboxLabelClick(elem){
@@ -93,7 +96,7 @@
 
 					for(var i=0;i<nalozi.length;i++){
 						//isfiltriraj ovde
-						if(opstineToShow.indexOf(nalozi[i].radnaJedinica)>=0){
+						if(opstineToShow.indexOf(nalozi[i].majstor)>=0){
 							var nalogToPush = {};
 							nalogToPush.broj = nalozi[i].broj;
 							nalogToPush.datum = nalozi[i].datum.datum;

@@ -5,7 +5,7 @@
 		var istorijat = <%-JSON.stringify(istorijat)%>;
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
 		var ucinci = <%-JSON.stringify(ucinci)%>; 
-		var stariCenovnik = <%-JSON.stringify(stariCenovnik)%>;
+		var stariCenovnik = <%-JSON.stringify(stariCenovnik)%>;//Milica koristi za ucinak
 	</script>
 	<div class="pageWidth">
 		<div class="administracijaNalog nalog">
@@ -135,9 +135,9 @@
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumFakturisanjaIcon.png"></div>
 					<div class="info">
 						<div class="title">Датум фактурe</div>
-						<div class="text"><span id="broj-fakture"></span></div>
+						<div class="text"><span id="datum-fakture"></span></div>
 						<script>
-							document.getElementById("broj-fakture").innerHTML = nalog.faktura.datum.datum;
+							document.getElementById("datum-fakture").innerHTML = nalog.faktura.datum.datum;
 						</script>
 					</div>
 				</div>
@@ -217,7 +217,11 @@
 					</div>
 				</div>
 			</div>
-			<%- include ("partials/obracunNaloga") -%>
+			<% if(podizvodjac==0){ %>
+				<%- include ("partials/obracunNaloga") -%>
+			<% }else{ %>
+				<%- include ("partials/obracunNalogaPodizvodjac") -%>
+			<% } %>
 			<div class="detalji">
 				<div class="title">Оператива</div>
 				<div class="boxesWrap">

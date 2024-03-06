@@ -1,0 +1,27 @@
+<div class="obracunWrap" style="width:125%;margin-left:-12.5%">
+	<div class="title">Обрачун налога</div>
+	<div class="header elems">
+		<div class="row">
+			<div class="elem redniBroj">Бр.</div>
+			<div class="elem sifra">Шифра</div>
+			<div class="elem naziv">Назив</div>
+			<div class="elem jedinica">Јед.</div>
+			<div class="elem cena">Цена</div>
+			<div class="elem cena">Цена Под.</div>
+			<div class="elem kolicina">Кол.</div>
+			<div class="elem ukupno">Укупно</div>
+			<div class="elem ukupno">Укупно Под.</div>
+			<div class="elem obrisi"> </div>
+		</div>
+		
+	</div>
+	<div id="obracun-wrap" class="elems"></div>
+	<div class="buttonWrap" onclick="addRow()">
+		<div class="button">Додај ред</div>
+	</div>
+	<div class="total">
+		Укупно обрачунат износ: <span id="tabela-iznos"></span><br>
+		Укупно обрачунат износ подизвођача: <span id="tabela-iznos-podizvodjac"></span>
+	</div>
+	<script src="/js/obracunNalogaPodizvodjac.js"></script>
+</div>
