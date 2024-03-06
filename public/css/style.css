@@ -816,6 +816,27 @@ input[type=number] {
     box-shadow:1px 1px 4px rgba(255,255,255,0.8);
 }
 
+.imageLightbox .arrow{
+    position:fixed;
+    top:50%;
+    z-index:90002;
+    -webkit-transform:translateY(-50%);
+    -moz-transform:translateY(-50%);
+    -ms-transform:translateY(-50%);
+    -o-transform:translateY(-50%);
+    transform:translateY(-50%);
+    width:50px;
+    cursor:pointer;
+}
+
+.imageLightbox .arrowLeft{
+    left:10px;
+}
+
+.imageLightbox .arrowRight{
+    right:10px;
+}
+
 
 
 .administracija .boxesWrap{

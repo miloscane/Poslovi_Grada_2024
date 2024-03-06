@@ -338,7 +338,7 @@
 								</div>
 								
 							</div>
-							<div class="dropSlike" id="drop-zone" style="">Или превуци овде</div>
+							<div class="dropSlike" id="drop-zone" style="">Или превуци слике овде</div>
 							<script>
 								var dropContainer = document.getElementById("drop-zone");
 								dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
@@ -472,13 +472,8 @@
 					loadGif();
 					document.getElementById("form").submit();
 				}
-				window.addEventListener('keydown', function(event) {
-					if (event.keyCode == 27) {
-						if(document.getElementById("image-lightbox").style.display=="block"){
-							document.getElementById("image-lightbox").style.display = "none";
-						}
-					}
-				});
+
+				
 			</script>
 			
 		</div>

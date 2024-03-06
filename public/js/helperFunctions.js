@@ -79,14 +79,6 @@ function datetimeToReadable(datetime){
   return  dayString+"."+monthString+"."+yearString + ". - "+date.getHours()+":"+date.getMinutes();
 }
 
-function previewImage(elem,name){
-  var url = elem.getElementsByTagName("IMG")[0].src;
-  document.getElementById("image-lightbox").style.display="block";
-  document.getElementById("image-lightbox").getElementsByClassName("image")[0].src = url;
-  document.getElementById("image-lightbox").getElementsByTagName("A")[0].href = url;
-  document.getElementById("image-lightbox").getElementsByTagName("A")[0].download = name+"."+url.split(".")[url.split(".").length-1];
-}
-
 function getMajstorByCode(majstorId){
   var majstor = {};
   if(majstori){

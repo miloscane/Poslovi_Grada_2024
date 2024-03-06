@@ -36,10 +36,80 @@
 			<div class="lightboxContent">
 				<img class="image" onclick="event.stopPropagation()"> 
 			</div>
+			<div class="arrow arrowLeft" onclick="event.stopPropagation()">
+				<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/arrowLeft.png" onclick="showPreviousImage()">
+			</div>
+			<div class="arrow arrowRight" onclick="event.stopPropagation()">
+				<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/arrowRight.png" onclick="showNextImage()">
+			</div>
 			<div class="downloadButtonWrap" onclick="event.stopPropagation()">
 				<a id="download-button" href="" download="">SAČUVAJ SLIKU</a>
 			</div>
 		</div>
+		<script>
+			
+
+			function previewImage(elem,name){
+				
+				var url = elem.getElementsByTagName("IMG")[0].src;
+				document.getElementById("image-lightbox").style.display="block";
+				document.getElementById("image-lightbox").getElementsByClassName("image")[0].src = url;
+				document.getElementById("image-lightbox").getElementsByTagName("A")[0].href = url;
+				document.getElementById("image-lightbox").getElementsByTagName("A")[0].download = name+"."+url.split(".")[url.split(".").length-1];
+			}
+			function showNextImage(){
+				var imageUrl = document.getElementById("image-lightbox").getElementsByClassName("image")[0].src;
+				var availableImages = document.getElementById("komentari").getElementsByClassName("imagePreview");
+				for(var i=0;i<availableImages.length;i++){
+					if(availableImages[i].getElementsByClassName("image")[0].src==imageUrl){
+						if(availableImages[i+1]){
+							previewImage(availableImages[i+1])
+							document.getElementById("image-lightbox").getElementsByClassName("arrowLeft")[0].style.opacity="1"
+							if(i+1==availableImages.length-1){
+								document.getElementById("image-lightbox").getElementsByClassName("arrowRight")[0].style.opacity="0"	
+							}
+						}else{
+							//Nema vise slika u tu stranu
+						}
+					}
+				}
+			}
+
+			function showPreviousImage(){
+				var imageUrl = document.getElementById("image-lightbox").getElementsByClassName("image")[0].src;
+				var availableImages = document.getElementById("komentari").getElementsByClassName("imagePreview");
+				for(var i=0;i<availableImages.length;i++){
+					if(availableImages[i].getElementsByClassName("image")[0].src==imageUrl){
+						if(availableImages[i-1]){
+							previewImage(availableImages[i-1]);
+							document.getElementById("image-lightbox").getElementsByClassName("arrowRight")[0].style.opacity="1";
+							if(i-1==0){
+								document.getElementById("image-lightbox").getElementsByClassName("arrowLeft")[0].style.opacity="0"	
+							}
+						}else{
+							//Nema vise slika u tu stranu
+						}
+					}
+				}
+			}
+
+			window.addEventListener('keydown', function(event) {
+				if (event.keyCode == 27) {
+					if(document.getElementById("image-lightbox").style.display=="block"){
+						document.getElementById("image-lightbox").style.display = "none";
+					}
+				}
+
+				if(document.getElementById("image-lightbox").style.display=="block"){
+					if(event.keyCode==39){
+						showNextImage();
+					}else if(event.keyCode==37){
+						showPreviousImage();
+					}
+				}
+				
+			});
+		</script>
 		<script>
 			function loadGif(){
 				document.getElementById("load-lightbox").style.display = "block";
