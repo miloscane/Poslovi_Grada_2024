@@ -19,9 +19,11 @@
 						td.innerHTML = "<div class=\"value\">"+reversi[i].nalog+"</div>";
 						tr.appendChild(td);
 
+
 						var reversDate = new Date(Number(reversi[i].datetime));
+						var datum = reversi[i].datum ?  reversi[i].datum : reshuffleDate(reversi[i].date);//.date je za stare reverse
 						var td = document.createElement("TD");
-						td.innerHTML = "<div class=\"value\">"+reversi[i].datum+" "+reversDate.getHours()+":"+reversDate.getMinutes()+"</div>";
+						td.innerHTML = "<div class=\"value\">"+datum+" "+reversDate.getHours()+":"+reversDate.getMinutes()+"</div>";
 						tr.appendChild(td);
 
 						var td = document.createElement("TD");
