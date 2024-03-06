@@ -300,6 +300,46 @@
 								</script>
 							</div>
 						</div>
+						<div class="dropSlike" id="drop-zone" style="">Или превуци овде</div>
+						<script>
+							var dropContainer = document.getElementById("drop-zone");
+							dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
+							  evt.preventDefault();
+							};
+
+							dropContainer.ondrop = function(evt) {
+							  // pretty simple -- but not for IE :(
+							  	document.getElementById("slike-input").files = evt.dataTransfer.files;
+							  	document.getElementById("drop-zone").classList.remove("dropHot");
+							  	document.getElementById("preview-images").innerHTML = "";
+								for(var i=0;i<document.getElementById("slike-input").files.length;i++){
+									var imagePreview =	document.createElement("DIV");
+									imagePreview.setAttribute("class","imagePreview");
+									imagePreview.setAttribute("onclick","previewImage(this)");
+										var image = document.createElement("IMG");
+										image.setAttribute("class","image");
+										image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
+										imagePreview.appendChild(image)
+									document.getElementById("preview-images").appendChild(imagePreview);
+								}
+								if(document.getElementById("slike-input").files.length>10){
+									alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 10 слика по извештају. Уколико желите да окачите више од 10 слика направите два извештаја.");
+									document.getElementById("preview-images").innerHTML = "";
+									document.getElementById("slike-input").value = "";
+								}
+							  evt.preventDefault();
+							};
+
+							dropContainer.ondragover = function(evt) {
+							  evt.preventDefault();
+							  document.getElementById("drop-zone").classList.add("dropHot");
+							};
+
+							dropContainer.ondragleave = function(evt) {
+							  evt.preventDefault();
+							  document.getElementById("drop-zone").classList.remove("dropHot");
+							};
+						</script>
 					</div>
 				</div>
 				<div class="saveNalog">

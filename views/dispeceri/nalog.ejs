@@ -306,8 +306,8 @@
 						<%if(user.opstine.indexOf(nalog.radnaJedinica)>=0){%>
 							<textarea id="komentar" placeholder="Текст извештаја"></textarea>
 							<div class="previewImages" id="preview-images"></div>
-							<form method="POST" action="/edit-nalog" id="form" enctype="multipart/form-data">
-								<input type="text" name="json" id="json" style="display:none;">
+							<form method="POST" action="/edit-nalog" id="form" style="display:none;" enctype="multipart/form-data">
+								<input type="text" name="json" id="json">
 								<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
 							</form>
 							<div class="buttonWrap" onclick="document.getElementById('slike-input').click()">
@@ -338,6 +338,46 @@
 								</div>
 								
 							</div>
+							<div class="dropSlike" id="drop-zone" style="">Или превуци овде</div>
+							<script>
+								var dropContainer = document.getElementById("drop-zone");
+								dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
+								  evt.preventDefault();
+								};
+
+								dropContainer.ondrop = function(evt) {
+								  // pretty simple -- but not for IE :(
+								  	document.getElementById("slike-input").files = evt.dataTransfer.files;
+								  	document.getElementById("drop-zone").classList.remove("dropHot");
+								  	document.getElementById("preview-images").innerHTML = "";
+									for(var i=0;i<document.getElementById("slike-input").files.length;i++){
+										var imagePreview =	document.createElement("DIV");
+										imagePreview.setAttribute("class","imagePreview");
+										imagePreview.setAttribute("onclick","previewImage(this)");
+											var image = document.createElement("IMG");
+											image.setAttribute("class","image");
+											image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
+											imagePreview.appendChild(image)
+										document.getElementById("preview-images").appendChild(imagePreview);
+									}
+									if(document.getElementById("slike-input").files.length>10){
+										alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 10 слика по извештају. Уколико желите да окачите више од 10 слика направите два извештаја.");
+										document.getElementById("preview-images").innerHTML = "";
+										document.getElementById("slike-input").value = "";
+									}
+								  evt.preventDefault();
+								};
+
+								dropContainer.ondragover = function(evt) {
+								  evt.preventDefault();
+								  document.getElementById("drop-zone").classList.add("dropHot");
+								};
+
+								dropContainer.ondragleave = function(evt) {
+								  evt.preventDefault();
+								  document.getElementById("drop-zone").classList.remove("dropHot");
+								};
+							</script>
 						<%}%>
 					</div>
 				</div>
