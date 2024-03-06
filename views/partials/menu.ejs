@@ -65,8 +65,9 @@
 								</div>
 							</div>
 						<% }else if(Number(user.role)==20){ %>
-							<div class="menuItem"><a href="#">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
+							<div class="menuItem"><a href="/dispecer/sviNalozi">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
 								<div class="subMenu">
+									<div class="subMenuItem"><a href="/dispecer/sviNalozi" onclick="loadGif()">Сви налози</a><div class="bottomBorder"></div></div>
 									<div class="subMenuItem"><a href="/dispecer/otvoreniNalozi" onclick="loadGif()">Отворени налози</a><div class="bottomBorder"></div></div>
 									<div class="subMenuItem"><a href="/dispecer/zavrseniNalozi" onclick="loadGif()">Завршени налози</a></div>
 								</div>

@@ -461,6 +461,15 @@
 					loadGif();
 					document.getElementById("form").submit();
 				}
+
+				window.addEventListener('keydown', function(event) {
+					if (event.keyCode == 27) {
+						if(document.getElementById("image-lightbox").style.display=="block"){
+							document.getElementById("image-lightbox").style.display = "none";
+						}
+					}
+				});
+				
 			</script>
 		</div>
 	</div>	

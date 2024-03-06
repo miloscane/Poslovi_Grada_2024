@@ -306,6 +306,10 @@
 						<%if(user.opstine.indexOf(nalog.radnaJedinica)>=0){%>
 							<textarea id="komentar" placeholder="Текст извештаја"></textarea>
 							<div class="previewImages" id="preview-images"></div>
+							<form method="POST" action="/edit-nalog" id="form" enctype="multipart/form-data">
+								<input type="text" name="json" id="json" style="display:none;">
+								<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
+							</form>
 							<div class="buttonWrap" onclick="document.getElementById('slike-input').click()">
 								<div class="button">
 									<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/addImageIcon.png"></div>
@@ -332,10 +336,7 @@
 										}
 									</script>
 								</div>
-								<form method="POST" action="/edit-nalog" id="form" enctype="multipart/form-data">
-										<input type="text" name="json" id="json" style="display:none;">
-										<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
-									</form>
+								
 							</div>
 						<%}%>
 					</div>
@@ -431,6 +432,13 @@
 					loadGif();
 					document.getElementById("form").submit();
 				}
+				window.addEventListener('keydown', function(event) {
+					if (event.keyCode == 27) {
+						if(document.getElementById("image-lightbox").style.display=="block"){
+							document.getElementById("image-lightbox").style.display = "none";
+						}
+					}
+				});
 			</script>
 			
 		</div>

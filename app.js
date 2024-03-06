@@ -2449,12 +2449,55 @@ server.get('/ucinakMajstora',async (req,res)=>{
 				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
 			});
 		}
-		
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url))
 	}
 });
 
+server.get('/dispecer/sviNalozi',async (req,res)=>{
+	if(req.session.user){
+			if(Number(req.session.user.role)==20){
+				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"]}}).toArray()
+				.then((nalozi) => {
+					for(var i=0;i<nalozi.length;i++){
+						delete nalozi[i]._id;
+						delete nalozi[i].uniqueId;
+						delete nalozi[i].digitalizacija;
+						delete nalozi[i].opis;
+						delete nalozi[i].vrstaRada;
+						delete nalozi[i].kategorijeRadova;
+						delete nalozi[i].punaAdresa;
+						delete nalozi[i].obracun;
+						delete nalozi[i].ukupanIznos;
+						delete nalozi[i].faktura;
+						delete nalozi[i].prijemnica;
+					}
+					res.render("dispeceri/sviNalozi",{
+						pageTitle:"Сви налози",
+						user: req.session.user,
+						nalozi: nalozi
+					})
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 2487.</div>"
+					});
+				});
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
 
 server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 	if(req.session.user){
