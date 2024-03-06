@@ -18,7 +18,7 @@
 				for(var i=0;i<proizvodi.length;i++){
 					proizvodi[i].realnoStanje = parseFloat(proizvodi[i].stanje);
 					proizvodi[i].obracunStanja = [];
-					proizvodi[i].obracunStanja.push("<p>Стање на попису " + proizvodi[i].datumPopisa + " : " + proizvodi[i].stanje + "</p>");
+					proizvodi[i].obracunStanja.push("<p>Стање на попису " + reshuffleDate(proizvodi[i].datumPopisa) + " : " + proizvodi[i].stanje + "</p>");
 					proizvodi[i].ukupnoDodato = 0;
 					proizvodi[i].ukupnoUzeto = 0;
 					for(var j=0;j<ulazi.length;j++){
@@ -37,23 +37,40 @@
 					for(var j=0;j<reversi.length;j++){
 						for(var k=0;k<reversi[j].zaduzenje.length;k++){
 							if(reversi[j].zaduzenje[k].uniqueId==proizvodi[i].uniqueId){
-								var datetimeReversa = new Date(reversi[j].date).getTime();
-								var datetimePopisa = new Date(proizvodi[i].datumPopisa).getTime()+1;//+1 dodato zbog toga jer se popis radi isti dan kad se izdaje materijal ujutru pa se izdati materijal racuna
-								if(datetimeReversa>=datetimePopisa){
-									var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
-									proizvodi[i].ukupnoUzeto = proizvodi[i].ukupnoUzeto + uzeto;
-									var vraceno = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity2);
-									proizvodi[i].ukupnoDodato = proizvodi[i].ukupnoDodato + vraceno;
-									proizvodi[i].realnoStanje = proizvodi[i].realnoStanje - uzeto + vraceno;
-									var imeMajstora = getMajstorByCode(reversi[j].majstor).ime ? getMajstorByCode(reversi[j].majstor).ime : "Фантомског мајстора";
-									proizvodi[i].obracunStanja.push("<p>Реверс за "+imeMajstora+" по налогу број "+reversi[j].nalog+" дана "+reshuffleDate(reversi[j].date)+" узето "+uzeto+",  враћено "+vraceno+"</p>");
+								if(reversi[j].date){
+									//Stari revers
+									var datetimeReversa = new Date(reversi[j].date).getTime();
+									var datetimePopisa = new Date(proizvodi[i].datumPopisa).getTime()+1;//+1 dodato zbog toga jer se popis radi isti dan kad se izdaje materijal ujutru pa se izdati materijal racuna
+									if(datetimeReversa>=datetimePopisa){
+										var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
+										proizvodi[i].ukupnoUzeto = proizvodi[i].ukupnoUzeto + uzeto;
+										var vraceno = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity2);
+										proizvodi[i].ukupnoDodato = proizvodi[i].ukupnoDodato + vraceno;
+										proizvodi[i].realnoStanje = proizvodi[i].realnoStanje - uzeto + vraceno;
+										var imeMajstora = getMajstorByCode(reversi[j].majstor).ime ? getMajstorByCode(reversi[j].majstor).ime : "Фантомског мајстора";
+										proizvodi[i].obracunStanja.push("<p>Реверс за "+imeMajstora+" по налогу број "+reversi[j].nalog+" дана "+reshuffleDate(reversi[j].date)+" узето "+uzeto+",  враћено "+vraceno+"</p>");
+									}
+								}else{
+									//novi revers
+									var datetimeReversa = Number(reversi[j].datetime);
+									var datetimePopisa = new Date(proizvodi[i].datumPopisa).getTime()+1;//+1 dodato zbog toga jer se popis radi isti dan kad se izdaje materijal ujutru pa se izdati materijal racuna
+									if(datetimeReversa>=datetimePopisa){
+										var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
+										proizvodi[i].ukupnoUzeto = proizvodi[i].ukupnoUzeto + uzeto;
+										var vraceno = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity2);
+										proizvodi[i].ukupnoDodato = proizvodi[i].ukupnoDodato + vraceno;
+										proizvodi[i].realnoStanje = proizvodi[i].realnoStanje - uzeto + vraceno;
+										var imeMajstora = getMajstorByCode(reversi[j].majstor).ime ? getMajstorByCode(reversi[j].majstor).ime : "Фантомског мајстора";
+										proizvodi[i].obracunStanja.push("<p>Реверс за "+imeMajstora+" по налогу број "+reversi[j].nalog+" дана "+reversi[j].datum+" узето "+uzeto+",  враћено "+vraceno+"</p>");
+									}
 								}
+								
 								
 							}
 						}
 					}
 					proizvodi[i].obracunStanja.push("<div style=\"border-bottom:2px solid rgb(37,57,101);\"></div>");
-					proizvodi[i].obracunStanja.push("<p>Стање: <b>"+proizvodi[i].stanje+"</b></p>");
+					proizvodi[i].obracunStanja.push("<p>Попис: <b>"+proizvodi[i].stanje+"</b></p>");
 					proizvodi[i].obracunStanja.push("<p>Улаз и враћено: <b>"+proizvodi[i].ukupnoDodato+"</b></p>");
 					proizvodi[i].obracunStanja.push("<p>Издато: <b>"+proizvodi[i].ukupnoUzeto+"</b></p>");
 					var cenaProizvoda = isNaN(parseFloat(proizvodi[i].price)) ? 0 : parseFloat(proizvodi[i].price);

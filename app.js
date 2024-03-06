@@ -3413,6 +3413,203 @@ server.post('/pretraga-reversa', async (req, res)=> {
 	} 
 });
 
+
+
+
+server.get('/magacioner/danasnjiReversi', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			var today = new Date();
+			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
+			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
+			magacinReversiDB.find({datum:{$regex:dateString+"."+monthString}}).toArray()
+			.then((reversi)=>{
+				var naloziToFind = [];
+				for(var i=0;i<reversi.length;i++){
+					naloziToFind.push(reversi[i].nalog);
+				}
+				naloziDB.find({broj:{$in:naloziToFind}}).toArray()
+				.then((nalozi)=>{
+					majstoriDB.find({}).toArray()
+					.then((majstori)=>{
+						res.render("magacioner/rezultatPretrage",{
+							pageTitle: "Данашњи реверси",
+							user: req.session.user,
+							reversi: reversi,
+							majstori: majstori,
+							nalozi: nalozi
+						});
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 3439.</div>"
+						});
+					})
+					
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 3449.</div>"
+					});
+				})
+				
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3459.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	} 
+});
+
+server.get('/magacioner/jucerasnjiReversi', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			var today = new Date();
+			today.setDate(today.getDate()-1);
+			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
+			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
+			magacinReversiDB.find({datum:{$regex:dateString+"."+monthString}}).toArray()
+			.then((reversi)=>{
+				var naloziToFind = [];
+				for(var i=0;i<reversi.length;i++){
+					naloziToFind.push(reversi[i].nalog);
+				}
+				naloziDB.find({broj:{$in:naloziToFind}}).toArray()
+				.then((nalozi)=>{
+					majstoriDB.find({}).toArray()
+					.then((majstori)=>{
+						res.render("magacioner/rezultatPretrage",{
+							pageTitle: "Јучерашњи реверси",
+							user: req.session.user,
+							reversi: reversi,
+							majstori: majstori,
+							nalozi: nalozi
+						});
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 3439.</div>"
+						});
+					})
+					
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 3449.</div>"
+					});
+				})
+				
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3459.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	} 
+});
+
+server.get('/magacioner/prekojucerasnjiReversi', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			var today = new Date();
+			today.setDate(today.getDate()-2);
+			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
+			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
+			magacinReversiDB.find({datum:{$regex:dateString+"."+monthString}}).toArray()
+			.then((reversi)=>{
+				var naloziToFind = [];
+				for(var i=0;i<reversi.length;i++){
+					naloziToFind.push(reversi[i].nalog);
+				}
+				naloziDB.find({broj:{$in:naloziToFind}}).toArray()
+				.then((nalozi)=>{
+					majstoriDB.find({}).toArray()
+					.then((majstori)=>{
+						res.render("magacioner/rezultatPretrage",{
+							pageTitle: "Јучерашњи реверси",
+							user: req.session.user,
+							reversi: reversi,
+							majstori: majstori,
+							nalozi: nalozi
+						});
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 3439.</div>"
+						});
+					})
+					
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 3449.</div>"
+					});
+				})
+				
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3459.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	} 
+});
+
 server.post('/fakturisi', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==40){

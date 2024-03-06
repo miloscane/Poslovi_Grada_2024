@@ -1,0 +1,64 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+		var reversi = <%-JSON.stringify(reversi)%>;
+		var majstori = <%-JSON.stringify(majstori)%>;
+	</script>
+	<div class="pageWidth">
+		<div class="rezultatPretrageReversa">
+			<div id="table"></div>
+			<script>
+				var table = document.createElement("TABLE");
+				for(var i=0;i<reversi.length;i++){
+					var tr = document.createElement("TR");
+						var td = document.createElement("TD");
+						td.innerHTML = "<div class=\"value\">"+eval(i+1)+".</div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.innerHTML = "<div class=\"value\">"+reversi[i].nalog+"</div>";
+						tr.appendChild(td);
+
+						var reversDate = new Date(Number(reversi[i].datetime));
+						var td = document.createElement("TD");
+						td.innerHTML = "<div class=\"value\">"+reversi[i].datum+" "+reversDate.getHours()+":"+reversDate.getMinutes()+"</div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						var radnaJedinica = getNalogByBroj(reversi[i].nalog).radnaJedinica ? getNalogByBroj(reversi[i].nalog).radnaJedinica : " ";
+						td.innerHTML = "<div class=\"value\">"+radnaJedinica+"</div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						var adresa = getNalogByBroj(reversi[i].nalog).adresa ? getNalogByBroj(reversi[i].nalog).adresa : "";
+						td.innerHTML = "<div class=\"value\">"+adresa+"</div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						var majstor = getMajstorByCode(reversi[i].majstor).ime ? getMajstorByCode(reversi[i].majstor).ime : "";
+						td.innerHTML = "<div class=\"value\">"+majstor+"</div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.innerHTML = "<div class=\"value\"><a href=\"/magacioner/revers/"+reversi[i].uniqueId+"\">Види реверс</div>";
+						tr.appendChild(td);
+
+					table.appendChild(tr);
+					var redniBroj = document.cr
+				}
+				document.getElementById("table").appendChild(table);
+
+				function getNalogByBroj(broj){
+					var nalog = {};
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].broj==broj){
+							nalog = nalozi[i];
+							break
+						}
+					}
+					return nalog;
+				}
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>
