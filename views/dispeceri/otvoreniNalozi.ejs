@@ -163,6 +163,7 @@
 							nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
 							nalogToPush.adresa = nalozi[i].adresa;
 							nalogToPush.statusNaloga = nalozi[i].statusNaloga;
+							nalogToPush.majstor = nalozi[i].majstor;
 							
 							if(statusToShow=="Svi"){
 								naloziToShow.push(nalogToPush);
@@ -217,8 +218,10 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value ikonica");
-								if(naloziToShow[i].statusNaloga=="Primljen"){
+								if(naloziToShow[i].statusNaloga=="Primljen" && podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
 									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
+								}else if(podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png'>"
 								}
 								td.appendChild(div);
 							tr.appendChild(td);

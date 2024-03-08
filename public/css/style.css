@@ -2250,6 +2250,13 @@ input[type=number] {
 
 .otvoreniNalozi .tableWrap table td .ikonica{
     width:40px;
+    padding:3px;
+}
+
+.otvoreniNalozi .tableWrap table td .ikonica img{
+    display:block;
+    max-height:100%;
+    margin:0 auto;
 }
 
 .otvoreniNalozi .tableWrap table td .datumNaloga{
@@ -2527,6 +2534,13 @@ input[type=number] {
 
 .zavrseniNalozi .tableWrap table td .ikonica{
     width:40px;
+    padding:3px;
+}
+
+.zavrseniNalozi .tableWrap table td .ikonica img{
+    max-height: 100%;
+    display:block;
+    margin:0 auto;
 }
 
 .zavrseniNalozi .tableWrap table td .datumNaloga{

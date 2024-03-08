@@ -137,7 +137,15 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value ikonica");
-								div.innerHTML = "<img src=''>";
+								if(naloziToShow[i].statusNaloga=="Primljen" && podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
+								}else if(podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png'>"
+								}
+
+								if(naloziToShow[i].statusNaloga=="Završeno"){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png'>"
+								}
 								td.appendChild(div);
 							tr.appendChild(td);
 							
