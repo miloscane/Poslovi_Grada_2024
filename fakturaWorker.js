@@ -503,7 +503,7 @@ parentPort.on("message", receiveObject => {
 	if(Number(infoJson.penal)<100){
 		bodyString	=	generatePremijusSaPenalom(infoJson)
 	}else{
-		if(parseFloat(infoJson.ukupanIznos)>=500000){
+		if(parseFloat(infoJson.iznos)>=500000){
 			bodyString	=	generatePremijusPrekoPolaMilBezPenala(info)
 		}else{
 			bodyString	=	generatePremijusBezPenala(infoJson)
