@@ -3970,6 +3970,7 @@ io.on('connection', function(socket){
 				nalogToPush.faktura = nalozi[i].faktura;
 				nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
 				nalogToPush.ukupanIznos = nalozi[i].ukupanIznos;
+				nalogToPush.prijemnica = nalozi[i].prijemnica;
 				if(startTime!="" && endTime!=""){
 					var datetime = Number(nalogToPush.faktura.datum.datetime);
 					if(datetime>=startTime && datetime<=endTime){

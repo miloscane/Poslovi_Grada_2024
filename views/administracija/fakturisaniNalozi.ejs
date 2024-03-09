@@ -70,6 +70,7 @@
 							<td><div class="value brojNaloga">Број<br>налога</div></td>
 							<td><div class="value brojFakture">Број<br>фактуре</div></td>
 							<td><div class="value datumNaloga">Датум<br>фактуре</div></td>
+							<td><div class="value datumNaloga">Датум<br>промета</div></td>
 							<td><div class="value radnaJedinica">Радна<br>јединица</div></td>
 							<td><div class="value iznos">Износ<br>налога</div></td>
 							<td><div class="value pogledajNalog"></div></td>
@@ -223,6 +224,13 @@
 									var div = document.createElement("DIV");
 									div.setAttribute("class","value datumNaloga");
 									div.innerHTML = nalozi[i].faktura.datum.datum;
+									td.appendChild(div);
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value datumNaloga");
+									div.innerHTML = nalozi[i].prijemnica.datum.datum;
 									td.appendChild(div);
 								tr.appendChild(td);
 
