@@ -4037,6 +4037,7 @@ io.on('connection', function(socket){
 				nalogToPush.faktura = nalozi[i].faktura;
 				nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
 				nalogToPush.ukupanIznos = nalozi[i].ukupanIznos;
+				nalogToPush.prijemnica = nalozi[i].prijemnica;
 				if(nalogToPush.faktura.samoBroj==0 || isNaN(Number(nalogToPush.faktura.samoBroj))){
 					warnings.push("Nije moguce odrediti broj fakture za nalog "+nalogToPush.broj+", broj fakture"+nalogToPush.brojFakture);
 				}else{
@@ -4051,6 +4052,8 @@ io.on('connection', function(socket){
 			statistika.ukupanIznos					=	0;
 			statistika.ukupanPdv						=	0;
 			statistika.ukupnoPrekoPolaMil		=	0;
+			statistika.osnovica							=	0;
+			statistika.neoporezivo					=	0;
 
 			for(var i=0;i<naloziToSend.length;i++){
 				if(isNaN(parseFloat(naloziToSend[i].ukupanIznos))){
@@ -4060,8 +4063,10 @@ io.on('connection', function(socket){
 				statistika.ukupanIznos = statistika.ukupanIznos + iznosNaloga
 				if(iznosNaloga>=500000){
 					statistika.ukupnoPrekoPolaMil++;
+					statistika.neoporezivo	= statistika.neoporezivo	+ iznosNaloga;
 				}else{
 					statistika.ukupanPdv = statistika.ukupanPdv + iznosNaloga*0.2;
+					statistika.osnovica	= statistika.osnovica	+ iznosNaloga;
 				}
 			}
 			naloziToSend = naloziToSend.sort((a, b) => {
