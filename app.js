@@ -3919,7 +3919,17 @@ server.get('/uspesnoFakturisano',async (req,res)=>{
 });
 
 server.get('/portalStambenoNalozi', async (req, res)=> {
+	console.log("GET od portala!")
 	console.log(req.body);
+	console.log("-----------------------------");
+	res.send("Ok i get you");
+});
+
+server.post('/portalStambenoNalozi', async (req, res)=> {
+	console.log("POST od portala!")
+	console.log(req.body);
+	console.log("-----------------------------");
+	res.send("Ok i get it you posted a thing");
 });
 
 
