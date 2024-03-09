@@ -152,6 +152,8 @@ function logError(error){
 	errorJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
 	errorJSON.error = error.toString()
 	errorJSON.jsonerror = error;
+	errorJSON.errorstack = error.stack;
+	errorJSON.errormessage = error.message;
 	errorDB.insertOne(errorJSON)
 	.then((dbResponse)=>{
 		//console.log(dbResponse)
@@ -745,6 +747,22 @@ http.listen(process.env.PORT, function(){
 		.catch((error)=>{
 			logError(error);
 		});
+
+		errorDB.find({}).toArray()
+		.then((errors)=>{
+			console.log(errors)
+		})
+		.catch((error)=>{
+			console.log(error)
+		})
+
+		/*errorDB.deleteMany({error:{$regex:"MongoInvalidArgumentError:"}})
+		.then((dbResponse)=>{
+			console.log(dbResponse)
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
  
 		//Ubacivanje novih naloga
 		/*var user = {};
@@ -3898,6 +3916,10 @@ server.get('/uspesnoFakturisano',async (req,res)=>{
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
+});
+
+server.get('/portalStambenoNalozi', async (req, res)=> {
+	console.log(req.body);
 });
 
 
