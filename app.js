@@ -453,6 +453,36 @@ function parsePrijemnica(textdata){
 	return prijemnicaJson
 }
 
+function brojSaRazmacima(x) {
+  if(!x){
+    return 0
+  }
+    numberAsString = x.toString().replace(/,/g, " ")
+    var parts = numberAsString.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    if(parts.length==1){
+        parts[1] = "00";
+    }else{
+        if(parts[1].length==1){
+            parts[1]=parts[1]+"0";
+        }else if(parts[1].length>2){
+          if(Number(parts[1][2])>5){
+            var lastDigit = Number(parts[1][1])+1;
+          }else{
+            var lastDigit = Number(parts[1][1])
+          }
+          if(lastDigit==10){
+            parts[1] = eval(Number(parts[1][0])+1).toString() + "0";
+          }else{
+            parts[1] = eval(Number(parts[1][0])).toString() + lastDigit;
+          }
+            parts[1]=parts[1][0].toString() + lastDigit;
+            //parts[1]=parts[1][0].toString() + parts[1][1].toString();
+        }
+    }
+    return parts.join(",");
+}
+
 
 var cenovnik;
 var cenovnikHigh;
@@ -561,6 +591,121 @@ http.listen(process.env.PORT, function(){
 					
 				}, index*200)
 			)*/
+
+			/*nalozi2023DB.find({}).toArray()
+			.then((nalozi2023)=>{
+				naloziDB.find({}).toArray()
+				.then((nalozi)=>{
+					var noviUgovor = 0;
+					for(var i=0;i<nalozi2023.length;i++){
+						for(var j=0;j<nalozi.length;j++){
+							if(nalozi2023[i].broj==nalozi[j].broj){
+								nalozi2023.splice(i,1);
+								i--;
+								noviUgovor++;
+							}
+						}
+					}
+					var ukupanIznos = 0;
+					for(var i=0;i<nalozi2023.length;i++){
+						if(!isNaN(parseFloat(nalozi2023[i].ukupanIznos))){
+							ukupanIznos = ukupanIznos + parseFloat(nalozi2023[i].ukupanIznos);
+						}else{
+							//console.log("Nedefinisan iznos za nalog "+nalozi2023[i].broj+" , iznos: "+nalozi2023[i].ukupanIznos+" RSD");
+						}
+					}
+					//console.log("Nalozi iz novog ugovora: " + noviUgovor)
+					console.log("Iznos starog ugovora:" + brojSaRazmacima(ukupanIznos));
+
+					var ukupanIznosNovogUgovoraNaDanPrelaza = 0;
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].datum.datum.includes("22.02.")){
+							if(!isNaN(parseFloat(nalozi[i].ukupanIznos))){
+								ukupanIznosNovogUgovoraNaDanPrelaza = ukupanIznosNovogUgovoraNaDanPrelaza + parseFloat(nalozi[i].ukupanIznos);
+							}else{
+								//console.log("Nedefinisan iznos za nalog "+nalozi[i].broj+" , iznos: "+nalozi[i].ukupanIznos +" RSD");
+							}	
+						}
+					}
+					console.log("Iznos naloga NOVOG UGOVORA na dan prelaza na novi ugovor:" + brojSaRazmacima(ukupanIznosNovogUgovoraNaDanPrelaza));
+
+					var ukupanIznosStarogUgovoraNaDanPrelaza = 0;
+					for(var i=0;i<nalozi2023.length;i++){
+						if(nalozi2023[i].datum.includes("22.02.")){
+							if(!isNaN(parseFloat(nalozi2023[i].ukupanIznos))){
+								ukupanIznosStarogUgovoraNaDanPrelaza = ukupanIznosStarogUgovoraNaDanPrelaza + parseFloat(nalozi2023[i].ukupanIznos);
+							}else{
+								//console.log("Nedefinisan iznos za nalog "+nalozi2023[i].broj+" , iznos: "+nalozi2023[i].ukupanIznos +" RSD");
+							}	
+						}
+					}
+					console.log("Iznos naloga STAROG UGOVORA na dan prelaza na novi ugovor:" + brojSaRazmacima(ukupanIznosStarogUgovoraNaDanPrelaza));
+					
+					var ukupanFebruarZaPDV = 0;
+					var ukupanFebruarBezPDV = 0;
+					var pocetakPDV = new Date("2024-02-01");
+					var krajPDV = new Date("2024-02-29");
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].prijemnica.datum.datetime){
+							if(Number(nalozi[i].prijemnica.datum.datetime)>=pocetakPDV.getTime() && Number(nalozi[i].prijemnica.datum.datetime)<=krajPDV.getTime()){
+								if(!isNaN(parseFloat(nalozi[i].ukupanIznos))){
+									if(parseFloat(nalozi[i].ukupanIznos)>500000){
+										ukupanFebruarBezPDV = ukupanFebruarBezPDV + parseFloat(nalozi[i].ukupanIznos);
+									}else{
+										ukupanFebruarZaPDV = ukupanFebruarZaPDV + parseFloat(nalozi[i].ukupanIznos);
+									}
+								}else{
+									console.log("Nedefinisan iznos za nalog "+nalozi[i].broj+" , iznos: "+nalozi[i].ukupanIznos +" RSD");
+								}	
+							}	
+						}
+						
+					}
+					console.log("------------------------------------------------------------")
+					console.log("Novi Ugovor Februar NEOPOREZIVO: " + brojSaRazmacima(ukupanFebruarBezPDV));
+					console.log("Novi Ugovor Februar OPOREZIVO: " + brojSaRazmacima(ukupanFebruarZaPDV));
+					
+					//1834-3202
+					var ukupanFebruarZaPDVStari = 0;
+					var ukupanFebruarBezPDVStari = 0;
+					var pocetakPDV = new Date("2024-02-01");
+					var krajPDV = new Date("2024-02-29");
+					for(var i=0;i<nalozi2023.length;i++){
+						var datumPrometaTemp = nalozi2023[i].radPregledan;
+						var datumPrometa = new Date(datumPrometaTemp.split(".")[2]+"-"+datumPrometaTemp.split(".")[1]+"-"+datumPrometaTemp.split(".")[0])
+						if(datumPrometa instanceof Date){
+							if(datumPrometa.getTime()>=pocetakPDV.getTime() && datumPrometa.getTime()<=krajPDV.getTime()){
+								if(!isNaN(parseFloat(nalozi2023[i].ukupanIznos))){
+									if(parseFloat(nalozi2023[i].ukupanIznos)>500000){
+										ukupanFebruarBezPDVStari = ukupanFebruarBezPDVStari + parseFloat(nalozi2023[i].ukupanIznos);
+									}else{
+										ukupanFebruarZaPDVStari = ukupanFebruarZaPDVStari + parseFloat(nalozi2023[i].ukupanIznos);
+									}
+								}else{
+									console.log("Nedefinisan iznos za nalog "+nalozi2023[i].broj+" , iznos: "+nalozi2023[i].ukupanIznos +" RSD");
+								}	
+							}
+							
+						}else{
+							console.log("Nije dobar datum prometa za nalog "+nalozi2023[i].broj+", "+nalozi2023[i].radPregledan)
+						}						
+					}
+					console.log("------------------------------------------------------------")
+					console.log("Stari Ugovor Februar NEOPOREZIVO: " + brojSaRazmacima(ukupanFebruarBezPDVStari));
+					console.log("Stari Ugovor Februar OPOREZIVO: " + brojSaRazmacima(ukupanFebruarZaPDVStari));
+					console.log("UKUPNO:")
+					console.log("------------------------------------------------------------")
+					console.log("Februar NEOPOREZIVO: " + brojSaRazmacima(ukupanFebruarBezPDVStari+ukupanFebruarBezPDV));
+					console.log("Februar OPOREZIVO: " + brojSaRazmacima(ukupanFebruarZaPDVStari+ukupanFebruarZaPDV));
+					//console.log("UKUPNOOOO:" + brojSaRazmacima(ukupanFebruarBezPDVStari+ukupanFebruarBezPDV+ukupanFebruarZaPDVStari+ukupanFebruarZaPDV))
+				})
+				.catch((error)=>{
+					console.log(error);
+				})
+			})
+			.catch((error)=>{
+				console.log(error);
+			})*/
 
 
 		})
@@ -3848,6 +3993,8 @@ io.on('connection', function(socket){
 			statistika.ukupanIznos					=	0;
 			statistika.ukupanPdv						=	0;
 			statistika.ukupnoPrekoPolaMil		=	0;
+			statistika.osnovica							=	0;
+			statistika.neoporezivo					=	0;
 
 			for(var i=0;i<naloziToSend.length;i++){
 				if(isNaN(parseFloat(naloziToSend[i].ukupanIznos))){
@@ -3857,8 +4004,10 @@ io.on('connection', function(socket){
 				statistika.ukupanIznos = statistika.ukupanIznos + iznosNaloga
 				if(iznosNaloga>=500000){
 					statistika.ukupnoPrekoPolaMil++;
+					statistika.neoporezivo	= statistika.neoporezivo + parseFloat(naloziToSend[i].ukupanIznos)
 				}else{
 					statistika.ukupanPdv = statistika.ukupanPdv + iznosNaloga*0.2;
+					statistika.osnovica	= statistika.osnovica + parseFloat(naloziToSend[i].ukupanIznos)
 				}
 			}
 			naloziToSend = naloziToSend.sort((a, b) => {

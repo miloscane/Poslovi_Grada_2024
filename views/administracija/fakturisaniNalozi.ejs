@@ -13,6 +13,14 @@
 							<td><div class="value"><span id="ukupan-iznos-naloga"></span></div></td>
 						</tr>
 						<tr>
+							<td><div class="value">Основица за ПДВ:</div></td>
+							<td><div class="value"><span id="osnovica-za-pdv"></span></div></td>
+						</tr>
+						<tr>
+							<td><div class="value">Неопорезиво:</div></td>
+							<td><div class="value"><span id="neoporezivo"></span></div></td>
+						</tr>
+						<tr>
 							<td><div class="value">ПДВ за фактурисане налоге:</div></td>
 							<td><div class="value"><span id="ukupan-pdv-naloga"></span></div></td>
 						</tr>
@@ -171,6 +179,8 @@
 					document.getElementById("ukupan-iznos-naloga").innerHTML = brojSaRazmacima(json.ukupanIznos);
 					document.getElementById("ukupan-pdv-naloga").innerHTML = brojSaRazmacima(json.ukupanPdv);
 					document.getElementById("fakture-preko-pola-mil").innerHTML = brojSaRazmacimaBezDecimala(json.ukupnoPrekoPolaMil);
+					document.getElementById("osnovica-za-pdv").innerHTML = brojSaRazmacima(json.osnovica);
+					document.getElementById("neoporezivo").innerHTML = brojSaRazmacima(json.neoporezivo);
 				}
 
 				function scrollTable(reset){
