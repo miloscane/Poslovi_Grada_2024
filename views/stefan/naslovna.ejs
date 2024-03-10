@@ -1,0 +1,230 @@
+<%- include ("partials/header") -%>
+<script>
+	var informacije = <%-JSON.stringify(informacije)%>;
+</script>
+<div class="stefan">
+	<div class="pageWidth">
+		<div class="blueWrap">
+			<div class="boxesTitle">Уговор ВиК 2024</div>
+			<div class="boxesWrap">
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/sumIcon.png"></div>
+					<div class="info">
+						<div class="title">Реализовано</div>
+						<div class="text"><span id="realizovano"></span></div>
+						<script>
+							document.getElementById("realizovano").innerHTML = brojSaRazmacima(informacije.realizovano) +" дин.<br>"+informacije.realizovaniNalozi+ " налога";
+						</script>
+						<div class="graphWrap">
+							<div class="graphFill" id="realizovano-fill"></div>
+							<div class="percentage" id="realizovano-percentage"></div>
+							<script>
+								var procenatRealizovanog = parseFloat(informacije.realizovano)/800000000;
+								document.getElementById("realizovano-fill").style.width = procenatRealizovanog+"%";
+								document.getElementById("realizovano-percentage").innerHTML = procenatRealizovanog.toFixed(2)+"%";
+							</script>
+						</div>
+					</div>
+				</div>	
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturisanoIcon.png"></div>
+					<div class="info">
+						<div class="title">Фактурисано</div>
+						<div class="text"><span id="fakturisano"></span></div>
+						<script>
+							document.getElementById("fakturisano").innerHTML = brojSaRazmacima(informacije.fakturisano.iznos) + " дин.<br>" + informacije.fakturisano.nalozi;
+						</script>
+					</div>
+				</div>	
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nefakturisanoIcon.png"></div>
+					<div class="info">
+						<div class="title">Чека на наплату</div>
+						<div class="text"><span id="cekanje"></span></div>
+						<script>
+							document.getElementById("cekanje").innerHTML = brojSaRazmacima(informacije.cekanje.iznos)+" дин.<br>" + brojSaRazmacima(informacije.cekanje.nalozi) + " налога";
+						</script>
+					</div>
+				</div>	
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/neobracunatoIcon.png"></div>
+					<div class="info">
+						<div class="title">Необрачунати налози</div>
+						<div class="text"><span id="neobracunato"></span></div>
+						<script>
+							document.getElementById("neobracunato").innerHTML = informacije.neobracunato;
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/unfinishedIcon.png"></div>
+					<div class="info">
+						<div class="title">Незавршени налози</div>
+						<div class="text"><span id="nezavrseni"></span></div>
+						<script>
+							document.getElementById("nezavrseni").innerHTML = informacije.nezavrseno;
+						</script>
+					</div>
+				</div>
+			</div>
+			<div class="boxesTitle">Тренутни месец</div>
+			<div class="boxesWrap">
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/sumIcon.png"></div>
+					<div class="info">
+						<div class="title">Остварено</div>
+						<div class="text"><span id="trenutni-ostvareno"></span></div>
+						<script>
+							document.getElementById("trenutni-ostvareno").innerHTML = brojSaRazmacima(informacije.trenutni.iznos) + " дин.<br>"+informacije.trenutni.nalozi+" налога.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturisanoIcon.png"></div>
+					<div class="info">
+						<div class="title">фактурисано до сад</div>
+						<div class="text"><span id="trenutni-fakturisano"></span></div>
+						<script>
+							document.getElementById("trenutni-fakturisano").innerHTML = brojSaRazmacima(informacije.trenutni.fakturisano.iznos) +" дин.<br>"+ informacije.trenutni.fakturisano.nalozi +" налога";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/pdvIcon.png"></div>
+					<div class="info">
+						<div class="title">Опорезиво до сад</div>
+						<div class="text"><span id="trenutni-oporezivo"></span></div>
+						<script>
+							document.getElementById("trenutni-oporezivo").innerHTML = brojSaRazmacima(informacije.trenutni.oporezivo) +" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/pdvIcon.png" style="opacity:0.3"></div>
+					<div class="info">
+						<div class="title">Неопорезиво до сад</div>
+						<div class="text"><span id="trenutni-neoporezivo"></span></div>
+						<script>
+							document.getElementById("trenutni-neoporezivo").innerHTML = brojSaRazmacima(informacije.trenutni.neoporezivo) +" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/pdvIcon.png"></div>
+					<div class="info">
+						<div class="title">ПДВ</div>
+						<div class="text"><span id="trenutni-pdv"></span></div>
+						<script>
+							document.getElementById("trenutni-pdv").innerHTML = brojSaRazmacima(informacije.trenutni.pdv) +" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstorIcon.png"></div>
+					<div class="info">
+						<div class="title">Трошак мајстора</div>
+						<div class="text"><span id="trenutni-trosak-majstora"></span></div>
+						<script>
+							var pocetakUgovora = informacije.trenutni.mesec+"-"+informacije.trenutni.godina;
+							var faktor = pocetakUgovora=="02.2024" ? 7 : 30;
+							document.getElementById("trenutni-trosak-majstora").innerHTML = brojSaRazmacima(faktor*15*35000) +" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Добит</div>
+						<div class="text"><span id="trenutni-dobit"></span></div>
+						<script>
+							var pocetakUgovora = informacije.trenutni.mesec+"-"+informacije.trenutni.godina;
+							var faktor = pocetakUgovora=="02.2024" ? 7 : 30;
+							document.getElementById("trenutni-dobit").innerHTML = brojSaRazmacima(parseFloat(informacije.trenutni.iznos)-faktor*15*35000) +" дин.";
+						</script>
+					</div>
+				</div>
+			</div>
+
+			<div class="boxesTitle">Претходни месец</div>
+			<div class="boxesWrap">
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/sumIcon.png"></div>
+					<div class="info">
+						<div class="title">Остварено</div>
+						<div class="text"><span id="prethodni-ostvareno"></span></div>
+						<script>
+							document.getElementById("prethodni-ostvareno").innerHTML = brojSaRazmacima(informacije.prethodni.iznos) + " дин.<br>" + informacije.prethodni.nalozi +" налога";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturisanoIcon.png"></div>
+					<div class="info">
+						<div class="title">фактурисано</div>
+						<div class="text"><span id="prethodni-fakturisano"></span></div>
+						<script>
+							document.getElementById("prethodni-fakturisano").innerHTML = brojSaRazmacima(informacije.prethodni.fakturisano.iznos) +" дин.<br>"+ informacije.prethodni.fakturisano.nalozi +" налога";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/pdvIcon.png"></div>
+					<div class="info">
+						<div class="title">Опорезиво</div>
+						<div class="text"><span id="prethodni-oporezivo"></span></div>
+						<script>
+							document.getElementById("prethodni-oporezivo").innerHTML = brojSaRazmacima(informacije.prethodni.oporezivo) +" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/pdvIcon.png" style="opacity:0.3"></div>
+					<div class="info">
+						<div class="title">Неопорезиво</div>
+						<div class="text"><span id="prethodni-neoporezivo"></span></div>
+						<script>
+							document.getElementById("prethodni-neoporezivo").innerHTML = brojSaRazmacima(informacije.prethodni.neoporezivo) +" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/pdvIcon.png"></div>
+					<div class="info">
+						<div class="title">ПДВ</div>
+						<div class="text"><span id="prethodni-pdv"></span></div>
+						<script>
+							document.getElementById("prethodni-pdv").innerHTML = brojSaRazmacima(informacije.prethodni.pdv) +" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstorIcon.png"></div>
+					<div class="info">
+						<div class="title">Трошак мајстора</div>
+						<div class="text"><span id="prethodni-trosak-majstora"></span></div>
+						<script>
+							var pocetakUgovora = informacije.prethodni.mesec+"."+informacije.prethodni.godina;
+							var faktor = pocetakUgovora=="02.2024" ? 7 : 30;
+							document.getElementById("prethodni-trosak-majstora").innerHTML = brojSaRazmacima(faktor*15*35000) +" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Добит</div>
+						<div class="text"><span id="prethodni-dobit"></span></div>
+						<script>
+							var pocetakUgovora = informacije.prethodni.mesec+"."+informacije.prethodni.godina;
+							var faktor = pocetakUgovora=="02.2024" ? 7 : 30;
+							document.getElementById("prethodni-dobit").innerHTML = brojSaRazmacima(parseFloat(informacije.prethodni.iznos)-faktor*15*35000) +" дин.";
+						</script>
+					</div>
+				</div>
+			</div>
+			
+
+		</div>
+	</div>
+</div>
+<%- include ("partials/footer") -%>

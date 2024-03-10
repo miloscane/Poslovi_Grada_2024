@@ -32,7 +32,9 @@
 				</div>
 				<div class="menuWrap" id="site-meni">
 					<div class="pageWidth">
-						<% if(Number(user.role)==10){ %>
+						<% if(Number(user.role)==5){ %>
+							<div class="menuItem"><a href="/stefan/naslovna" onclick="loadGif()">Насловна</a><div class="rightBorder"></div></div>
+						<% }else if(Number(user.role)==10){ %>
 							<div class="menuItem"><a href="/" onclick="loadGif()">Насловна</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="#">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
 								<div class="subMenu">

@@ -748,13 +748,13 @@ http.listen(process.env.PORT, function(){
 			logError(error);
 		});
 
-		errorDB.find({}).toArray()
+		/*errorDB.find({}).toArray()
 		.then((errors)=>{
 			console.log(errors)
 		})
 		.catch((error)=>{
 			console.log(error)
-		})
+		})*/
 
 		/*errorDB.deleteMany({error:{$regex:"MongoInvalidArgumentError:"}})
 		.then((dbResponse)=>{
@@ -1125,11 +1125,11 @@ http.listen(process.env.PORT, function(){
 });
 
 
-
-
 server.get('/',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==5){
+			res.redirect("/stefan/naslovna")
+		}else if(Number(req.session.user.role)==10){
 			naloziDB.find({}).toArray()
 			.then((nalozi) => {
 				var ukupnoNaloga = 0;
@@ -1467,6 +1467,150 @@ server.post('/reset-lozinke',async (req,res)=>{
 	}
 });
 
+server.get('/stefan/naslovna',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==5){
+			naloziDB.find({}).toArray()
+			.then((nalozi)=>{
+				var informacije = {};
+				informacije.realizovano = 0;
+				informacije.realizovaniNalozi = 0;
+				informacije.neobracunato = 0;
+				informacije.nezavrseno = 0;
+				informacije.fakturisano = {};
+				informacije.fakturisano.iznos = 0;
+				informacije.fakturisano.nalozi = 0;
+				informacije.cekanje = {};
+				informacije.cekanje.iznos = 0;
+				informacije.cekanje.nalozi = 0;
+				informacije.trenutni = {};
+				informacije.trenutni.mesec = "";
+				informacije.trenutni.godina = "";
+				informacije.trenutni.iznos = 0;
+				informacije.trenutni.nalozi = 0;
+				informacije.trenutni.oporezivo = 0;
+				informacije.trenutni.neoporezivo = 0;
+				informacije.trenutni.pdv = 0;
+				informacije.trenutni.fakturisano = {};
+				informacije.trenutni.fakturisano.iznos = 0;
+				informacije.trenutni.fakturisano.nalozi = 0;
+				informacije.prethodni = {};
+				informacije.prethodni.mesec = "";
+				informacije.prethodni.godina = "";
+				informacije.prethodni.iznos = 0;
+				informacije.prethodni.nalozi = 0;
+				informacije.prethodni.oporezivo = 0;
+				informacije.prethodni.neoporezivo = 0;
+				informacije.prethodni.pdv = 0;
+				informacije.prethodni.fakturisano = {};
+				informacije.prethodni.fakturisano.iznos = 0;
+				informacije.prethodni.fakturisano.nalozi = 0;
+				for(var i=0;i<nalozi.length;i++){
+					//Ukupna statistika
+					var iznosNaloga = isNaN(parseFloat(nalozi[i].ukupanIznos)) ? 0 : parseFloat(nalozi[i].ukupanIznos);
+					informacije.realizovano = informacije.realizovano + iznosNaloga;
+					var zavrseniStatusi = ["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Storniran","Storniran na SEF-u"];
+					
+					if(iznosNaloga>0){
+						informacije.realizovaniNalozi++;
+					}else{
+						if(zavrseniStatusi.indexOf(nalozi[i].statusNaloga)>=0){
+							informacije.neobracunato++;
+						}
+					}
+
+					if(zavrseniStatusi.indexOf(nalozi[i].statusNaloga)<0){
+						informacije.nezavrseno++;
+					}
+
+					if(nalozi[i].statusNaloga == "Fakturisan"){
+						informacije.fakturisano.iznos = informacije.fakturisano.iznos + iznosNaloga;
+						informacije.fakturisano.nalozi++;
+					}
+
+					var cekanjeStatus = ["Završeno","Nalog u Stambenom","Spreman za fakturisanje"];
+					if(cekanjeStatus.indexOf(nalozi[i].statusNaloga)>=0){
+						informacije.cekanje.iznos = informacije.cekanje.iznos + iznosNaloga;
+						informacije.cekanje.nalozi++;
+					}
+
+					//Ovomesecna
+					var today = new Date();
+					var currentMonth = today.getMonth()+1;
+					var month = currentMonth.toString().length==1 ? "0"+currentMonth : currentMonth;
+					var year = today.getFullYear();
+					var monthString = month+"."+year;
+					informacije.trenutni.mesec = month;
+					informacije.trenutni.godina = year;
+
+					if(nalozi[i].prijemnica.datum.datum.includes(monthString)){
+						informacije.trenutni.iznos = informacije.trenutni.iznos + iznosNaloga;
+						informacije.trenutni.nalozi++;
+						if(iznosNaloga>=500000){
+							informacije.trenutni.neoporezivo = informacije.trenutni.neoporezivo + iznosNaloga;
+						}else{
+							informacije.trenutni.oporezivo = informacije.trenutni.oporezivo + iznosNaloga;
+						}
+
+						if(nalozi[i].statusNaloga=="Fakturisan"){
+							informacije.trenutni.fakturisano.iznos = informacije.trenutni.fakturisano.iznos + iznosNaloga;
+							informacije.trenutni.fakturisano.nalozi++;
+						}
+					}
+
+					//prosli mesecna
+					today.setMonth(today.getMonth() - 1);
+					var currentMonth = today.getMonth()+1;
+					var month = currentMonth.toString().length==1 ? "0"+currentMonth : currentMonth;
+					var year = today.getFullYear();
+					var monthString = month+"."+year;
+					informacije.prethodni.mesec = month;
+					informacije.prethodni.godina = year;
+
+					if(nalozi[i].prijemnica.datum.datum.includes(monthString)){
+						informacije.prethodni.iznos = informacije.prethodni.iznos + iznosNaloga;
+						informacije.prethodni.nalozi++;
+						if(iznosNaloga>=500000){
+							informacije.prethodni.neoporezivo = informacije.prethodni.neoporezivo + iznosNaloga;
+						}else{
+							informacije.prethodni.oporezivo = informacije.prethodni.oporezivo + iznosNaloga;
+						}
+
+						if(nalozi[i].statusNaloga=="Fakturisan"){
+							informacije.prethodni.fakturisano.iznos = informacije.prethodni.fakturisano.iznos + iznosNaloga;
+							informacije.prethodni.fakturisano.nalozi++;
+						}
+					}
+
+				}
+				informacije.trenutni.pdv = informacije.trenutni.oporezivo*0.2;
+				informacije.prethodni.pdv = informacije.prethodni.oporezivo*0.2;
+				res.render("stefan/naslovna",{
+					pageTitle:"Насловна",
+					informacije: informacije,
+					user: req.session.user
+				});
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази података 1484.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.get('/sviNalozi',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
@@ -1475,7 +1619,11 @@ server.get('/sviNalozi',async (req,res)=>{
 				user: req.session.user
 			});
 		}else{
-			res.redirect("/")
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
 		}
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));

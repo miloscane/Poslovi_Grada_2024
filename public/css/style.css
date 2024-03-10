@@ -3444,6 +3444,73 @@ input[type=number] {
 
 }
 
+.stefan .boxesTitle{
+    font-size:32px;
+    font-weight:700;
+    color:rgb(37,57,101);
+}
+
+.stefan .boxesWrap{
+    display:flex;
+    flex-wrap: wrap;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    margin-top:20px;
+    margin-bottom:40px;
+}
+
+.stefan .boxesWrap .box{
+    width: calc(50% - 20px);
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    margin:5px;
+    background-color:rgb(37,57,101);
+    color:rgb(255,255,255);
+    font-size:0;
+    -webkit-transition:all ease 0.5s;
+    -moz-transition:all ease 0.5s;
+    -ms-transition:all ease 0.5s;
+    -o-transition:all ease 0.5s;
+    transition:all ease 0.5s;
+    padding:10px;
+    padding-bottom:20px;
+    position:relative;
+}
+
+.stefan .boxesWrap .box:hover{
+    background-color:rgb(93,142,220);
+}
+
+.stefan .boxesWrap .box .icon{
+    width:72px;
+    display:inline-block;
+    vertical-align: top;
+    margin-right:10px;
+}
+
+.stefan .boxesWrap .box .info{
+    width:calc(100% - 82px);
+    display:inline-block;
+    vertical-align: top;
+    font-size:14px;
+}
+
+.stefan .boxesWrap .box .info .title{
+    font-size:26px;
+    font-weight:700;
+}
+
+.stefan .boxesWrap .box .info .text{
+    font-size:18px;
+    font-weight:400;
+    margin:5px auto;
+}
+
+.stefan .boxesWrap .box .info .note{
+    font-size:12px;
+    font-weight:200;
+}
+
 @media screen and (max-width: 1100px) {
     .pageWidth{
         padding-left:10px;
@@ -3537,6 +3604,18 @@ input[type=number] {
     .nalog .detalji .boxesWrap .box{
         width:calc(100% - 20px);
     }
+
+    .stefan .boxesTitle{
+        font-size:22px;
+    }
+
+    .stefan .boxesWrap .box .info .title{
+        font-size:18px;
+    }
+
+    .stefan .boxesWrap .box .info .text{
+        font-size:14px;
+    }
 }
 
 @media screen and (max-width: 600px) {
@@ -3590,6 +3669,32 @@ input[type=number] {
 
     .dropSlike{
         display:none;
+    }
+
+    .stefan .boxesWrap .box .icon{
+        width:50px;
+        display:block;
+        margin:0 auto;
+        margin-bottom:10px;
+    }
+
+    .stefan .boxesWrap .box .info{
+        width:90%;
+        display:block;
+        margin:0 auto;
+        text-align:center;
+    }
+
+    .stefan .boxesTitle{
+        position:sticky;
+        top:0;
+        background-color:rgb(243,249,255);
+        padding:7px;
+        text-align:center;
+        border-bottom:1px solid rgb(100,100,100);
+        z-index:20000;
+        left:0;
+        right:0;
     }
 
 }
