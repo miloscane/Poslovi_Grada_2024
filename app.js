@@ -2634,9 +2634,28 @@ server.get('/fakturePodizvodjaca',async (req,res)=>{
 	}
 });
 
+server.get('/stefan/ucinakDispecera',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==5){
+			res.render("stefan/ucinakDispecera",{
+				pageTitle:"Учинак диспечера",
+				user: req.session.user
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
+
 server.get('/ucinakMajstora',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
+		if(Number(req.session.user.role)==5 || Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			ucinakMajstoraDB.find({}).toArray()
 			.then((ucinci)=>{
 				stariUcinakMajstoraDB.find({}).toArray()
@@ -2645,7 +2664,7 @@ server.get('/ucinakMajstora',async (req,res)=>{
 					.then((majstori)=>{
 						var majstoriObject = [];
 						for(var i=0;i<majstori.length;i++){
-							if(podizvodjaci.indexOf(majstori[i].uniqueId)<0){
+							if(podizvodjaci.indexOf(majstori[i].uniqueId)<0 && !majstori[i].inactive){
 								var majstorObject = {};
 								majstorObject.name 			= majstori[i].ime;
 								majstorObject.uniqueId	= majstori[i].uniqueId;

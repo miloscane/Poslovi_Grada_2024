@@ -209,6 +209,7 @@
 							var layout = {
 								xaxis:{'fixedrange':true},
 								yaxis:{'fixedrange':true,'range': [0, 5000000]},
+								margin:{t:20,l:20,r:20,b:20},
 								shapes: [
 								    {
 								        type: 'line',
@@ -224,7 +225,7 @@
 								    }
 								 ]
 							}
-							Plotly.newPlot(plot, plotData,layout,{displayModeBar: false});
+							Plotly.newPlot(plot, plotData,layout,{displayModeBar: false,responsive: true});
 							plots.appendChild(plot);
 						row.appendChild(plots);
 					document.getElementById("ucinci").appendChild(row);

@@ -3617,6 +3617,18 @@ input[type=number] {
         margin-top:10px;
         width:90%;
     }
+
+    .prikazUcinka .row .infoWrap{
+        display:block;
+        width:90%;
+        margin:0 auto;
+    }
+
+    .prikazUcinka .row .plots{
+        display:block;
+        width:90%;
+        margin:0 auto;
+    }
 }
 
 @media screen and (max-width: 850px) {
@@ -3715,9 +3727,13 @@ input[type=number] {
         padding:7px;
         text-align:center;
         border-bottom:1px solid rgb(100,100,100);
-        z-index:20000;
+        z-index:11000;
         left:0;
         right:0;
+    }
+
+    .prikazUcinka .row .infoWrap .displayRow .displayWrap{
+        width:45%;
     }
 
 }
