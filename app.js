@@ -414,7 +414,13 @@ function parsePrijemnica(textdata){
 				obracun.push(obracunJson);
 			}
 			prijemnicaJson.obracun = obracun;
+			for(var j=0;j<prijemnicaJson.obracun.length;j++){
+				if(prijemnicaJson.obracun[j].code=="80.04.02.001"){
+					console.log("PRIJEMNICA SA UVECANOM STAVKOM!!");
+				}
+			}
 		}
+		
 
 		if(rowArray[i].includes("Broj naloga:")){
 			prijemnicaJson.nalog = rowArray[i].split("Broj naloga:")[1];
@@ -1100,7 +1106,40 @@ http.listen(process.env.PORT, function(){
 		})*/
 		
 
-		
+		/*naloziDB.find({statusNaloga:"Fakturisan"}).toArray()
+		.then((nalozi) => {
+			var odBroja = 3202;
+			var doBroja = 3459;
+			var naloziToExport	=	[];
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].faktura.samoBroj==0 || isNaN(Number(nalozi[i].faktura.samoBroj))){
+					warnings.push("Nije moguce odrediti broj fakture za nalog "+nalozi[i].broj+", broj fakture"+nalozi[i].brojFakture);
+				}else{
+					if(Number(nalozi[i].faktura.samoBroj)>=Number(odBroja) && Number(nalozi[i].faktura.samoBroj)<=Number(doBroja)){
+						naloziToExport.push(nalozi[i])
+					}
+				}
+			}
+
+			naloziToExport = naloziToExport.sort((a, b) => {
+				if (a.faktura.samoBroj < b.faktura.samoBroj) {
+					return -1;
+				}
+			});
+
+			var csvString = "Broj Naloga,Broj Fakture,Iznos,PDV,Iznos PDVa,Datum PDV\r\n";
+			for(var i=0;i<naloziToExport.length;i++){
+				var pdv = parseFloat(naloziToExport[i].ukupanIznos)>=500000 ? 0 : 20; 
+				var iznosPdv = parseFloat(naloziToExport[i].ukupanIznos)*pdv/100;
+				var datumPdv = naloziToExport[i].faktura.pdv == "35" ? naloziToExport[i].prijemnica.datum.datum : "Datum Slanja"
+				csvString += naloziToExport[i].broj+","+naloziToExport[i].faktura.broj+","+naloziToExport[i].ukupanIznos+","+pdv+","+iznosPdv+","+datumPdv+"\r\n"
+			}
+			fs.writeFileSync("./Export-"+odBroja+"-"+doBroja+".csv",csvString,"utf8");
+			console.log("Wrote "+ naloziToExport.length)
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 
 
 
@@ -3152,6 +3191,58 @@ server.get('/podizvodjac/zavrseniNalozi',async (req,res)=>{
 				}
 				res.render("podizvodjaci/zavrseniNalozi",{
 					pageTitle:"Завршени налози",
+					user: req.session.user,
+					cenovnik: cenovnikZaPrikaz,
+					nalozi: nalozi
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 1243.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+
+server.get('/podizvodjac/vraceniNalozi',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==30){
+			naloziDB.find({majstor:req.session.user.nalozi,statusNaloga:"Vraćen"}).toArray()
+			.then((nalozi) => {
+				for(var i=0;i<nalozi.length;i++){
+					delete nalozi[i]._id;
+					delete nalozi[i].uniqueId;
+					delete nalozi[i].digitalizacija;
+					delete nalozi[i].opis;
+					delete nalozi[i].vrstaRada;
+					delete nalozi[i].kategorijeRadova;
+					delete nalozi[i].punaAdresa;
+					delete nalozi[i].ukupanIznos;
+					delete nalozi[i].faktura;
+					delete nalozi[i].prijemnica;
+					delete nalozi[i].ukupanIznos;
+				}
+				var cenovnikZaPrikaz = [];
+				if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507"){
+					cenovnikZaPrikaz = cenovnikHigh;
+				}else{
+					cenovnikZaPrikaz = cenovnikLow;
+				}
+				res.render("podizvodjaci/vraceniNalozi",{
+					pageTitle:"Враћени налози",
 					user: req.session.user,
 					cenovnik: cenovnikZaPrikaz,
 					nalozi: nalozi
