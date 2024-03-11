@@ -386,7 +386,7 @@ function parsePrijemnica(textdata){
 			for(var j=0;j<sortedObracunArray.length;j++){
 				var obracunJson = {};
 				obracunJson.code = "80.0"+sortedObracunArray[j].split("80.0")[1].substring(0,8);
-				//12 je proizvoljna duzina sifre, da bi se sklonilo 0.00 iz sifre
+				//12 je proizvoljna duzina sifre, da bi se sklonilo 0.00 iz sifre, duzina je proizvoljna jer posle sifre ide ime, a ono ima dosta slova
 				var ostatak = sortedObracunArray[j].substring(12,sortedObracunArray[j].length-1);
 				var quantityIndex = -1;
 				for(var k=0;k<ostatak.length;k++){
@@ -394,6 +394,18 @@ function parsePrijemnica(textdata){
 						quantityIndex = k+4;
 						break;
 					}
+				}
+				if(obracunJson.code=="80.04.02.001"){
+					var priceStartIndex = -1;
+					for(var k=0;k<ostatak.length;k++){
+						if(ostatak[k]=="1" && ostatak[k+1]=="." && ostatak[k+2]=="0" && ostatak[k+3]=="0"){
+							priceStartIndex = k+4;
+							break;
+						}
+					}
+					var price = ostatak.substring(priceStartIndex,ostatak.length-1).split(".")[0]+"."+ostatak.substring(priceStartIndex,ostatak.length-1).split(".")[1][0]+ostatak.substring(priceStartIndex,ostatak.length-1).split(".")[1][1];
+					price = price.split(",").join("");
+					obracunJson.price = price;
 				}
 				var foundQuantity = "";
 				if(quantityIndex>=0){
@@ -414,11 +426,12 @@ function parsePrijemnica(textdata){
 				obracun.push(obracunJson);
 			}
 			prijemnicaJson.obracun = obracun;
-			for(var j=0;j<prijemnicaJson.obracun.length;j++){
+			/*for(var j=0;j<prijemnicaJson.obracun.length;j++){
 				if(prijemnicaJson.obracun[j].code=="80.04.02.001"){
 					console.log("PRIJEMNICA SA UVECANOM STAVKOM!!");
+					//console.log(textdata)
 				}
-			}
+			}*/
 		}
 		
 

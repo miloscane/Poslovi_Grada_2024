@@ -445,7 +445,7 @@
 					document.getElementById("obracun-wrap").innerHTML = "";
 					if(nalogJson.obracun){
 						for(var i=0;i<nalogJson.obracun.length;i++){
-							addRow({code:nalogJson.obracun[i].code,quantity:nalogJson.obracun[i].quantity})
+							addRow({code:nalogJson.obracun[i].code,quantity:nalogJson.obracun[i].quantity,price:nalogJson.obracun[i].price})
 						}
 						calculateTable();
 					}

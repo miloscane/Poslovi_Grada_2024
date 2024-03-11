@@ -3,8 +3,18 @@ function addRow(json){
 	//json = {code:code,quantity:quantity}
 
 	if(json){
-		var rowJson = getPriceByCode(json.code);
-		rowJson.kolicina = json.quantity;
+		if(json.code!="80.04.02.001"){
+			var rowJson = getPriceByCode(json.code);
+			rowJson.kolicina = json.quantity;
+		}else{
+			var rowJson = {};
+			rowJson.code = json.code;
+			rowJson.name = "Uvecanje 15% usled otezanih uslova rada koji mogu biti posledica suzenog prostora u tehnickim i podrumskim etazama, velikih kolicina fekalnog materijala opasnog za zadravlje radnika, kao i drugim specificnim situacijama u kojima je otezano izvodjenje radova"
+			rowJson.price = json.price;
+			rowJson.kolicina = json.quantity;
+			rowJson.unit = "RSD";
+		}
+		
 	}
 	var row = document.createElement("DIV");
 	row.setAttribute("class","row");
