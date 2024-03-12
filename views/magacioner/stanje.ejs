@@ -13,6 +13,12 @@
 	<div class="magacinStanje">
 		<div class="pageWidth">
 			<div class="ukupnaVrednost">Укупна вредност магацина: <span id="vrednost-magacina"></span></div>
+			<div class="inputWrap printButton">
+				<div class="button" onclick="excelExport()">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
+					<div class="label">Извези у Excel</div>
+				</div>
+			</div>	
 			<script>
 				var ukupnaVrednostMagacina = 0;
 				for(var i=0;i<proizvodi.length;i++){
@@ -76,6 +82,24 @@
 					var cenaProizvoda = isNaN(parseFloat(proizvodi[i].price)) ? 0 : parseFloat(proizvodi[i].price);
 					ukupnaVrednostMagacina = ukupnaVrednostMagacina + proizvodi[i].realnoStanje*cenaProizvoda;
 					document.getElementById("vrednost-magacina").innerHTML = brojSaRazmacima(ukupnaVrednostMagacina) + " дин.";
+				}
+
+				function excelExport(){
+					var csvString = "Šifra stavke,Naziv stavke,Jedinica mere,Stanje,Jedinicna Cena,Ukupna Cena\r\n";
+					for(var i=0;i<proizvodi.length;i++){
+						var cenaStavke = proizvodi[i].price!=0 && proizvodi[i].price!="" ? parseFloat(proizvodi[i].price) : 0;
+						cenaStavke = isNaN(cenaStavke) ? 0 : cenaStavke;
+						console.log(cenaStavke)
+						csvString += "\""+proizvodi[i].code+"\""+","+proizvodi[i].name.replace(/,/g,'')+","+proizvodi[i].unit+","+proizvodi[i].realnoStanje+","+cenaStavke+","+parseFloat(proizvodi[i].realnoStanje)*cenaStavke+"\r\n"
+					}
+					var blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+					var url = URL.createObjectURL(blob);
+
+					// Create a link to download it
+					var pom = document.createElement('a');
+					pom.href = url;
+					pom.setAttribute('download', "Stanje u magacinu");
+					pom.click();
 				}
 			</script>
 			<div class="lightBlueBox">
