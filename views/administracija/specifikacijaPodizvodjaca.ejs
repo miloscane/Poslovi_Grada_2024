@@ -1,0 +1,124 @@
+<%- include ("partials/header") -%>
+<script>
+	var specifikacija = <%-JSON.stringify(specifikacija)%>;
+	console.log(specifikacija);
+</script>
+	<div class="pageWidth podizvodjac podizvodjacSpecifikacija">
+		<div class="lightBlueBox">
+			<div class="boxesWrap">
+				<div class="box">
+					<div class="icon"><img style="width:80%" src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
+					<div class="info">
+						<div class="title">Број спецификације</div>
+						<div class="text"><%=specifikacija.brojSpecifikacije%></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturisanoIcon.png"></div>
+					<div class="info">
+						<div class="title">Број фактуре</div>
+						<div class="text"><%=specifikacija.brojFakture%></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumIcon.png"></div>
+					<div class="info">
+						<div class="title">Датум спецификације</div>
+						<div class="text"><%=specifikacija.datum.datum%></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Износ</div>
+						<div class="text"><span id="iznos-specifikacije"></span></div>
+						<script>
+							document.getElementById("iznos-specifikacije").innerHTML = brojSaRazmacima(specifikacija.ukupanIznos)+" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img style="width:50%" src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/pdvIcon.png"></div>
+					<div class="info">
+						<div class="title">ПДВ</div>
+						<div class="text"><span id="pdv"></span></div>
+						<script>
+							document.getElementById("pdv").innerHTML = brojSaRazmacima(parseFloat(specifikacija.ukupanIznos)*0.2)+" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img style="width:80%" id="status-icon" src=""></div>
+					<div class="info">
+						<div class="title">Статус</div>
+						<div class="text"><span id="status"></span></div>
+						<script>
+							if(Number(specifikacija.odobrena)==1){
+								document.getElementById("status-icon").src = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png";
+								document.getElementById("status").innerHTML = "Одобрена";
+							}else{
+								document.getElementById("status-icon").src = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png";
+								document.getElementById("status").innerHTML = "Чека одобрење";
+							}
+						</script>
+					</div>
+				</div>
+			</div>
+			<div class="specifikacija">
+				<div class="rows" id="rows"></div>
+			</div>
+			<script>
+				for(var i=0;i<specifikacija.nalozi.length;i++){
+					var row = document.createElement("DIV");
+					row.setAttribute("class","row");
+						var item = document.createElement("DIV");
+						item.setAttribute("class","inline rBr");
+						item.innerHTML = eval(i+1)+".";
+						row.appendChild(item);
+
+						var item = document.createElement("DIV");
+						item.setAttribute("class","inline brojNaloga");
+						item.innerHTML = specifikacija.nalozi[i].broj;
+						row.appendChild(item);
+
+						var item = document.createElement("DIV");
+						item.setAttribute("class","inline radnaJedinica");
+						item.innerHTML = specifikacija.nalozi[i].radnaJedinica;
+						row.appendChild(item);
+
+						var item = document.createElement("DIV");
+						item.setAttribute("class","inline adresa");
+						item.innerHTML = specifikacija.nalozi[i].adresa;
+						row.appendChild(item);
+
+						var item = document.createElement("DIV");
+						item.setAttribute("class","inline iznos");
+						item.innerHTML = brojSaRazmacima(specifikacija.nalozi[i].ukupanIznos);
+						row.appendChild(item);
+
+
+					document.getElementById("rows").appendChild(row);
+				}
+			</script>
+			<% if(Number(specifikacija.odobrena)==0 ){%>
+				<div class="inputWrap printButton" style="margin-top:50px">
+					<div class="button" onclick="loadGif();document.getElementById('form').submit()" style="display:inline-block;vertical-align: top;">
+						<div class="label">Одобри спецификацију</div>
+					</div>
+					<form method="POST" action="/administracija/odobri-specifikaciju" style="display:none" id="form">
+						<input type="text" name="specifikacija" value="<%=specifikacija.uniqueId%>">
+					</form>
+				</div>
+			<%}else{%>
+				<div class="inputWrap printButton" style="margin-top:50px">
+					<div class="button deleteButton" onclick="loadGif();document.getElementById('form').submit()" style="display:inline-block;vertical-align: top;">
+						<div class="label">Поништи спецификацију</div>
+					</div>
+					<form method="POST" action="/administracija/ponisti-specifikaciju" style="display:none" id="form">
+						<input type="text" name="specifikacija" value="<%=specifikacija.uniqueId%>">
+					</form>
+				</div>
+			<%}%>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

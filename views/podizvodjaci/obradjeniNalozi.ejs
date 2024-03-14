@@ -1,9 +1,10 @@
 <%- include ("partials/header") -%>
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
+		var cenovnik = <%-JSON.stringify(cenovnik)%>;
 	</script>
 	<div class="pageWidth podizvodjaci">
-		<div class="zavrseniNalozi">
+		<div class="zavrseniNalozi obradjeniNalozi">
 			<div class="boxesWrap">
 				<div class="box">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/sumIcon.png"></div>
@@ -40,6 +41,11 @@
 				</div>
 			</div>
 			<script>
+
+				var specifikacija = {};
+				specifikacija.brojFakture = "";
+				specifikacija.brojSpecifikacije = "";
+				specifikacija.nalozi = [];
 				function getPriceByCode(code){
 					for(var i=0;i<cenovnik.length;i++){
 						if(cenovnik[i].code==code){
@@ -47,20 +53,33 @@
 						}
 					}
 				}
-				var naloziToShow = [];
+				var naloziToShow;
 				function generateTable(){
-					naloziToShow = nalozi;
+					naloziToShow = [];
+					for(var i=0;i<nalozi.length;i++){
+						var nalogFound = false;
+						for(var j=0;j<specifikacija.nalozi.length;j++){
+							if(specifikacija.nalozi[j].broj==nalozi[i].broj){
+								nalogFound = true;
+								break;
+							}
+						}
+						if(!nalogFound){
+							naloziToShow.push(nalozi[i])
+						}
+					}
 					document.getElementById("table").innerHTML = "";
 					var table = document.createElement("TABLE");
 					var ukupanIznos = 0;
 					for(var i=0;i<naloziToShow.length;i++){
 						var obracunatIznos = 0;
 						for(var j=0;j<naloziToShow[i].obracun.length;j++){
-							obracunatIznos = obracunIznos + getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity);
+							obracunatIznos = obracunatIznos + getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity);
 						}
 						naloziToShow[i].ukupanIznos = obracunatIznos;
 						ukupanIznos = ukupanIznos + obracunatIznos;
 						var tr = document.createElement("TR");
+						tr.setAttribute("data-nalog",JSON.stringify(naloziToShow[i]));
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value redniBroj");
@@ -105,8 +124,15 @@
 							
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
-								div.setAttribute("class","value status");
-								div.innerHTML = "Можете фактурисати";
+								div.setAttribute("class","value dugme");
+								div.innerHTML = "<div onclick=\"staviNaSpecifikaciju(this)\" class=\"button\">Стави на спецификацију</div>";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value iznos");
+								div.innerHTML = brojSaRazmacima(naloziToShow[i].ukupanIznos);
 								td.appendChild(div);
 							tr.appendChild(td);
 
@@ -117,7 +143,127 @@
 				}
 
 				generateTable();
+
+				function staviNaSpecifikaciju(elem){
+					var nalogJson = JSON.parse(elem.parentElement.parentElement.parentElement.dataset.nalog);
+					var specifikacijaJson = {};
+					specifikacijaJson.broj = nalogJson.broj;
+					specifikacijaJson.adresa = nalogJson.adresa;
+					specifikacijaJson.radnaJedinica = nalogJson.radnaJedinica;
+					specifikacijaJson.ukupanIznos = nalogJson.ukupanIznos;
+					specifikacija.nalozi.push(specifikacijaJson);
+					generateTable()
+					generateSpecifikacija()
+				}
+
+				function skiniSaSpecifikacije(elem){
+					var brojNaloga = elem.parentElement.dataset.brojnaloga;
+					for(var i=0;i<specifikacija.nalozi.length;i++){
+						if(specifikacija.nalozi[i].broj==brojNaloga){
+							specifikacija.nalozi.splice(i,1);
+							break;
+						}
+					}
+					generateTable()
+					generateSpecifikacija()
+				}
+
+				function generateSpecifikacija(){
+					document.getElementById("nalozi-specifikacije").innerHTML = "";
+					var ukupanIznosSpecifikacije = 0;
+					for(var i=0;i<specifikacija.nalozi.length;i++){
+						ukupanIznosSpecifikacije = ukupanIznosSpecifikacije + parseFloat(specifikacija.nalozi[i].ukupanIznos);
+						var row = document.createElement("DIV");
+						row.setAttribute("class","row");
+						row.setAttribute("data-brojnaloga",specifikacija.nalozi[i].broj);
+							var item = document.createElement("DIV");
+							item.setAttribute("class","inline rBr");
+							item.innerHTML = eval(i+1)+".";
+							row.appendChild(item);
+
+							var item = document.createElement("DIV");
+							item.setAttribute("class","inline brojNaloga");
+							item.innerHTML = specifikacija.nalozi[i].broj;
+							row.appendChild(item);
+
+							var item = document.createElement("DIV");
+							item.setAttribute("class","inline radnaJedinica");
+							item.innerHTML = specifikacija.nalozi[i].radnaJedinica;
+							row.appendChild(item);
+
+							var item = document.createElement("DIV");
+							item.setAttribute("class","inline adresa");
+							item.innerHTML = specifikacija.nalozi[i].adresa;
+							row.appendChild(item);
+
+							var item = document.createElement("DIV");
+							item.setAttribute("class","inline iznos");
+							item.innerHTML = brojSaRazmacima(specifikacija.nalozi[i].ukupanIznos);
+							row.appendChild(item);
+
+							var item = document.createElement("DIV");
+							item.setAttribute("class","inline obrisi");
+							item.setAttribute("onclick","skiniSaSpecifikacije(this)");
+							item.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/deleteRow.png\">";
+							row.appendChild(item);
+
+
+						document.getElementById("nalozi-specifikacije").appendChild(row);
+					}
+					specifikacija.ukupanIznos = ukupanIznosSpecifikacije;
+					document.getElementById("iznos-specifikacije").value = brojSaRazmacima(ukupanIznosSpecifikacije)
+				}
+
 			</script>
+			<div class="specifikacija">
+				<div class="title">Спецификација</div>
+				<div class="header">
+					<div class="inputWrap">
+						<div class="label">Број фактуре:</div>
+						<div class="inputWrapper">
+							<input type="text" id="broj-fakture">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="label">Број спецификације:</div>
+						<div class="inputWrapper">
+							<input type="text" id="broj-specifikacije">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="label">Износ налога:</div>
+						<div class="inputWrapper">
+							<input type="text" id="iznos-specifikacije" readonly>
+						</div>
+					</div>	
+				</div>
+				<div id="nalozi-specifikacije" class="rows"></div>
+				<div class="inputWrap">
+					<div class="button" onclick="saveSpecifikacija()">Сачувај спецификацију</div>
+					<form method="POST" action="/podizvodjac/nova-specifikacija" id="form" style="display:none">
+						<input type="text" name="json" id="json">
+					</form>
+				</div>
+				<script>
+					function saveSpecifikacija(){
+						var brojFakture = document.getElementById("broj-fakture").value;
+						var brojSpecifikacije = document.getElementById("broj-specifikacije").value;
+						if(brojFakture!="" && brojSpecifikacije!=""){
+							if(specifikacija.nalozi.length==0){
+								alert("На спецификацији нисте унели ниједан налог.")
+							}else{
+								specifikacija.brojFakture = brojFakture;
+								specifikacija.brojSpecifikacije = brojSpecifikacije;
+								document.getElementById("json").value = JSON.stringify(specifikacija);
+								loadGif();
+								document.getElementById("form").submit();
+							}
+						}else{
+							alert("Морате унети број фактуре и број спецификације")
+						}
+					}
+				</script>
+			</div>
 		</div>
 	</div>
 <%- include ("partials/footer") -%>

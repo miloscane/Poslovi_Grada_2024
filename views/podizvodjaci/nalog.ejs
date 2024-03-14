@@ -350,7 +350,9 @@
 				<div class="saveNalog">
 					<div class="inputWrapper">
 						<div class="inputWrap">
-							<div class="button" onclick="saveNalog()">САЧУВАЈ ИЗМЕНЕ НА НАЛОГУ</div>
+							<% if(nalog.statusNaloga!="U obradi" && nalog.statusNaloga!="Možete fakturisati" && nalog.statusNaloga!="Fakturisan"){%>
+								<div class="button" onclick="saveNalog()">САЧУВАЈ ИЗМЕНЕ НА НАЛОГУ</div>
+							<%}%>
 						</div>
 					</div>
 				</div>

@@ -1,7 +1,6 @@
 <%- include ("partials/header") -%>
 	<script>
 		var specifikacije = <%-JSON.stringify(specifikacije)%>;
-		console.log(specifikacije);
 	</script>
 	<div class="pageWidth podizvodjaci">
 		<div class="lightBlueBox">
@@ -9,6 +8,7 @@
 				<div class="tableWrap">
 					<table id="table">
 						<tr>
+							<td>Подизвођач</td>
 							<td>Број<br>спецификације</td>
 							<td>Број<br>фактуре</td>
 							<td>Датум<br>спецификације</td>
@@ -20,7 +20,11 @@
 						for(var i=0;i<specifikacije.length;i++){
 							var tr = document.createElement("TR");
 								var td = document.createElement("TD");
-								td.innerHTML = "<div class=\"value\"><a href=\"/podizvodjac/specifikacija/"+specifikacije[i].uniqueId+"\" target=\"_blank\">"+specifikacije[i].brojSpecifikacije+"</a></div>";
+								td.innerHTML = "<div class=\"value\">"+specifikacije[i].user.name+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\"><a href=\"/administracija/specifikacijaPodizvodjaca/"+specifikacije[i].uniqueId+"\" target=\"_blank\">"+specifikacije[i].brojSpecifikacije+"</a></div>";
 								tr.appendChild(td);
 
 								var td = document.createElement("TD");

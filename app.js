@@ -70,6 +70,15 @@ const s3Nalozi = new aws.S3({
   }
 });
 
+const spacesEndpointPrijemnice = new aws.Endpoint("fra1.digitaloceanspaces.com/prijemniceTest");
+const s3Prijemnice = new aws.S3({
+  endpoint: spacesEndpointPrijemnice,
+  credentials: {
+    accessKeyId: process.env.storageaccesskey,
+    secretAccessKey: process.env.storageaccesskeysecret,
+  }
+});
+
 
 /*const upload = multer({
   storage: multerS3({
@@ -124,6 +133,17 @@ const uploadNalozi = multer({
     }
   })
 }).single('nalog');
+
+const uploadPrijemnica = multer({
+  storage: multerS3({
+    s3: s3Prijemnice,
+    bucket: 'poslovi-grada-2024',
+    acl: 'public-read',
+    key: function (request, file, cb) {
+      cb(null, new Date().getTime().toString() +"-"+ file.originalname);
+    }
+  })
+}).array('prijemnica',500);
 
 var mailPotpis = "<br>&nbsp;<br>Срдачан поздрав,<br>ВиК Портал Послова Града<br><img style='width:200px' src='https://portal.poslovigrada.rs/images/logo.png'>";
 var resetPassLimit = 1.8e6; //30 minuta
@@ -540,6 +560,7 @@ http.listen(process.env.PORT, function(){
 		proizvodiDB						=	client.db("Poslovi_Grada_2024").collection('magacinProizvodi');
 		magacinUlaziDB				=	client.db("Poslovi_Grada_2024").collection('magacinUlazi');
 		magacinReversiDB			=	client.db("Poslovi_Grada_2024").collection('magacinReversi');
+		specifikacijePodizvodjacaDB			=	client.db("Poslovi_Grada_2024").collection('specifikacijePodizvodjaca');
 		errorDB								=	client.db("Poslovi_Grada_2024").collection('errors');
 
 
@@ -550,6 +571,21 @@ http.listen(process.env.PORT, function(){
 		stariProizvodiDB			=	client.db("Poslovi-Grada").collection('magacin-proizvodi-4');
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			for(var i=0;i<nalozi.length;i++){
+				if(podizvodjaci.indexOf(nalozi[i].majstor)>=0 && nalozi[i].statusNaloga=="Fakturisan"){
+					console.log("NADJENO "+nalozi[i].broj)
+				}else{
+					console.log("...")
+				}
+
+			}
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 
 		pricesDB.find({}).toArray()
 		.then((prices)=>{
@@ -1155,6 +1191,75 @@ http.listen(process.env.PORT, function(){
 		})*/
 
 
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var naloziToExport = [];
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].faktura.broj){
+					if(nalozi[i].faktura.broj.length>3){
+						if(nalozi[i].prijemnica.datum.datum){
+							if(nalozi[i].prijemnica.datum.datum.includes(".02.2024")){
+								naloziToExport.push(nalozi[i])
+							}
+						}
+					}
+				}
+			}
+
+			for(var i=0;i<naloziToExport.length;i++){
+				if(naloziToExport[i].prijemnica.datum.datum){
+					if(naloziToExport[i].prijemnica.datum.datum.length>3){
+						var dateElements = naloziToExport[i].prijemnica.datum.datum.split(".");
+						naloziToExport[i].sorting = new Date(dateElements[2]+"-"+dateElements[1]+"-"+dateElements[0]).getTime();
+					}
+				}
+			}
+
+			naloziToExport.sort((a, b) => parseFloat(b.sorting) - parseFloat(a.sorting));
+
+			var problemNalozi = [];
+
+			for(var i=0;i<naloziToExport.length;i++){
+				//console.log(naloziToExport[i].statusNaloga)
+			}
+
+			var csvString = "Datum,Broj Fakture,Konto,Stranka,Prazno,Prazno,Datum,Datum,Prazno,Prazno,Duguje,Potrazuje,Prazno,Prazno\r\n";
+			for(var i=0;i<naloziToExport.length;i++){
+				var iznosBezPDVa = parseFloat(naloziToExport[i].ukupanIznos);
+				if(!isNaN(iznosBezPDVa)){
+					if(iznosBezPDVa<500000){
+						var iznosPDV = iznosBezPDVa*0.2;
+						var iznosSaPDVom = iznosBezPDVa*1.2;
+						var datumPDV = "";
+						if(naloziToExport[i].prijemnica.datum.datum){
+							if(naloziToExport[i].prijemnica.datum.datum.length>3){
+								datumPDV = naloziToExport[i].prijemnica.datum.datum;
+								csvString+=datumPDV+","+naloziToExport[i].faktura.broj+",2040,1,,,"+datumPDV+","+datumPDV+",,,"+iznosSaPDVom+",,,,\r\n";
+								csvString+=datumPDV+","+naloziToExport[i].faktura.broj+",6142,,,,"+datumPDV+","+datumPDV+",,,,"+iznosBezPDVa+",,,\r\n";
+								csvString+=datumPDV+","+naloziToExport[i].faktura.broj+",4700,,,,"+datumPDV+","+datumPDV+",,,,"+iznosPDV+",,,\r\n";
+							}else{
+								naloziToExport[i].problem = "Nema polja definisan datum prometa";
+								problemNalozi.push(naloziToExport[i])
+							}
+						}
+					}else{
+						naloziToExport[i].problem = "Iznos preko pola miliona";
+						problemNalozi.push(naloziToExport[i]);
+					}
+				}else{
+					naloziToExport[i].problem = "Nedefinisan iznos";
+					problemNalozi.push(naloziToExport[i]);
+				}
+			}
+			for(var i=0;i<problemNalozi.length;i++){
+				csvString+="NAPOMENA:"+" / Broj fakture: "+problemNalozi[i].faktura.broj+" / Broj naloga: "+problemNalozi[i].broj+" / Problem: "+problemNalozi[i].problem+"\r\n";
+			}
+			fs.writeFileSync("./Minimax-02-2024.csv",csvString,"utf8");
+			console.log("Written ")
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 
 
 
@@ -1663,6 +1768,29 @@ server.get('/stefan/naslovna',async (req,res)=>{
 	}
 });
 
+
+server.post('/prijemnice', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+				uploadPrijemnica(req, res, function (error) {
+				    if (error) {
+				      logError(error);
+				      return res.render("message",{pageTitle: "Грешка",message: "<div class=\"text\">Дошло је до грешке приликом качења слика.</div>",user: req.session.user});
+				    }
+				    for(var i=0;i<req.files.length;i++){
+				    	izvestajJson.photos.push(req.files[i].transforms[0].location)
+				    }
+				    res.send("OK");
+				});
+			
+		}else{
+			res.send("Nije definisan nivo korisnika");
+		}
+	}else{
+		res.redirect("/login");
+	}
+});
+
 server.get('/sviNalozi',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
@@ -1937,6 +2065,132 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 		}
 	}else{
 		res.redirect("/login");
+	}
+});
+
+server.get('/administracija/specifikacijePodizvodjaca',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			specifikacijePodizvodjacaDB.find({}).toArray()
+			.then((specifikacije)=>{
+				res.render("administracija/specifikacijePodizvodjaca",{
+					pageTitle:"Спецификације подизвођача",
+					specifikacije: specifikacije,
+					user: req.session.user
+				});
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2085.</div>",
+					user: req.session.user
+				});
+			})
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/administracija/specifikacijaPodizvodjaca/:uniqueId',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			specifikacijePodizvodjacaDB.find({uniqueId:req.params.uniqueId}).toArray()
+			.then((specifikacije)=>{
+				res.render("administracija/specifikacijaPodizvodjaca",{
+					pageTitle:"Спецификацијa подизвођачa <b>" +specifikacije[0].user.name + "</b> број <b>"+ specifikacije[0].brojSpecifikacije+"</b>",
+					specifikacija: specifikacije[0],
+					user: req.session.user
+				});
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2085.</div>",
+					user: req.session.user
+				});
+			})
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.post('/administracija/odobri-specifikaciju',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var setObj	=	{ $set: {
+				odobrena: "1"
+			}};							
+			specifikacijePodizvodjacaDB.updateOne({uniqueId:req.body.specifikacija},setObj)
+			.then((dbResponse2) => {
+				res.redirect("/administracija/specifikacijaPodizvodjaca/"+req.body.specifikacija);
+			})
+			.catch((error)=>{
+				logError(error)
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2149.</div>",
+					user: req.session.user
+				});
+			})
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/");
+	}
+});
+
+server.post('/administracija/ponisti-specifikaciju',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var setObj	=	{ $set: {
+				odobrena: "0"
+			}};							
+			specifikacijePodizvodjacaDB.updateOne({uniqueId:req.body.specifikacija},setObj)
+			.then((dbResponse2) => {
+				res.redirect("/administracija/specifikacijaPodizvodjaca/"+req.body.specifikacija);
+			})
+			.catch((error)=>{
+				logError(error)
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2149.</div>",
+					user: req.session.user
+				});
+			})
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/");
 	}
 });
 
@@ -3286,31 +3540,54 @@ server.get('/podizvodjac/obradjeniNalozi',async (req,res)=>{
 		if(Number(req.session.user.role)==30){
 			naloziDB.find({majstor:req.session.user.nalozi,statusNaloga:"Fakturisan"}).toArray()//OVDE POTREBAN FILTER AKO JE PODIZVODJAC FAKTURISAO NE PRIKAZUJ
 			.then((nalozi) => {
-				for(var i=0;i<nalozi.length;i++){
-					delete nalozi[i]._id;
-					delete nalozi[i].uniqueId;
-					delete nalozi[i].digitalizacija;
-					delete nalozi[i].opis;
-					delete nalozi[i].vrstaRada;
-					delete nalozi[i].kategorijeRadova;
-					delete nalozi[i].punaAdresa;
-					delete nalozi[i].ukupanIznos;
-					delete nalozi[i].faktura;
-					delete nalozi[i].prijemnica;
-					delete nalozi[i].ukupanIznos;
-					nalozi[i].statusNaloga = "Možete fakturisati";
-				}
-				var cenovnikZaPrikaz = [];
-				if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507"){
-					cenovnikZaPrikaz = cenovnikHigh;
-				}else{
-					cenovnikZaPrikaz = cenovnikLow;
-				}
-				res.render("podizvodjaci/obradjeniNalozi",{
-					pageTitle:"Обрађени налози",
-					cenovnik: cenovnikZaPrikaz,
-					user: req.session.user,
-					nalozi: nalozi
+				specifikacijePodizvodjacaDB.find({}).toArray()
+				.then((specifikacije)=>{
+					var naloziNaSpecifikacijama = [];
+					for(var i=0;i<specifikacije.length;i++){
+						for(var j=0;j<specifikacije[i].nalozi.length;j++){
+							naloziNaSpecifikacijama.push(specifikacije[i].nalozi[j].broj);
+						}
+					}
+					for(var i=0;i<nalozi.length;i++){
+						if(naloziNaSpecifikacijama.indexOf(nalozi[i].broj)>=0){
+							nalozi.splice(i,1);
+							i--;
+						}
+					}
+					for(var i=0;i<nalozi.length;i++){
+						delete nalozi[i]._id;
+						delete nalozi[i].uniqueId;
+						delete nalozi[i].digitalizacija;
+						delete nalozi[i].opis;
+						delete nalozi[i].vrstaRada;
+						delete nalozi[i].kategorijeRadova;
+						delete nalozi[i].punaAdresa;
+						delete nalozi[i].ukupanIznos;
+						delete nalozi[i].faktura;
+						delete nalozi[i].prijemnica;
+						delete nalozi[i].ukupanIznos;
+						nalozi[i].statusNaloga = "Možete fakturisati";
+					}
+					var cenovnikZaPrikaz = [];
+					if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507"){
+						cenovnikZaPrikaz = cenovnikHigh;
+					}else{
+						cenovnikZaPrikaz = cenovnikLow;
+					}
+					res.render("podizvodjaci/obradjeniNalozi",{
+						pageTitle:"Обрађени налози",
+						cenovnik: cenovnikZaPrikaz,
+						user: req.session.user,
+						nalozi: nalozi
+					})
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 3426.</div>"
+					});
 				})
 			})
 			.catch((error)=>{
@@ -3332,6 +3609,127 @@ server.get('/podizvodjac/obradjeniNalozi',async (req,res)=>{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
 });
+
+server.post('/podizvodjac/nova-specifikacija',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==30){
+			var specifikacija = JSON.parse(req.body.json);
+			specifikacija.odobrena = "0";
+			specifikacija.uniqueId = new Date().getTime()+"--"+generateId(7);
+			specifikacija.user = req.session.user;
+			specifikacija.datum = {};
+			specifikacija.datum.datetime = new Date().getTime();
+			specifikacija.datum.datum = getDateAsStringForDisplay(new Date());
+			specifikacijePodizvodjacaDB.insertOne(specifikacija)
+			.then((dbResponse)=>{
+				res.redirect("/podizvodjac/specifikacija/"+specifikacija.uniqueId);
+			}).catch((err)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3481.</div>"
+				})
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");
+	}
+})
+
+server.post('/podizvodjac/obrisi-specifikaciju',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==30){
+			specifikacijePodizvodjacaDB.find({uniqueId:req.body.specifikacija}).toArray()
+			.then((specifikacije)=>{
+				if(specifikacije.length>0){
+					if(specifikacije[0].user.email==req.session.user.email){
+						specifikacijePodizvodjacaDB.deleteOne({uniqueId:req.body.specifikacija})
+						.then((dbResponse)=>{
+							res.render("message",{
+								pageTitle: "Успешно обрисано",
+								user: req.session.user,
+								message: "<div class=\"text\">Спецификација успешно обрисана.</div>"
+							})
+						}).catch((err)=>{
+							logError(error);
+							res.render("message",{
+								pageTitle: "Програмска грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">Дошло је до грешке у бази податка 3539.</div>"
+							})
+						});
+					}else{
+						res.render("message",{
+							pageTitle: "Грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Спецификација није ваша.</div>"
+						});
+					}
+				}else{
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Непостојећа спецификација.</div>"
+					});
+				}
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3481.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");
+	}
+})
+
+server.get('/podizvodjac/specifikacija/:uniqueId',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==30){
+			specifikacijePodizvodjacaDB.find({uniqueId:req.params.uniqueId}).toArray()
+			.then((specifikacije)=>{
+				res.render("podizvodjaci/specifikacija",{
+					pageTitle:"Спецификација",
+					specifikacija: specifikacije[0],
+					user: req.session.user
+				})
+			})
+			.catch((error)=>{
+				logError(error)
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3481.</div>"
+				})
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
 
 server.get('/podizvodjac/fakturisaniNalozi',async (req,res)=>{
 	if(req.session.user){
@@ -3399,10 +3797,23 @@ server.get('/podizvodjac/ucinak',async (req,res)=>{
 server.get('/podizvodjac/specifikacije',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==30){
-			res.render("podizvodjaci/specifikacije",{
-				pageTitle:"Спецификације",
-				user: req.session.user
+			specifikacijePodizvodjacaDB.find({"user.email":req.session.user.email}).toArray()
+			.then((specifikacije)=>{
+				res.render("podizvodjaci/specifikacije",{
+					pageTitle:"Спецификације",
+					specifikacije: specifikacije,
+					user: req.session.user
+				})
 			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3626.</div>"
+				});
+			})
+			
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
