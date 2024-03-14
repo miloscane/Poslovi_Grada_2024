@@ -28,13 +28,14 @@
 					proizvodi[i].ukupnoDodato = 0;
 					proizvodi[i].ukupnoUzeto = 0;
 					for(var j=0;j<ulazi.length;j++){
-						var datetimeUlaza = new Date(ulazi[j].datum).getTime();
+						//var datetimeUlaza = new Date(ulazi[j].datum).getTime();
+						var datetimeUlaza = Number(ulazi[j].datetime);
 						var datetimePopisa = new Date(proizvodi[i].datumPopisa).getTime();
 						if(ulazi[j].productUniqueId==proizvodi[i].uniqueId){
 							if(datetimeUlaza>=datetimePopisa){
 								proizvodi[i].realnoStanje = proizvodi[i].realnoStanje + parseFloat(ulazi[j].quantity);
 								proizvodi[i].ukupnoDodato = proizvodi[i].ukupnoDodato + parseFloat(ulazi[j].quantity);
-								proizvodi[i].obracunStanja.push("<p>Улаз за производ дана "+reshuffleDate(ulazi[j].datum)+" : "+ulazi[j].quantity+"</p>");
+								proizvodi[i].obracunStanja.push("<p>Улаз за производ дана "+ulazi[j].datum+" : "+ulazi[j].quantity+"</p>");
 							}
 							
 						}
@@ -175,7 +176,7 @@
 									for(var i=0;i<ulazi.length;i++){
 										if(ulazi[i].productUniqueId==productJson.uniqueId){
 											//check the date
-											var datetimeUlaza = new Date(ulazi[i].datum).getTime();
+											var datetimeUlaza = Number(ulazi[i].datetime);
 											var datetimePopisa = new Date(productJson.datumPopisa).getTime();
 											if(datetimeUlaza>=datetimePopisa){
 												var item = document.createElement("DIV");
