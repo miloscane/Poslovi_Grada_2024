@@ -1,20 +1,20 @@
 <%- include ("partials/header") -%>
 <script>
-	var majstori = <%-JSON.stringify(majstori)%>;
+	var meseci = <%-JSON.stringify(meseci)%>;
 </script>
 <div class="stefan">
 	<div class="pageWidth">
 		<div class="blueWrap" id="boxes-wrap">
 			<script>
-				for(var i=0;i<majstori.length;i++){
+				for(var i=0;i<meseci.length;i++){
 					var title = document.createElement("DIV");
 					title.setAttribute("class","boxesTitle");
-					title.innerHTML = majstori[i].ime;
+					title.innerHTML = meseci[i].ime;
 					document.getElementById("boxes-wrap").appendChild(title);
 
 					var boxesWrap = document.createElement("DIV");
 					boxesWrap.setAttribute("class","boxesWrap");
-					for(var j=0;j<majstori[i].ucinak.length;j++){
+					for(var j=0;j<meseci[i].kategorije.length;j++){
 						var box = document.createElement("DIV");
 						box.setAttribute("class","box");
 							var icon = document.createElement("DIV");
@@ -25,12 +25,12 @@
 							info.setAttribute("class","info");
 								var title2 = document.createElement("DIV");
 								title2.setAttribute("class","title");
-								title2.innerHTML = majstori[i].ucinak[j].ime;
+								title2.innerHTML = meseci[i].kategorije[j].kategorija;
 								info.appendChild(title2);
 
 								var text = document.createElement("DIV");
 								text.setAttribute("class","text");
-								text.innerHTML = brojSaRazmacima(majstori[i].ucinak[j].iznos) +" дин<br>"+brojSaRazmacimaBezDecimala(majstori[i].ucinak[j].nalozi) + " налога";
+								text.innerHTML = brojSaRazmacima(meseci[i].kategorije[j].iznos) +" дин<br>"+brojSaRazmacimaBezDecimala(meseci[i].kategorije[j].ukupanoNaloga) + " налога";
 								info.appendChild(text);
 							box.appendChild(info); 
 						boxesWrap.appendChild(box);	

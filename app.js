@@ -1768,6 +1768,80 @@ server.get('/stefan/naslovna',async (req,res)=>{
 	}
 });
 
+server.get('/stefan/kategorije',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==5){
+			naloziDB.find({}).toArray()
+			.then((nalozi)=>{
+				var meseci = [{broj:"02.2024",ime:"Februar 2024",kategorije:[]},{broj:"03.2024",ime:"Mart 2024",kategorije:[]},{broj:"04.2024",ime:"April 2024",kategorije:[]},{broj:"05.2024",ime:"Maj 2024",kategorije:[]}]
+				var kategorije = ["Zamena","Sajla","Woma","Cprljenje","Kopanje","Rov","Betoniranje","Nekategorisano"]
+				var informacije = {};
+				for(var i=0;i<kategorije.length;i++){
+					for(var j=0;j<meseci.length;j++){
+						meseci[j].kategorije.push({kategorija:kategorije[i],iznos:0,ukupnoNaloga:0});
+					}
+				}
+
+
+				for(var i=0;i<nalozi.length;i++){
+					var iznosNaloga = isNaN(parseFloat(nalozi[i].ukupanIznos)) ? 0 : parseFloat(nalozi[i].ukupanIznos);
+					if(nalozi[i].prijemnica.datum.datum!=""){
+						if(podizvodjaci.indexOf(nalozi[i].majstor)<0){
+							var mesecIndex = -1;
+							for(var j=0;j<meseci.length;j++){
+								if(nalozi[i].prijemnica.datum.datum.includes(meseci[j].broj)){
+									mesecIndex = j;
+								}
+							}
+
+							if(nalozi[i].kategorijeRadova.length>0 && mesecIndex>=0){
+								for(var j=0;j<nalozi[i].kategorijeRadova.length;j++){
+									for(var k=0;k<meseci[mesecIndex].kategorije.length;k++){
+										if(meseci[mesecIndex].kategorije[k].kategorija==nalozi[i].kategorijeRadova[j]){
+											meseci[mesecIndex].kategorije[k].iznos = meseci[mesecIndex].kategorije[k].iznos + iznosNaloga;
+											meseci[mesecIndex].kategorije[k].ukupnoNaloga++;
+										}
+									}
+								}
+							}else{
+								//nekategorisan
+								for(var k=0;k<meseci[mesecIndex].kategorije.length;k++){
+									if(meseci[mesecIndex].kategorije[k].kategorija=="Nekategorisano"){
+										meseci[mesecIndex].kategorije[k].iznos = meseci[mesecIndex].kategorije[k].iznos + iznosNaloga;
+										meseci[mesecIndex].kategorije[k].ukupnoNaloga++;
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				res.render("stefan/kategorije",{
+					pageTitle:"Категорије радова",
+					meseci: meseci,
+					user: req.session.user
+				});
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази података 1484.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 
 server.post('/prijemnice', async (req, res)=> {
 	if(req.session.user){
@@ -2902,10 +2976,61 @@ server.get('/zavrseniNaloziPodizvodjaca',async (req,res)=>{
 
 server.get('/ucinakPodizvodjaca',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
-			res.render("administracija/ucinakPodizvodjaca",{
-				pageTitle:"Учинак подизвођача",
-				user: req.session.user
+		if(Number(req.session.user.role)==5 || Number(req.session.user.role)==10){
+			majstoriDB.find({}).toArray()
+			.then((majstori)=>{
+				for(var i=0;i<majstori.length;i++){
+					if(podizvodjaci.indexOf(majstori[i].uniqueId)<0){
+						majstori.splice(i,1);
+						i--;
+					}
+				}
+
+				for(var i=0;i<majstori.length;i++){
+					if(Number(majstori[i].inactive)==1){
+						majstori.splice(i,1);
+						i--;
+					}
+				}
+
+				naloziDB.find({}).toArray()
+				.then((nalozi)=>{
+					for(var i=0;i<majstori.length;i++){
+						majstori[i].ucinak = [{broj:"02.2024",ime:"Februar 2024",iznos:0,nalozi:0},{broj:"03.2024",ime:"Mart 2024",iznos:0,nalozi:0},{broj:"04.2024",ime:"April 2024",iznos:0,nalozi:0},{broj:"05.2024",ime:"Maj 2024",iznos:0,nalozi:0}]
+						for(var j=0;j<nalozi.length;j++){
+							if(nalozi[j].majstor==majstori[i].uniqueId){
+								var iznosNaloga = isNaN(parseFloat(nalozi[j].ukupanIznos)) ? 0 : parseFloat(nalozi[j].ukupanIznos);
+								for(var k=0;k<majstori[i].ucinak.length;k++){
+									if(nalozi[j].prijemnica.datum.datum.includes(majstori[i].ucinak[k].broj)){
+										majstori[i].ucinak[k].iznos = majstori[i].ucinak[k].iznos + iznosNaloga;
+										majstori[i].ucinak[k].nalozi++;
+									}
+								}
+							}
+						}
+					}
+					res.render("administracija/ucinakPodizvodjaca",{
+						pageTitle:"Учинак подизвођача",
+						majstori: majstori,
+						user: req.session.user
+					})
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 2997.</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2989.</div>"
+				});
 			})
 		}else{
 			res.render("message",{
