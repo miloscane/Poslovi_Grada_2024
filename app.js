@@ -108,7 +108,7 @@ const uploadSlika = multer({
         cb(null, new Date().getTime().toString() +".jpg")
       },
       transform: function (req, file, cb) {
-        cb(null, sharp({ failOnError: false }).resize(1000,null).withMetadata().jpeg())
+        cb(null, sharp({ failOnError: false }).resize(800,null).withMetadata().jpeg())
       }
     }/*, {
       id: 'thumbnail',
