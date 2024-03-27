@@ -468,6 +468,10 @@
 							nalogJson.kategorijeRadova.push(document.getElementsByClassName("kategorijeRadova")[i].value);
 						}
 					}
+					nalogJson.radnaJedinica = nalog.radnaJedinica;
+					nalogJson.adresa = nalog.adresa;
+					nalogJson.zahtevalac = nalog.zahtevalac;
+					nalogJson.opis = nalog.opis;
 					nalogJson.izvestaj = document.getElementById("komentar").value;
 					nalogJson.stariNalog 					=	{};
 					nalogJson.stariNalog.broj 				=	nalog.broj;

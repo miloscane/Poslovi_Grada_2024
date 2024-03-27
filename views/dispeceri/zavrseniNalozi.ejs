@@ -64,6 +64,12 @@
 							<input type="text" id="adresa-filter" oninput="adresaFilter(this)">
 						</div>
 					</div>
+					<div class="filter">
+						<div class="label">Филтер по броју налога:</div>
+						<div class="checkboxes">
+							<input type="text" id="broj-filter" oninput="brojFilter(this)">
+						</div>
+					</div>
 				</div>
 				<div class="tableWrap">
 					<div class="tableHeader">
@@ -215,8 +221,8 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value ikonica");
-								if(naloziToShowAdresa[i].statusNaloga=="Primljen"){
-									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
+								if(podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png'>"
 								}
 								td.appendChild(div);
 							tr.appendChild(td);
@@ -253,6 +259,83 @@
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value link");
 								div.innerHTML = "<a href='/nalog/"+naloziToShowAdresa[i].broj+"' target='_blank'>Види налог</a>";
+								td.appendChild(div);
+							tr.appendChild(td);
+
+						table.appendChild(tr);	
+					}
+					document.getElementById("table").appendChild(table)
+					
+					
+				}
+
+				function brojFilter(elem){
+					var filterValue = elem.value.toLowerCase();
+					var naloziToShowBroj = [];
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].broj.includes(filterValue)){
+							naloziToShowBroj.push(nalozi[i])
+						}
+					}
+					document.getElementById("table").innerHTML="";
+					var table = document.createElement("TABLE");
+					for(var i=0;i<naloziToShowBroj.length;i++){
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1)+".";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojNaloga");
+								div.innerHTML = naloziToShowBroj[i].broj;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value ikonica");
+								if(podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png'>"
+								}
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value datumNaloga");
+								div.innerHTML = naloziToShowBroj[i].datum.datum;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value radnaJedinica");
+								div.innerHTML = naloziToShowBroj[i].radnaJedinica;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value adresa");
+								div.innerHTML = naloziToShowBroj[i].adresa;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value status");
+								div.innerHTML = naloziToShowBroj[i].statusNaloga;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value link");
+								div.innerHTML = "<a href='/nalog/"+naloziToShowBroj[i].broj+"' target='_blank'>Види налог</a>";
 								td.appendChild(div);
 							tr.appendChild(td);
 

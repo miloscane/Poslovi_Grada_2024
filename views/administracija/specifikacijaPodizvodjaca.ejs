@@ -63,6 +63,40 @@
 						</script>
 					</div>
 				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Износ Послови Града</div>
+						<div class="text"><span id="iznos-pg"></span></div>
+						<script>
+							var iznosPG = 0;
+							for(var i=0;i<specifikacija.nalozi.length;i++){
+								iznosPG = iznosPG + parseFloat(specifikacija.nalozi[i].iznosPG);
+							}
+							document.getElementById("iznos-pg").innerHTML = brojSaRazmacima(iznosPG)+" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Профит</div>
+						<div class="text"><span id="iznos-profita"></span></div>
+						<script>
+							document.getElementById("iznos-profita").innerHTML = brojSaRazmacima(iznosPG-parseFloat(specifikacija.ukupanIznos))+" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Процентуални профит</div>
+						<div class="text"><span id="iznos-profita-procenat"></span></div>
+						<script>
+							document.getElementById("iznos-profita-procenat").innerHTML = brojSaRazmacima(eval(100-parseFloat(specifikacija.ukupanIznos)/iznosPG*100))+" %";
+						</script>
+					</div>
+				</div>
 			</div>
 			<div class="specifikacija">
 				<div class="rows" id="rows"></div>
@@ -96,6 +130,16 @@
 						item.innerHTML = brojSaRazmacima(specifikacija.nalozi[i].ukupanIznos);
 						row.appendChild(item);
 
+						var item = document.createElement("DIV");
+						item.setAttribute("class","inline iznos");
+						item.innerHTML = brojSaRazmacima(specifikacija.nalozi[i].iznosPG);
+						row.appendChild(item);
+
+						var item = document.createElement("DIV");
+						item.setAttribute("class","inline iznos");
+						item.innerHTML = eval(100-parseFloat(specifikacija.nalozi[i].ukupanIznos)/parseFloat(specifikacija.nalozi[i].iznosPG)*100).toFixed(2)+"%";
+						row.appendChild(item);
+
 
 					document.getElementById("rows").appendChild(row);
 				}
@@ -119,6 +163,103 @@
 					</form>
 				</div>
 			<%}%>
+			<div class="inputWrap printButton">
+				<div class="button" onclick="printSpecifikacija()" style="display:inline-block;vertical-align: top;">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
+					<div class="label">Штампај спецификацију</div>
+				</div>
+			</div>
+			<%- include ("partials/printer") -%>
+			<div style="overflow:hidden;height:1px;width:1px;">
+				<canvas id="logo-canvas" height="306" width="300"></canvas>
+				<script>
+					var logoCanvas = document.getElementById('logo-canvas');
+					var logoCanvasContext = logoCanvas.getContext('2d');
+					logoCanvasContext.globalAlpha = 0.05;
+					var logoLogoBlob;
+					function make_base3(){
+					  base_image3 = new Image();
+					  base_image3.crossOrigin="anonymous"
+					  base_image3.src = 'https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturaLogo.png';
+					  base_image3.onload = function(){
+					    logoCanvasContext.drawImage(base_image3, 0, 0);
+					    logoLogoBlob 	=	logoCanvas.toDataURL("image/png", 1.0);
+
+					  }
+					}
+					make_base3();
+				</script>
+			</div>
+			<script>
+				function printSpecifikacija(){
+					doc = new jsPDF({
+						orientation: 'p',
+						unit: 'mm',
+						format: 'a4',
+						compress: true
+						//putOnlyUsedFonts:true
+					});
+					pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+					pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+					var yPos = 12;
+					var xPos = 12;
+					//doc.getFontList("Helvetica");
+					doc.addFileToVFS("PTSans.ttf", PTSans);
+					doc.addFileToVFS("PTSansBold.ttf", PTSansBold);
+					doc.addFont('PTSans.ttf', 'PTSans', 'normal');
+					doc.addFont('PTSansBold.ttf', 'PTSans', 'bold');
+					doc.setFont('PTSans'); // set font
+					doc.getFontList("PTSans");
+
+					doc.addImage(logoLogoBlob, 'PNG', 28, 5, 150, 153,'','FAST');
+			        doc.setFontType("bold");
+					doc.setFontSize(16);
+			        doc.text("Подизвођач: "+specifikacija.user.name,205,yPos,'right');
+			        doc.setFontType("normal");
+					doc.setFontSize(11);
+					yPos = yPos + 5;
+			        doc.text("Спецификација број: " + specifikacija.brojSpecifikacije , 205 , yPos , 'right');
+					yPos = yPos + 5;
+			        doc.text("Фактура број: " + specifikacija.brojFakture , 205 , yPos , 'right');
+			        yPos = yPos + 10;
+					doc.setFontType("bold");
+					doc.setFontSize(20);
+			        doc.text("Спецификација урађених налога",pageWidth/2,yPos,'center');
+				    var xOffset = 10;
+				    doc.setFontSize(10);
+				    yPos= yPos+10;
+				    doc.setFontType("normal");
+				    for(var i=0;i<specifikacija.nalozi.length;i++){
+				    	xOffset = 10;
+					    doc.text(eval(i+1).toString()+".",xOffset,yPos);
+					    xOffset = xOffset + 7;
+					    doc.text(specifikacija.nalozi[i].broj,xOffset,yPos);
+					    xOffset = xOffset + 25;
+					    doc.text(specifikacija.nalozi[i].radnaJedinica,xOffset,yPos);
+					    xOffset = xOffset + 30;
+					    doc.text(specifikacija.nalozi[i].adresa,xOffset,yPos);
+					    xOffset = xOffset + 70;
+					    doc.text(brojSaRazmacima(specifikacija.nalozi[i].ukupanIznos),xOffset,yPos);
+					    yPos = yPos + 7;
+					    if(yPos>=285){
+					    	doc.addPage();
+					    	doc.addImage(logoLogoBlob, 'PNG', 28, 5, 150, 153,'','FAST');
+					    	yPos = 12;
+					    	xOffset = 10;
+						    yPos = yPos + 7;
+					    }
+				    }
+
+				    doc.setFontSize(14);
+				    doc.setFontType("bold");
+				    var xOffset = 10;
+				    doc.text("Укупно: "+brojSaRazmacima(specifikacija.ukupanIznos),xOffset,yPos);
+
+
+
+			        window.open(doc.output('bloburl'), '_blank');
+				}
+			</script>
 		</div>
 	</div>
 <%- include ("partials/footer") -%>

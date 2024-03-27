@@ -593,6 +593,7 @@ http.listen(process.env.PORT, function(){
 				delete prices[i]._id;
 			}
 			cenovnik = prices;
+			console.log("Cenovnik inicijalizovan");
 			
 
 			//Ubacivanje prijemnica
@@ -787,6 +788,7 @@ http.listen(process.env.PORT, function(){
 				delete prices[i]._id;
 			}
 			cenovnikHigh = prices;
+			console.log("Cenovnik visokih podizvodjaca inicijalizovan");
 		})
 		.catch((error)=>{
 			logError(error);
@@ -798,6 +800,7 @@ http.listen(process.env.PORT, function(){
 				delete prices[i]._id;
 			}
 			cenovnikLow = prices;
+			console.log("Cenovnik niskih podizvodjaca inicijalizovan");
 		})
 		.catch((error)=>{
 			logError(error);
@@ -1262,7 +1265,7 @@ http.listen(process.env.PORT, function(){
 		})*/
 
 
-
+		
 
 
 
@@ -1281,6 +1284,141 @@ http.listen(process.env.PORT, function(){
 	});
 });
 
+
+/*server.get('/test', async (req,res)=>{
+	console.log("-----------------------------------------------")
+	console.log("-----------------------------------------------")
+	naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var ukupanIznosUgovora = 0;
+			var ukupnoNalogaSaIznosom = 0;
+			for(var i=0;i<nalozi.length;i++){
+				var iznosNaloga = isNaN(parseFloat(nalozi[i].ukupanIznos)) ? -1 : parseFloat(nalozi[i].ukupanIznos);
+				if(iznosNaloga>0){
+					ukupanIznosUgovora = ukupanIznosUgovora + iznosNaloga;
+					ukupnoNalogaSaIznosom++;
+				}
+			}
+			console.log("ANALITIKA UGOVORA:")
+			console.log("Ukupno naloga: "+ nalozi.length);
+			console.log("Ukupno naloga sa iznosom: "+ ukupnoNalogaSaIznosom);
+			console.log("Vrednost ugovora: "+ brojSaRazmacima(ukupanIznosUgovora));
+			console.log("-----------------------------------------------")
+			console.log("-----------------------------------------------")
+			var naloziPodizvodjaca = [];
+			for(var i=0;i<nalozi.length;i++){
+				if(podizvodjaci.indexOf(nalozi[i].majstor)>=0 && nalozi[i].obracun.length>0){
+					naloziPodizvodjaca.push(nalozi[i])
+				}
+			}
+			console.log("ANALITIKA PODIZVODJACA:")
+			console.log("Nadjeno " + nalozi.length + " od cega su podizvodjaci " + naloziPodizvodjaca.length);
+			console.log("Prikaz analitike za " + naloziPodizvodjaca.length + " naloga");
+			var ukupnoPG = 0;
+			var ukupnoPodizvodjaca = 0;
+			for(var i=0;i<naloziPodizvodjaca.length;i++){
+				var iznosNaloga = isNaN(parseFloat(naloziPodizvodjaca[i].ukupanIznos)) ? -1 : parseFloat(naloziPodizvodjaca[i].ukupanIznos);
+				if(iznosNaloga==-1){
+					console.log("Nisam mogao da interpretiram cifru za nalog "+naloziPodizvodjaca[i].broj +", iznos: "+naloziPodizvodjaca[i].ukupanIznos);
+				}
+				ukupnoPG = ukupnoPG + iznosNaloga;
+				var cenovnikPodizvodjaca	=	[];
+				if(naloziPodizvodjaca[i].majstor=="SeHQZ--1672650353244" || naloziPodizvodjaca[i].majstor=="IIwY4--1672650358507"){
+					cenovnikPodizvodjaca = cenovnikHigh;
+				}else{
+					cenovnikPodizvodjaca = cenovnikLow;
+				}
+
+				var iznosNalogaPodizvodjaca = 0;
+				for(var j=0;j<naloziPodizvodjaca[i].obracun.length;j++){
+					for(var k=0;k<cenovnikPodizvodjaca.length;k++){
+						if(naloziPodizvodjaca[i].obracun[j].code == cenovnikPodizvodjaca[k].code){
+							iznosNalogaPodizvodjaca = iznosNalogaPodizvodjaca + parseFloat(naloziPodizvodjaca[i].obracun[j].quantity)*parseFloat(cenovnikPodizvodjaca[k].price)
+						}
+					}
+				}
+				ukupnoPodizvodjaca = ukupnoPodizvodjaca + iznosNalogaPodizvodjaca
+			}
+			console.log("Ukupno novca Poslovi Grada: " + brojSaRazmacima(ukupnoPG));
+			console.log("Od toga podizvodjaci: " + brojSaRazmacima(ukupnoPodizvodjaca));
+			var procenat = 100-((ukupnoPodizvodjaca)/ukupnoPG)*100;
+			console.log("Procentna dobit: " + procenat.toFixed(2)+"%");
+			console.log("-----------------------------------------------");
+			console.log("-----------------------------------------------");
+			console.log("ANALITIKA MATERIJALA:")
+
+			magacinReversiDB.find({}).toArray()
+			.then((reversi)=>{
+				proizvodiDB.find({}).toArray()
+				.then((proizvodi)=>{
+					var ukupnoPG = 0;
+					var iznosNalogaSaReversima = 0;
+					var brojNaloga = 0;
+					var naloziBezMaterijala = 0;
+					var materijalBezCene = 0;
+					var ukupnoMaterijal = 0;
+					for(var i=0;i<nalozi.length;i++){
+						if(podizvodjaci.indexOf(nalozi[i].majstor)<0){
+							var iznosNaloga = isNaN(parseFloat(nalozi[i].ukupanIznos)) ? -1 : parseFloat(nalozi[i].ukupanIznos);
+							if(iznosNaloga==-1){
+								console.log("Nisam mogao da interpretiram cifru za nalog "+nalozi[i].broj +", iznos: "+nalozi[i].ukupanIznos);
+							}else{
+								ukupnoPG = ukupnoPG + iznosNaloga;
+								brojNaloga++;
+							}
+							var reversFound = false;
+							var materijalPoNalogu = 0;
+							for(var j=0;j<reversi.length;j++){
+								if(reversi[j].nalog==nalozi[i].broj){
+									reversFound = true;
+									for(var k=0;k<reversi[j].zaduzenje.length;k++){
+										for(var l=0;l<proizvodi.length;l++){
+											if(proizvodi[l].code==reversi[j].zaduzenje[k].code){
+												var cenaMaterijala = isNaN(parseFloat(proizvodi[l].price)) ? -1 : parseFloat(proizvodi[l].price);
+												if(cenaMaterijala<=0){
+													materijalBezCene++;
+												}else{
+													var uzeto		=	isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
+													var vraceno	=	isNaN(parseFloat(reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity2);
+													var utroseno = uzeto - vraceno;
+													materijalPoNalogu = materijalPoNalogu + utroseno*cenaMaterijala;
+												}
+											}
+										}
+									}
+								}
+							}
+							if(reversFound){
+								ukupnoMaterijal = ukupnoMaterijal + materijalPoNalogu;
+								iznosNalogaSaReversima = iznosNalogaSaReversima + iznosNaloga;
+							}else{
+								naloziBezMaterijala++;
+							}	
+						}
+					}
+					console.log("Ukupno naloga sa iznosom: "+brojNaloga);
+					console.log("Ukupan iznos: "+brojSaRazmacima(ukupnoPG));
+					console.log("Nalozi bez reversa: "+naloziBezMaterijala);
+					console.log("Broj stavki bez definisane cene materijala: "+materijalBezCene);
+					console.log("Ukupan iznos naloga koji imaju reverse: " + brojSaRazmacima(iznosNalogaSaReversima));
+					console.log("Ukupan utrosen materijal: " + brojSaRazmacima(ukupnoMaterijal));
+					console.log("Procentni gubitak na materijalu: " + eval(ukupnoMaterijal/iznosNalogaSaReversima*100).toFixed(2)+"%");
+					res.send("Ok");
+				})
+				.catch((error)=>{
+					console.log(error);
+				})
+			})
+			.catch((error)=>{
+				console.log(error)
+			})
+			
+		})
+		.catch((error)=>{
+			console.log(error);
+			res.send("bad");
+		})
+});*/
 
 server.get('/',async (req,res)=>{
 	if(req.session.user){
@@ -2179,11 +2317,33 @@ server.get('/administracija/specifikacijaPodizvodjaca/:uniqueId',async (req,res)
 		if(Number(req.session.user.role)==10){
 			specifikacijePodizvodjacaDB.find({uniqueId:req.params.uniqueId}).toArray()
 			.then((specifikacije)=>{
-				res.render("administracija/specifikacijaPodizvodjaca",{
-					pageTitle:"Спецификацијa подизвођачa <b>" +specifikacije[0].user.name + "</b> број <b>"+ specifikacije[0].brojSpecifikacije+"</b>",
-					specifikacija: specifikacije[0],
-					user: req.session.user
-				});
+				var naloziToFind = [];
+				for(var i=0;i<specifikacije[0].nalozi.length;i++){
+					naloziToFind.push(specifikacije[0].nalozi[i].broj)
+				}
+				naloziDB.find({broj:{$in:naloziToFind}}).toArray()
+				.then((nalozi)=>{
+					for(var i=0;i<specifikacije[0].nalozi.length;i++){
+						for(var j=0;j<nalozi.length;j++){
+							if(nalozi[j].broj==specifikacije[0].nalozi[i].broj){
+								specifikacije[0].nalozi[i].iznosPG = nalozi[j].ukupanIznos;
+							}
+						}
+					}
+					res.render("administracija/specifikacijaPodizvodjaca",{
+						pageTitle:"Спецификацијa подизвођачa <b>" +specifikacije[0].user.name + "</b> број <b>"+ specifikacije[0].brojSpecifikacije+"</b>",
+						specifikacija: specifikacije[0],
+						user: req.session.user
+					});
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 2332.</div>",
+						user: req.session.user
+					});
+				})
 			})
 			.catch((error)=>{
 				logError(error);
@@ -2619,7 +2779,49 @@ server.post('/edit-nalog', async (req, res)=> {
 							//ima izvestaja
 							izvestajiDB.insertOne(izvestajJson)
 							.then((dbResponse)=>{
-								res.redirect("/nalog/"+nalogJson.broj);
+								if(nalogJson.majstor==nalogJson.stariNalog.majstor){
+									res.redirect("/nalog/"+nalogJson.broj);
+								}else{
+									majstoriDB.find({uniqueId:nalogJson.majstor}).toArray()
+									.then((majstori)=>{
+										if(majstori.length>0){
+											if(majstori[i].kontakt){
+												if(majstori[i].kontakt.length>0){
+													var mailOptions = {
+														from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+														to: 'miloscane@gmail.com',
+														subject: 'Додељен вам је нови налог',
+														html: 'Поштовани '+majstori[0].ime+',<br>Додељен вам је нови ВиК налог на порталу послова града.<br>Број налога: '+nalogJson.broj+'<br>Радна јединица: '+nalogJson.radnaJedinica+'<br>Адреса: <a href=\"https://www.google.com/maps/search/?api=1&query='+nalogJson.adresa.replace(/,/g, '%2C').replace(/ /g, '+')+'\">'+nalogJson.adresa+'<br>Захтевалац: '+ nalogJson.zahtevalac+'<br>Опис проблема: '+nalogJson.opis+'<br><a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">Отвори налог на порталу</a>',
+													};
+
+													transporter.sendMail(mailOptions, (error, info) => {
+														if (error) {
+															logError(error);
+															res.redirect("/nalog/"+nalogJson.broj);
+														}else{
+															res.redirect("/nalog/"+nalogJson.broj);
+														}
+													});
+												}else{
+													res.redirect("/nalog/"+nalogJson.broj);
+												}
+											}else{
+												res.redirect("/nalog/"+nalogJson.broj);
+											}
+										}else{
+											res.redirect("/nalog/"+nalogJson.broj);
+										}
+									})
+									.catch((error)=>{
+										logError(error);
+										res.render("message",{
+											pageTitle: "Програмска грешка",
+											user:req.session.user,
+											message: "<div class=\"text\">Дошло је до грешке у бази податка 2634.</div>"
+										});
+									})
+								}
+								
 							})
 							.catch((error)=>{
 								logError(error);
