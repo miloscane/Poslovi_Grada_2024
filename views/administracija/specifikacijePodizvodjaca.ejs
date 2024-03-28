@@ -5,47 +5,103 @@
 	<div class="pageWidth podizvodjaci">
 		<div class="lightBlueBox">
 			<div class="specifikacije">
+				<div class="header" id="header"></div>
+				<script>
+					for(var i=0;i<specifikacije.length;i++){
+						var podizvodjaci = document.getElementById("header").getElementsByClassName("podizvodjac");
+						var podizvodjacFound = false;
+						for(var j=0;j<podizvodjaci.length;j++){
+							if(podizvodjaci[j].dataset.name==specifikacije[i].user.name){
+								podizvodjacFound = true;
+							}
+						}
+						if(!podizvodjacFound){
+							var podizvodjac = document.createElement("DIV");
+							podizvodjac.setAttribute("class","podizvodjac");
+							podizvodjac.setAttribute("data-name",specifikacije[i].user.name)
+							podizvodjac.setAttribute("onclick","izborPodizvodjaca(this)")
+							podizvodjac.innerHTML = specifikacije[i].user.name;
+							document.getElementById("header").appendChild(podizvodjac);	
+						}
+					}
+
+					function izborPodizvodjaca(elem){
+						var imePodizvodjaca = elem.dataset.name;
+						var podizvodjaci = document.getElementById("header").getElementsByClassName("podizvodjac");
+						for(var i=0;i<podizvodjaci.length;i++){
+							podizvodjaci[i].classList.remove("podizvodjacActive");
+							if(podizvodjaci[i].dataset.name==imePodizvodjaca){
+								podizvodjaci[i].classList.add("podizvodjacActive");
+							}
+						}
+						generateTable(imePodizvodjaca);
+					}
+				</script>
+				<div class="filters">
+					<div class="filter"></div>
+				</div>
+				<div class="information" id="information"></div>
 				<div class="tableWrap">
-					<table id="table">
-						<tr>
-							<td>Подизвођач</td>
-							<td>Број<br>спецификације</td>
-							<td>Број<br>фактуре</td>
-							<td>Датум<br>спецификације</td>
-							<td>Износ</td>
-							<td>Статус</td>
-						</tr>
-					</table>
+					<table id="table"></table>
 					<script>
-						for(var i=0;i<specifikacije.length;i++){
+						function generateTable(imePodizvodjaca){
+							document.getElementById("table").innerHTML = "";
 							var tr = document.createElement("TR");
 								var td = document.createElement("TD");
-								td.innerHTML = "<div class=\"value\">"+specifikacije[i].user.name+"</div>";
+								td.innerHTML="Број<br>спецификације";
 								tr.appendChild(td);
-
+								
 								var td = document.createElement("TD");
-								td.innerHTML = "<div class=\"value\"><a href=\"/administracija/specifikacijaPodizvodjaca/"+specifikacije[i].uniqueId+"\" target=\"_blank\">"+specifikacije[i].brojSpecifikacije+"</a></div>";
+								td.innerHTML="Број<br>фактуре";
 								tr.appendChild(td);
-
+								
 								var td = document.createElement("TD");
-								td.innerHTML = "<div class=\"value\">"+specifikacije[i].brojFakture+"</div>";
+								td.innerHTML="Датум<br>спецификације";
 								tr.appendChild(td);
-
+								
 								var td = document.createElement("TD");
-								td.innerHTML = "<div class=\"value\">"+specifikacije[i].datum.datum+"</div>";
+								td.innerHTML="Износ";
 								tr.appendChild(td);
-
+								
 								var td = document.createElement("TD");
-								td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(specifikacije[i].ukupanIznos)+"</div>";
+								td.innerHTML="Статус";
 								tr.appendChild(td);
-
-								var td = document.createElement("TD");
-								var status = Number(specifikacije[i].odobrena)==0 ? "На одобрењу" : "Одобрена";
-								td.innerHTML = "<div class=\"value\">"+status+"</div>";
-								tr.appendChild(td);
-
 							document.getElementById("table").appendChild(tr);
+
+							var ukupanIznos = 0;
+							for(var i=0;i<specifikacije.length;i++){
+								if(specifikacije[i].user.name==imePodizvodjaca){
+									var tr = document.createElement("TR");
+										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\"><a href=\"/administracija/specifikacijaPodizvodjaca/"+specifikacije[i].uniqueId+"\" target=\"_blank\">"+specifikacije[i].brojSpecifikacije+"</a></div>";
+										tr.appendChild(td);
+
+										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\">"+specifikacije[i].brojFakture+"</div>";
+										tr.appendChild(td);
+
+										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\">"+specifikacije[i].datum.datum+"</div>";
+										tr.appendChild(td);
+
+										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(specifikacije[i].ukupanIznos)+"</div>";
+										tr.appendChild(td);
+										ukupanIznos = ukupanIznos + parseFloat(specifikacije[i].ukupanIznos);
+
+										var td = document.createElement("TD");
+										var status = Number(specifikacije[i].odobrena)==0 ? "На одобрењу" : "Одобрена";
+										td.innerHTML = "<div class=\"value\">"+status+"</div>";
+										tr.appendChild(td);
+
+									document.getElementById("table").appendChild(tr);	
+								}
+							}
+							document.getElementById("information").innerHTML = "Укупно: " + brojSaRazmacima(ukupanIznos);
 						}
+
+						izborPodizvodjaca(document.getElementById("header").getElementsByClassName("podizvodjac")[0]);
+						
 					</script>
 				</div>
 			</div>
