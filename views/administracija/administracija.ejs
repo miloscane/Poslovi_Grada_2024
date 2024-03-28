@@ -94,6 +94,20 @@
 						<a href="">Погледај налоге</a>
 					</div>
 				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/obracunatoIcon.png"></div>
+					<div class="info">
+						<div class="title">Реализовано</div>
+						<div class="text"><span id="iznos-realizovano"></span></div>
+						<script>
+							document.getElementById("iznos-realizovano").innerHTML = brojSaRazmacima(informacije.ukupnoRealizovano) + " дин.";
+						</script>
+						<div class="note">Налози са статусом Спреман за фактурисање и Фактурисан</div>
+					</div>
+					<div class="boxMore">
+						<a href="">Погледај налоге</a>
+					</div>
+				</div>
 
 			</div>
 		</div>

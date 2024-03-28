@@ -766,6 +766,49 @@ http.listen(process.env.PORT, function(){
 			})*/
 
 
+			/*naloziDB.find({}).toArray()
+			.then((nalozi)=>{
+				var naloziBezIznosa = [];
+				for(var i=0;i<nalozi.length;i++){
+					if(nalozi[i].obracun.length>0 && parseFloat(nalozi[i].ukupanIznos)==0){
+						naloziBezIznosa.push(nalozi[i].broj)
+					}
+				}
+				console.log(naloziBezIznosa)
+				naloziDB.find({broj:{$in:naloziBezIznosa}}).toArray()
+				.then((naloziZaIspravku)=>{
+					naloziZaIspravku.forEach((value, index) =>
+						setTimeout(() => {
+							var ukupanIznos = 0;
+							for(var i=0;i<value.obracun.length;i++){
+								for(var j=0;j<cenovnik.length;j++){
+									if(value.obracun[i].code==cenovnik[j].code){
+										ukupanIznos = ukupanIznos + parseFloat(cenovnik[j].price)*parseFloat(value.obracun[i].quantity);
+										break;
+									}
+								}
+							}
+							var setObj	=	{ $set: {
+								ukupanIznos: ukupanIznos
+							}};
+							naloziDB.updateOne({broj:value.broj},setObj)
+							.then((dbResponse)=>{
+								console.log(index+". success")
+							})
+							.catch((error)=>{
+								console.log(error);
+							})
+							
+						},index*200))
+				})
+				.catch((error)=>{
+					console.log(error)
+				})
+			})
+			.catch((error)=>{
+				console.log(error)
+			})*/
+
 		})
 		.catch((error)=>{
 			logError(error);
@@ -1423,8 +1466,32 @@ http.listen(process.env.PORT, function(){
 server.get('/',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==5){
-			res.redirect("/stefan/naslovna")
+			res.redirect("/stefan/naslovna");
 		}else if(Number(req.session.user.role)==10){
+			res.redirect("/administracija");
+		}else if(Number(req.session.user.role)==20){
+			res.redirect("/dispecer/otvoreniNalozi")
+		}else if(Number(req.session.user.role)==30){
+			res.redirect("/podizvodjac/otvoreniNalozi")
+		}else if(Number(req.session.user.role)==40){
+			res.redirect("/spremniNalozi")
+		}else if(Number(req.session.user.role)==50){
+			res.redirect("/magacioner/stanje")
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>",
+				user: req.session.user
+			});
+		}
+	}else{
+		res.redirect("/login");
+	}
+});
+
+server.get('/administracija',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
 			naloziDB.find({}).toArray()
 			.then((nalozi) => {
 				var ukupnoNaloga = 0;
@@ -1436,7 +1503,8 @@ server.get('/',async (req,res)=>{
 				var ukupnoNezavrsenihNaloga = 0;
 				var ukupnoNeobracunatihNaloga = 0;
 				var ukupnoSpremnihIznos = 0;
-				var ukupnoSpremnihNaloga = 0
+				var ukupnoSpremnihNaloga = 0;
+				var ukupnoRealizovano = 0;
 				for(var i=0;i<nalozi.length;i++){
 					var nalog = nalozi[i];
 					ukupnoNaloga++;
@@ -1481,6 +1549,7 @@ server.get('/',async (req,res)=>{
 				informacijeJson.ukupnoNeobracunatihNaloga = ukupnoNeobracunatihNaloga;
 				informacijeJson.ukupnoSpremnihIznos = ukupnoSpremnihIznos;
 				informacijeJson.ukupnoSpremnihNaloga = ukupnoSpremnihNaloga;
+				informacijeJson.ukupnoRealizovano = ukupnoSpremnihIznos + ukupnoFakturisanIznos;
 				res.render("administracija/administracija",{
 					pageTitle:"Насловна",
 					user: req.session.user,
@@ -1494,25 +1563,16 @@ server.get('/',async (req,res)=>{
 					message: "<div class=\"text\">Дошло је до грешке у бази податка 116.</div>"
 				});
 			});
-		}else if(Number(req.session.user.role)==20){
-			res.redirect("/dispecer/otvoreniNalozi")
-		}else if(Number(req.session.user.role)==30){
-			res.redirect("/podizvodjac/otvoreniNalozi")
-		}else if(Number(req.session.user.role)==40){
-			res.redirect("/spremniNalozi")
-		}else if(Number(req.session.user.role)==50){
-			res.redirect("/magacioner/stanje")
 		}else{
 			res.render("message",{
-				pageTitle: "Грешка",
-				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>",
-				user: req.session.user
+				pageTitle: "Програмска грешка",
+				message: "<div class=\"text\">Дошло је до грешке у бази податка 116.</div>"
 			});
 		}
 	}else{
-		res.redirect("/login");
+
 	}
-});
+})
 
 server.get('/login',async (req,res)=>{
 	if(req.session.user){
