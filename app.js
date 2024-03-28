@@ -2869,7 +2869,48 @@ server.post('/edit-nalog', async (req, res)=> {
 									nalogJson.stariNalog.datetime = new Date().getTime();
 									istorijaNalogaDB.insertOne(nalogJson.stariNalog)
 									.then((dbResponse3)=>{
-										res.redirect("/nalog/"+nalogJson.broj);
+										if(nalogJson.majstor==nalogJson.stariNalog.majstor){
+											res.redirect("/nalog/"+nalogJson.broj);
+										}else{
+											majstoriDB.find({uniqueId:nalogJson.majstor}).toArray()
+											.then((majstori)=>{
+												if(majstori.length>0){
+													if(majstori[i].kontakt){
+														if(majstori[i].kontakt.length>0){
+															var mailOptions = {
+																from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+																to: 'miloscane@gmail.com',
+																subject: 'Додељен вам је нови налог',
+																html: 'Поштовани '+majstori[0].ime+',<br>Додељен вам је нови ВиК налог на порталу послова града.<br>Број налога: '+nalogJson.broj+'<br>Радна јединица: '+nalogJson.radnaJedinica+'<br>Адреса: <a href=\"https://www.google.com/maps/search/?api=1&query='+nalogJson.adresa.replace(/,/g, '%2C').replace(/ /g, '+')+'\">'+nalogJson.adresa+'<br>Захтевалац: '+ nalogJson.zahtevalac+'<br>Опис проблема: '+nalogJson.opis+'<br><a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">Отвори налог на порталу</a>',
+															};
+
+															transporter.sendMail(mailOptions, (error, info) => {
+																if (error) {
+																	logError(error);
+																	res.redirect("/nalog/"+nalogJson.broj);
+																}else{
+																	res.redirect("/nalog/"+nalogJson.broj);
+																}
+															});
+														}else{
+															res.redirect("/nalog/"+nalogJson.broj);
+														}
+													}else{
+														res.redirect("/nalog/"+nalogJson.broj);
+													}
+												}else{
+													res.redirect("/nalog/"+nalogJson.broj);
+												}
+											})
+											.catch((error)=>{
+												logError(error);
+												res.render("message",{
+													pageTitle: "Програмска грешка",
+													user:req.session.user,
+													message: "<div class=\"text\">Дошло је до грешке у бази податка 2634.</div>"
+												});
+											})
+										}
 									})
 									.catch((error)=>{
 										logError(error);
