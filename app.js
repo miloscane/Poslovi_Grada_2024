@@ -2293,9 +2293,11 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 												.then((korisnici)=>{
 													var emails = [];
 													for(var i=0;i<korisnici.length;i++){
-														if(korisnici[i].opstine.indexOf(nalogJson.radnaJedinica)>=0){
-															for(var j=0;j<korisnici[i].kontakt.length;i++){
-																emails.push(korisnici[i].kontakt[j]);
+														if(korisnici[i].opstine){
+															if(korisnici[i].opstine.indexOf(nalogJson.radnaJedinica)>=0){
+																for(var j=0;j<korisnici[i].kontakt.length;i++){
+																	emails.push(korisnici[i].kontakt[j]);
+																}
 															}
 														}
 													}
