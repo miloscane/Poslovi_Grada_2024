@@ -2890,7 +2890,7 @@ server.post('/edit-nalog', async (req, res)=> {
 									majstoriDB.find({uniqueId:nalogJson.majstor}).toArray()
 									.then((majstori)=>{
 										if(majstori.length>0){
-											if(majstori[i].kontakt){
+											if(majstori[i].hasOwnProperty("kontakt")){
 												if(majstori[i].kontakt.length>0){
 													var mailOptions = {
 														from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
@@ -2980,7 +2980,7 @@ server.post('/edit-nalog', async (req, res)=> {
 											majstoriDB.find({uniqueId:nalogJson.majstor}).toArray()
 											.then((majstori)=>{
 												if(majstori.length>0){
-													if(majstori[i].kontakt){
+													if(majstori[i].hasOwnProperty("kontakt")){
 														if(majstori[i].kontakt.length>0){
 															var mailOptions = {
 																from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
