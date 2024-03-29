@@ -2295,9 +2295,16 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 													for(var i=0;i<korisnici.length;i++){
 														if(korisnici[i].opstine){
 															if(korisnici[i].opstine.indexOf(nalogJson.radnaJedinica)>=0){
-																for(var j=0;j<korisnici[i].kontakt.length;i++){
-																	emails.push(korisnici[i].kontakt[j]);
+																if(korisnici[i].kontakt){
+																	if(korisnici[i].kontakt.length>0){
+																		for(var j=0;j<korisnici[i].kontakt.length;i++){
+																			emails.push(korisnici[i].kontakt[j]);
+																		}
+																	}else{
+																		emails.push("radninalog@poslovigrada.rs")
+																	}
 																}
+																
 															}
 														}
 													}
