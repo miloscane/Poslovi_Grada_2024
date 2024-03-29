@@ -2303,8 +2303,9 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 																	}else{
 																		emails.push("radninalog@poslovigrada.rs")
 																	}
+																}else{
+																	emails.push("radninalog@poslovigrada.rs")
 																}
-																
 															}
 														}
 													}
