@@ -105,7 +105,13 @@ const uploadSlika = multer({
     transforms: [{
       id: 'original',
       key: function (req, file, cb) {
-        cb(null, new Date().getTime().toString() +".jpg")
+      	var filename = "";
+      	if(req.body){
+      		if(req.body.json){
+      			filename = JSON.parse(req.body.json).broj;
+      		}
+      	}
+        cb(null, filename+ "--"+new Date().getTime().toString() +".jpg")
       },
       transform: function (req, file, cb) {
         cb(null, sharp({ failOnError: false }).resize(800,null).withMetadata().jpeg())
@@ -1306,7 +1312,6 @@ http.listen(process.env.PORT, function(){
 		.catch((error)=>{
 			console.log(error)
 		})*/
-
 
 		
 
