@@ -2296,9 +2296,13 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 														if(korisnici[i].opstine){
 															if(korisnici[i].opstine.indexOf(nalogJson.radnaJedinica)>=0){
 																if(korisnici[i].hasOwnProperty("kontakt")){
-																	if(korisnici[i].kontakt.length>0){
-																		for(var j=0;j<korisnici[i].kontakt.length;j++){
-																			emails.push(korisnici[i].kontakt[j]);
+																	if(korisnici[i].kontakt instanceof Array){
+																		if(korisnici[i].kontakt.length>0){
+																			for(var j=0;j<korisnici[i].kontakt.length;j++){
+																				emails.push(korisnici[i].kontakt[j]);
+																			}
+																		}else{
+																			emails.push("radninalog@poslovigrada.rs")
 																		}
 																	}else{
 																		emails.push("radninalog@poslovigrada.rs")
@@ -2314,7 +2318,7 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 														from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
 														to: emails.join(","),
 														subject: 'Додељен вам је нови налог број '+nalogJson.broj,
-														html: 'Поштовани ,<br>Додељен вам је нови ВиК налог на порталу послова града.<br>Број налога: '+nalogJson.broj+'<br>Радна јединица: '+nalogJson.radnaJedinica+'<br>Адреса: <a href=\"https://www.google.com/maps/search/?api=1&query='+nalogJson.adresa.replace(/,/g, '%2C').replace(/ /g, '+')+'\">'+nalogJson.adresa+'</a><br>Захтевалац: '+ nalogJson.zahtevalac+'<br>Опис проблема: '+nalogJson.opis+'<br><a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">Отвори налог на порталу</a>',
+														html: 'Поштовани,<br>Додељен вам је нови ВиК налог на порталу послова града.<br>Број налога: '+nalogJson.broj+'<br>Радна јединица: '+nalogJson.radnaJedinica+'<br>Адреса: <a href=\"https://www.google.com/maps/search/?api=1&query='+nalogJson.adresa.replace(/,/g, '%2C').replace(/ /g, '+')+'\">'+nalogJson.adresa+'</a><br>Захтевалац: '+ nalogJson.zahtevalac+'<br>Опис проблема: '+nalogJson.opis+'<br><a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">Отвори налог на порталу</a>',
 													};
 
 													transporter.sendMail(mailOptions, (error, info) => {
@@ -2891,22 +2895,26 @@ server.post('/edit-nalog', async (req, res)=> {
 									.then((majstori)=>{
 										if(majstori.length>0){
 											if(majstori[i].hasOwnProperty("kontakt")){
-												if(majstori[i].kontakt.length>0){
-													var mailOptions = {
-														from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
-														to: majstori[i].kontakt.join(","),
-														subject: 'Додељен вам је нови налог број '+nalogJson.broj,
-														html: 'Поштовани '+majstori[0].ime+',<br>Додељен вам је нови ВиК налог на порталу послова града.<br>Број налога: '+nalogJson.broj+'<br>Радна јединица: '+nalogJson.radnaJedinica+'<br>Адреса: <a href=\"https://www.google.com/maps/search/?api=1&query='+nalogJson.adresa.replace(/,/g, '%2C').replace(/ /g, '+')+'\">'+nalogJson.adresa+'</a><br>Захтевалац: '+ nalogJson.zahtevalac+'<br>Опис проблема: '+nalogJson.opis+'<br><a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">Отвори налог на порталу</a>',
-													};
+												if(majstori[i].kontakt instanceof Array){
+													if(majstori[i].kontakt.length>0){
+														var mailOptions = {
+															from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+															to: majstori[i].kontakt.join(","),
+															subject: 'Додељен вам је нови налог број '+nalogJson.broj,
+															html: 'Поштовани '+majstori[0].ime+',<br>Додељен вам је нови ВиК налог на порталу послова града.<br>Број налога: '+nalogJson.broj+'<br>Радна јединица: '+nalogJson.radnaJedinica+'<br>Адреса: <a href=\"https://www.google.com/maps/search/?api=1&query='+nalogJson.adresa.replace(/,/g, '%2C').replace(/ /g, '+')+'\">'+nalogJson.adresa+'</a><br>Захтевалац: '+ nalogJson.zahtevalac+'<br>Опис проблема: '+nalogJson.opis+'<br><a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">Отвори налог на порталу</a>',
+														};
 
-													transporter.sendMail(mailOptions, (error, info) => {
-														if (error) {
-															logError(error);
-															res.redirect("/nalog/"+nalogJson.broj);
-														}else{
-															res.redirect("/nalog/"+nalogJson.broj);
-														}
-													});
+														transporter.sendMail(mailOptions, (error, info) => {
+															if (error) {
+																logError(error);
+																res.redirect("/nalog/"+nalogJson.broj);
+															}else{
+																res.redirect("/nalog/"+nalogJson.broj);
+															}
+														});
+													}else{
+														res.redirect("/nalog/"+nalogJson.broj);
+													}
 												}else{
 													res.redirect("/nalog/"+nalogJson.broj);
 												}
@@ -2981,22 +2989,26 @@ server.post('/edit-nalog', async (req, res)=> {
 											.then((majstori)=>{
 												if(majstori.length>0){
 													if(majstori[i].hasOwnProperty("kontakt")){
-														if(majstori[i].kontakt.length>0){
-															var mailOptions = {
-																from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
-																to: majstori[i].kontakt.join(","),
-																subject: 'Додељен вам је нови налог број '+nalogJson.broj,
-																html: 'Поштовани '+majstori[0].ime+',<br>Додељен вам је нови ВиК налог на порталу послова града.<br>Број налога: '+nalogJson.broj+'<br>Радна јединица: '+nalogJson.radnaJedinica+'<br>Адреса: <a href=\"https://www.google.com/maps/search/?api=1&query='+nalogJson.adresa.replace(/,/g, '%2C').replace(/ /g, '+')+'\">'+nalogJson.adresa+'</a><br>Захтевалац: '+ nalogJson.zahtevalac+'<br>Опис проблема: '+nalogJson.opis+'<br><a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">Отвори налог на порталу</a>',
-															};
+														if(majstori[i].kontakt instanceof Array){
+															if(majstori[i].kontakt.length>0){
+																var mailOptions = {
+																	from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+																	to: majstori[i].kontakt.join(","),
+																	subject: 'Додељен вам је нови налог број '+nalogJson.broj,
+																	html: 'Поштовани '+majstori[0].ime+',<br>Додељен вам је нови ВиК налог на порталу послова града.<br>Број налога: '+nalogJson.broj+'<br>Радна јединица: '+nalogJson.radnaJedinica+'<br>Адреса: <a href=\"https://www.google.com/maps/search/?api=1&query='+nalogJson.adresa.replace(/,/g, '%2C').replace(/ /g, '+')+'\">'+nalogJson.adresa+'</a><br>Захтевалац: '+ nalogJson.zahtevalac+'<br>Опис проблема: '+nalogJson.opis+'<br><a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">Отвори налог на порталу</a>',
+																};
 
-															transporter.sendMail(mailOptions, (error, info) => {
-																if (error) {
-																	logError(error);
-																	res.redirect("/nalog/"+nalogJson.broj);
-																}else{
-																	res.redirect("/nalog/"+nalogJson.broj);
-																}
-															});
+																transporter.sendMail(mailOptions, (error, info) => {
+																	if (error) {
+																		logError(error);
+																		res.redirect("/nalog/"+nalogJson.broj);
+																	}else{
+																		res.redirect("/nalog/"+nalogJson.broj);
+																	}
+																});
+															}else{
+																res.redirect("/nalog/"+nalogJson.broj);
+															}
 														}else{
 															res.redirect("/nalog/"+nalogJson.broj);
 														}
