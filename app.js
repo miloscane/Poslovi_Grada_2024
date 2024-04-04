@@ -2542,6 +2542,14 @@ server.post('/administracija/ponisti-specifikaciju',async (req,res)=>{
 	}
 });
 
+//posebna imovina znaci da je samo njena , nije bracna tekovina i ne deli
+
+//ugovor o posredovanju, opsirniji mozda, uvedeni u posed, 
+
+//overa 50% ukupne overe za ugovor 51 000 za ugovor, 1/2 uvecana za broj primeraka , treba jos jedan original za banku za 1600 dinara.
+
+//
+
 server.get('/nalog/:broj',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20 || Number(req.session.user.role)==30){

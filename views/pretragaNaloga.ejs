@@ -31,6 +31,36 @@
 							});
 						</script>
 					</div>
+					<div class="spacer"></div>
+					<div class="inputWrap">
+						<div class="title">Адреса налога</div>
+						<div class="inputWrapper">
+							<input type="text" id="adresa-naloga" class="textInput">
+						</div>
+					</div>
+					<div class="inputWrap" style="margin-top:30px">
+						<div class="button" onclick="nadjiNalogPoAdresi()">Пронађи по адреси</div>
+						<form method="POST" action="/pretragaNalogaPoAdresi" style="display:none" id="form">
+							<input type="text" id="adresa" name="adresa">
+						</form>
+						<script>
+							function nadjiNalogPoAdresi(){
+								var adresa = document.getElementById('adresa-naloga').value;
+								if(adresa.length<3){
+									alert("Адреса налога мора имати барем три слова за претрагу.");
+								}else{
+									document.getElementById("adresa").value = adresa;
+									loadGif();
+									document.getElementById("form").submit();
+								}
+							}
+							document.getElementById("adresa-naloga").addEventListener('keypress', function(event) {
+								if (event.keyCode == 13) {
+									nadjiNalogPoAdresi();
+								}
+							});
+						</script>
+					</div>
 				</div>
 			</div>
 		</div>
