@@ -46,8 +46,8 @@
 						<script>
 							function nadjiNalogPoAdresi(){
 								var adresa = document.getElementById('adresa-naloga').value;
-								if(adresa.length<3){
-									alert("Адреса налога мора имати барем три слова за претрагу.");
+								if(adresa.length<1){
+									alert("Адреса налога мора имати барем једна слово за претрагу.");
 								}else{
 									document.getElementById("adresa").value = adresa;
 									loadGif();
