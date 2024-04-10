@@ -336,7 +336,25 @@
 										}
 
 										function printZaduzenje(){
-											
+											doc = new jsPDF({
+												orientation: 'p',
+												unit: 'mm',
+												format: 'a4',
+												compress: true
+												//putOnlyUsedFonts:true
+											});
+											pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+											pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+											var yPos = 12;
+											var xPos = 12;
+											//doc.getFontList("Helvetica");
+											doc.addFileToVFS("PTSans.ttf", PTSans);
+											doc.addFileToVFS("PTSansBold.ttf", PTSansBold);
+											doc.addFont('PTSans.ttf', 'PTSans', 'normal');
+											doc.addFont('PTSansBold.ttf', 'PTSans', 'bold');
+
+											doc.setFont('PTSans'); // set font
+											doc.getFontList("PTSans");
 										    doc.addImage(logoLogoBlob, 'PNG', 5, 5, 150/mm, 153/mm,'','FAST');
 									        doc.setFontType("bold");
 											doc.setFontSize(16);
@@ -394,7 +412,25 @@
 										}
 
 										function printRazduzenje(){
-											
+											doc = new jsPDF({
+												orientation: 'p',
+												unit: 'mm',
+												format: 'a4',
+												compress: true
+												//putOnlyUsedFonts:true
+											});
+											pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+											pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+											var yPos = 12;
+											var xPos = 12;
+											//doc.getFontList("Helvetica");
+											doc.addFileToVFS("PTSans.ttf", PTSans);
+											doc.addFileToVFS("PTSansBold.ttf", PTSansBold);
+											doc.addFont('PTSans.ttf', 'PTSans', 'normal');
+											doc.addFont('PTSansBold.ttf', 'PTSans', 'bold');
+
+											doc.setFont('PTSans'); // set font
+											doc.getFontList("PTSans");
 										    doc.addImage(logoLogoBlob, 'PNG', 5, 5, 150/mm, 153/mm,'','FAST');
 									        doc.setFontType("bold");
 											doc.setFontSize(16);
