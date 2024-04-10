@@ -22,6 +22,9 @@
 			<script>
 				var ukupnaVrednostMagacina = 0;
 				for(var i=0;i<proizvodi.length;i++){
+					if(proizvodi[i].datumPopisa.split(".").length>1){
+						proizvodi[i].datumPopisa = reshuffleDateInverse(proizvodi[i].datumPopisa);
+					}
 					proizvodi[i].realnoStanje = parseFloat(proizvodi[i].stanje);
 					proizvodi[i].obracunStanja = [];
 					proizvodi[i].obracunStanja.push("<p>Стање на попису " + reshuffleDate(proizvodi[i].datumPopisa) + " : " + proizvodi[i].stanje + "</p>");

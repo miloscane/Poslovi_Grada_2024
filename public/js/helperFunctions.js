@@ -55,9 +55,14 @@ function getDateAsStringForInputObject(date){
   return  yearString+"-"+monthString+"-"+dayString;
 }
 
-function reshuffleDate(date){//gets yyyy-mm-dd and returns dd.mm.yyyy.
+function reshuffleDate(date){//gets yyyy-mm-dd and returns dd.mm.yyyy
   var array = date.split("-");
   return  array[2]+"."+array[1]+"."+array[0];
+}
+
+function reshuffleDateInverse(date){//gets dd.mm.yyyy. and returns yyyy-mm-dd
+  var array = date.split(".");
+  return  array[2]+"-"+array[1]+"-"+array[0];
 }
 
 function getDateAsStringForDisplay(date){

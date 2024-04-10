@@ -771,7 +771,7 @@ http.listen(process.env.PORT, function(){
 				console.log(error);
 			})*/
 
-
+			//Prepravka iznosa
 			/*naloziDB.find({}).toArray()
 			.then((nalozi)=>{
 				var naloziBezIznosa = [];
