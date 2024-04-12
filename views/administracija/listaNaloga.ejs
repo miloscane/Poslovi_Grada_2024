@@ -66,7 +66,8 @@
 								var input = document.createElement("INPUT");
 								input.setAttribute("class","opstinaFilter");
 								input.setAttribute("type","checkbox");
-								input.setAttribute("checked","checked");
+								//input.setAttribute("checked","checked");
+								input.setAttribute("onclick","updateTable()");
 								input.setAttribute("value",radneJedinice[i]);
 								inputWrapper.appendChild(input);
 							inputWrap.appendChild(inputWrapper);
@@ -137,22 +138,13 @@
 				var odDatuma = document.getElementById("od-datuma").value;
 				var doDatuma = document.getElementById("do-datuma").value;
 				var adresa = document.getElementById("adresa-filter").value;
-				var opstine = [];
-				var opstineElems = document.getElementById("opstine-filter").getElementsByClassName("opstinaFilter");
-
-				for(var i=0;i<opstineElems.length;i++){
-					if(opstineElems[i].checked){
-						opstine.push(opstineElems[i].value)
-					}
-				}
-				socket.emit("listaNalogaAdministracija",odDatuma,doDatuma,adresa,opstine);
+				socket.emit("listaNalogaAdministracija",odDatuma,doDatuma,adresa,radneJedinice);
 				
 				socket.on("listaNalogaAdministracijaOdgovor",function(status,statistika,naloziFromServer,data){
 		          if(status==1){
 		          	nalozi = naloziFromServer;
 		          	scrollTable(1);
 		          	placeInformation(statistika);
-		          	console.log(data);
 		          }else if(status==0){
 		          	document.getElementById("table").innerHTML = "<div class=\"infoError\">Дошло је до грешке приликом преузимања налога.</div><div class=\"error\">"+data+"</div>"
 		          }else{
@@ -193,6 +185,7 @@
 					document.getElementById("table").innerHTML = "";
 					var table = document.createElement("TABLE");
 					for(var i=startIndex;i<endIndex;i++){
+
 						var tr = document.createElement("TR");
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
@@ -204,7 +197,12 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojNaloga");
-								div.innerHTML = nalozi[i].broj;
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+nalozi[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("class","tableButton");
+									a.innerHTML = nalozi[i].broj;
+									div.appendChild(a)
 								td.appendChild(div);
 							tr.appendChild(td);
 
@@ -257,17 +255,6 @@
 								div.innerHTML = iznosNaloga>500000 ? 0 : brojSaRazmacima(iznosNaloga*0.2);
 								td.appendChild(div);
 							tr.appendChild(td);*/
-
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value pogledajNalog");
-									var a = document.createElement("A");
-									a.setAttribute("href","/nalog/"+nalozi[i].broj);
-									a.setAttribute("class","tableButton");
-									a.innerHTML = "Погледај налог"
-									div.appendChild(a)
-								td.appendChild(div);
-							tr.appendChild(td);
 						table.appendChild(tr)
 					}
 					document.getElementById("table").appendChild(table);
