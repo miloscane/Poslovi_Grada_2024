@@ -5135,19 +5135,25 @@ io.on('connection', function(socket){
 				naloziToSend = nalozi;
 			}
 
-			if(adresa){
-				for(var i=0;i<naloziToSend.length;i++){
-					if(!naloziToSend[i].punaAdresa.toLowerCase().includes(adresa)){
-						naloziToSend.splice(i,1);
-						i--
-					}
-				}
-			}
+			
 
 			for(var i=0;i<naloziToSend.length;i++){
 				if(opstine.indexOf(naloziToSend[i].radnaJedinica)<0){
 					naloziToSend.splice(i,1);
 					i--;
+				}
+			}
+
+			if(adresa){
+				console.log("Adresa:");
+				//console.log(adresa);
+				for(var i=0;i<naloziToSend.length;i++){
+				//console.log("--------")
+				//console.log(naloziToSend[i].adresa);
+					if(!naloziToSend[i].adresa.toLowerCase().includes(adresa.toString().toLowerCase())){
+						naloziToSend.splice(i,1);
+						i--
+					}
 				}
 			}
 
