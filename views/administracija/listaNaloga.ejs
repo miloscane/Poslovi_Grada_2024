@@ -38,14 +38,43 @@
 				<div class="filterWrap">
 					<div class="inputWrap">
 						<div class="label">Од датума налога:</div>
-						<div class="inputWrapper"><input type="date" id="od-datuma" oninput="updateTableFromDates()"></div>
+						<div class="inputWrapper"><input type="date" id="od-datuma"></div>
 					</div>
 					<div class="inputWrap">
 						<div class="label">До датума налога:</div>
-						<div class="inputWrapper"><input type="date" id="do-datuma"  oninput="updateTableFromDates()"></div>
+						<div class="inputWrapper"><input type="date" id="do-datuma"></div>
 					</div>
 				</div>
+				<div class="filterWrap">
+					<div class="inputWrap">
+						<div class="label">Adresa:</div>
+						<div class="inputWrapper"><input type="text" id="adresa-filter"></div>
+					</div>
+				</div>
+				<div class="filterWrap" id="opstine-filter"></div>
+				<script>
+					for(var i=0;i<radneJedinice.length;i++){
+						var inputWrap = document.createElement("DIV");
+						inputWrap.setAttribute("class","inputWrapper");
+							var label = document.createElement("DIV");
+							label.setAttribute("class","label");
+							label.innerHTML = radneJedinice[i];
+							inputWrap.appendChild(label);
+
+							var inputWrapper = document.createElement("DIV");
+							inputWrapper.setAttribute("class","inputWrap");
+								var input = document.createElement("INPUT");
+								input.setAttribute("class","opstinaFilter");
+								input.setAttribute("type","checkbox");
+								input.setAttribute("checked","checked");
+								input.setAttribute("value",radneJedinice[i]);
+								inputWrapper.appendChild(input);
+							inputWrap.appendChild(inputWrapper);
+						document.getElementById("opstine-filter").appendChild(inputWrap);
+					}
+				</script>
 			</div>
+			<button onclick="updateTable()" style="margin-top:20px;margin-bottom:20px">Примени филтере</button>
 			<div class="tableWrap" id="table-wrap">
 				<div class="tableHeader" id="table-header">
 					<table>
@@ -69,8 +98,28 @@
 			</div>
 			<script>
 				var nalozi = [];
-				function updateTableFromDates(){
-					if(document.getElementById("od-datuma").value && document.getElementById("do-datuma").value){
+				function updateTable(){
+					var odDatuma = document.getElementById("od-datuma").value;
+					var doDatuma = document.getElementById("do-datuma").value;
+					var adresa = document.getElementById("adresa-filter").value;
+					var opstine = [];
+					var opstineElems = document.getElementById("opstine-filter").getElementsByClassName("opstinaFilter");
+					for(var i=0;i<opstineElems.length;i++){
+						if(opstineElems[i].checked){
+							opstine.push(opstineElems[i].value)
+						}
+					}
+					document.getElementById("table").innerHTML = "<img id='wait' src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/loadGif.gif'>";
+					document.getElementById("ukupno-naloga").innerHTML = "-";
+					document.getElementById("ukupno-obracunatih-naloga").innerHTML = "-";
+					document.getElementById("ukupan-iznos-naloga").innerHTML = "-";
+					document.getElementById("ukupno-fakturisanih-naloga").innerHTML = "-";
+					document.getElementById("ukupan-iznos-fakturisanih-naloga").innerHTML = "-";
+					document.getElementById("ukupan-pdv-naloga").innerHTML = "-";
+					document.getElementById("ukupno-naloga-podizvodjaca").innerHTML = "-";
+					document.getElementById("ukupan-iznos-naloga-podizvodjaca").innerHTML = "-";
+					socket.emit("listaNalogaAdministracija",odDatuma,doDatuma,adresa,opstine);
+					/*if(document.getElementById("od-datuma").value && document.getElementById("do-datuma").value){
 						document.getElementById("table").innerHTML = "<img id='wait' src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/loadGif.gif'>";
 						document.getElementById("ukupno-naloga").innerHTML = "-";
 						document.getElementById("ukupno-obracunatih-naloga").innerHTML = "-";
@@ -81,11 +130,22 @@
 						document.getElementById("ukupno-naloga-podizvodjaca").innerHTML = "-";
 						document.getElementById("ukupan-iznos-naloga-podizvodjaca").innerHTML = "-";
 						socket.emit("listaNalogaAdministracija",Number(new Date(document.getElementById("od-datuma").value).getTime()),Number(new Date(document.getElementById("do-datuma").value).getTime()));	
-					}
+					}*/
 					
 				}
 
-				socket.emit("listaNalogaAdministracija","","");	
+				var odDatuma = document.getElementById("od-datuma").value;
+				var doDatuma = document.getElementById("do-datuma").value;
+				var adresa = document.getElementById("adresa-filter").value;
+				var opstine = [];
+				var opstineElems = document.getElementById("opstine-filter").getElementsByClassName("opstinaFilter");
+
+				for(var i=0;i<opstineElems.length;i++){
+					if(opstineElems[i].checked){
+						opstine.push(opstineElems[i].value)
+					}
+				}
+				socket.emit("listaNalogaAdministracija",odDatuma,doDatuma,adresa,opstine);
 				
 				socket.on("listaNalogaAdministracijaOdgovor",function(status,statistika,naloziFromServer,data){
 		          if(status==1){

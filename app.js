@@ -5114,12 +5114,14 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 
 
 io.on('connection', function(socket){
-	socket.on('listaNalogaAdministracija', function(startTime,endTime){
+	socket.on('listaNalogaAdministracija', function(odDatuma,doDatuma,adresa,opstine){
 		var dbFindStart	=	new Date().getTime();
 		naloziDB.find({}).toArray()
 		.then((nalozi) => {
 			var naloziToSend	=	[];
-			if(startTime && endTime){
+			if(odDatuma && doDatuma){
+				var startTime = new Date(odDatuma).getTime();
+				var endTime = new Date(doDatuma).getTime();
 				for(var i=0;i<nalozi.length;i++){
 					var nalogDate	=	new Date(Number(nalozi[i].uniqueId.split("--")[1]));
 					var nalogTime	=	new Date(getDateAsStringForInputObject(nalogDate)).getTime();
@@ -5132,6 +5134,24 @@ io.on('connection', function(socket){
 			}else{
 				naloziToSend = nalozi;
 			}
+
+			if(adresa){
+				for(var i=0;i<naloziToSend.length;i++){
+					if(!naloziToSend[i].punaAdresa.toLowerCase().includes(adresa)){
+						naloziToSend.splice(i,1);
+						i--
+					}
+				}
+			}
+
+			for(var i=0;i<naloziToSend.length;i++){
+				if(opstine.indexOf(naloziToSend[i].radnaJedinica)<0){
+					naloziToSend.splice(i,1);
+					i--;
+				}
+			}
+
+
 			var statistika	=	{};
 			statistika.ukupnoNaloga				=	naloziToSend.length;
 			statistika.ukupnoObracnuatih		=	0;

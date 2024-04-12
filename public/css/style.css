@@ -1107,6 +1107,36 @@ input[type=number] {
     font-size: 12px;
 }
 
+.listaNalogaAdministracija .filters #opstine-filter{
+    width:700px;
+}
+
+.listaNalogaAdministracija .filters #opstine-filter .inputWrapper{
+    display:inline-block;
+    vertical-align: top;
+    margin-right:10px;
+    padding-right:10px;
+    margin-bottom:10px;
+    border-right:1px solid rgb(200,200,200);
+}
+
+.listaNalogaAdministracija .filters #opstine-filter .inputWrapper .label{
+    display:inline-block;
+    vertical-align: middle;
+}
+
+.listaNalogaAdministracija .filters #opstine-filter .inputWrapper .inputWrap{
+    display:inline-block;
+    vertical-align: middle;
+    margin-bottom:0;
+    margin-left:5px;
+}
+
+.listaNalogaAdministracija .filters #opstine-filter .inputWrapper .inputWrap input{
+    width:20px;
+    height:20px;
+}
+
 .nalog .printButton{
     width:150px;
     margin-left:0;
