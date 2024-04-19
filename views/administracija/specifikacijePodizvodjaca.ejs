@@ -1,6 +1,7 @@
 <%- include ("partials/header") -%>
 	<script>
 		var specifikacije = <%-JSON.stringify(specifikacije)%>;
+		console.log(specifikacije)
 	</script>
 	<div class="pageWidth podizvodjaci">
 		<div class="lightBlueBox">
@@ -46,6 +47,7 @@
 					<script>
 						function generateTable(imePodizvodjaca){
 							document.getElementById("table").innerHTML = "";
+							document.getElementById("information").innerHTML = "";
 							var tr = document.createElement("TR");
 								var td = document.createElement("TD");
 								td.innerHTML="Број<br>спецификације";
@@ -64,11 +66,26 @@
 								tr.appendChild(td);
 								
 								var td = document.createElement("TD");
+								td.innerHTML="Износ ПГ";
+								tr.appendChild(td);
+								
+								var td = document.createElement("TD");
+								td.innerHTML="Добит";
+								tr.appendChild(td);
+								
+								var td = document.createElement("TD");
 								td.innerHTML="Статус";
 								tr.appendChild(td);
 							document.getElementById("table").appendChild(tr);
 
 							var ukupanIznos = 0;
+							var ukupanIznosPG = 0;
+							var ukupnaDobit = 0;
+							for(var j=0;j<meseciJson.length;j++){
+								meseciJson[j].iznos = 0;
+								meseciJson[j].iznosPG = 0;
+								meseciJson[j].dobit = 0;
+							}
 							for(var i=0;i<specifikacije.length;i++){
 								if(specifikacije[i].user.name==imePodizvodjaca){
 									var tr = document.createElement("TR");
@@ -90,14 +107,88 @@
 										ukupanIznos = ukupanIznos + parseFloat(specifikacije[i].ukupanIznos);
 
 										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(specifikacije[i].ukupanIznosPG)+"</div>";
+										tr.appendChild(td);
+										ukupanIznosPG = ukupanIznosPG + parseFloat(specifikacije[i].ukupanIznosPG);
+
+										var td = document.createElement("TD");
+										var razlika = parseFloat(specifikacije[i].ukupanIznosPG) - parseFloat(specifikacije[i].ukupanIznos)
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(razlika)+"</div>";
+										tr.appendChild(td);
+										ukupnaDobit = ukupnaDobit + razlika;
+
+										var td = document.createElement("TD");
 										var status = Number(specifikacije[i].odobrena)==0 ? "На одобрењу" : "Одобрена";
 										td.innerHTML = "<div class=\"value\">"+status+"</div>";
 										tr.appendChild(td);
 
-									document.getElementById("table").appendChild(tr);	
+									document.getElementById("table").appendChild(tr);
+
+									for(var j=0;j<meseciJson.length;j++){
+										if(specifikacije[i].datum.datum.includes(meseciJson[j].string)){
+											meseciJson[j].iznos = meseciJson[j].iznos + parseFloat(specifikacije[i].ukupanIznos);
+											meseciJson[j].iznosPG = meseciJson[j].iznosPG + parseFloat(specifikacije[i].ukupanIznosPG);
+											meseciJson[j].dobit = meseciJson[j].dobit + razlika;
+										}
+									}
 								}
 							}
-							document.getElementById("information").innerHTML = "Укупно: " + brojSaRazmacima(ukupanIznos);
+
+							var table = document.createElement("TABLE");
+								var tr = document.createElement("TR");
+									var td = document.createElement("TD");
+									td.innerHTML = "<div class=\"value\">Период</div>"
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.innerHTML = "<div class=\"value\">Износ</div>"
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.innerHTML = "<div class=\"value\">Износ ПГ</div>"
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.innerHTML = "<div class=\"value\">Добит</div>"
+									tr.appendChild(td);
+								table.appendChild(tr);
+								var tr = document.createElement("TR");
+									var td = document.createElement("TD");
+									td.innerHTML = "<div class=\"value\">Укупно</div>"
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupanIznos)+"</div>"
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupanIznosPG)+"</div>"
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupnaDobit)+"</div>";
+									tr.appendChild(td);
+								table.appendChild(tr);
+								for(var i=0;i<meseciJson.length;i++){
+									var tr = document.createElement("TR");
+										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\">"+meseciJson[i].name+"</div>"
+										tr.appendChild(td);
+
+										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].iznos)+"</div>"
+										tr.appendChild(td);
+
+										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].iznosPG)+"</div>"
+										tr.appendChild(td);
+
+										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].dobit)+"</div>"
+										tr.appendChild(td);
+									table.appendChild(tr);
+								}
+							document.getElementById("information").appendChild(table);
 						}
 
 						izborPodizvodjaca(document.getElementById("header").getElementsByClassName("podizvodjac")[0]);

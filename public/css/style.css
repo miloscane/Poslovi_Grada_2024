@@ -3711,6 +3711,26 @@ input[type=number] {
     font-weight:700;
 }
 
+.specifikacije .information{
+    margin-bottom:40px;
+}
+
+.specifikacije .information table{
+    border-collapse: collapse;
+    background-color:rgb(255,255,255);
+    color:rgb(100,100,100);
+}
+
+.specifikacije .information table td{
+    border:1px solid rgb(150,150,150);
+    padding:5px;
+}
+
+.specifikacije .information table tr:first-child{
+    background-color:rgb(220,220,220);
+    font-weight:700;
+}
+
 .podizvodjacSpecifikacija .boxesWrap{
     display:flex;
     flex-wrap: wrap;

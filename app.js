@@ -1313,7 +1313,73 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 
-		
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var naloziToExport = [];
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].faktura.broj){
+					if(nalozi[i].faktura.broj.length>3){
+						if(nalozi[i].prijemnica.datum.datum.includes(".03.2024")){
+							naloziToExport.push(nalozi[i])
+						}
+					}
+					
+				}
+			}
+
+			for(var i=0;i<naloziToExport.length;i++){
+				if(naloziToExport[i].prijemnica.datum.datum){
+					if(naloziToExport[i].prijemnica.datum.datum.length>3){
+						var dateElements = naloziToExport[i].prijemnica.datum.datum.split(".");
+						naloziToExport[i].sorting = new Date(dateElements[2]+"-"+dateElements[1]+"-"+dateElements[0]).getTime();
+					}
+				}
+			}
+
+			naloziToExport.sort((a, b) => parseFloat(b.sorting) - parseFloat(a.sorting));
+
+			var problemNalozi = [];
+
+			var csvString = "Datum,Broj Fakture,Konto,Stranka,Prazno,Prazno,Datum,Datum,Prazno,Prazno,Duguje,Potrazuje,Prazno,Prazno\r\n";
+			for(var i=0;i<naloziToExport.length;i++){
+				var iznosBezPDVa = parseFloat(naloziToExport[i].ukupanIznos);
+				if(!isNaN(iznosBezPDVa)){
+					if(iznosBezPDVa<500000){
+						var iznosPDV = iznosBezPDVa*0.2;
+						var iznosSaPDVom = iznosBezPDVa*1.2;
+						var datumPDV = "";
+						if(naloziToExport[i].prijemnica.datum.datum){
+							if(naloziToExport[i].prijemnica.datum.datum.length>3){
+								datumPDV = naloziToExport[i].prijemnica.datum.datum;
+								csvString+=datumPDV+","+naloziToExport[i].faktura.broj+",2040,1,,,"+datumPDV+","+datumPDV+",,,"+iznosSaPDVom+",,,,\r\n";
+								csvString+=datumPDV+","+naloziToExport[i].faktura.broj+",6142,,,,"+datumPDV+","+datumPDV+",,,,"+iznosBezPDVa+",,,\r\n";
+								csvString+=datumPDV+","+naloziToExport[i].faktura.broj+",4700,,,,"+datumPDV+","+datumPDV+",,,,"+iznosPDV+",,,\r\n";
+							}else{
+								naloziToExport[i].problem = "Nema polja definisan datum prometa";
+								problemNalozi.push(naloziToExport[i])
+							}
+						}
+					}else if(iznosBezPDVa==0){
+						naloziToExport[i].problem = "Iznos naloga je nula";
+						problemNalozi.push(naloziToExport[i]);
+					}else{
+						naloziToExport[i].problem = "Iznos preko pola miliona";
+						problemNalozi.push(naloziToExport[i]);
+					}
+				}else{
+					naloziToExport[i].problem = "Nedefinisan iznos";
+					problemNalozi.push(naloziToExport[i]);
+				}
+			}
+			for(var i=0;i<problemNalozi.length;i++){
+				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+",Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", , , , , , , , , , ,\r\n";
+			}
+			fs.writeFileSync("./Minimax-03-2024.csv",csvString,"utf8");
+			console.log("Written ")
+		})
+		.catch((error)=>{
+			console.log(error)
+		})	*/
 
 
 
@@ -2399,11 +2465,42 @@ server.get('/administracija/specifikacijePodizvodjaca',async (req,res)=>{
 		if(Number(req.session.user.role)==10){
 			specifikacijePodizvodjacaDB.find({}).toArray()
 			.then((specifikacije)=>{
-				res.render("administracija/specifikacijePodizvodjaca",{
-					pageTitle:"Спецификације подизвођача",
-					specifikacije: specifikacije,
-					user: req.session.user
-				});
+				var naloziToFind = [];
+				for(var i=0;i<specifikacije.length;i++){
+					for(var j=0;j<specifikacije[i].nalozi.length;j++){
+						naloziToFind.push(specifikacije[i].nalozi[j].broj)
+					}
+				}
+				naloziDB.find({broj:{$in:naloziToFind}}).toArray()
+				.then((nalozi)=>{
+					for(var i=0;i<specifikacije.length;i++){
+						var ukupanIznosPG = 0;
+						for(var j=0;j<specifikacije[i].nalozi.length;j++){
+							for(var k=0;k<nalozi.length;k++){
+								if(nalozi[k].broj==specifikacije[i].nalozi[j].broj){
+									var iznosNaloga = isNaN(parseFloat(nalozi[k].ukupanIznos)) ? 0 : parseFloat(nalozi[k].ukupanIznos);
+									ukupanIznosPG = ukupanIznosPG + iznosNaloga;
+									specifikacije[i].nalozi[j].iznosPG = nalozi[k].ukupanIznos;
+									break;
+								}
+							}
+						}
+						specifikacije[i].ukupanIznosPG = ukupanIznosPG;
+					}
+					res.render("administracija/specifikacijePodizvodjaca",{
+						pageTitle:"Спецификације подизвођача",
+						specifikacije: specifikacije,
+						user: req.session.user
+					});
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 2482.</div>",
+						user: req.session.user
+					});
+				})
 			})
 			.catch((error)=>{
 				logError(error);
