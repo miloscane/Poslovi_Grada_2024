@@ -18,7 +18,109 @@ const multerS3						= require('multer-s3-transform');
 const sharp 							= require('sharp');
 const pdfParse						=	require('pdf-parse');
 const {Worker,SHARE_ENV}	=	require('worker_threads');
+const request 			=	require('request');
 dotenv.config();
+
+var premijusHeader = {
+    'accept': 'text/plain',
+    'nts-application': 'nts-rest-api',
+    'Content-Type': 'application/json'
+};
+
+var options = {
+    url: 'https://app.nts-international.net/NTSSecurity/login',
+    method: 'POST',
+    headers: premijusHeader,
+    auth: {username:'n7292-poslovigrada.api',password:'api2023'}
+};
+console.log("request sent");
+console.log("----")
+/*request(options, (error,response,body)=>{
+	if(error){
+		console.log(error)
+	}else{
+		console.log("request recevied");
+		//console.log(response.headers['set-cookie']);
+		var cookie = response.headers['set-cookie'];
+		var headers = {
+			'accept': 'application/json',
+	    'Cookie': cookie,
+	    'Content-Type': 'application/json'
+		}
+		var options = {
+		    url: 'https://app.nts-international.net/ntsapi/allvehicles',
+		    method: 'GET',
+		    headers: headers
+		};
+		console.log("Request2 sent");
+		request(options, (error,response2,body2)=>{
+			if(error){
+				console.log(error)
+			}else{
+				console.log("request2 received");
+				console.log(response2)
+			}
+		});
+	}
+});*/
+
+/*request(options, (error,response,body)=>{
+	if(error){
+		console.log(error)
+	}else{
+		console.log("request recevied");
+		//console.log(response.headers['set-cookie']);
+		var cookie = response.headers['set-cookie'];
+		var headers = {
+			'accept': 'application/json',
+	    'Cookie': cookie,
+	    'Content-Type': 'application/json'
+		}
+		var options = {
+		    url: 'https://app.nts-international.net/ntsapi/stops?vehicle=44537&from=2024-04-18 00:00:00&to=2024-04-19 00:00:00&timzeone=UTC&version=2.3',
+		    method: 'GET',
+		    headers: headers
+		};
+		console.log("Request2 sent");
+		request(options, (error,response2,body2)=>{
+			if(error){
+				console.log(error)
+			}else{
+				console.log("request2 received");
+				console.log(JSON.parse(response2.body))
+			}
+		});
+	}
+});*/
+
+/*request(options, (error,response,body)=>{
+	if(error){
+		console.log(error)
+	}else{
+		console.log("request recevied");
+		//console.log(response.headers['set-cookie']);
+		var cookie = response.headers['set-cookie'];
+		var headers = {
+			'accept': 'application/json',
+	    'Cookie': cookie,
+	    'Content-Type': 'application/json'
+		}
+		var options = {
+		    url: 'http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true',
+		    method: 'GET',
+		    headers: headers
+		};
+		console.log("Request2 sent");
+		request(options, (error,response2,body2)=>{
+			if(error){
+				console.log(error)
+			}else{
+				console.log("request2 received");
+				console.log(JSON.parse(response2.body))
+			}
+		});
+	}
+});*/
 
 server.set('view engine','ejs');
 var viewArray	=	[__dirname+'/views'];
@@ -153,8 +255,7 @@ const uploadPrijemnica = multer({
 
 var mailPotpis = "<br>&nbsp;<br>Срдачан поздрав,<br>ВиК Портал Послова Града<br><img style='width:200px' src='https://portal.poslovigrada.rs/images/logo.png'>";
 var resetPassLimit = 1.8e6; //30 minuta
-var podizvodjaci  = ["SeHQZ--1672650353244","IIwY4--1672650358507","TPvkz--1672745311574","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","eexTg--1672041776086","LysTK--1672041750935","ylSnq--1672041756318","KaOzW--1677669275156","QmhV5--1681280323035"];
-
+var podizvodjaci  = ["SeHQZ--1672650353244","IIwY4--1672650358507","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","ylSnq--1672041756318"];
 var phoneAccessCode = generateId(25);
 setInterval(function(){
 	phoneAccessCode = generateId(25);
@@ -1380,6 +1481,23 @@ http.listen(process.env.PORT, function(){
 		.catch((error)=>{
 			console.log(error)
 		})	*/
+
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var ukupno = 0;
+			for(var i=0;i<nalozi.length;i++){
+				console.log(nalozi[i].kategorijeRadova)
+				if(nalozi[i].kategorijeRadova.indexOf("Sajla") >= 0 && nalozi[i].prijemnica.datum.datum.includes("03.2024") && nalozi[i].kategorijeRadova.length==1 && podizvodjaci.indexOf(nalozi[i].majstor)<0){
+					ukupno = ukupno + parseFloat(nalozi[i].ukupanIznos);
+				}
+
+			}
+			console.log(brojSaRazmacima(ukupno))
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 
 
 

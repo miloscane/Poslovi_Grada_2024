@@ -21,6 +21,13 @@
 						<div class="text"><span id="ukupno-prikazanih-naloga"></span></div>
 					</div>
 				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
+					<div class="info">
+						<div class="title">Укупан износ приказаних налога</div>
+						<div class="text"><span id="ukupan-iznos-prikazanih-naloga"></span></div>
+					</div>
+				</div>
 			</div>
 			<div class="lightBlueBox">
 				<div class="filters">
@@ -113,6 +120,7 @@
 						}
 						
 					}
+					var ukupanIznos = 0;
 					document.getElementById("ukupno-prikazanih-naloga").innerHTML = naloziToShow.length;
 					document.getElementById("table").innerHTML = "";
 					var table = document.createElement("TABLE");
@@ -164,6 +172,7 @@
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value iznos");
 								div.innerHTML = brojSaRazmacima(naloziToShow[i].ukupanIznos);
+								ukupanIznos = ukupanIznos + parseFloat(naloziToShow[i].ukupanIznos);
 								td.appendChild(div);
 							tr.appendChild(td);
 							
@@ -177,6 +186,7 @@
 
 						table.appendChild(tr);
 					}
+					document.getElementById("ukupan-iznos-prikazanih-naloga").innerHTML = brojSaRazmacima(ukupanIznos);
 					document.getElementById("table").appendChild(table);
 				}
 
