@@ -1,5 +1,4 @@
 <% if (typeof user!="undefined") { %>
-	
 		<div id="menu">
 			<div class="topBlueBar">
 				<div class="pageWidth">
@@ -38,6 +37,7 @@
 							<div class="menuItem"><a href="/stefan/kategorije" onclick="loadGif()">Категорије радова</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/stefan/ucinakDispecera" onclick="loadGif()">Учинак диспечера</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/ucinakPodizvodjaca" onclick="loadGif()">Учинак подизвођача</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
 						<% }else if(Number(user.role)==10){ %>
 							<div class="menuItem"><a href="/administracija" onclick="loadGif()">Насловна</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="#">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
@@ -70,6 +70,7 @@
 									<div class="subMenuItem"><a href="/administracija/specifikacijePodizvodjaca" onclick="loadGif()">Спецификације</a></div>
 								</div>
 							</div>
+							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
 						<% }else if(Number(user.role)==20){ %>
 							<div class="menuItem"><a href="/dispecer/sviNalozi">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
 								<div class="subMenu">
@@ -82,6 +83,7 @@
 							<div class="menuItem"><a href="/dispecer/mojUcinak" onclick="loadGif()">Мој учинак</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/ucinakMajstora" onclick="loadGif()">Учинак мајстора</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/digitalizacijaNaloga" onclick="loadGif()">Дигитализација налога</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
 						<% }else if(Number(user.role)==30){ %>
 							<div class="menuItem"><a href="#">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
 								<div class="subMenu">
@@ -95,6 +97,7 @@
 							<div class="menuItem"><a href="/podizvodjac/pretragaNaloga" onclick="loadGif()">Претрага налога</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/podizvodjac/specifikacije" onclick="loadGif()">Спецификације</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/podizvodjac/ucinak" onclick="loadGif()">Учинак</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
 						<% }else if(Number(user.role)==40){ %>
 							<div class="menuItem"><a href="/spremniNalozi" onclick="loadGif()">Спремни налози</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/fakturisaniNalozi" onclick="loadGif()">Фактурисани налози</a><div class="rightBorder"></div></div>
@@ -111,6 +114,7 @@
 								</div>
 							</div>
 							<div class="menuItem"><a href="/magacioner/pretragaReversa" onclick="loadGif()">Претрага реверса</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
 						<% } %>
 					</div>
 				</div>

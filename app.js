@@ -21,21 +21,21 @@ const {Worker,SHARE_ENV}	=	require('worker_threads');
 const request 			=	require('request');
 dotenv.config();
 
-var premijusHeader = {
+var ntsHeader = {
     'accept': 'text/plain',
     'nts-application': 'nts-rest-api',
     'Content-Type': 'application/json'
 };
 
-var options = {
+var ntsOptions = {
     url: 'https://app.nts-international.net/NTSSecurity/login',
     method: 'POST',
-    headers: premijusHeader,
-    auth: {username:'n7292-poslovigrada.api',password:'api2023'}
+    headers: ntsHeader,
+    auth: {username:process.env.ntsusername,password:process.env.ntspassword}
 };
 console.log("request sent");
 console.log("----")
-/*request(options, (error,response,body)=>{
+/*request(ntsOptions, (error,response,body)=>{
 	if(error){
 		console.log(error)
 	}else{
@@ -59,6 +59,35 @@ console.log("----")
 			}else{
 				console.log("request2 received");
 				console.log(response2)
+			}
+		});
+	}
+});*/
+
+/*request(ntsOptions, (error,response,body)=>{
+	if(error){
+		console.log(error)
+	}else{
+		console.log("request recevied");
+		//console.log(response.headers['set-cookie']);
+		var cookie = response.headers['set-cookie'];
+		var headers = {
+			'accept': 'application/json',
+	    'Cookie': cookie,
+	    'Content-Type': 'application/json'
+		}
+		var options = {
+		    url: 'https://app.nts-international.net/ntsapi/allvehicles',
+		    method: 'GET',
+		    headers: headers
+		};
+		console.log("Request2 sent");
+		request(options, (error,response2,body2)=>{
+			if(error){
+				console.log(error)
+			}else{
+				console.log("request2 received");
+				console.log(response2.body)
 			}
 		});
 	}
@@ -229,7 +258,6 @@ const uploadSlika = multer({
     }*/]
   })
 }).array('image', 10);
-
 
 const uploadNalozi = multer({
   storage: multerS3({
@@ -3844,6 +3872,25 @@ server.get('/ucinakMajstora',async (req,res)=>{
 	}
 });
 
+server.get('/mapa',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==5 || Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
+			res.render("mapa",{
+				pageTitle: "Мапа",
+				user: req.session.user,
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
 server.get('/dispecer/sviNalozi',async (req,res)=>{
 	if(req.session.user){
 			if(Number(req.session.user.role)==20){
@@ -5546,6 +5593,73 @@ io.on('connection', function(socket){
 		.catch((error)=>{
 			logError(error)
 		})
+	})
+
+	socket.on('lokacijaMajstora', function(broj){
+		request(ntsOptions, (error,response,body)=>{
+			if(error){
+				logError(error)
+				socket.emit('lokacijaMajstoraOdgovor',[])
+			}else{
+				//console.log(response.headers['set-cookie']);
+				var cookie = response.headers['set-cookie'];
+				var headers = {
+					'accept': 'application/json',
+			    'Cookie': cookie,
+			    'Content-Type': 'application/json'
+				}
+				var options = {
+				    url: 'http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true',
+				    method: 'GET',
+				    headers: headers
+				};
+				request(options, (error,response2,body2)=>{
+					if(error){
+						logError(error);
+					}else{
+						var options = {
+						    url: 'https://app.nts-international.net/ntsapi/allvehicles',
+						    method: 'GET',
+						    headers: headers
+						};
+						request(options, (error,response3,body3)=>{
+							if(error){
+								logError(error)
+							}else{
+								try{
+									var vehiclesInfo = JSON.parse(response3.body);
+									try{
+										var vehicleStates = JSON.parse(response2.body);
+										/*console.log(vehicleStates)
+										console.log("---------------------------------------------------")
+										console.log(vehiclesInfo)*/
+										for(var i=0;i<vehicleStates.length;i++){
+											for(var j=0;j<vehiclesInfo.length;j++){
+												if(vehicleStates[i].vehicleId==vehiclesInfo[j].id){
+													vehicleStates[i].licenceplate = vehiclesInfo[j].licenceplate;
+												}
+											}
+										}
+										socket.emit('lokacijaMajstoraOdgovor',vehicleStates)
+									}catch(err){
+										logError(err)
+										socket.emit('lokacijaMajstoraOdgovor',[])
+									}
+								}catch(err){
+									logError(err);
+								}
+							}
+						});
+
+
+
+						
+					}
+				});
+			}
+		});
+		
+			
 	})
 
 });
