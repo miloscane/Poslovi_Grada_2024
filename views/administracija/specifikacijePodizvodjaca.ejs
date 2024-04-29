@@ -1,11 +1,93 @@
 <%- include ("partials/header") -%>
 	<script>
 		var specifikacije = <%-JSON.stringify(specifikacije)%>;
-		console.log(specifikacije)
+		//console.log(specifikacije)
 	</script>
 	<div class="pageWidth podizvodjaci">
 		<div class="lightBlueBox">
 			<div class="specifikacije">
+				<div class="totalTable">
+					<table id="total-table"></table>
+				</div>
+				<script>
+					var tr = document.createElement("TR");
+						var td = document.createElement("TD");
+						td.innerHTML="Период";
+						tr.appendChild(td);
+						
+						var td = document.createElement("TD");
+						td.innerHTML="Износ";
+						tr.appendChild(td);
+						
+						var td = document.createElement("TD");
+						td.innerHTML="Износ ПГ";
+						tr.appendChild(td);
+						
+						var td = document.createElement("TD");
+						td.innerHTML="Добит";
+						tr.appendChild(td);
+					document.getElementById("total-table").appendChild(tr);
+					var ukupanIznos = 0;
+					var ukupanIznosPG = 0;
+					var ukupnaDobit = 0;
+					for(var i=0;i<meseciJson.length;i++){
+						meseciJson[i].iznos = 0;
+						meseciJson[i].iznosPG = 0;
+						meseciJson[i].dobit = 0;
+					}
+
+					for(var i=0;i<specifikacije.length;i++){
+						ukupanIznos = ukupanIznos + parseFloat(specifikacije[i].ukupanIznos);
+						ukupanIznosPG = ukupanIznosPG + parseFloat(specifikacije[i].ukupanIznosPG);
+						var razlika = parseFloat(specifikacije[i].ukupanIznosPG) - parseFloat(specifikacije[i].ukupanIznos);
+						ukupnaDobit = ukupnaDobit + razlika;
+						for(var j=0;j<meseciJson.length;j++){
+							if(specifikacije[i].datum.datum.includes(meseciJson[j].string)){
+								meseciJson[j].iznos = meseciJson[j].iznos + parseFloat(specifikacije[i].ukupanIznos);
+								meseciJson[j].iznosPG = meseciJson[j].iznosPG + parseFloat(specifikacije[i].ukupanIznosPG);
+								meseciJson[j].dobit = meseciJson[j].dobit + razlika;
+							}	
+						}
+					}
+
+					var tr = document.createElement("TR");
+						var td = document.createElement("TD");
+						td.innerHTML = "<div class=\"value\">Укупно</div>"
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupanIznos)+"</div>"
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupanIznosPG)+"</div>"
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupnaDobit)+"</div>"
+						tr.appendChild(td);
+					document.getElementById("total-table").appendChild(tr);
+
+					for(var i=0;i<meseciJson.length;i++){
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+							td.innerHTML = "<div class=\"value\">"+meseciJson[i].name+"</div>"
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+							td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].iznos)+"</div>"
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+							td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].iznosPG)+"</div>"
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+							td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].dobit)+"</div>"
+							tr.appendChild(td);
+						document.getElementById("total-table").appendChild(tr);
+					}
+				</script>
 				<div class="header" id="header"></div>
 				<script>
 					for(var i=0;i<specifikacije.length;i++){

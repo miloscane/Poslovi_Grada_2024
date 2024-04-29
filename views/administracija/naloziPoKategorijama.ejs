@@ -1,0 +1,38 @@
+<%- include ("partials/header") -%>
+	<script>
+		var informacije = <%-JSON.stringify(informacije)%>;
+		console.log(informacije)
+	</script>
+	<div class="pageWidth">
+		<div class="autoKategorije" id="auto-kategorije"></div>
+		<script>
+			for(var i=0;i<informacije.length;i++){
+				var mesec = document.createElement("DIV");
+				mesec.setAttribute("class","mesec");
+					var title = document.createElement("DIV");
+					title.setAttribute("class","title");
+					title.innerHTML = informacije[i].ime;
+					mesec.appendChild(title);
+
+					var kategorije = document.createElement("DIV");
+					kategorije.setAttribute("class","kategorije");
+					for(var j=0;j<informacije[i].kategorije.length;j++){
+						var kategorija = document.createElement("DIV");
+						kategorija.setAttribute("class","kategorija");
+							var ime = document.createElement("DIV");
+							ime.setAttribute("class","ime");
+							ime.innerHTML = informacije[i].kategorije[j].ime;
+							kategorija.appendChild(ime);
+
+							var iznos = document.createElement("DIV");
+							iznos.setAttribute("class","iznos");
+							iznos.innerHTML = brojSaRazmacima(informacije[i].kategorije[j].iznos);
+							kategorija.appendChild(iznos);
+						kategorije.appendChild(kategorija);
+					}
+					mesec.appendChild(kategorije);
+				document.getElementById("auto-kategorije").appendChild(mesec);
+			}
+		</script>
+	</div>
+<%- include ("partials/footer") -%>

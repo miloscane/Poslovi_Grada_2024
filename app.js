@@ -33,8 +33,30 @@ var ntsOptions = {
     headers: ntsHeader,
     auth: {username:process.env.ntsusername,password:process.env.ntspassword}
 };
-console.log("request sent");
-console.log("----")
+
+/*var geoCodeHeader = {
+    'accept': 'text/plain',
+    'Content-Type': 'application/json'
+};
+
+var geoCodeOptions = {
+    url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+encodeURIComponent("Vidikovački Venac 90")+'&key='+process.env.googlegeocoding,
+    method: 'GET',
+    headers: geoCodeHeader
+};
+
+request(geoCodeOptions, (error,response,body)=>{
+	if(error){
+		console.log(error)
+	}else{
+		//console.log(response);
+		console.log("-------------------------");
+		var json = JSON.parse(response.body);
+		//console.log(json.results[0].geometry.location)
+	}
+})*/
+
+
 /*request(ntsOptions, (error,response,body)=>{
 	if(error){
 		console.log(error)
@@ -284,6 +306,7 @@ const uploadPrijemnica = multer({
 var mailPotpis = "<br>&nbsp;<br>Срдачан поздрав,<br>ВиК Портал Послова Града<br><img style='width:200px' src='https://portal.poslovigrada.rs/images/logo.png'>";
 var resetPassLimit = 1.8e6; //30 minuta
 var podizvodjaci  = ["SeHQZ--1672650353244","IIwY4--1672650358507","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","ylSnq--1672041756318"];
+var meseciJson    = [{name:"Februar 2024",string:"02.2024"},{name:"Mart 2024",string:"03.2024"},{name:"April 2024",string:"04.2024"},{name:"Maj 2024",string:"05.2024"},{name:"Jun 2024",string:"06.2024"},{name:"Jul 2024",string:"07.2024"},{name:"Avgust 2024",string:"08.2024"},{name:"Septembar 2024",string:"09.2024"},{name:"Oktobar 2024",string:"10.2024"},{name:"Novembar 2024",string:"11.2024"},{name:"Decembar 2024",string:"12.2024"}]
 var phoneAccessCode = generateId(25);
 setInterval(function(){
 	phoneAccessCode = generateId(25);
@@ -309,12 +332,14 @@ function logError(error){
 	errorJSON.jsonerror = error;
 	errorJSON.errorstack = error.stack;
 	errorJSON.errormessage = error.message;
-	errorDB.insertOne(errorJSON)
-	.then((dbResponse)=>{
-		//console.log(dbResponse)
-	}).catch((err)=>{
-		console.log(err);
-	})
+	if(errorDB){
+		errorDB.insertOne(errorJSON)
+		.then((dbResponse)=>{
+			//console.log(dbResponse)
+		}).catch((err)=>{
+			console.log(err);
+		})	
+	}
 }
 
 function generateId(length) {
@@ -348,6 +373,11 @@ function getDateAsStringForDisplay(date){
 function getDatetimeFromSerbia(str){//gets dd.mm.yyyy
 	var array = str.split(".");
 	return new Date(array[2]+"-"+array[1]+"-"+array[0]).getTime()
+}
+
+function reshuffleDate(date){//gets yyyy-mm-dd and returns dd.mm.yyyy
+  var array = date.split("-");
+  return  array[2]+"."+array[1]+"."+array[0];
 }
 
 function parseNalog(data,user,lokacija){
@@ -707,6 +737,39 @@ http.listen(process.env.PORT, function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
+		/*var kategorije = fs.readFileSync("kategorije.csv",{encoding:"utf8"});
+		var kategorijeArray = kategorije.split("\r\n");
+		kategorijeArray.forEach((value, index) =>
+			setTimeout(() => {
+				var kategorijaArray = value.split(";");
+				kategorijaArray[1] = kategorijaArray[1].trim();
+				var setArray = [];
+				if(kategorijaArray[13]!=""){
+					setArray.push(kategorijaArray[13])
+				}
+				if(kategorijaArray[14]!=""){
+					setArray.push(kategorijaArray[14])
+				}
+				if(kategorijaArray[15]!=""){
+					setArray.push(kategorijaArray[15])
+				}
+				if(setArray.length>0){
+					var setObj	=	{ $set: {
+						kategorije: setArray,
+					}};
+					pricesLowDB.updateOne({code:kategorijaArray[1]},setObj)
+					.then((dbResponse)=>{
+						console.log(index+"/"+kategorijeArray.length);
+						console.log("success")
+					})
+					.catch((error)=>{
+						console.log(error);
+					})
+				}
+				
+			}, index*100)
+		)*/
+
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			for(var i=0;i<nalozi.length;i++){
@@ -717,6 +780,97 @@ http.listen(process.env.PORT, function(){
 				}
 
 			}
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+		/*var geoCodeHeader = {
+    'accept': 'text/plain',
+    'Content-Type': 'application/json'
+};
+
+var geoCodeOptions = {
+    url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+encodeURIComponent("Vidikovački Venac 90")+'&key='+process.env.googlegeocoding,
+    method: 'GET',
+    headers: geoCodeHeader
+};
+
+request(geoCodeOptions, (error,response,body)=>{
+	if(error){
+		console.log(error)
+	}else{
+		//console.log(response);
+		console.log("-------------------------");
+		var json = JSON.parse(response.body);
+		//console.log(json.results[0].geometry.location)
+	}
+})*/
+
+		/*naloziDB.find({coordinates:null}).toArray()
+		.then((nalozi)=>{
+			nalozi.forEach((value, index) =>
+				
+				setTimeout(() => {
+					var geoCodeHeader = {
+					    'accept': 'text/plain',
+					    'Content-Type': 'application/json'
+					};
+
+					var geoCodeOptions = {
+					    url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+encodeURIComponent(value.punaAdresa)+'&key='+process.env.googlegeocoding,
+					    method: 'GET',
+					    headers: geoCodeHeader
+					};
+
+					request(geoCodeOptions, (error,response,body)=>{
+						if(error){
+							console.log(error)
+						}else{
+							//console.log(response);
+							console.log("-------------------------");
+							console.log(index+"/"+nalozi.length)
+							var json = JSON.parse(response.body);
+							//console.log(response.body);
+							//console.log(value.broj);
+							//console.log(value.adresa);
+							if(json.hasOwnProperty("results")){
+								if(json.results.length>0){
+									if(json.results[0].hasOwnProperty("geometry")){
+										//console.log(json.results[0].geometry.location);
+										var setObj	=	{ $set: {
+											coordinates: json.results[0].geometry.location,
+										}};
+										naloziDB.updateOne({broj:value.broj},setObj)
+										.then((dbResponse)=>{
+											console.log("success")
+										})
+										.catch((error)=>{
+											console.log(error);
+										})
+									}else{
+										console.log("No coordinates");
+									}
+								}else{
+									console.log("No coordinates");
+								}
+							}else{
+								console.log("No coordinates")
+							}
+							/*var setObj	=	{ $set: {
+								obracun: prijemnicaJson.obracun,
+							}};
+							naloziDB.updateOne({broj:prijemnicaJson.nalog.toString()},setObj)
+							.then((dbResponse)=>{
+								console.log(index+"/"+prijemnice.length+". success")
+							})
+							.catch((error)=>{
+								console.log(error);
+							})
+						}
+					})				
+				}, index*1000)
+			)
 		})
 		.catch((error)=>{
 			console.log(error)
@@ -1539,6 +1693,7 @@ http.listen(process.env.PORT, function(){
 
 	})
 	.catch(error => {
+		console.log(error)
 		console.log('Failed to connect to database');
 		logError(error);
 	});
@@ -2603,6 +2758,244 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 		}
 	}else{
 		res.redirect("/login");
+	}
+});
+
+server.get('/naloziPoKategorijama',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			naloziDB.find({}).toArray()
+			.then((nalozi)=>{
+				var informacije = [];
+				informacije.push({broj:"13.2024",ime:"Укупно",kategorije:[]});
+				for(var i=0;i<meseciJson.length;i++){
+					informacije.push({broj:meseciJson[i].string,ime:meseciJson[i].name,kategorije:[]});
+				}
+				pricesDB.find({}).toArray()
+				.then((prices)=>{
+					var kategorije = [];
+					for(var i=0;i<prices.length;i++){
+						if(prices[i].hasOwnProperty("kategorije")){
+							for(var j=0;j<prices[i].kategorije.length;j++){
+								if(kategorije.indexOf(prices[i].kategorije[j])<0){
+									kategorije.push(prices[i].kategorije[j])
+								}
+							}	
+						}
+					}
+					for(var i=0;i<informacije.length;i++){
+						for(var j=0;j<kategorije.length;j++){
+							informacije[i].kategorije.push({ime:kategorije[j],iznos:0,brojNaloga:0})
+						}
+					}
+
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].prijemnica.datum.datum){
+							for(var j=0;j<nalozi[i].obracun.length;j++){
+								nalozi[i].obracun[j].kategorije = [];
+								for(var k=0;k<prices.length;k++){
+									if(nalozi[i].obracun[j].code==prices[k].code){
+										if(prices[k].hasOwnProperty("kategorije")){
+											for(var l=0;l<prices[k].kategorije.length;l++){
+												for(var q=0;q<informacije.length;q++){
+													if(nalozi[i].prijemnica.datum.datum.includes(informacije[q].broj)){
+														for(var w=0;w<informacije[q].kategorije.length;w++){
+															if(informacije[q].kategorije[w].ime==prices[k].kategorije[l]){
+																informacije[q].kategorije[w].iznos = informacije[q].kategorije[w].iznos + parseFloat(nalozi[i].obracun[j].quantity)*parseFloat(prices[k].price);
+															}
+														}
+													}
+												}
+											}	
+										}
+									}
+								}
+							}
+						}
+					}
+
+					for(var i=0;i<informacije[0].kategorije.length;i++){
+						for(var j=1;j<informacije.length;j++){
+							for(var k=0;k<informacije[j].kategorije.length;k++){
+								if(informacije[0].kategorije[i].ime==informacije[j].kategorije[k].ime){
+									informacije[0].kategorije[i].iznos = informacije[0].kategorije[i].iznos + informacije[j].kategorije[k].iznos;
+								}
+							}
+						}
+					}
+
+					res.render("administracija/naloziPoKategorijama",{
+						pageTitle: "Категорије",
+						user: req.session.user,
+						informacije: informacije
+					});
+				})
+				.catch((error)=>{
+					logError(error)
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази података 2777.</div>"
+					});		
+				})
+
+				
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази података 2771.</div>"
+				});	
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+
+server.get('/proveraLokacijeMajstora',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			majstoriDB.find({}).toArray()
+			.then((majstori)=>{
+				res.render("administracija/proveraLokacijeMajstora",{
+					pageTitle: "Провера локације мајстора",
+					user: req.session.user,
+					majstori: majstori
+				});
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 2872.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.post('/proveraLokacijeMajstora',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var json = JSON.parse(req.body.json);
+			stariUcinakMajstoraDB.find({majstor:json.majstor,datum:json.date}).toArray()
+			.then((stariUcinci)=>{
+				console.log(stariUcinci.length);
+				var brojeviNaloga = [];
+				for(var i=0;i<stariUcinci.length;i++){
+					brojeviNaloga.push(stariUcinci[i].brojNaloga);
+				}
+				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
+				.then((nalozi)=>{
+					console.log(nalozi.length)
+					var naloziToSend = [];
+					for(var i=0;i<nalozi.length;i++){
+						var jsonToPush = {};
+						jsonToPush.broj = nalozi[i].broj;
+						jsonToPush.coordinates = nalozi[i].coordinates;
+						naloziToSend.push(jsonToPush);
+					}
+					request(ntsOptions, (error,response,body)=>{
+						if(error){
+							logError(error)
+							res.render("message",{
+								pageTitle: "Грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">Грешка у бази података 2921</div>"
+							});
+						}else{
+							var cookie = response.headers['set-cookie'];
+							var headers = {
+								'accept': 'application/json',
+						    'Cookie': cookie,
+						    'Content-Type': 'application/json'
+							}
+							var options = {
+							    url: 'http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true',
+							    method: 'GET',
+							    headers: headers
+							};
+							request(options, (error,response2,body2)=>{
+								if(error){
+									logError(error);
+									res.render("message",{
+										pageTitle: "Грешка",
+										user: req.session.user,
+										message: "<div class=\"text\">Грешка у бази података 2941</div>"
+									});
+								}else{
+									var vehicles = JSON.parse(response2.body);
+									var yesterday = new Date(json.date);
+									yesterday.setDate(yesterday.getDate()-1);
+									var options = {
+									    url: 'https://app.nts-international.net/ntsapi/stops?vehicle='+vehicles[0].vehicleId+'&from='+getDateAsStringForInputObject(yesterday)+' 00:00:00&to='+json.date+' 00:00:00&timzeone=UTC&version=2.3',
+									    method: 'GET',
+									    headers: headers
+									};
+									request(options, (error,response3,body3)=>{
+										if(error){
+											logError(error)
+										}else{
+											var stops = JSON.parse(response3.body)
+											res.render("administracija/izvestajLokacijeMajstora",{
+												pageTitle: "Извештај локације за "+json.imeMajstora+" за датум "+reshuffleDate(json.date),
+												user: req.session.user,
+												nalozi: naloziToSend,
+												stops: stops
+											});
+										}
+									});
+								}
+							});
+						}
+					});
+
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у бази података 2910</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 2904</div>"
+				});	
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
 });
 
@@ -3875,10 +4268,37 @@ server.get('/ucinakMajstora',async (req,res)=>{
 server.get('/mapa',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==5 || Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
-			res.render("mapa",{
-				pageTitle: "Мапа",
-				user: req.session.user,
-			});
+			if(Number(req.session.user.role)==20){
+				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"]}}).toArray()
+				.then((nalozi) => {
+					var naloziZaMapu = [];
+					for(var i=0;i<nalozi.length;i++){
+						var nalogZaMapu = {};
+						nalogZaMapu.broj = nalozi[i].broj;
+						nalogZaMapu.statusNaloga = nalozi[i].statusNaloga;
+						nalogZaMapu.coordinates = nalozi[i].coordinates;
+						naloziZaMapu.push(nalogZaMapu);
+					}
+					res.render("mapa",{
+						pageTitle: "Мапа",
+						nalozi: naloziZaMapu,
+						user: req.session.user
+					});
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази података 4037.</div>"
+					});
+				})
+			}else{
+				res.render("mapa",{
+					pageTitle: "Мапа",
+					user: req.session.user,
+				});	
+			}
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -5596,6 +6016,7 @@ io.on('connection', function(socket){
 	})
 
 	socket.on('lokacijaMajstora', function(broj){
+
 		request(ntsOptions, (error,response,body)=>{
 			if(error){
 				logError(error)
