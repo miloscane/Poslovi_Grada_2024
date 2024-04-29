@@ -2659,19 +2659,54 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 									naloziDB.find({broj:nalogJson.broj}).toArray()
 									.then((nalozi)=>{
 										if(nalozi.length==0){
-											naloziDB.insertOne(nalogJson)
-											.then((dbResponse)=>{
-												usersDB.find({}).toArray()
-												.then((korisnici)=>{
-													var emails = [];
-													for(var i=0;i<korisnici.length;i++){
-														if(korisnici[i].opstine){
-															if(korisnici[i].opstine.indexOf(nalogJson.radnaJedinica)>=0){
-																if(korisnici[i].hasOwnProperty("kontakt")){
-																	if(korisnici[i].kontakt instanceof Array){
-																		if(korisnici[i].kontakt.length>0){
-																			for(var j=0;j<korisnici[i].kontakt.length;j++){
-																				emails.push(korisnici[i].kontakt[j]);
+											var geoCodeHeader = {
+											    'accept': 'text/plain',
+											    'Content-Type': 'application/json'
+											};
+
+											var geoCodeOptions = {
+											    url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+encodeURIComponent(nalogJson.punaAdresa)+'&key='+process.env.googlegeocoding,
+											    method: 'GET',
+											    headers: geoCodeHeader
+											};
+											nalogJson.coordinates = {};
+
+											request(geoCodeOptions, (error,response,body)=>{
+												if(error){
+													console.log(error)
+												}else{
+													var json = JSON.parse(response.body);
+													if(json.hasOwnProperty("results")){
+														if(json.results.length>0){
+															if(json.results[0].hasOwnProperty("geometry")){
+																//console.log(json.results[0].geometry.location);
+																nalogJson.coordinates = json.results[0].geometry.location; 
+															}else{
+																console.log("No coordinates");
+															}
+														}else{
+															console.log("No coordinates");
+														}
+													}else{
+														console.log("No coordinates")
+													}
+												}
+												naloziDB.insertOne(nalogJson)
+												.then((dbResponse)=>{
+													usersDB.find({}).toArray()
+													.then((korisnici)=>{
+														var emails = [];
+														for(var i=0;i<korisnici.length;i++){
+															if(korisnici[i].opstine){
+																if(korisnici[i].opstine.indexOf(nalogJson.radnaJedinica)>=0){
+																	if(korisnici[i].hasOwnProperty("kontakt")){
+																		if(korisnici[i].kontakt instanceof Array){
+																			if(korisnici[i].kontakt.length>0){
+																				for(var j=0;j<korisnici[i].kontakt.length;j++){
+																					emails.push(korisnici[i].kontakt[j]);
+																				}
+																			}else{
+																				emails.push("radninalog@poslovigrada.rs")
 																			}
 																		}else{
 																			emails.push("radninalog@poslovigrada.rs")
@@ -2679,46 +2714,44 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 																	}else{
 																		emails.push("radninalog@poslovigrada.rs")
 																	}
-																}else{
-																	emails.push("radninalog@poslovigrada.rs")
 																}
 															}
 														}
-													}
 
-													var mailOptions = {
-														from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
-														to: emails.join(","),
-														subject: 'Додељен вам је нови налог број '+nalogJson.broj,
-														html: 'Поштовани,<br>Додељен вам је нови ВиК налог на порталу послова града.<br>Број налога: '+nalogJson.broj+'<br>Радна јединица: '+nalogJson.radnaJedinica+'<br>Адреса: <a href=\"https://www.google.com/maps/search/?api=1&query='+nalogJson.adresa.replace(/,/g, '%2C').replace(/ /g, '+')+'\">'+nalogJson.adresa+'</a><br>Захтевалац: '+ nalogJson.zahtevalac+'<br>Опис проблема: '+nalogJson.opis+'<br><a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">Отвори налог на порталу</a>',
-													};
+														var mailOptions = {
+															from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+															to: emails.join(","),
+															subject: 'Додељен вам је нови налог број '+nalogJson.broj,
+															html: 'Поштовани,<br>Додељен вам је нови ВиК налог на порталу послова града.<br>Број налога: '+nalogJson.broj+'<br>Радна јединица: '+nalogJson.radnaJedinica+'<br>Адреса: <a href=\"https://www.google.com/maps/search/?api=1&query='+nalogJson.adresa.replace(/,/g, '%2C').replace(/ /g, '+')+'\">'+nalogJson.adresa+'</a><br>Захтевалац: '+ nalogJson.zahtevalac+'<br>Опис проблема: '+nalogJson.opis+'<br><a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">Отвори налог на порталу</a>',
+														};
 
-													transporter.sendMail(mailOptions, (error, info) => {
-														if (error) {
-															logError(error);
-															res.redirect("/nalog/"+nalogJson.broj);
-														}else{
-															res.redirect("/nalog/"+nalogJson.broj);
-														}
-													});
+														transporter.sendMail(mailOptions, (error, info) => {
+															if (error) {
+																logError(error);
+																res.redirect("/nalog/"+nalogJson.broj);
+															}else{
+																res.redirect("/nalog/"+nalogJson.broj);
+															}
+														});
+													})
+													.catch((error)=>{
+														logError(error);
+														res.render("message",{
+															pageTitle: "Програмска грешка",
+															user: req.session.user,
+															message: "<div class=\"text\">Дошло је до грешке у бази податка 2301.</div>"
+														});
+													})
+													
 												})
 												.catch((error)=>{
 													logError(error);
 													res.render("message",{
 														pageTitle: "Програмска грешка",
 														user: req.session.user,
-														message: "<div class=\"text\">Дошло је до грешке у бази податка 2301.</div>"
+														message: "<div class=\"text\">Дошло је до грешке у бази податка 879.</div>"
 													});
 												})
-												
-											})
-											.catch((error)=>{
-												logError(error);
-												res.render("message",{
-													pageTitle: "Програмска грешка",
-													user: req.session.user,
-													message: "<div class=\"text\">Дошло је до грешке у бази податка 879.</div>"
-												});
 											})
 										}else{
 											res.render("message",{
