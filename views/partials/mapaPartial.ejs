@@ -188,6 +188,34 @@
 	},300000)
 
 	markers = [];
+
+	function hideNaloge(elem){
+		if(Number(elem.dataset.hidden)==0){
+			elem.dataset.hidden =	1;
+			elem.innerHTML = "Прикажи налоге";
+			showNalogMarkers(1);
+		}else if(Number(elem.dataset.hidden)==1){
+			elem.dataset.hidden	=	0;
+			elem.innerHTML = "Сакриј налоге";
+			showNalogMarkers(0);
+		}
+	}
+
+	function showNalogMarkers(hidden){
+		if(hidden==1){
+			for(var i=0;i<markers.length;i++){
+				if(markers[i].icon.url=="https://maps.google.com/mapfiles/ms/icons/red-dot.png"){
+					markers[i].setMap(null);
+				}
+			}
+		}else if(hidden==0){
+			for(var i=0;i<markers.length;i++){
+				if(markers[i].icon.url=="https://maps.google.com/mapfiles/ms/icons/red-dot.png"){
+					markers[i].setMap(map);
+				}
+			}
+		}
+	}
 	
 	socket.on("lokacijaMajstoraOdgovor",function(data){
 		if(data instanceof Array){

@@ -5,7 +5,7 @@ const http								=	require('http').Server(server);
 const fs 									=	require('fs');
 const express							=	require('express');
 const bodyParser					=	require('body-parser');    
-const session							=	require('cookie-session');
+const session							=	require('express-session');
 const nodemailer					=	require('nodemailer');
 const dotenv 							=	require('dotenv');
 const cookieParser				=	require('cookie-parser');
@@ -2008,9 +2008,10 @@ server.post('/login',async (req,res)=>{
 
 server.get('/logout',async (req,res)=>{
 	if(req.session){
-		req.session.destroy(function(){});
+		res.session=null;
 	}
-	res.redirect('/login');
+		res.redirect('/login');
+
 });
 
 server.get('/zaboravljena-lozinka',async (req,res)=>{
