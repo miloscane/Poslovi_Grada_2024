@@ -5821,12 +5821,14 @@ server.get('/portalStambenoNalozi', async (req, res)=> {
 	nalogJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
 	nalogJSON.req = req.toString()
 	nalogJSON.reqObject = req;
+	nalogJSON.source = "GET";
 	if(stambenoDB){
 		stambenoDB.insertOne(nalogJSON)
 		.then((dbResponse)=>{
 			res.status(200);
 			res.send("Ok");
 		}).catch((err)=>{
+			logError(error)
 			res.status(500);
 			res.send("Database error");
 		})	
@@ -5834,10 +5836,23 @@ server.get('/portalStambenoNalozi', async (req, res)=> {
 });
 
 server.post('/portalStambenoNalozi', async (req, res)=> {
-	console.log("POST od portala!")
-	console.log(req.body);
-	console.log("-----------------------------");
-	res.send("Ok i get it you posted a thing");
+	var nalogJSON = {};
+	nalogJSON.datetime = new Date().getTime();
+	nalogJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
+	nalogJSON.req = req.toString()
+	nalogJSON.reqObject = req;
+	nalogJSON.source = "POST";
+	if(stambenoDB){
+		stambenoDB.insertOne(nalogJSON)
+		.then((dbResponse)=>{
+			res.status(200);
+			res.send("Ok");
+		}).catch((err)=>{
+			logError(error)
+			res.status(500);
+			res.send("Database error");
+		})	
+	}
 });
 
 
