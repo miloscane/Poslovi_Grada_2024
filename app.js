@@ -727,6 +727,7 @@ http.listen(process.env.PORT, function(){
 		magacinReversiDB			=	client.db("Poslovi_Grada_2024").collection('magacinReversi');
 		specifikacijePodizvodjacaDB			=	client.db("Poslovi_Grada_2024").collection('specifikacijePodizvodjaca');
 		errorDB								=	client.db("Poslovi_Grada_2024").collection('errors');
+		stambenoDB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno')
 
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
@@ -5815,10 +5816,21 @@ server.get('/uspesnoFakturisano',async (req,res)=>{
 });
 
 server.get('/portalStambenoNalozi', async (req, res)=> {
-	console.log("GET od portala!")
-	console.log(req.body);
-	console.log("-----------------------------");
-	res.send("Ok i get you");
+	var nalogJSON = {};
+	nalogJSON.datetime = new Date().getTime();
+	nalogJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
+	nalogJSON.req = req.toString()
+	nalogJSON.reqObject = req;
+	if(stambenoDB){
+		stambenoDB.insertOne(nalogJSON)
+		.then((dbResponse)=>{
+			res.status(200);
+			res.send("Ok");
+		}).catch((err)=>{
+			res.status(500);
+			res.send("Database error");
+		})	
+	}
 });
 
 server.post('/portalStambenoNalozi', async (req, res)=> {
