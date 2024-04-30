@@ -5828,7 +5828,7 @@ server.get('/portalStambenoNalozi', async (req, res)=> {
 			res.status(200);
 			res.send("Ok");
 		}).catch((err)=>{
-			logError(error)
+			logError(err)
 			res.status(500);
 			res.send("Database error");
 		})	
@@ -5848,7 +5848,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 			res.status(200);
 			res.send("Ok");
 		}).catch((err)=>{
-			logError(error)
+			logError(err)
 			res.status(500);
 			res.send("Database error");
 		})	
