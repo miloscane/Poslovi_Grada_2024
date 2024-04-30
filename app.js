@@ -5819,7 +5819,8 @@ server.get('/portalStambenoNalozi', async (req, res)=> {
 	var nalogJSON = {};
 	nalogJSON.datetime = new Date().getTime();
 	nalogJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
-	nalogJSON.reqObject = req;
+	nalogJSON.reqBody = req.body;
+	nalogJSON.reqHeader = req.header;
 	nalogJSON.source = "GET";
 	if(stambenoDB){
 		stambenoDB.insertOne(nalogJSON)
@@ -5838,7 +5839,8 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 	var nalogJSON = {};
 	nalogJSON.datetime = new Date().getTime();
 	nalogJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
-	nalogJSON.reqObject = req;
+	nalogJSON.reqBody = req.body;
+	nalogJSON.reqHeader = req.header;
 	nalogJSON.source = "POST";
 	if(stambenoDB){
 		stambenoDB.insertOne(nalogJSON)
