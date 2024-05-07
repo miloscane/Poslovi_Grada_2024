@@ -172,7 +172,8 @@
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value iznos");
 								div.innerHTML = brojSaRazmacima(naloziToShow[i].ukupanIznos);
-								ukupanIznos = ukupanIznos + parseFloat(naloziToShow[i].ukupanIznos);
+								var iznosNaloga = isNaN(naloziToShow[i].ukupanIznos) ? -1 : parseFloat(naloziToShow[i].ukupanIznos);
+								ukupanIznos = ukupanIznos + iznosNaloga;
 								td.appendChild(div);
 							tr.appendChild(td);
 							
