@@ -781,6 +781,17 @@ http.listen(process.env.PORT, function(){
 		})
 		
 
+		/*var setObj	=	{ $set: {
+			datumPopisa: "12-05-2024",
+		}};
+		proizvodiDB.updateMany({},setObj)
+		.then((dbResponse)=>{
+			console.log(dbResponse)
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
+
 		/*var kategorije = fs.readFileSync("kategorije.csv",{encoding:"utf8"});
 		var kategorijeArray = kategorije.split("\r\n");
 		kategorijeArray.forEach((value, index) =>
@@ -1570,6 +1581,7 @@ request(geoCodeOptions, (error,response,body)=>{
 		})*/
 
 
+	
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
@@ -1640,13 +1652,17 @@ request(geoCodeOptions, (error,response,body)=>{
 			console.log(error)
 		})*/
 
+
+
+		//ZA KNJIGOVODJU
+
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
-						if(nalozi[i].prijemnica.datum.datum.includes(".03.2024")){
+						if(nalozi[i].prijemnica.datum.datum.includes(".04.2024")){
 							naloziToExport.push(nalozi[i])
 						}
 					}
@@ -1701,7 +1717,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<problemNalozi.length;i++){
 				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+",Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", , , , , , , , , , ,\r\n";
 			}
-			fs.writeFileSync("./Minimax-03-2024.csv",csvString,"utf8");
+			fs.writeFileSync("./Minimax-04-2024.csv",csvString,"utf8");
 			console.log("Written ")
 		})
 		.catch((error)=>{
