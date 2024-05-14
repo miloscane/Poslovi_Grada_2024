@@ -689,7 +689,7 @@ function brojSaRazmacima(x) {
     return parts.join(",");
 }
 
-
+var navigacijaInfo = [];
 var cenovnik;
 var cenovnikHigh;
 var cenovnikLow;
@@ -704,6 +704,7 @@ var pricesLowDB;
 var proizvodiDB;
 var ucinakMajstoraDB;
 var errorDB;
+var navigacijaInfoDB;
 
 http.listen(process.env.PORT, function(){
 	console.log("Poslovi Grada 2024");
@@ -727,7 +728,8 @@ http.listen(process.env.PORT, function(){
 		magacinReversiDB			=	client.db("Poslovi_Grada_2024").collection('magacinReversi');
 		specifikacijePodizvodjacaDB			=	client.db("Poslovi_Grada_2024").collection('specifikacijePodizvodjaca');
 		errorDB								=	client.db("Poslovi_Grada_2024").collection('errors');
-		stambenoDB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno')
+		stambenoDB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno');
+		navigacijaInfoDB			=	client.db("Poslovi_Grada_2024").collection('NavigacijaInfo');
 
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
@@ -737,6 +739,47 @@ http.listen(process.env.PORT, function(){
 		stariProizvodiDB			=	client.db("Poslovi-Grada").collection('magacin-proizvodi-4');
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
+
+		//navigacija informacije
+		var vozila = fs.readFileSync("navigacija.csv",{encoding:"utf8"});
+		var vozilaArray = vozila.split("\r\n");
+		var vozilaJsons = [];
+		for(var i=0;i<vozilaArray.length;i++){
+			var voziloArray = vozilaArray[i].split(";");
+			var voziloJson = {};
+			voziloJson.imeNaNavigaciji = voziloArray[1];
+			voziloJson.brojTablice = voziloArray[2];
+			voziloJson.brojVozila = voziloArray[3];
+			voziloJson.imeMajstora = voziloArray[4];
+			voziloJson.tipVozila = voziloArray[5];
+			voziloJson.idNavigacije = Number(voziloArray[6]);
+			voziloJson.idMajstora = "";
+			voziloJson.nadimakMajstora = "";
+			voziloJson.status = 1;
+			vozilaJsons.push(voziloJson)
+		} 
+
+		/*navigacijaInfoDB.insertMany(vozilaJsons)
+		.then((dbResponse)=>{
+			console.log(dbResponse)
+		})
+		.catch((error)=>{
+			console.log("INSERT FAILED!!!!!!!!!!!!!!!!!!!!!!!");
+		})*/
+
+		navigacijaInfoDB.find({}).toArray()
+		.then((info)=>{
+			for(var i=0;i<info.length;i++){
+				if(Number(info[i].status)==1){
+					navigacijaInfo.push(info[i])
+				}
+			}
+			console.log("Navigacija inicijalizovana");
+		})
+		.catch((error)=>{
+			console.log(error)
+		})
+		
 
 		/*var kategorije = fs.readFileSync("kategorije.csv",{encoding:"utf8"});
 		var kategorijeArray = kategorije.split("\r\n");
@@ -6149,18 +6192,42 @@ io.on('connection', function(socket){
 							}else{
 								try{
 									var vehiclesInfo = JSON.parse(response3.body);
+									//console.log(vehiclesInfo);
 									try{
 										var vehicleStates = JSON.parse(response2.body);
 										/*console.log(vehicleStates)
 										console.log("---------------------------------------------------")
 										console.log(vehiclesInfo)*/
-										for(var i=0;i<vehicleStates.length;i++){
+										/*for(var i=0;i<vehicleStates.length;i++){
 											for(var j=0;j<vehiclesInfo.length;j++){
 												if(vehicleStates[i].vehicleId==vehiclesInfo[j].id){
 													vehicleStates[i].licenceplate = vehiclesInfo[j].licenceplate;
 												}
 											}
+										}*/
+										for(var i=0;i<navigacijaInfo.length;i++){
+											for(var j=0;j<vehicleStates.length;j++){
+												if(navigacijaInfo[i].idNavigacije==vehicleStates[j].vehicleId){
+													vehicleStates[j].imeMajstora = navigacijaInfo[i].imeMajstora;
+													vehicleStates[j].nadimakMajstora = navigacijaInfo[i].nadimakMajstora;
+													vehicleStates[j].brojTablice = navigacijaInfo[i].brojTablice;
+													vehicleStates[j].brojVozila = navigacijaInfo[i].brojVozila;
+													vehicleStates[j].tipVozila = navigacijaInfo[i].tipVozila;
+													vehicleStates[j].statusVozila = navigacijaInfo[i].status;
+												}
+											}
 										}
+
+										for(var i=0;i<vehicleStates.length;i++){
+											if(!vehicleStates[i].statusVozila){
+												vehicleStates.splice(i,1);
+												i--;
+											}
+										}
+
+										/*for(var i=0;i<vehicleStates.length;i++){
+											console.log(vehicleStates[i].statusMajstora)
+										}*/
 										socket.emit('lokacijaMajstoraOdgovor',vehicleStates)
 									}catch(err){
 										logError(err)

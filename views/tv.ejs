@@ -31,7 +31,17 @@
 				</div>
 			</div>
 		</div>
-		
+		<style>
+			.gm-style-iw-d{
+				padding:0 !important;
+				overflow:hidden !important;
+			}
+
+			.gm-style .gm-style-iw-c{
+				padding:0 !important;
+				overflow:hidden !important;
+			}
+		</style>
 		<div id="map"></div>
 		<script>
 			var map;
@@ -252,6 +262,7 @@
 			
 			socket.on("lokacijaMajstoraOdgovor",function(data){
 				if(data instanceof Array){
+					console.log(data)
 					if(markers.length==0){
 						for(var i=0;i<data.length;i++){
 							if(!isNaN(parseFloat(data[i].gpsLat)) && !isNaN(parseFloat(data[i].gpsLon))){
@@ -263,7 +274,7 @@
 							         }
 							    });
 							    var infowindow = new google.maps.InfoWindow({
-									content: data[i].licenceplate
+									content: "<div style=\"text-align:center;padding-top:8px;padding-left:4px;padding-right:4px\">"+data[i].imeMajstora.split(" ")[0]+"<br>"+data[i].imeMajstora.split(" ")[1]+"</div>"
 								});
 								infowindow.open(map,marker);
 							    markers.push(marker)
@@ -300,6 +311,6 @@
 			})
 
 		</script>
-		<script src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyAsUyoMs0Ba_6bPbtD5A5_1yOJXjjMYsMQ&amp;callback=initMap" async="" defer=""></script>
+		<script src="https://maps.googleapis.com/maps/api/js?v=1&key=AIzaSyAsUyoMs0Ba_6bPbtD5A5_1yOJXjjMYsMQ&amp;callback=initMap" async="" defer=""></script>
 	</div>
 <%- include ("partials/footer") -%>
