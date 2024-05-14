@@ -5855,6 +5855,45 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 	}
 });
 
+server.get('/tv', async (req, res)=> {
+    naloziDB.find({statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Storniran"]}}).toArray()
+    .then((nalozi)=>{
+        var naloziToSend = [];
+        for(var i=0;i<nalozi.length;i++){
+        	var nalogToPush = {};
+        	nalogToPush.coordinates = nalozi[i].coordinates;
+        	nalogToPush.broj = nalozi[i].broj;
+        	nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
+        	nalogToPush.statusNaloga = nalozi[i].statusNaloga;
+          naloziToSend.push(nalogToPush);
+        }
+        majstoriDB.find({}).toArray()
+        .then((majstori)=>{
+            res.render("tv",{
+                majstori: majstori,
+                nalozi: naloziToSend,
+                pageTitle: "Мапа"
+            })
+        })
+        .catch((error)=>{
+            logError(error);
+            res.render("message",{
+                pageTitle: "Грешка",
+                user: req.session.user,
+                message: "<div class=\"text\">Грешка у бази података 5870.</div>"
+            });
+        });
+    })
+    .catch((error)=>{
+        logError(error);
+        res.render("message",{
+            pageTitle: "Грешка",
+            user: req.session.user,
+            message: "<div class=\"text\">Грешка у бази података 5871.</div>"
+        });
+    });
+});
+
 
 io.on('connection', function(socket){
 	socket.on('listaNalogaAdministracija', function(odDatuma,doDatuma,adresa,opstine){
