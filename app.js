@@ -741,7 +741,7 @@ http.listen(process.env.PORT, function(){
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
 		//navigacija informacije
-		var vozila = fs.readFileSync("navigacija.csv",{encoding:"utf8"});
+		/*var vozila = fs.readFileSync("navigacija.csv",{encoding:"utf8"});
 		var vozilaArray = vozila.split("\r\n");
 		var vozilaJsons = [];
 		for(var i=0;i<vozilaArray.length;i++){
@@ -757,7 +757,7 @@ http.listen(process.env.PORT, function(){
 			voziloJson.nadimakMajstora = "";
 			voziloJson.status = 1;
 			vozilaJsons.push(voziloJson)
-		} 
+		} */
 
 		/*navigacijaInfoDB.insertMany(vozilaJsons)
 		.then((dbResponse)=>{
