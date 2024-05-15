@@ -2068,7 +2068,7 @@ server.post('/login',async (req,res)=>{
 
 server.get('/logout',async (req,res)=>{
 	if(req.session){
-		res.session=null;
+		req.session.destroy(function(){});
 	}
 		res.redirect('/login');
 

@@ -67,6 +67,11 @@ function reshuffleDateInverse(date){//gets dd.mm.yyyy. and returns yyyy-mm-dd
   return  array[2]+"-"+array[1]+"-"+array[0];
 }
 
+function reshuffleDateInverse2(date){//gets dd-mm-yyyy and returns yyyy-mm-dd
+  var array = date.split("-");
+  return  array[2]+"-"+array[1]+"-"+array[0];
+}
+
 function getDateAsStringForDisplay(date){
   var yearString  = date.getFullYear();
   var month   = eval(date.getMonth()+1);
