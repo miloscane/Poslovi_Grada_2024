@@ -355,7 +355,7 @@
 
 											doc.setFont('PTSans'); // set font
 											doc.getFontList("PTSans");
-										    doc.addImage(logoLogoBlob, 'PNG', 5, 5, 150/mm, 153/mm,'','FAST');
+										    //doc.addImage(logoLogoBlob, 'PNG', 5, 5, 150/mm, 153/mm,'','FAST');
 									        doc.setFontType("bold");
 											doc.setFontSize(16);
 									        doc.text("Послови Града доо",205,yPos,'right');
@@ -380,6 +380,8 @@
 									        doc.setFontType("normal");
 											doc.setFontSize(16);
 											yPos = yPos + 10;
+											doc.text(nalog.adresa,pageWidth/2,yPos,'center');
+											yPos = yPos + 10;
 									        doc.text(vremePrijema(revers.datetime),pageWidth/2,yPos,'center');
 											yPos = yPos + 10;
 									        doc.setFontType("bold");
@@ -391,7 +393,7 @@
 									        	doc.setFontType("bold");
 												doc.text(eval(i+1).toString()+".",5,yPos);
 												doc.setFontType("normal");
-												doc.text(getProductById(revers.zaduzenje[i].uniqueId).name,10,yPos);
+												doc.text(getProductById(revers.zaduzenje[i].uniqueId).name,15,yPos);
 												doc.text(revers.zaduzenje[i].quantity+" kom.",120,yPos);
 												yPos = yPos + 7;
 												if(yPos>285){
@@ -431,7 +433,7 @@
 
 											doc.setFont('PTSans'); // set font
 											doc.getFontList("PTSans");
-										    doc.addImage(logoLogoBlob, 'PNG', 5, 5, 150/mm, 153/mm,'','FAST');
+										    //doc.addImage(logoLogoBlob, 'PNG', 5, 5, 150/mm, 153/mm,'','FAST');
 									        doc.setFontType("bold");
 											doc.setFontSize(16);
 									        doc.text("Послови Града доо.",205,yPos,'right');
@@ -456,10 +458,13 @@
 									        doc.setFontType("normal");
 											doc.setFontSize(16);
 											yPos = yPos + 10;
+											doc.text(nalog.adresa,pageWidth/2,yPos,'center');
+											yPos = yPos + 10;
 									        doc.text(vremePrijema(revers.datetime),pageWidth/2,yPos,'center');
 											yPos = yPos + 10;
 									        doc.setFontType("bold");
 											doc.text("Требован материјал:",5,yPos);
+											doc.text("Враћен материјал:",150,yPos);
 											doc.setFontType("normal");
 											doc.setFontSize(14);
 											yPos = yPos + 7;
@@ -467,15 +472,16 @@
 									        	doc.setFontType("bold");
 												doc.text(eval(i+1).toString()+".",5,yPos);
 												doc.setFontType("normal");
-												doc.text(getProductById(revers.zaduzenje[i].uniqueId).name,10,yPos);
+												doc.text(getProductById(revers.zaduzenje[i].uniqueId).name,15,yPos);
 												doc.text(revers.zaduzenje[i].quantity+" kom.",120,yPos);
+												doc.text(revers.zaduzenje[i].quantity2+" kom.",150,yPos);
 												yPos = yPos + 7;
 												if(yPos>285){
 													doc.addPage()
 													yPos = 5;
 												}
 											}
-											yPos = yPos + 10;
+											/*yPos = yPos + 10;
 											if(yPos>285){
 												doc.addPage()
 												yPos = 5;
@@ -501,7 +507,7 @@
 													doc.addPage()
 													yPos = 5;
 												}
-											}
+											}*/
 
 											doc.setFontType("bold");
 											doc.text(getMajstorByCode(revers.majstor).ime,5,yPos);
