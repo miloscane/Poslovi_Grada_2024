@@ -380,7 +380,8 @@
 									        doc.setFontType("normal");
 											doc.setFontSize(16);
 											yPos = yPos + 10;
-											doc.text(nalog.adresa,pageWidth/2,yPos,'center');
+											var adresa = nalog.adresa ? nalog.adresa : " ";
+											doc.text(adresa,pageWidth/2,yPos,'center');
 											yPos = yPos + 10;
 									        doc.text(vremePrijema(revers.datetime),pageWidth/2,yPos,'center');
 											yPos = yPos + 10;
@@ -458,7 +459,8 @@
 									        doc.setFontType("normal");
 											doc.setFontSize(16);
 											yPos = yPos + 10;
-											doc.text(nalog.adresa,pageWidth/2,yPos,'center');
+											var adresa = nalog.adresa ? nalog.adresa : " ";
+											doc.text(adresa,pageWidth/2,yPos,'center');
 											yPos = yPos + 10;
 									        doc.text(vremePrijema(revers.datetime),pageWidth/2,yPos,'center');
 											yPos = yPos + 10;
