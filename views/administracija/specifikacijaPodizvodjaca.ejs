@@ -2,6 +2,10 @@
 <script>
 	var specifikacija = <%-JSON.stringify(specifikacija)%>;
 	console.log(specifikacija);
+	var umanjenje = 1;
+	if(Number(specifikacija.datum.datetime)>1714521600000){
+		umanjenje = 0.675;
+	}
 </script>
 	<div class="pageWidth podizvodjac podizvodjacSpecifikacija">
 		<div class="lightBlueBox">
@@ -66,12 +70,26 @@
 				<div class="box">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
 					<div class="info">
-						<div class="title">Износ Послови Града</div>
+						<div class="title">Износ Премијус</div>
+						<div class="text"><span id="iznos-premijus"></span></div>
+						<script>
+							var iznosPremijus = 0;
+							for(var i=0;i<specifikacija.nalozi.length;i++){
+								iznosPremijus = iznosPremijus + parseFloat(specifikacija.nalozi[i].iznosPG);
+							}
+							document.getElementById("iznos-premijus").innerHTML = brojSaRazmacima(iznosPremijus)+" дин.";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Износ ПГ</div>
 						<div class="text"><span id="iznos-pg"></span></div>
 						<script>
 							var iznosPG = 0;
 							for(var i=0;i<specifikacija.nalozi.length;i++){
-								iznosPG = iznosPG + parseFloat(specifikacija.nalozi[i].iznosPG);
+								iznosPG = iznosPG + parseFloat(specifikacija.nalozi[i].iznosPG)*umanjenje;
 							}
 							document.getElementById("iznos-pg").innerHTML = brojSaRazmacima(iznosPG)+" дин.";
 						</script>
@@ -80,20 +98,22 @@
 				<div class="box">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
 					<div class="info">
-						<div class="title">Профит</div>
-						<div class="text"><span id="iznos-profita"></span></div>
+						<div class="title">Профит Премијус</div>
+						<div class="text"><span id="iznos-profita-premijus"></span></div>
 						<script>
-							document.getElementById("iznos-profita").innerHTML = brojSaRazmacima(iznosPG-parseFloat(specifikacija.ukupanIznos))+" дин.";
+							var procenat = eval(100-parseFloat(specifikacija.ukupanIznos)/iznosPremijus*100);
+							document.getElementById("iznos-profita-premijus").innerHTML = brojSaRazmacima(iznosPremijus-parseFloat(specifikacija.ukupanIznos))+" дин.<br>" + brojSaRazmacima(procenat)+"%";
 						</script>
 					</div>
 				</div>
 				<div class="box">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
 					<div class="info">
-						<div class="title">Процентуални профит</div>
-						<div class="text"><span id="iznos-profita-procenat"></span></div>
+						<div class="title">Профит ПГ</div>
+						<div class="text"><span id="iznos-profita-pg"></span></div>
 						<script>
-							document.getElementById("iznos-profita-procenat").innerHTML = brojSaRazmacima(eval(100-parseFloat(specifikacija.ukupanIznos)/iznosPG*100))+" %";
+							var procenat2 = eval(100-parseFloat(specifikacija.ukupanIznos)/iznosPG*100);
+							document.getElementById("iznos-profita-pg").innerHTML = brojSaRazmacima(iznosPG-parseFloat(specifikacija.ukupanIznos))+" дин.<br>" + brojSaRazmacima(procenat2)+"%";
 						</script>
 					</div>
 				</div>
@@ -138,6 +158,16 @@
 						var item = document.createElement("DIV");
 						item.setAttribute("class","inline iznos");
 						item.innerHTML = eval(100-parseFloat(specifikacija.nalozi[i].ukupanIznos)/parseFloat(specifikacija.nalozi[i].iznosPG)*100).toFixed(2)+"%";
+						row.appendChild(item);
+
+						var item = document.createElement("DIV");
+						item.setAttribute("class","inline iznos");
+						item.innerHTML = brojSaRazmacima(specifikacija.nalozi[i].iznosPG*umanjenje);
+						row.appendChild(item);
+
+						var item = document.createElement("DIV");
+						item.setAttribute("class","inline iznos");
+						item.innerHTML = eval(100-parseFloat(specifikacija.nalozi[i].ukupanIznos)/parseFloat(specifikacija.nalozi[i].iznosPG*umanjenje)*100).toFixed(2)+"%";
 						row.appendChild(item);
 
 

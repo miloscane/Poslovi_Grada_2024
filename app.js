@@ -1193,6 +1193,27 @@ request(geoCodeOptions, (error,response,body)=>{
 			logError(error);
 		});
 
+
+		//ubacivanje cena za ucinak
+		var cenovnikUcinak = fs.readFileSync("./cenovnikUcinak.csv",{encoding:"utf8"});
+		var cenovnikUcinakArray = cenovnikUcinak.split("\r\n");
+		cenovnikUcinakArray.splice(0,1);
+		for(var i=0;i<4;i++){
+			cenovnikUcinakArray.splice(cenovnikUcinakArray.length-1,1);
+		}
+		cenovnikUcinakJsons = [];
+		for(var i=0;i<cenovnikUcinakArray.length;i++){
+			var cenovnikUcinakArray2 = cenovnikUcinakArray[i].split(";");
+			var cenovnikJson = {};
+			cenovnikJson.code = cenovnikUcinakArray2[1];
+			cenovnikJson.price = parseFloat(cenovnikUcinakArray2[9].split(".").join(""));
+			//console.log(cenovnikJson);
+			cenovnikUcinakJsons.push(cenovnikJson);
+		}
+
+		
+
+
 		/*errorDB.find({}).toArray()
 		.then((errors)=>{
 			console.log(errors)
@@ -6076,18 +6097,35 @@ io.on('connection', function(socket){
 			statistika.osnovica							=	0;
 			statistika.neoporezivo					=	0;
 
+			statistika.ukupnoNalogaPG					=	naloziToSend.length;
+			statistika.ukupanIznosPG					=	0;
+			statistika.ukupanPdvPG						=	0;
+			statistika.ukupnoPrekoPolaMilPG		=	0;
+			statistika.osnovicaPG							=	0;
+			statistika.neoporezivoPG					=	0;
+
 			for(var i=0;i<naloziToSend.length;i++){
 				if(isNaN(parseFloat(naloziToSend[i].ukupanIznos))){
 					warnings.push("Nalog "+ naloziToSend.broj +" nema definisan iznos ("+naloziToSend[i].ukupanIznos+").")
 				}
 				var iznosNaloga = isNaN(parseFloat(naloziToSend[i].ukupanIznos)) ? 0 : parseFloat(naloziToSend[i].ukupanIznos);
-				statistika.ukupanIznos = statistika.ukupanIznos + iznosNaloga
+				var iznosNalogaPG = iznosNaloga * 0.675;
+				statistika.ukupanIznos = statistika.ukupanIznos + iznosNaloga;
+				statistika.ukupanIznosPG = statistika.ukupanIznosPG + iznosNalogaPG;
 				if(iznosNaloga>=500000){
 					statistika.ukupnoPrekoPolaMil++;
-					statistika.neoporezivo	= statistika.neoporezivo + parseFloat(naloziToSend[i].ukupanIznos)
+					statistika.neoporezivo	= statistika.neoporezivo + iznosNaloga
 				}else{
 					statistika.ukupanPdv = statistika.ukupanPdv + iznosNaloga*0.2;
-					statistika.osnovica	= statistika.osnovica + parseFloat(naloziToSend[i].ukupanIznos)
+					statistika.osnovica	= statistika.osnovica + iznosNaloga;
+				}
+
+				if(iznosNalogaPG>=500000){
+					statistika.ukupnoPrekoPolaMilPG++;
+					statistika.neoporezivo	= statistika.neoporezivo + iznosNalogaPG;
+				}else{
+					statistika.ukupanPdvPG = statistika.ukupanPdvPG + iznosNalogaPG*0.2;
+					statistika.osnovicaPG	= statistika.osnovicaPG + iznosNalogaPG;
 				}
 			}
 			naloziToSend = naloziToSend.sort((a, b) => {
@@ -6134,18 +6172,35 @@ io.on('connection', function(socket){
 			statistika.osnovica							=	0;
 			statistika.neoporezivo					=	0;
 
+			statistika.ukupnoNalogaPG					=	naloziToSend.length;
+			statistika.ukupanIznosPG					=	0;
+			statistika.ukupanPdvPG						=	0;
+			statistika.ukupnoPrekoPolaMilPG		=	0;
+			statistika.osnovicaPG							=	0;
+			statistika.neoporezivoPG					=	0;
+
 			for(var i=0;i<naloziToSend.length;i++){
 				if(isNaN(parseFloat(naloziToSend[i].ukupanIznos))){
 					warnings.push("Nalog "+ naloziToSend.broj +" nema definisan iznos ("+naloziToSend[i].ukupanIznos+").")
 				}
 				var iznosNaloga = isNaN(parseFloat(naloziToSend[i].ukupanIznos)) ? 0 : parseFloat(naloziToSend[i].ukupanIznos);
-				statistika.ukupanIznos = statistika.ukupanIznos + iznosNaloga
+				var iznosNalogaPG = iznosNaloga * 0.675;
+				statistika.ukupanIznos = statistika.ukupanIznos + iznosNaloga;
+				statistika.ukupanIznosPG = statistika.ukupanIznosPG + iznosNalogaPG;
 				if(iznosNaloga>=500000){
 					statistika.ukupnoPrekoPolaMil++;
-					statistika.neoporezivo	= statistika.neoporezivo	+ iznosNaloga;
+					statistika.neoporezivo	= statistika.neoporezivo + iznosNaloga
 				}else{
 					statistika.ukupanPdv = statistika.ukupanPdv + iznosNaloga*0.2;
-					statistika.osnovica	= statistika.osnovica	+ iznosNaloga;
+					statistika.osnovica	= statistika.osnovica + iznosNaloga;
+				}
+
+				if(iznosNalogaPG>=500000){
+					statistika.ukupnoPrekoPolaMilPG++;
+					statistika.neoporezivo	= statistika.neoporezivo + iznosNalogaPG;
+				}else{
+					statistika.ukupanPdvPG = statistika.ukupanPdvPG + iznosNalogaPG*0.2;
+					statistika.osnovicaPG	= statistika.osnovicaPG + iznosNalogaPG;
 				}
 			}
 			naloziToSend = naloziToSend.sort((a, b) => {

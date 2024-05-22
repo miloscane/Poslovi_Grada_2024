@@ -20,32 +20,54 @@
 						tr.appendChild(td);
 						
 						var td = document.createElement("TD");
+						td.innerHTML="Износ Премијус";
+						tr.appendChild(td);
+						
+						var td = document.createElement("TD");
 						td.innerHTML="Износ ПГ";
 						tr.appendChild(td);
 						
 						var td = document.createElement("TD");
-						td.innerHTML="Добит";
+						td.innerHTML="Добит Премијус";
+						tr.appendChild(td);
+						
+						var td = document.createElement("TD");
+						td.innerHTML="Добит ПГ";
 						tr.appendChild(td);
 					document.getElementById("total-table").appendChild(tr);
 					var ukupanIznos = 0;
+					var ukupanIznosPremijus = 0;
 					var ukupanIznosPG = 0;
-					var ukupnaDobit = 0;
+					var ukupnaDobitPremijus = 0;
+					var ukupnaDobitPG = 0;
 					for(var i=0;i<meseciJson.length;i++){
 						meseciJson[i].iznos = 0;
+						meseciJson[i].iznosPremijus = 0;
 						meseciJson[i].iznosPG = 0;
-						meseciJson[i].dobit = 0;
+						meseciJson[i].dobitPremijus = 0;
+						meseciJson[i].dobitPG = 0;
 					}
 
 					for(var i=0;i<specifikacije.length;i++){
+						var umanjenje = 1;
+						if(Number(specifikacije[i].datum.datetime)>1714521600000){
+							umanjenje = 0.675;
+						}
 						ukupanIznos = ukupanIznos + parseFloat(specifikacije[i].ukupanIznos);
-						ukupanIznosPG = ukupanIznosPG + parseFloat(specifikacije[i].ukupanIznosPG);
+						ukupanIznosPremijus = ukupanIznosPremijus + parseFloat(specifikacije[i].ukupanIznosPG);
+						ukupanIznosPG = ukupanIznosPG + parseFloat(specifikacije[i].ukupanIznosPG)*umanjenje;
 						var razlika = parseFloat(specifikacije[i].ukupanIznosPG) - parseFloat(specifikacije[i].ukupanIznos);
-						ukupnaDobit = ukupnaDobit + razlika;
+						ukupnaDobitPremijus = ukupnaDobitPremijus + razlika;
+						var razlika2 = parseFloat(specifikacije[i].ukupanIznosPG)*umanjenje - parseFloat(specifikacije[i].ukupanIznos);
+						ukupnaDobitPG = ukupnaDobitPG + razlika2;
 						for(var j=0;j<meseciJson.length;j++){
 							if(specifikacije[i].datum.datum.includes(meseciJson[j].string)){
 								meseciJson[j].iznos = meseciJson[j].iznos + parseFloat(specifikacije[i].ukupanIznos);
-								meseciJson[j].iznosPG = meseciJson[j].iznosPG + parseFloat(specifikacije[i].ukupanIznosPG);
-								meseciJson[j].dobit = meseciJson[j].dobit + razlika;
+								meseciJson[j].iznosPremijus = meseciJson[j].iznosPremijus + parseFloat(specifikacije[i].ukupanIznosPG);
+								meseciJson[j].dobitPremijus = meseciJson[j].dobitPremijus + razlika;
+
+								meseciJson[j].iznosPG = meseciJson[j].iznosPG + parseFloat(specifikacije[i].ukupanIznosPG)*umanjenje;
+								meseciJson[j].dobitPG = meseciJson[j].dobitPG + razlika2;
 							}	
 						}
 					}
@@ -60,11 +82,21 @@
 						tr.appendChild(td);
 
 						var td = document.createElement("TD");
+						td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupanIznosPremijus)+"</div>"
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
 						td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupanIznosPG)+"</div>"
 						tr.appendChild(td);
 
 						var td = document.createElement("TD");
-						td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupnaDobit)+"</div>"
+						var procentualnaDobit = isNaN(100 - ukupanIznos/ukupanIznosPremijus*100) ? 0 : 100 - ukupanIznos/ukupanIznosPremijus*100;
+						td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupnaDobitPremijus)+"<br>"+procentualnaDobit.toFixed(2)+"%</div>"
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						var procentualnaDobit = isNaN(100 - ukupanIznos/ukupanIznosPG*100) ? 0 : 100 - ukupanIznos/ukupanIznosPG*100;
+						td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupnaDobitPG)+"<br>"+procentualnaDobit.toFixed(2)+"%</div>"
 						tr.appendChild(td);
 					document.getElementById("total-table").appendChild(tr);
 
@@ -79,11 +111,21 @@
 							tr.appendChild(td);
 
 							var td = document.createElement("TD");
+							td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].iznosPremijus)+"</div>"
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
 							td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].iznosPG)+"</div>"
 							tr.appendChild(td);
 
 							var td = document.createElement("TD");
-							td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].dobit)+"</div>"
+							var procentualnaDobit = isNaN(100 - meseciJson[i].iznos/meseciJson[i].iznosPremijus*100) ? 0 : 100 - meseciJson[i].iznos/meseciJson[i].iznosPremijus*100;
+							td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].dobitPremijus)+"<br>"+procentualnaDobit.toFixed(2)+"%</div>"
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+							var procentualnaDobit = isNaN(100 - meseciJson[i].iznos/meseciJson[i].iznosPG*100) ? 0 : 100 - meseciJson[i].iznos/meseciJson[i].iznosPG*100;
+							td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].dobitPG)+"<br>"+procentualnaDobit.toFixed(2)+"%</div>"
 							tr.appendChild(td);
 						document.getElementById("total-table").appendChild(tr);
 					}
@@ -148,28 +190,44 @@
 								tr.appendChild(td);
 								
 								var td = document.createElement("TD");
+								td.innerHTML="Износ Премијус";
+								tr.appendChild(td);
+								
+								var td = document.createElement("TD");
 								td.innerHTML="Износ ПГ";
 								tr.appendChild(td);
 								
 								var td = document.createElement("TD");
-								td.innerHTML="Добит";
+								td.innerHTML="Добит Премијус";
+								tr.appendChild(td);
+								
+								var td = document.createElement("TD");
+								td.innerHTML="Добит ПГ";
 								tr.appendChild(td);
 								
 								var td = document.createElement("TD");
 								td.innerHTML="Статус";
 								tr.appendChild(td);
 							document.getElementById("table").appendChild(tr);
-
+							document.getElementById("table").style = "width:140%;margin-left:-20%"
 							var ukupanIznos = 0;
+							var ukupanIznosPremijus = 0;
 							var ukupanIznosPG = 0;
-							var ukupnaDobit = 0;
+							var ukupnaDobitPremijus = 0;
+							var ukupnaDobitPG = 0;
 							for(var j=0;j<meseciJson.length;j++){
 								meseciJson[j].iznos = 0;
+								meseciJson[j].iznosPremijus = 0;
 								meseciJson[j].iznosPG = 0;
-								meseciJson[j].dobit = 0;
+								meseciJson[j].dobitPremijus = 0;
+								meseciJson[j].dobitPG = 0;
 							}
 							for(var i=0;i<specifikacije.length;i++){
 								if(specifikacije[i].user.name==imePodizvodjaca){
+									var umanjenje = 1;
+									if(Number(specifikacije[i].datum.datetime)>1714521600000){
+										umanjenje = 0.675;
+									}
 									var tr = document.createElement("TR");
 										var td = document.createElement("TD");
 										td.innerHTML = "<div class=\"value\"><a href=\"/administracija/specifikacijaPodizvodjaca/"+specifikacije[i].uniqueId+"\" target=\"_blank\">"+specifikacije[i].brojSpecifikacije+"</a></div>";
@@ -191,13 +249,26 @@
 										var td = document.createElement("TD");
 										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(specifikacije[i].ukupanIznosPG)+"</div>";
 										tr.appendChild(td);
-										ukupanIznosPG = ukupanIznosPG + parseFloat(specifikacije[i].ukupanIznosPG);
+										ukupanIznosPremijus = ukupanIznosPremijus + parseFloat(specifikacije[i].ukupanIznosPG);
 
 										var td = document.createElement("TD");
-										var razlika = parseFloat(specifikacije[i].ukupanIznosPG) - parseFloat(specifikacije[i].ukupanIznos)
-										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(razlika)+"</div>";
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(parseFloat(specifikacije[i].ukupanIznosPG)*umanjenje)+"</div>";
 										tr.appendChild(td);
-										ukupnaDobit = ukupnaDobit + razlika;
+										ukupanIznosPG = ukupanIznosPG + parseFloat(specifikacije[i].ukupanIznosPG)*umanjenje;
+
+										var td = document.createElement("TD");
+										var razlika = parseFloat(specifikacije[i].ukupanIznosPG) - parseFloat(specifikacije[i].ukupanIznos);
+										var procentualnaDobit = isNaN(100 - specifikacije[i].ukupanIznos/parseFloat(specifikacije[i].ukupanIznosPG)*100) ? 0 : 100 - specifikacije[i].ukupanIznos/parseFloat(specifikacije[i].ukupanIznosPG)*100;
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(razlika)+"<br>"+procentualnaDobit.toFixed(2)+"%</div>";
+										tr.appendChild(td);
+										ukupnaDobitPremijus = ukupnaDobitPremijus + razlika;
+
+										var td = document.createElement("TD");
+										var razlika2 = parseFloat(specifikacije[i].ukupanIznosPG)*umanjenje - parseFloat(specifikacije[i].ukupanIznos);
+										var procentualnaDobit = isNaN(100 - specifikacije[i].ukupanIznos/(parseFloat(specifikacije[i].ukupanIznosPG)*umanjenje)*100) ? 0 : 100 - specifikacije[i].ukupanIznos/(parseFloat(specifikacije[i].ukupanIznosPG)*umanjenje)*100;
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(razlika2)+"<br>"+procentualnaDobit.toFixed(2)+"%</div>";
+										tr.appendChild(td);
+										ukupnaDobitPG = ukupnaDobitPG + razlika2;
 
 										var td = document.createElement("TD");
 										var status = Number(specifikacije[i].odobrena)==0 ? "На одобрењу" : "Одобрена";
@@ -209,8 +280,10 @@
 									for(var j=0;j<meseciJson.length;j++){
 										if(specifikacije[i].datum.datum.includes(meseciJson[j].string)){
 											meseciJson[j].iznos = meseciJson[j].iznos + parseFloat(specifikacije[i].ukupanIznos);
-											meseciJson[j].iznosPG = meseciJson[j].iznosPG + parseFloat(specifikacije[i].ukupanIznosPG);
-											meseciJson[j].dobit = meseciJson[j].dobit + razlika;
+											meseciJson[j].iznosPremijus = meseciJson[j].iznosPremijus + parseFloat(specifikacije[i].ukupanIznosPG);
+											meseciJson[j].iznosPG = meseciJson[j].iznosPG + parseFloat(specifikacije[i].ukupanIznosPG)*umanjenje;
+											meseciJson[j].dobitPremijus = meseciJson[j].dobitPremijus + razlika;
+											meseciJson[j].dobitPG = meseciJson[j].dobitPG + razlika2;
 										}
 									}
 								}
@@ -227,11 +300,19 @@
 									tr.appendChild(td);
 
 									var td = document.createElement("TD");
+									td.innerHTML = "<div class=\"value\">Износ Премијус</div>"
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
 									td.innerHTML = "<div class=\"value\">Износ ПГ</div>"
 									tr.appendChild(td);
 
 									var td = document.createElement("TD");
-									td.innerHTML = "<div class=\"value\">Добит</div>"
+									td.innerHTML = "<div class=\"value\">Добит Премијус</div>"
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.innerHTML = "<div class=\"value\">Добит ПГ</div>"
 									tr.appendChild(td);
 								table.appendChild(tr);
 								var tr = document.createElement("TR");
@@ -244,11 +325,22 @@
 									tr.appendChild(td);
 
 									var td = document.createElement("TD");
-									td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupanIznosPG)+"</div>"
+									td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupanIznosPremijus)+"</div>"
 									tr.appendChild(td);
 
 									var td = document.createElement("TD");
-									td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupnaDobit)+"</div>";
+									td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupanIznosPG)+"</div>"
+									tr.appendChild(td);
+
+
+									var td = document.createElement("TD");
+									var procentualnaDobit = isNaN(100 - ukupanIznos/ukupanIznosPremijus*100) ? 0 : 100 - ukupanIznos/ukupanIznosPremijus*100;
+									td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupnaDobitPremijus)+"<br>"+procentualnaDobit.toFixed(2)+"%</div>";
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									var procentualnaDobit = isNaN(100 - ukupanIznos/ukupanIznosPG*100) ? 0 : 100 - ukupanIznos/ukupanIznosPG*100;
+									td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(ukupnaDobitPG)+"<br>"+procentualnaDobit.toFixed(2)+"%</div>";
 									tr.appendChild(td);
 								table.appendChild(tr);
 								for(var i=0;i<meseciJson.length;i++){
@@ -262,11 +354,21 @@
 										tr.appendChild(td);
 
 										var td = document.createElement("TD");
-										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].iznosPG)+"</div>"
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].iznosPremijus)+"</div>"
 										tr.appendChild(td);
 
 										var td = document.createElement("TD");
-										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].dobit)+"</div>"
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].iznosPG)+"</div>"
+										tr.appendChild(td);
+
+										var procentualnaDobit = isNaN(100 - meseciJson[i].iznos/meseciJson[i].iznosPremijus*100) ? 0 : 100 - meseciJson[i].iznos/meseciJson[i].iznosPremijus*100;
+										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].dobitPremijus)+"<br>"+procentualnaDobit.toFixed(2)+"%</div>";
+										tr.appendChild(td);
+
+										var procentualnaDobit = isNaN(100 - meseciJson[i].iznos/meseciJson[i].iznosPG*100) ? 0 : 100 - meseciJson[i].iznos/meseciJson[i].iznosPG*100;
+										var td = document.createElement("TD");
+										td.innerHTML = "<div class=\"value\">"+brojSaRazmacima(meseciJson[i].dobitPG)+"<br>"+procentualnaDobit.toFixed(2)+"%</div>"
 										tr.appendChild(td);
 									table.appendChild(tr);
 								}
