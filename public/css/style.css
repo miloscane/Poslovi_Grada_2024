@@ -1005,7 +1005,7 @@ input[type=number] {
 }
 
 .listaNalogaAdministracija .tableWrap table td .brojFakture{
-    width:180px;
+    width:120px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -1013,6 +1013,13 @@ input[type=number] {
 
 .listaNalogaAdministracija .tableWrap table td .iznos{
     width:120px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.listaNalogaAdministracija .tableWrap table td .penal{
+    width:130px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;

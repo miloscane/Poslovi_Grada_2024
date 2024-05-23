@@ -106,7 +106,8 @@
 							<td><div class="value datumNaloga">Датум<br>промета</div></td>
 							<td><div class="value radnaJedinica">Радна<br>јединица</div></td>
 							<td><div class="value iznos">Износ<br>налога</div></td>
-							<td><div class="value pogledajNalog"></div></td>
+							<td><div class="value iznos">Износ<br>ПГ</div></td>
+							<td><div class="value penal">Износ<br>Пенала</div></td>
 						</tr>
 					</table>
 				</div>
@@ -250,7 +251,7 @@
 								var td = document.createElement("TD");
 									var div = document.createElement("DIV");
 									div.setAttribute("class","value brojNaloga");
-									div.innerHTML = nalozi[i].broj;
+									div.innerHTML = "<a href=\"/nalog/"+nalozi[i].broj+"\" target=\"_blank\">"+nalozi[i].broj+"</a>";
 									td.appendChild(div);
 								tr.appendChild(td);
 
@@ -290,23 +291,25 @@
 									td.appendChild(div);
 								tr.appendChild(td);
 
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value iznos");
+									div.innerHTML = brojSaRazmacima(iznosNaloga*0.675);
+									td.appendChild(div);
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value penal");
+									div.innerHTML = brojSaRazmacima(iznosNaloga*(1-nalozi[i].faktura.penal/100));
+									td.appendChild(div);
+								tr.appendChild(td);
+
 								if(iznosNaloga>=500000){
 									tr.setAttribute("style","font-weight:bold")
 								}else if(iznosNaloga==0){
 									tr.setAttribute("style","color:rgb(200,0,0)")
 								}
-
-								var td = document.createElement("TD");
-									var div = document.createElement("DIV");
-									div.setAttribute("class","value pogledajNalog");
-										var a = document.createElement("A");
-										a.setAttribute("href","/nalog/"+nalozi[i].broj);
-										a.setAttribute("target","_blank");
-										a.setAttribute("class","tableButton");
-										a.innerHTML = "Погледај налог"
-										div.appendChild(a)
-									td.appendChild(div);
-								tr.appendChild(td);
 							table.appendChild(tr);	
 						}
 						
