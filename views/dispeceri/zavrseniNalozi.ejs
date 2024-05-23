@@ -181,7 +181,12 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value link");
-								div.innerHTML = "<a href='/nalog/"+naloziToShow[i].broj+"' target='_blank'>Види налог</a>";
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+naloziToShow[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)'");
+									a.innerHTML = "Види налог";
+									div.appendChild(a);
 								td.appendChild(div);
 							tr.appendChild(td);
 
@@ -258,7 +263,12 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value link");
-								div.innerHTML = "<a href='/nalog/"+naloziToShowAdresa[i].broj+"' target='_blank'>Види налог</a>";
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+naloziToShow[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
+									a.innerHTML = "Види налог";
+									div.appendChild(a);
 								td.appendChild(div);
 							tr.appendChild(td);
 
@@ -335,7 +345,12 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value link");
-								div.innerHTML = "<a href='/nalog/"+naloziToShowBroj[i].broj+"' target='_blank'>Види налог</a>";
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+naloziToShow[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
+									a.innerHTML = "Види налог";
+									div.appendChild(a);
 								td.appendChild(div);
 							tr.appendChild(td);
 
