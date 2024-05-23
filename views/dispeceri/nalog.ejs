@@ -9,10 +9,15 @@
 	</script>
 	<div class="pageWidth">
 		<div class="administracijaNalog nalog">
-			<div class="inputWrap printButton">
+			<div class="inputWrap printButton" style="display:inline-block;vertical-align: top;">
 				<div class="button" onclick="window.open('<%=nalog.digitalizacija.lokacija%>','_blank')">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
 					<div class="label">Штампај налог</div>
+				</div>
+			</div>
+			<div class="inputWrap printButton" style="margin-left:210px; display:inline-block;vertical-align: top;">
+				<div class="button" onclick="saveNalog()">
+					<div class="label">САЧУВАЈ</div>
 				</div>
 			</div>
 			<div class="boxesWrap">
@@ -482,6 +487,14 @@
 					document.getElementById("json").value = JSON.stringify(nalogJson);
 					loadGif();
 					document.getElementById("form").submit();
+				}
+
+				if(window.location.href.includes("digital")){
+					window.addEventListener('keydown', function(event) {
+						if (event.keyCode == 16) {
+							window.location.href="/digitalizacijaNaloga"
+						}
+					});
 				}
 
 				

@@ -279,7 +279,7 @@ const uploadSlika = multer({
       }
     }*/]
   })
-}).array('image', 10);
+}).array('image', 20);
 
 const uploadNalozi = multer({
   storage: multerS3({
@@ -2810,9 +2810,9 @@ server.post('/digitalizacijaNaloga', async (req, res)=> {
 														transporter.sendMail(mailOptions, (error, info) => {
 															if (error) {
 																logError(error);
-																res.redirect("/nalog/"+nalogJson.broj);
+																res.redirect("/nalog/"+nalogJson.broj+"?digital=1");
 															}else{
-																res.redirect("/nalog/"+nalogJson.broj);
+																res.redirect("/nalog/"+nalogJson.broj+"?digital=1");
 															}
 														});
 													})
