@@ -157,6 +157,22 @@
 					</div>
 				</div>
 				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nefakturisanoIcon.png"></div>
+					<div class="info">
+						<div class="title">Пенал</div>
+						<div class="text">
+							<div class="text"><span id="iznos-penala"></span></div>
+							<div class="text"><span id="procenat-penala"></span></div>
+							<script>
+								if(nalog.prijemnica.broj!=""){
+									document.getElementById("iznos-penala").innerHTML = brojSaRazmacima(parseFloat(nalog.ukupanIznos)*(1-nalog.faktura.penal/100));
+									document.getElementById("procenat-penala").innerHTML = brojSaRazmacima(100-nalog.faktura.penal)+"%";
+								}
+							</script>
+						</div>
+					</div>
+				</div>
+				<div class="box">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/historyIcon.png"></div>
 					<div class="info">
 						<div class="title">Историјат налога</div>
