@@ -1,4 +1,18 @@
+<style>
+	.gm-style-iw{
+		padding:0px !important;
+	}
 
+	.gm-style .gm-style-iw-d{
+		padding:0px !important;
+		margin-bottom:-10px;
+		margin-right:-10px;
+	}
+
+	.gm-ui-hover-effect{
+		display:none !important; 
+	}
+</style>
 <div id="map"></div>
 <script>
 	var map;
@@ -233,7 +247,7 @@
 							content: "<div style=\"text-align:center;\">"+data[i].imeMajstora.split(" ")[0]+"<br>"+data[i].imeMajstora.split(" ")[1]+"</div>"
 						});
 						infowindow.open(map,marker);
-					    markers.push(marker)
+					    markers.push(marker);
 					}
 				}
 				for(var i=0;i<nalozi.length;i++){
@@ -245,7 +259,7 @@
 				         }
 				    });
 				    var infowindow = new google.maps.InfoWindow({
-						content: "<a href=\"/nalog/"+nalozi[i].broj+"\" style=\"color:rgb(31,52,101)\" target=\"_blank\">" + nalozi[i].broj + "</a><br>" + nalozi[i].statusNaloga
+						content: "<a class=\"mapLink\" onwheel=\"event.preventDefault()\" style=\"padding-left:4px;\" href=\"/nalog/"+nalozi[i].broj+"\" style=\"color:rgb(31,52,101)\" target=\"_blank\">" + nalozi[i].broj + "</a><br>" + nalozi[i].statusNaloga
 					});
 					infowindow.open(map,marker);
 				    markers.push(marker)

@@ -4426,6 +4426,45 @@ server.get('/mapa',async (req,res)=>{
 	}
 });
 
+server.get('/wome',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
+			naloziDB.find({statusNaloga:"Potrebna WOMA"}).toArray()
+			.then((nalozi) => {
+				var naloziZaMapu = [];
+				for(var i=0;i<nalozi.length;i++){
+					var nalogZaMapu = {};
+					nalogZaMapu.broj = nalozi[i].broj;
+					nalogZaMapu.statusNaloga = nalozi[i].statusNaloga;
+					nalogZaMapu.coordinates = nalozi[i].coordinates;
+					naloziZaMapu.push(nalogZaMapu);
+				}
+				res.render("administracija/wome",{
+					pageTitle: "WOME",
+					nalozi: naloziZaMapu,
+					user: req.session.user
+				});
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази података 4453.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
 server.get('/dispecer/sviNalozi',async (req,res)=>{
 	if(req.session.user){
 			if(Number(req.session.user.role)==20){
@@ -6303,6 +6342,104 @@ io.on('connection', function(socket){
 									}catch(err){
 										logError(err)
 										socket.emit('lokacijaMajstoraOdgovor',[])
+									}
+								}catch(err){
+									logError(err);
+								}
+							}
+						});
+
+
+
+						
+					}
+				});
+			}
+		});
+		
+			
+	})
+
+	socket.on('lokacijaWomi', function(broj){
+		request(ntsOptions, (error,response,body)=>{
+			if(error){
+				logError(error)
+				socket.emit('lokacijaWomiOdgovor',[])
+			}else{
+				//console.log(response.headers['set-cookie']);
+				var cookie = response.headers['set-cookie'];
+				var headers = {
+					'accept': 'application/json',
+			    'Cookie': cookie,
+			    'Content-Type': 'application/json'
+				}
+				var options = {
+				    url: 'http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true',
+				    method: 'GET',
+				    headers: headers
+				};
+				request(options, (error,response2,body2)=>{
+					if(error){
+						logError(error);
+					}else{
+						var options = {
+						    url: 'https://app.nts-international.net/ntsapi/allvehicles',
+						    method: 'GET',
+						    headers: headers
+						};
+						request(options, (error,response3,body3)=>{
+							if(error){
+								logError(error)
+							}else{
+								try{
+									var vehiclesInfo = JSON.parse(response3.body);
+									//console.log(vehiclesInfo);
+									try{
+										var vehicleStates = JSON.parse(response2.body);
+										/*console.log(vehicleStates)
+										console.log("---------------------------------------------------")
+										console.log(vehiclesInfo)*/
+										/*for(var i=0;i<vehicleStates.length;i++){
+											for(var j=0;j<vehiclesInfo.length;j++){
+												if(vehicleStates[i].vehicleId==vehiclesInfo[j].id){
+													vehicleStates[i].licenceplate = vehiclesInfo[j].licenceplate;
+												}
+											}
+										}*/
+										for(var i=0;i<navigacijaInfo.length;i++){
+											for(var j=0;j<vehicleStates.length;j++){
+												if(navigacijaInfo[i].idNavigacije==vehicleStates[j].vehicleId){
+													vehicleStates[j].imeMajstora = navigacijaInfo[i].imeMajstora;
+													vehicleStates[j].nadimakMajstora = navigacijaInfo[i].nadimakMajstora;
+													vehicleStates[j].brojTablice = navigacijaInfo[i].brojTablice;
+													vehicleStates[j].brojVozila = navigacijaInfo[i].brojVozila;
+													vehicleStates[j].tipVozila = navigacijaInfo[i].tipVozila;
+													vehicleStates[j].statusVozila = navigacijaInfo[i].status;
+												}
+											}
+										}
+
+										for(var i=0;i<vehicleStates.length;i++){
+											if(!vehicleStates[i].statusVozila){
+												vehicleStates.splice(i,1);
+												i--;
+											}
+										}
+
+										for(var i=0;i<vehicleStates.length;i++){
+											if(vehicleStates[i].tipVozila==""){
+												vehicleStates.splice(i,1);
+												i--;
+											}
+										}
+
+										/*for(var i=0;i<vehicleStates.length;i++){
+											console.log(vehicleStates[i].statusMajstora)
+										}*/
+										socket.emit('lokacijaWomiOdgovor',vehicleStates)
+									}catch(err){
+										logError(err)
+										socket.emit('lokacijaWomiOdgovor',[])
 									}
 								}catch(err){
 									logError(err);
