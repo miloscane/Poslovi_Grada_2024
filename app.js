@@ -6235,7 +6235,7 @@ io.on('connection', function(socket){
 
 				if(iznosNalogaPG>=500000){
 					statistika.ukupnoPrekoPolaMilPG++;
-					statistika.neoporezivo	= statistika.neoporezivo + iznosNalogaPG;
+					statistika.neoporezivoPG	= statistika.neoporezivoPG + iznosNalogaPG;
 				}else{
 					statistika.ukupanPdvPG = statistika.ukupanPdvPG + iznosNalogaPG*0.2;
 					statistika.osnovicaPG	= statistika.osnovicaPG + iznosNalogaPG;
@@ -6310,7 +6310,7 @@ io.on('connection', function(socket){
 
 				if(iznosNalogaPG>=500000){
 					statistika.ukupnoPrekoPolaMilPG++;
-					statistika.neoporezivo	= statistika.neoporezivo + iznosNalogaPG;
+					statistika.neoporezivoPG	= statistika.neoporezivoPG + iznosNalogaPG;
 				}else{
 					statistika.ukupanPdvPG = statistika.ukupanPdvPG + iznosNalogaPG*0.2;
 					statistika.osnovicaPG	= statistika.osnovicaPG + iznosNalogaPG;
