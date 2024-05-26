@@ -1,9 +1,40 @@
 <%- include ("partials/header") -%>
+	<style>
+		.gm-style-iw{
+			padding:0px !important;
+		}
+
+		.gm-style .gm-style-iw-d{
+			padding:0px !important;
+			margin-bottom:-10px;
+			margin-right:-10px;
+		}
+
+		.gm-ui-hover-effect{
+			display:none !important; 
+		}
+	</style>
 	<div class="pageWidth">
 		<script>
 			var nalozi = <%-JSON.stringify(nalozi)%>;
 			var stops = <%-JSON.stringify(stops)%>;
-			console.log(stops)
+			var pauza = 5;//min
+			pauza = 5 * 60000
+			//console.log(stops);
+			for(var i=0;i<stops.length;i++){
+				var stopStart = new Date(stops[i].gmtStopStart);
+				var stopEnd = new Date(stops[i].gmtStopEnd);
+				var stopTime = stopEnd.getTime() - stopStart.getTime();
+				if( stopTime > pauza){
+					stops[i].tip = "Pauza"
+				}else{
+					stops[i].tip = "Lokacija"
+				}
+				stops[i].trajanje = stopTime;
+			}
+			for(var i=0;i<stops.length;i++){
+				//console.log(stops[i].tip)
+			}
 		</script>
 		<div id="map"></div>
 		<script>
@@ -211,18 +242,36 @@
 						position.lat = stops[i].startLatitude;
 						position.lng = stops[i].startLongitude;
 					}
-					marker = new google.maps.Marker({
-				         position: position,
-				         map: map,
-				         icon:{
-				         	url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-				         }
-				    });
-				    var infowindow = new google.maps.InfoWindow({
-						content: stops[i].gmtStopStart
-					});
-					//infowindow.open(map,marker);
-				    markers.push(marker)
+					if(stops[i].tip == "Pauza"){
+						marker = new google.maps.Marker({
+					         position: position,
+					         map: map,
+					         icon:{
+					         	url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+					         }
+					    });
+					    var infowindow = new google.maps.InfoWindow({
+							content: eval(stops[i].trajanje*1.66667e-5).toFixed(0) + " min"
+						});
+						infowindow.open(map,marker);
+					    markers.push(marker);
+					}else if(stops[i].tip == "Lokacija"){
+						marker = new google.maps.Marker({
+					         position: position,
+					         map: map,
+					         icon:{
+					         	url: "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/green-nav2.png"
+					         }
+					    });
+					    var infowindow = new google.maps.InfoWindow({
+							content: eval(stops[i].trajanje*1.66667e-5).toFixed(0) + " min"
+						});
+						//infowindow.open(map,marker);
+					    markers.push(marker);
+					}else{
+						console.log("Greska 249")
+					}
+					
 				}
 
 			}

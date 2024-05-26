@@ -3041,16 +3041,18 @@ server.post('/proveraLokacijeMajstora',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
 			var json = JSON.parse(req.body.json);
+			var idMajstora = json.majstor;
+			console.log(idMajstora)
 			stariUcinakMajstoraDB.find({majstor:json.majstor,datum:json.date}).toArray()
 			.then((stariUcinci)=>{
-				console.log(stariUcinci.length);
+				//console.log(stariUcinci.length);
 				var brojeviNaloga = [];
 				for(var i=0;i<stariUcinci.length;i++){
 					brojeviNaloga.push(stariUcinci[i].brojNaloga);
 				}
 				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
 				.then((nalozi)=>{
-					console.log(nalozi.length)
+					//console.log(nalozi.length)
 					var naloziToSend = [];
 					for(var i=0;i<nalozi.length;i++){
 						var jsonToPush = {};
@@ -3078,38 +3080,42 @@ server.post('/proveraLokacijeMajstora',async (req,res)=>{
 							    method: 'GET',
 							    headers: headers
 							};
-							request(options, (error,response2,body2)=>{
-								if(error){
-									logError(error);
-									res.render("message",{
-										pageTitle: "Грешка",
-										user: req.session.user,
-										message: "<div class=\"text\">Грешка у бази података 2941</div>"
-									});
-								}else{
-									var vehicles = JSON.parse(response2.body);
-									var yesterday = new Date(json.date);
-									yesterday.setDate(yesterday.getDate()-1);
-									var options = {
-									    url: 'https://app.nts-international.net/ntsapi/stops?vehicle='+vehicles[0].vehicleId+'&from='+getDateAsStringForInputObject(yesterday)+' 00:00:00&to='+json.date+' 00:00:00&timzeone=UTC&version=2.3',
-									    method: 'GET',
-									    headers: headers
-									};
-									request(options, (error,response3,body3)=>{
-										if(error){
-											logError(error)
-										}else{
-											var stops = JSON.parse(response3.body)
-											res.render("administracija/izvestajLokacijeMajstora",{
-												pageTitle: "Извештај локације за "+json.imeMajstora+" за датум "+reshuffleDate(json.date),
-												user: req.session.user,
-												nalozi: naloziToSend,
-												stops: stops
-											});
-										}
-									});
+							var idNavigacije = 0;
+							for(var i=0;i<navigacijaInfo.length;i++){
+								if(navigacijaInfo[i].idMajstora==idMajstora){
+									idNavigacije = navigacijaInfo[i].idNavigacije;
+									break;
 								}
-							});
+							}
+							if(idNavigacije==0){
+								res.render("message",{
+									pageTitle: "Грешка",
+									user: req.session.user,
+									message: "<div class=\"text\">Непознато возило за мајстора.</div>"
+								});
+							}else{
+								var yesterday = new Date(json.date);
+								yesterday.setDate(yesterday.getDate()+1);
+								var options = {
+								    url: 'https://app.nts-international.net/ntsapi/stops?vehicle='+idNavigacije+'&from='+json.date+' 00:00:00&to='+json.date+' 23:59:00&timzeone=UTC&version=2.3',
+								    method: 'GET',
+								    headers: headers
+								};
+								request(options, (error,response3,body3)=>{
+									if(error){
+										logError(error)
+									}else{
+										var stops = JSON.parse(response3.body)
+										res.render("administracija/izvestajLokacijeMajstora",{
+											pageTitle: "Извештај локације за "+json.imeMajstora+" за датум "+reshuffleDate(json.date),
+											user: req.session.user,
+											nalozi: naloziToSend,
+											stops: stops
+										});
+									}
+								});
+							}
+							
 						}
 					});
 
