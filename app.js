@@ -3908,7 +3908,7 @@ server.post('/edit-nalog', async (req, res)=> {
 								statusNaloga: nalogJson.status,
 								majstor: nalogJson.majstor,
 								obracun: nalogJson.obracun,
-								kategorijeRadova: nalogJson.kategorijeRadova,
+								//kategorijeRadova: nalogJson.kategorijeRadova,
 								ukupanIznos: ukupanIznos,
 								izmenio: req.session.user
 							}};
