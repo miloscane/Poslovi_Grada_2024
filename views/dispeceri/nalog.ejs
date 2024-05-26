@@ -191,7 +191,34 @@
 					</div>
 					<div class="box noHover">
 						<div class="info">
-							<div class="title">Категорије радова</div>
+							<div class="majstorNaNalogu" onclick="majstorNaNalogu()">
+								Пошаљи мајстора на налог
+							</div>
+							<form style="display:none" method="POST" action="/majstorNaNalogu" id="majstor-na-nalogu-form">
+								<input type="text" id="majstor-na-nalogu-input" name="json">
+							</form>
+							<script>
+								function majstorNaNalogu(){
+									var submitJson = {};
+									submitJson.user = user;
+									submitJson.nalog = nalog.broj;
+									submitJson.majstor = document.getElementById("majstor-naloga").value;
+									submitJson.adresa = nalog.adresa;
+									submitJson.radnaJedinica = nalog.radnaJedinica;
+									submitJson.punaAdresa = nalog.punaAdresa;
+									submitJson.coordinates = nalog.coordinates;
+									if(!submitJson.majstor || submitJson.majstor=="Nijedan"){
+										alert("Нисте одабрали мајстора.")
+									}else if(podizvodjaci.indexOf(submitJson.majstor)>=0){
+										alert("Ова функција се не користи за подизвођаче.")
+									}else{
+										document.getElementById("majstor-na-nalogu-input").value = JSON.stringify(submitJson);
+										loadGif();
+										document.getElementById("majstor-na-nalogu-form").submit();
+									}
+								}
+							</script>
+							<!--<div class="title">Категорије радова</div>
 							<div class="text">
 								<div class="inline50s">
 									<div class="inline50">
@@ -237,7 +264,7 @@
 										elem.parentElement.getElementsByTagName("INPUT")[0].checked = true;
 									}
 								}
-							</script>
+							</script>-->
 						</div>
 					</div>
 				</div>
@@ -429,7 +456,7 @@
 					}
 					addRow();
 
-					if(nalogJson.kategorijeRadova){
+					/*if(nalogJson.kategorijeRadova){
 						var kategorije = document.getElementsByClassName("kategorijeRadova");
 						for(var j=0;j<kategorije.length;j++){
 							kategorije[j].checked = false;
@@ -441,7 +468,7 @@
 								}
 							}
 						}
-					}
+					}*/
 
 				}
 				showNalog(nalog);
@@ -467,12 +494,12 @@
 						}
 					}
 					nalogJson.ukupanIznos = ukupanIznos;
-					nalogJson.kategorijeRadova = [];
+					/*nalogJson.kategorijeRadova = [];
 					for(var i=0;i<document.getElementsByClassName("kategorijeRadova").length;i++){
 						if(document.getElementsByClassName("kategorijeRadova")[i].checked){
 							nalogJson.kategorijeRadova.push(document.getElementsByClassName("kategorijeRadova")[i].value);
 						}
-					}
+					}*/
 					nalogJson.radnaJedinica = nalog.radnaJedinica;
 					nalogJson.adresa = nalog.adresa;
 					nalogJson.zahtevalac = nalog.zahtevalac;
@@ -483,7 +510,7 @@
 					nalogJson.stariNalog.statusNaloga 		=	nalog.statusNaloga;
 					nalogJson.stariNalog.majstor 			=	nalog.majstor;
 					nalogJson.stariNalog.obracun 			=	nalog.obracun;
-					nalogJson.stariNalog.kategorijeRadova	=	nalog.kategorijeRadova ? nalog.kategorijeRadova : [];
+					//nalogJson.stariNalog.kategorijeRadova	=	nalog.kategorijeRadova ? nalog.kategorijeRadova : [];
 					document.getElementById("json").value = JSON.stringify(nalogJson);
 					loadGif();
 					document.getElementById("form").submit();

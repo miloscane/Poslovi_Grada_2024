@@ -2157,6 +2157,23 @@ input[type=number] {
     width:100%;
 }
 
+.nalog .majstorNaNalogu{
+    background-color:rgb(2,121,49);
+    border:2px solid rgba(37,57,101,0);
+    color:rgb(255,255,255);
+    text-align:center;
+    padding:10px 0;
+    width:100%;
+    font-weight:bold;
+    font-size:16px;
+    cursor:pointer;
+    -webkit-transition:all ease 0.5s;
+    -moz-transition:all ease 0.5s;
+    -ms-transition:all ease 0.5s;
+    -o-transition:all ease 0.5s;
+    transition:all ease 0.5s;
+}
+
 .lightBlueBox{
     background-color: rgb(243,249,255);
     padding: 20px;

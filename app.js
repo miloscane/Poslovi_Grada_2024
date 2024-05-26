@@ -705,6 +705,7 @@ var proizvodiDB;
 var ucinakMajstoraDB;
 var errorDB;
 var navigacijaInfoDB;
+var dodeljivaniNaloziDB;
 
 http.listen(process.env.PORT, function(){
 	console.log("Poslovi Grada 2024");
@@ -730,6 +731,7 @@ http.listen(process.env.PORT, function(){
 		errorDB								=	client.db("Poslovi_Grada_2024").collection('errors');
 		stambenoDB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno');
 		navigacijaInfoDB			=	client.db("Poslovi_Grada_2024").collection('NavigacijaInfo');
+		dodeljivaniNaloziDB		=	client.db("Poslovi_Grada_2024").collection('dodeljivaniNalozi');
 
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
@@ -2902,7 +2904,9 @@ server.get('/naloziPoKategorijama',async (req,res)=>{
 						for(var j=0;j<kategorije.length;j++){
 							informacije[i].kategorije.push({ime:kategorije[j],iznos:0,brojNaloga:0})
 						}
+						informacije[i].kategorije.push({ime:"Изоловане констатације",iznos:0,brojNaloga:0})
 					}
+					
 
 					for(var i=0;i<nalozi.length;i++){
 						if(nalozi[i].prijemnica.datum.datum){
@@ -2929,6 +2933,30 @@ server.get('/naloziPoKategorijama',async (req,res)=>{
 						}
 					}
 
+
+					var izolovaneKonstatacije = [];
+					izolovaneKonstatacije.push({broj:"13.2024",ime:"Укупно",iznos:0,brojNaloga:0});
+					for(var i=0;i<meseciJson.length;i++){
+						izolovaneKonstatacije.push({broj:meseciJson[i].string,ime:meseciJson[i].name,kategorije:[]});
+					}
+					var sifreZaIzolovanuKonstataciju = ["80.04.01.002","80.04.01.005"];
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].prijemnica.datum.datum){
+							if(nalozi[i].obracun.length<2){
+								var nalogValja = true;
+								for(var j=0;j<nalozi[i].obracun.length;j++){
+									if(sifreZaIzolovanuKonstataciju.indexOf(nalozi[i].obracun[j].code)<0){
+										nalogValja = false;
+									}
+								}
+								if(nalogValja){
+									izolovaneKonstatacije[0].iznos = izolovaneKonstatacije[0].iznos + parseFloat(nalozi[i].ukupanIznos);
+									izolovaneKonstatacije[0].brojNaloga++;
+								}
+							}
+						}
+					}
+
 					for(var i=0;i<informacije[0].kategorije.length;i++){
 						for(var j=1;j<informacije.length;j++){
 							for(var k=0;k<informacije[j].kategorije.length;k++){
@@ -2942,7 +2970,8 @@ server.get('/naloziPoKategorijama',async (req,res)=>{
 					res.render("administracija/naloziPoKategorijama",{
 						pageTitle: "Категорије",
 						user: req.session.user,
-						informacije: informacije
+						informacije: informacije,
+						izolovaneKonstatacije: izolovaneKonstatacije
 					});
 				})
 				.catch((error)=>{
@@ -3293,14 +3322,6 @@ server.post('/administracija/ponisti-specifikaciju',async (req,res)=>{
 	}
 });
 
-//posebna imovina znaci da je samo njena , nije bracna tekovina i ne deli
-
-//ugovor o posredovanju, opsirniji mozda, uvedeni u posed, 
-
-//overa 50% ukupne overe za ugovor 51 000 za ugovor, 1/2 uvecana za broj primeraka , treba jos jedan original za banku za 1600 dinara.
-
-//
-
 server.get('/nalog/:broj',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20 || Number(req.session.user.role)==30){
@@ -3505,6 +3526,59 @@ server.get('/nalog/:broj',async (req,res)=>{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
 });
+
+server.post('/majstorNaNalogu',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==20){
+			var json = JSON.parse(req.body.json);
+			json.datum  = {};
+			var currentDate = new Date();
+			var currentHour = currentDate.getHours().toString().length==1 ? "0"+currentDate.getHours() : currentDate.getHours();
+			var currentMinute = currentDate.getMinutes().toString().length==1 ? "0"+currentDate.getMinutes() : currentDate.getMinutes();
+			var timeStamp =  currentHour +":"+currentMinute;
+			json.datum.datetime = currentDate.getTime();
+			json.datum.datum = getDateAsStringForDisplay(currentDate);
+			json.datum.timestamp = timeStamp;
+			majstoriDB.find({uniqueId:json.majstor}).toArray()
+			.then((majstori)=>{
+				dodeljivaniNaloziDB.insertOne(json)
+					.then((dbResponse)=>{
+						res.render("message",{
+							pageTitle: "Мајстор послат на налог",
+							message: "<div class=\"text\">Успешно сте послали <b>"+majstori[0].ime+"</b> на налог број "+json.nalog+" - <b>"+json.adresa+"</b>, "+json.radnaJedinica+".<br>&nbsp;<br><b>Vreme:</b> "+json.datum.timestamp+"</div>",
+							user: req.session.user
+						});
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Грешка",
+							message: "<div class=\"text\">Грешка у бази података 3548.</div>",
+							user: req.session.user
+						});
+					})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Грешка у бази података 3545.</div>",
+					user: req.session.user
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Нисте овлашћени да шаљете мајстора на налог.</div>",
+				user: req.session.user
+			});
+		}
+	}else{
+		res.redirect("/login")
+	}
+});
+
+
 
 server.get('/pretragaNaloga',async (req,res)=>{
 	if(req.session.user){
@@ -3723,8 +3797,8 @@ server.post('/edit-nalog', async (req, res)=> {
 									var ukupanIznos = 0;
 									for(var i=0;i<nalogJson.obracun;i++){
 										for(var j=0;j<cenovnik.length;j++){
-											if(nalogJson.obracun[i].code==cenovnik[i].code){
-												ukupanIznos = ukupanIznos + cenovnik[i].price*nalogJson.obracun[i].quantity;
+											if(nalogJson.obracun[i].code==cenovnik[j].code){
+												ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
 												break;
 											}
 										}
@@ -3733,7 +3807,7 @@ server.post('/edit-nalog', async (req, res)=> {
 										statusNaloga: nalogJson.status,
 										majstor: nalogJson.majstor,
 										obracun: nalogJson.obracun,
-										kategorijeRadova: nalogJson.kategorijeRadova,
+										//kategorijeRadova: nalogJson.kategorijeRadova,
 										ukupanIznos: ukupanIznos,
 										izmenio: req.session.user
 									}};
@@ -3824,8 +3898,8 @@ server.post('/edit-nalog', async (req, res)=> {
 							var ukupanIznos = 0;
 							for(var i=0;i<nalogJson.obracun;i++){
 								for(var j=0;j<cenovnik.length;j++){
-									if(nalogJson.obracun[i].code==cenovnik[i].code){
-										ukupanIznos = ukupanIznos + cenovnik[i].price*nalogJson.obracun[i].quantity;
+									if(nalogJson.obracun[i].code==cenovnik[j].code){
+										ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
 										break;
 									}
 								}
