@@ -132,7 +132,6 @@
 								<td><div class="value radnaJedinica">Радна јединица</div></td>
 								<td><div class="value adresa">Адреса</div></td>
 								<td><div class="value status">Статус</div></td>
-								<td><div class="value link">Линк</div></td>
 							</tr>
 						</table>
 					</div>
@@ -213,13 +212,19 @@
 								div.innerHTML = eval(i+1)+".";
 								td.appendChild(div);
 							tr.appendChild(td);
-							
+
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojNaloga");
-								div.innerHTML = naloziToShow[i].broj;
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+naloziToShow[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
+									a.innerHTML = naloziToShow[i].broj;
+									div.appendChild(a);
 								td.appendChild(div);
 							tr.appendChild(td);
+							
 							
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
@@ -260,17 +265,7 @@
 								td.appendChild(div);
 							tr.appendChild(td);
 							
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value link");
-									var a = document.createElement("A");
-									a.setAttribute("href","/nalog/"+naloziToShow[i].broj);
-									a.setAttribute("target","_blank");
-									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
-									a.innerHTML = "Види налог";
-									div.appendChild(a);
-								td.appendChild(div);
-							tr.appendChild(td);
+							
 
 						table.appendChild(tr);
 					}
@@ -302,11 +297,16 @@
 								div.innerHTML = eval(i+1)+".";
 								td.appendChild(div);
 							tr.appendChild(td);
-							
+
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojNaloga");
-								div.innerHTML = naloziToShowAdresa[i].broj;
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+naloziToShowAdresa[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
+									a.innerHTML = naloziToShowAdresa[i].broj;
+									div.appendChild(a);
 								td.appendChild(div);
 							tr.appendChild(td);
 							
@@ -349,17 +349,7 @@
 								td.appendChild(div);
 							tr.appendChild(td);
 							
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value link");
-									var a = document.createElement("A");
-									a.setAttribute("href","/nalog/"+naloziToShowAdresa[i].broj);
-									a.setAttribute("target","_blank");
-									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
-									a.innerHTML = "Види налог";
-									div.appendChild(a);
-								td.appendChild(div);
-							tr.appendChild(td);
+							
 
 						table.appendChild(tr);	
 					}
@@ -386,11 +376,16 @@
 								div.innerHTML = eval(i+1)+".";
 								td.appendChild(div);
 							tr.appendChild(td);
-							
+
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojNaloga");
-								div.innerHTML = naloziToShowBroj[i].broj;
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+naloziToShowBroj[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
+									a.innerHTML = naloziToShowBroj[i].broj;
+									div.appendChild(a);
 								td.appendChild(div);
 							tr.appendChild(td);
 							
@@ -434,17 +429,7 @@
 								td.appendChild(div);
 							tr.appendChild(td);
 							
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value link");
-									var a = document.createElement("A");
-									a.setAttribute("href","/nalog/"+naloziToShow[i].broj);
-									a.setAttribute("target","_blank");
-									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
-									a.innerHTML = "Види налог";
-									div.appendChild(a);
-								td.appendChild(div);
-							tr.appendChild(td);
+							
 
 						table.appendChild(tr);	
 					}
