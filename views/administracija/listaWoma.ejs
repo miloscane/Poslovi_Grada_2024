@@ -1,0 +1,425 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+	</script>
+	<div class="pageWidth">
+		<div class="zavrseniNalozi">
+			<div class="boxesWrap">
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/sumIcon.png"></div>
+					<div class="info">
+						<div class="title">Укупно налога</div>
+						<div class="text"><%=nalozi.length%></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
+					<div class="info">
+						<div class="title">Приказани налози</div>
+						<div class="text"><span id="ukupno-prikazanih-naloga"></span></div>
+					</div>
+				</div>
+			</div>
+			<div class="lightBlueBox">
+				<div class="filters">
+					<div class="filter">
+						<div class="label">Приказане радне јединице:</div>
+						<div class="checkboxes" id="filter-opstine-checkboxes"></div>
+						<script>
+							for(var i=0;i<radneJedinice.length;i++){
+								var checkboxWrapper = document.createElement("DIV");
+								checkboxWrapper.setAttribute("class","checkboxWrapper");
+									var checkboxWrap = document.createElement("DIV");
+									checkboxWrap.setAttribute("class","checkboxWrap");
+										var input = document.createElement("INPUT");
+										input.setAttribute("type","checkbox");
+										input.setAttribute("class","radnaJedinicaCheckbox");
+										input.setAttribute("value",radneJedinice[i]);
+										input.setAttribute("oninput","generateTable()");
+										input.checked = true;
+										checkboxWrap.appendChild(input);
+									checkboxWrapper.appendChild(checkboxWrap);
+
+									var label = document.createElement("DIV");
+									label.setAttribute("class","label");
+									label.setAttribute("onclick","checkboxLabelClick(this)")
+									label.innerHTML	=	radneJedinice[i];
+									checkboxWrapper.appendChild(label);
+								document.getElementById("filter-opstine-checkboxes").appendChild(checkboxWrapper);
+							}
+
+							function checkboxLabelClick(elem){
+								if(elem.parentElement.getElementsByTagName("INPUT")[0].checked){
+									elem.parentElement.getElementsByTagName("INPUT")[0].checked = false;
+								}else{
+									elem.parentElement.getElementsByTagName("INPUT")[0].checked = true;
+								}
+								generateTable();
+							}
+						</script>
+					</div>
+					<div class="filter">
+						<div class="label">Филтер Адресе:</div>
+						<div class="checkboxes">
+							<input type="text" id="adresa-filter" oninput="adresaFilter(this)">
+						</div>
+					</div>
+					<div class="filter">
+						<div class="label">Филтер по броју налога:</div>
+						<div class="checkboxes">
+							<input type="number" id="broj-filter" oninput="brojFilter(this)">
+						</div>
+					</div>
+				</div>
+				<div class="tableWrap">
+					<div class="tableHeader">
+						<table>
+							<tr>
+								<td><div class="value redniBroj">Редни број</div></td>
+								<td><div class="value brojNaloga">Број налога</div></td>
+								<td><div class="value ikonica"></div></td>
+								<td><div class="value datumNaloga">Датум налога</div></td>
+								<td><div class="value radnaJedinica">Радна јединица</div></td>
+								<td><div class="value adresa">Адреса</div></td>
+								<td><div class="value status">Статус</div></td>
+								<td><div class="value link">Линк</div></td>
+							</tr>
+						</table>
+					</div>
+					<div class="table" id="table"></div>
+				</div>
+				<div class="inputWrap printButton" onclick="printTable()">
+					<div class="button">
+						<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
+						<div class="label">Штампај табелу</div>
+					</div>
+				</div>
+			</div>
+			<%- include ("partials/printer") -%>
+			<script>
+				var naloziToShow = [];
+				function generateTable(){
+					naloziToShow = [];
+					var opstineToShow = [];
+					var opstineFilter = document.getElementsByClassName("radnaJedinicaCheckbox");
+					for(var i=0;i<opstineFilter.length;i++){
+						if(opstineFilter[i].checked){
+							opstineToShow.push(opstineFilter[i].value);
+						}
+					}
+
+					for(var i=0;i<nalozi.length;i++){
+						//isfiltriraj ovde
+						if(opstineToShow.indexOf(nalozi[i].radnaJedinica)>=0){
+							var nalogToPush = {};
+							nalogToPush.broj = nalozi[i].broj;
+							nalogToPush.datum = nalozi[i].datum.datum;
+							nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
+							nalogToPush.adresa = nalozi[i].adresa;
+							nalogToPush.statusNaloga = nalozi[i].statusNaloga;
+							nalogToPush.majstor = nalozi[i].majstor;
+							naloziToShow.push(nalogToPush);	
+						}
+						
+					}
+					document.getElementById("ukupno-prikazanih-naloga").innerHTML = naloziToShow.length;
+					document.getElementById("table").innerHTML = "";
+					var table = document.createElement("TABLE");
+					for(var i=0;i<naloziToShow.length;i++){
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1)+".";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojNaloga");
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+naloziToShow[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)'");
+									a.innerHTML = naloziToShow[i].broj;
+									div.appendChild(a);
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value ikonica");
+								if(naloziToShow[i].statusNaloga=="Primljen" && podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
+								}else if(podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png'>"
+								}
+
+								if(naloziToShow[i].statusNaloga=="Završeno"){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png'>"
+								}
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value datumNaloga");
+								div.innerHTML = naloziToShow[i].datum;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value radnaJedinica");
+								div.innerHTML = naloziToShow[i].radnaJedinica;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value adresa");
+								div.innerHTML = naloziToShow[i].adresa;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value status");
+								div.innerHTML = naloziToShow[i].statusNaloga;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							
+
+						table.appendChild(tr);
+					}
+					document.getElementById("table").appendChild(table);
+				}
+
+				generateTable();
+
+				function adresaFilter(elem){
+					var filterValue = elem.value.toLowerCase();
+					var naloziToShowAdresa = [];
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].adresa.toLowerCase().includes(filterValue)){
+							naloziToShowAdresa.push(nalozi[i])
+						}
+					}
+					document.getElementById("table").innerHTML="";
+					var table = document.createElement("TABLE");
+					for(var i=0;i<naloziToShowAdresa.length;i++){
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1)+".";
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojNaloga");
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+naloziToShowAdresa[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
+									a.innerHTML = naloziToShowAdresa[i].broj;
+									div.appendChild(a);
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value ikonica");
+								if(naloziToShowAdresa[i].statusNaloga=="Primljen" && podizvodjaci.indexOf(naloziToShowAdresa[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
+								}else if(podizvodjaci.indexOf(naloziToShowAdresa[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png'>"
+								}
+
+								if(naloziToShow[i].statusNaloga=="Završeno"){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png'>"
+								}
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value datumNaloga");
+								div.innerHTML = naloziToShowAdresa[i].datum.datum;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value radnaJedinica");
+								div.innerHTML = naloziToShowAdresa[i].radnaJedinica;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value adresa");
+								div.innerHTML = naloziToShowAdresa[i].adresa;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value status");
+								div.innerHTML = naloziToShowAdresa[i].statusNaloga;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							
+
+						table.appendChild(tr);	
+					}
+					document.getElementById("table").appendChild(table);
+				}
+
+				function brojFilter(elem){
+					var filterValue = elem.value.toLowerCase();
+					var naloziToShowBroj = [];
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].broj.includes(filterValue)){
+							naloziToShowBroj.push(nalozi[i])
+						}
+					}
+					document.getElementById("table").innerHTML="";
+					var table = document.createElement("TABLE");
+					for(var i=0;i<naloziToShowBroj.length;i++){
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1)+".";
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojNaloga");
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+naloziToShowBroj[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
+									a.innerHTML = naloziToShowBroj[i].broj;
+									div.appendChild(a);
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value ikonica");
+								if(naloziToShowBroj[i].statusNaloga=="Primljen" && podizvodjaci.indexOf(naloziToShowBroj[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
+								}else if(podizvodjaci.indexOf(naloziToShowBroj[i].majstor)<0){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png'>"
+								}
+
+								if(naloziToShow[i].statusNaloga=="Završeno"){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png'>"
+								}
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value datumNaloga");
+								div.innerHTML = naloziToShowBroj[i].datum.datum;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value radnaJedinica");
+								div.innerHTML = naloziToShowBroj[i].radnaJedinica;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value adresa");
+								div.innerHTML = naloziToShowBroj[i].adresa;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value status");
+								div.innerHTML = naloziToShowBroj[i].statusNaloga;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							
+
+						table.appendChild(tr);	
+					}
+					document.getElementById("table").appendChild(table)
+					
+					
+				}
+
+				function printTable(){
+					doc.setFontSize(10);
+				    doc.setFontType("bold");
+				    var xOffset = 10;
+				    doc.text("Br.",xOffset,yPos);
+				    xOffset = xOffset + 7;
+				    doc.text("Broj Naloga",xOffset,yPos);
+				    xOffset = xOffset + 25;
+				    doc.text("Datum Naloga",xOffset,yPos);
+				    xOffset = xOffset + 25;
+				    doc.text("Opstina",xOffset,yPos);
+				    xOffset = xOffset + 25;
+				    doc.text("Adresa",xOffset,yPos);
+				    xOffset = xOffset + 50;
+				    doc.text("Status",xOffset,yPos);
+				    yPos= yPos+7;
+				    doc.setFontType("normal");
+				    for(var i=0;i<naloziToShow.length;i++){
+				    	xOffset = 10;
+					    doc.text(eval(i+1).toString()+".",xOffset,yPos);
+					    xOffset = xOffset + 7;
+					    doc.text(naloziToShow[i].broj,xOffset,yPos);
+					    xOffset = xOffset + 25;
+					    doc.text(naloziToShow[i].datum.split("00:")[0],xOffset,yPos);
+					    xOffset = xOffset + 25;
+					    doc.text(naloziToShow[i].radnaJedinica,xOffset,yPos);
+					    xOffset = xOffset + 25;
+					    doc.text(naloziToShow[i].adresa.split(",")[0],xOffset,yPos);
+					    xOffset = xOffset + 50;
+					    doc.text(naloziToShow[i].statusNaloga,xOffset,yPos);
+					    yPos= yPos+7;
+					    if(yPos>=285){
+					    	doc.addPage();
+					    	yPos = 12;
+					    	xOffset = 10;
+
+				    		doc.setFontType("bold");
+						    doc.text("Br.",xOffset,yPos);
+						    xOffset = xOffset + 7;
+						    doc.text("Broj Naloga",xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text("Datum Naloga",xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text("Opstina",xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text("Adresa",xOffset,yPos);
+						    xOffset = xOffset + 50;
+						    doc.text("Status",xOffset,yPos);
+						    yPos = yPos + 7;
+				    		doc.setFontType("normal");
+					    }
+				    }
+
+			        window.open(doc.output('bloburl'), '_blank');
+				}
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>
