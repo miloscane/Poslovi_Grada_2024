@@ -191,6 +191,16 @@
 					</div>
 					<div class="box noHover">
 						<div class="info">
+							<div class="text" id="dodele">
+								
+							</div>
+							<script>
+								var dodele = <%-JSON.stringify(dodele)%>;
+								for(var i=0;i<dodele.length;i++){
+									console
+									document.getElementById("dodele").innerHTML += eval(i+1)+". "+dodele[i].datum.datum + " "+dodele[i].datum.timestamp +" - "+getMajstorByCode(dodele[i].majstor).ime;
+								}
+							</script>
 							<div class="majstorNaNalogu" onclick="majstorNaNalogu()">
 								Пошаљи мајстора на налог
 							</div>

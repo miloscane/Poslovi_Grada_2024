@@ -3399,17 +3399,30 @@ server.get('/nalog/:broj',async (req,res)=>{
 											user: req.session.user
 										});
 									}else if(Number(req.session.user.role)==20){
-										res.render("dispeceri/nalog",{
-											pageTitle:"Налог број " + req.params.broj,
-											nalog: nalozi[0],
-											majstori: majstori,
-											cenovnik: cenovnik,
-											istorijat: istorijat,
-											izvestaji: izvestaji,
-											ucinci: ucinci,
-											phoneAccessCode: phoneAccessCode,
-											user: req.session.user
-										});
+										dodeljivaniNaloziDB.find({nalog:req.params.broj}).toArray()
+										.then((dodele)=>{
+											res.render("dispeceri/nalog",{
+												pageTitle:"Налог број " + req.params.broj,
+												nalog: nalozi[0],
+												majstori: majstori,
+												cenovnik: cenovnik,
+												istorijat: istorijat,
+												izvestaji: izvestaji,
+												ucinci: ucinci,
+												dodele: dodele,
+												phoneAccessCode: phoneAccessCode,
+												user: req.session.user
+											});
+										})
+										.catch((error)=>{
+											logError(error);
+											res.render("message",{
+												pageTitle: "Грешка",
+												message: "<div class=\"text\">Дошло је до грешке у бази податка 3376.</div>",
+												user: req.session.user
+											});
+										})
+										
 									}else if(Number(req.session.user.role)==30){
 										var obrada = ["Nalog u Stambenom","Spreman za fakturisanje","Spreman za obračun"];
 										if(obrada.indexOf(nalozi[0].statusNaloga)>=0){
