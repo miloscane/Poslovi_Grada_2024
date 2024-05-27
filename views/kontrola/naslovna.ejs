@@ -1,0 +1,72 @@
+<%- include ("partials/header") -%>
+	<div class="pageWidth">
+		<div class="proveraLokacije">
+			<div class="blueWrap">
+				<div class="imageWrap">
+					<!--<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/userIcon.svg" width="70">-->
+				</div>
+				<div class="inputWrap">
+					<div class="title">Одабир датума:</div>
+					<div class="inputWrapper">
+						<input type="date" id="date">
+						<script>
+							var yesterday = new Date();
+							yesterday.setDate(yesterday.getDate() - 1)
+
+							document.getElementById("date").value = getDateAsStringForInputObject(yesterday)
+						</script>
+					</div>
+				</div>
+				<div class="inputWrap">
+					<div class="title">Одабир мајстора:</div>
+					<div class="inputWrapper">
+						<select id="majstori"></select>
+						<script>
+							var majstori = <%-JSON.stringify(majstori)%>;
+							for(var i=0;i<majstori.length;i++){
+								if(!majstori[i].inactive){
+									var option = document.createElement("OPTION");
+									option.setAttribute("value",majstori[i].uniqueId);
+									option.innerHTML	=	majstori[i].ime;
+									if(podizvodjaci.indexOf(majstori[i].uniqueId)<0){
+										document.getElementById("majstori").appendChild(option);
+									}
+								}
+							}
+						</script>
+					</div>
+				</div>
+				<div class="inputWrap" style="margin-top:30px">
+					<div class="button" onclick="submitSearch()">Претражи</div>
+				</div>
+				<form method="POST" action="/proveraLokacijeMajstora" style="display:none" id="form">
+					<input type="text" name="json" id="json">
+				</form>
+				<script>
+					function submitSearch(){
+						var date = document.getElementById("date").value;
+						var majstor = document.getElementById("majstori").value;
+						var imeMajstora = "";
+						for(var i=0;i<document.getElementById("majstori").getElementsByTagName("OPTION").length ;i++){
+							if(document.getElementById("majstori").getElementsByTagName("option")[i].selected){
+								imeMajstora = document.getElementById("majstori").getElementsByTagName("option")[i].innerHTML;
+								break;
+							}
+						}
+						if(date && majstor){
+							var json = {};
+							json.date = date;
+							json.majstor = majstor;
+							json.imeMajstora = imeMajstora;
+							document.getElementById("json").value = JSON.stringify(json);
+							loadGif();
+							document.getElementById("form").submit();
+						}else{
+							alert("Морате одабрати датум и мајстора");
+						}
+					}
+				</script>
+			</div>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

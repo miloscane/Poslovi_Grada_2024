@@ -1926,6 +1926,8 @@ server.get('/',async (req,res)=>{
 			res.redirect("/administracija");
 		}else if(Number(req.session.user.role)==20){
 			res.redirect("/dispecer/otvoreniNalozi")
+		}else if(Number(req.session.user.role)==25){
+			res.redirect("/kontrola/naslovna")
 		}else if(Number(req.session.user.role)==30){
 			res.redirect("/podizvodjac/otvoreniNalozi")
 		}else if(Number(req.session.user.role)==40){
@@ -2496,6 +2498,25 @@ server.get('/stefan/kategorije',async (req,res)=>{
 	}
 });
 
+server.get('/kontrola/naslovna',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==25){	
+			res.render("kontrola/naslovna",{
+				pageTitle:"Контрола",
+				user: req.session.user
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 
 server.post('/prijemnice', async (req, res)=> {
 	if(req.session.user){
@@ -3037,12 +3058,13 @@ server.get('/proveraLokacijeMajstora',async (req,res)=>{
 	}
 });
 
+
 server.post('/proveraLokacijeMajstora',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
 			var json = JSON.parse(req.body.json);
 			var idMajstora = json.majstor;
-			console.log(idMajstora)
+			//console.log(idMajstora)
 			stariUcinakMajstoraDB.find({majstor:json.majstor,datum:json.date}).toArray()
 			.then((stariUcinci)=>{
 				//console.log(stariUcinci.length);
