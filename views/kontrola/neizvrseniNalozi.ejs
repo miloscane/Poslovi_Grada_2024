@@ -1,0 +1,42 @@
+<%- include ("partials/header") -%>
+	<script>
+		var informacije = <%-JSON.stringify(informacije)%>;
+	</script>
+	<div class="pageWidth">
+		<div class="neizvrseniNalozi">
+			<div id="text"></div>
+			<script>
+				var ukupnoNaloga = 0;
+				for(var i=0;i<informacije.length;i++){
+					ukupnoNaloga = ukupnoNaloga + informacije[i].brojNaloga;
+					var row = document.createElement("DIV");
+					row.setAttribute("class","row");
+						var inline = document.createElement("DIV");
+						inline.setAttribute("class","inline");
+						inline.innerHTML = informacije[i].radnaJedinica;
+						row.appendChild(inline);
+
+						var inline = document.createElement("DIV");
+						inline.setAttribute("class","inline");
+						inline.innerHTML = informacije[i].brojNaloga;
+						row.appendChild(inline);
+					document.getElementById("text").appendChild(row);
+				}
+
+				var row = document.createElement("DIV");
+				row.setAttribute("style","font-size:20px;border-top:1px solid rgb(100,100,100);padding-top:10px");
+				row.setAttribute("class","row");
+					var inline = document.createElement("DIV");
+					inline.setAttribute("class","inline");
+					inline.innerHTML = "УКУПНО";
+					row.appendChild(inline);
+
+					var inline = document.createElement("DIV");
+					inline.setAttribute("class","inline");
+					inline.innerHTML = ukupnoNaloga;
+					row.appendChild(inline);
+				document.getElementById("text").appendChild(row);
+			</script>
+		</div>
+	</div>	
+<%- include ("partials/footer") -%>

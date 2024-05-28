@@ -306,6 +306,7 @@ const uploadPrijemnica = multer({
 var mailPotpis = "<br>&nbsp;<br>Срдачан поздрав,<br>ВиК Портал Послова Града<br><img style='width:200px' src='https://portal.poslovigrada.rs/images/logo.png'>";
 var resetPassLimit = 1.8e6; //30 minuta
 var podizvodjaci  = ["SeHQZ--1672650353244","IIwY4--1672650358507","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","ylSnq--1672041756318"];
+var radneJedinice = ["ČUKARICA","RAKOVICA","NOVI BEOGRAD","ZEMUN","ZVEZDARA","VRAČAR","VOŽDOVAC","STARI GRAD","PALILULA","SAVSKI VENAC"];
 var meseciJson    = [{name:"Februar 2024",string:"02.2024"},{name:"Mart 2024",string:"03.2024"},{name:"April 2024",string:"04.2024"},{name:"Maj 2024",string:"05.2024"},{name:"Jun 2024",string:"06.2024"},{name:"Jul 2024",string:"07.2024"},{name:"Avgust 2024",string:"08.2024"},{name:"Septembar 2024",string:"09.2024"},{name:"Oktobar 2024",string:"10.2024"},{name:"Novembar 2024",string:"11.2024"},{name:"Decembar 2024",string:"12.2024"}]
 var phoneAccessCode = generateId(25);
 setInterval(function(){
@@ -2501,20 +2502,43 @@ server.get('/stefan/kategorije',async (req,res)=>{
 server.get('/kontrola/naslovna',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==25){
-			majstoriDB.find({}).toArray()
-			.then((majstori)=>{
-				res.render("kontrola/naslovna",{
-					pageTitle:"Контрола локације",
-					majstori: majstori,
+			var today = new Date();
+			naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom","Spreman za obračun","Završeno","Storniran"]}}).toArray()
+			.then((nalozi)=>{
+				for(var i=0;i<nalozi.length;i++){
+					if(podizvodjaci.indexOf(nalozi[i].majstor)>=0){
+						nalozi.splice(i,1);
+						i--;
+					}
+				}
+				var informacije = [];
+				for(var i=0;i<radneJedinice.length;i++){
+					var json = {};
+					json.radnaJedinica = radneJedinice[i];
+					json.brojNaloga = 0;
+					informacije.push(json);
+				}
+
+				for(var i=0;i<nalozi.length;i++){
+					for(var j=0;j<informacije.length;j++){
+						if(informacije[j].radnaJedinica == nalozi[i].radnaJedinica){
+							informacije[j].brojNaloga++;
+						}
+					}
+				}
+
+
+				res.render("kontrola/neizvrseniNalozi",{
+					pageTitle:"Неизвршени налози на дан "+getDateAsStringForDisplay(today),
+					informacije: informacije,
 					user: req.session.user
 				});
 			})
 			.catch((error)=>{
-				logError(error);
 				res.render("message",{
 					pageTitle: "Грешка",
 					user: req.session.user,
-					message: "<div class=\"text\">Грешка у бази података 2513.</div>"
+					message: "<div class=\"text\">Грешка у бази података 2517.</div>"
 				});
 			})
 		}else{

@@ -89,7 +89,8 @@
 							<div class="menuItem"><a href="/digitalizacijaNaloga" onclick="loadGif()">Дигитализација налога</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
 						<% }else if(Number(user.role)==25){ %>
-							<div class="menuItem"><a href="/kontrola/naslovna">Контрола локације</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/kontrola/naslovna">Неизвршени налози</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/proveraLokacijeMajstora">Контрола локације</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
 						<% }else if(Number(user.role)==30){ %>
 							<div class="menuItem"><a href="#">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
