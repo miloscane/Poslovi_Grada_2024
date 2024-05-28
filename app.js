@@ -2500,11 +2500,23 @@ server.get('/stefan/kategorije',async (req,res)=>{
 
 server.get('/kontrola/naslovna',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==25){	
-			res.render("kontrola/naslovna",{
-				pageTitle:"Контрола",
-				user: req.session.user
-			});
+		if(Number(req.session.user.role)==25){
+			majstoriDB.find({}).toArray()
+			.then((majstori)=>{
+				res.render("kontrola/naslovna",{
+					pageTitle:"Контрола локације",
+					majstori: majstori,
+					user: req.session.user
+				});
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 2513.</div>"
+				});
+			})
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -3029,7 +3041,7 @@ server.get('/naloziPoKategorijama',async (req,res)=>{
 
 server.get('/proveraLokacijeMajstora',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==25){
 			majstoriDB.find({}).toArray()
 			.then((majstori)=>{
 				res.render("administracija/proveraLokacijeMajstora",{
@@ -3061,95 +3073,72 @@ server.get('/proveraLokacijeMajstora',async (req,res)=>{
 
 server.post('/proveraLokacijeMajstora',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==25){
 			var json = JSON.parse(req.body.json);
 			var idMajstora = json.majstor;
 			//console.log(idMajstora)
-			stariUcinakMajstoraDB.find({majstor:json.majstor,datum:json.date}).toArray()
-			.then((stariUcinci)=>{
+			dodeljivaniNaloziDB.find({majstor:json.majstor,"datum.datum":reshuffleDate(json.date)}).toArray()
+			.then((dodeljivaniNalozi)=>{
+				//console.log(dodeljivaniNalozi);
 				//console.log(stariUcinci.length);
-				var brojeviNaloga = [];
-				for(var i=0;i<stariUcinci.length;i++){
-					brojeviNaloga.push(stariUcinci[i].brojNaloga);
-				}
-				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
-				.then((nalozi)=>{
-					//console.log(nalozi.length)
-					var naloziToSend = [];
-					for(var i=0;i<nalozi.length;i++){
-						var jsonToPush = {};
-						jsonToPush.broj = nalozi[i].broj;
-						jsonToPush.coordinates = nalozi[i].coordinates;
-						naloziToSend.push(jsonToPush);
-					}
-					request(ntsOptions, (error,response,body)=>{
-						if(error){
-							logError(error)
+				request(ntsOptions, (error,response,body)=>{
+					if(error){
+						logError(error)
+						res.render("message",{
+							pageTitle: "Грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Грешка у бази података 2921</div>"
+						});
+					}else{
+						var cookie = response.headers['set-cookie'];
+						var headers = {
+							'accept': 'application/json',
+					    'Cookie': cookie,
+					    'Content-Type': 'application/json'
+						}
+						var options = {
+						    url: 'http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true',
+						    method: 'GET',
+						    headers: headers
+						};
+						var idNavigacije = 0;
+						for(var i=0;i<navigacijaInfo.length;i++){
+							if(navigacijaInfo[i].idMajstora==idMajstora){
+								idNavigacije = navigacijaInfo[i].idNavigacije;
+								break;
+							}
+						}
+						if(idNavigacije==0){
 							res.render("message",{
 								pageTitle: "Грешка",
 								user: req.session.user,
-								message: "<div class=\"text\">Грешка у бази података 2921</div>"
+								message: "<div class=\"text\">Непознато возило за мајстора.</div>"
 							});
 						}else{
-							var cookie = response.headers['set-cookie'];
-							var headers = {
-								'accept': 'application/json',
-						    'Cookie': cookie,
-						    'Content-Type': 'application/json'
-							}
+							var yesterday = new Date(json.date);
+							yesterday.setDate(yesterday.getDate()+1);
 							var options = {
-							    url: 'http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true',
+							    url: 'https://app.nts-international.net/ntsapi/stops?vehicle='+idNavigacije+'&from='+json.date+' 00:00:00&to='+json.date+' 23:59:00&timzeone=UTC&version=2.3',
 							    method: 'GET',
 							    headers: headers
 							};
-							var idNavigacije = 0;
-							for(var i=0;i<navigacijaInfo.length;i++){
-								if(navigacijaInfo[i].idMajstora==idMajstora){
-									idNavigacije = navigacijaInfo[i].idNavigacije;
-									break;
+							request(options, (error,response3,body3)=>{
+								if(error){
+									logError(error)
+								}else{
+									var stops = JSON.parse(response3.body)
+									res.render("administracija/izvestajLokacijeMajstora",{
+										pageTitle: "Извештај локације за "+json.imeMajstora+" за датум "+reshuffleDate(json.date),
+										user: req.session.user,
+										nalozi: dodeljivaniNalozi,
+										stops: stops
+									});
 								}
-							}
-							if(idNavigacije==0){
-								res.render("message",{
-									pageTitle: "Грешка",
-									user: req.session.user,
-									message: "<div class=\"text\">Непознато возило за мајстора.</div>"
-								});
-							}else{
-								var yesterday = new Date(json.date);
-								yesterday.setDate(yesterday.getDate()+1);
-								var options = {
-								    url: 'https://app.nts-international.net/ntsapi/stops?vehicle='+idNavigacije+'&from='+json.date+' 00:00:00&to='+json.date+' 23:59:00&timzeone=UTC&version=2.3',
-								    method: 'GET',
-								    headers: headers
-								};
-								request(options, (error,response3,body3)=>{
-									if(error){
-										logError(error)
-									}else{
-										var stops = JSON.parse(response3.body)
-										res.render("administracija/izvestajLokacijeMajstora",{
-											pageTitle: "Извештај локације за "+json.imeMajstora+" за датум "+reshuffleDate(json.date),
-											user: req.session.user,
-											nalozi: naloziToSend,
-											stops: stops
-										});
-									}
-								});
-							}
-							
+							});
 						}
-					});
-
-				})
-				.catch((error)=>{
-					logError(error);
-					res.render("message",{
-						pageTitle: "Грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Грешка у бази података 2910</div>"
-					});
-				})
+						
+					}
+				});
 			})
 			.catch((error)=>{
 				logError(error);
@@ -4497,7 +4486,7 @@ server.get('/ucinakMajstora',async (req,res)=>{
 
 server.get('/mapa',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==5 || Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
+		if(Number(req.session.user.role)==5 || Number(req.session.user.role)==10 || Number(req.session.user.role)==20 || Number(req.session.user.role)==25){
 			if(Number(req.session.user.role)==20){
 				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"]}}).toArray()
 				.then((nalozi) => {
