@@ -381,6 +381,17 @@ function reshuffleDate(date){//gets yyyy-mm-dd and returns dd.mm.yyyy
   return  array[2]+"."+array[1]+"."+array[0];
 }
 
+function arraysEqual(a, b) {
+	if (a === b) return true;
+	if (a == null || b == null) return false;
+	if (a.length !== b.length) return false;
+
+	for (var i = 0; i < a.length; ++i) {
+	  if (a[i] !== b[i]) return false;
+	}
+	return true;
+}
+
 function parseNalog(data,user,lokacija){
 	//datumi se upisuju kao dd.mm.yyyy
 	var nalogArray	=	data.split("\n");
@@ -828,6 +839,33 @@ http.listen(process.env.PORT, function(){
 			}, index*100)
 		)*/
 
+		/*var kategorije = fs.readFileSync("Kategorije.csv",{encoding:"utf8"});
+		var kategorijeArray = kategorije.split("\r\n");
+		var kategorijeFinal = [];
+		for(var i=0;i<kategorijeArray.length;i++){
+			var kategorijaArray = kategorijeArray[i].split(";");
+			kategorijaArray[1] = kategorijaArray[1].trim();
+			kategorijeFinal.push(kategorijaArray);
+			//console.log(kategorijaArray[1] + " / " + kategorijaArray[13])
+		}
+
+		kategorijeFinal.forEach((value, index) =>
+			setTimeout(() => {
+					var setObj	=	{ $set: {
+						kategorija: value[13],
+					}};
+					pricesDB.updateOne({code:value[1]},setObj)
+					.then((dbResponse)=>{
+						console.log(index+"/"+kategorijeArray.length);
+						console.log("success")
+					})
+					.catch((error)=>{
+						console.log(error);
+					})
+				//console.log(value[1] + " / " + value[13])
+			}, index*100)
+		)*/
+
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			for(var i=0;i<nalozi.length;i++){
@@ -942,7 +980,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			cenovnik = prices;
 			console.log("Cenovnik inicijalizovan");
 
-			var kategorije = [];
+			/*var kategorije = [];
 			for(var i=0;i<prices.length;i++){
 				if(prices[i].hasOwnProperty("kategorije")){
 					for(var j=0;j<prices[i].kategorije.length;j++){
@@ -953,7 +991,7 @@ request(geoCodeOptions, (error,response,body)=>{
 				}
 			}
 
-			console.log(kategorije)
+			console.log(kategorije)*/
 			
 
 			//Ubacivanje prijemnica
@@ -2952,95 +2990,222 @@ server.get('/naloziPoKategorijama',async (req,res)=>{
 		if(Number(req.session.user.role)==10){
 			naloziDB.find({}).toArray()
 			.then((nalozi)=>{
-				var informacije = [];
-				informacije.push({broj:"13.2024",ime:"Укупно",kategorije:[]});
-				for(var i=0;i<meseciJson.length;i++){
-					informacije.push({broj:meseciJson[i].string,ime:meseciJson[i].name,kategorije:[]});
-				}
 				pricesDB.find({}).toArray()
 				.then((prices)=>{
 					var kategorije = [];
 					for(var i=0;i<prices.length;i++){
-						if(prices[i].hasOwnProperty("kategorije")){
-							for(var j=0;j<prices[i].kategorije.length;j++){
-								if(kategorije.indexOf(prices[i].kategorije[j])<0){
-									kategorije.push(prices[i].kategorije[j])
-								}
-							}	
+						if(kategorije.indexOf(prices[i].kategorija)<0){
+							if(prices[i].kategorija!=""){
+								kategorije.push(prices[i].kategorija);
+							}
 						}
+					}
+					//console.log(kategorije)
+					var informacije = [];
+					var informacijePodizvodjaci = [];
+					for(var i=0;i<meseciJson.length;i++){
+						informacije.push({broj:meseciJson[i].string,ime:meseciJson[i].name,kategorije:[]});
+						informacijePodizvodjaci.push({broj:meseciJson[i].string,ime:meseciJson[i].name,kategorije:[]});
 					}
 					for(var i=0;i<informacije.length;i++){
 						for(var j=0;j<kategorije.length;j++){
 							informacije[i].kategorije.push({ime:kategorije[j],iznos:0,brojNaloga:0})
 						}
-						informacije[i].kategorije.push({ime:"Изоловане констатације",iznos:0,brojNaloga:0})
 					}
+					for(var i=0;i<informacijePodizvodjaci.length;i++){
+						for(var j=0;j<kategorije.length;j++){
+							informacijePodizvodjaci[i].kategorije.push({ime:kategorije[j],iznos:0,brojNaloga:0})
+						}
+					}
+
+					//Izbaci naloge bez prijemnice
+					for(var i=0;i<nalozi.length;i++){
+						if(!nalozi[i].prijemnica.datum.datum){
+							nalozi.splice(i,1);
+							i--;
+							//console.log("Izbacio sam nalog bez prijemnice");
+						}
+					}
+						
+					//Izbaci naloge koji su konstatacija
+					var naloziKonstatacije = [];
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].obracun.length==2 || nalozi[i].obracun.length==1){
+							var kombinacije = [
+									["80.04.01.002"],
+									["80.04.01.004"],
+									["80.04.01.005"],
+									["80.04.01.002","80.04.01.004"],
+									["80.04.01.004","80.04.01.002"],
+									["80.04.01.002","80.04.01.005"],
+									["80.04.01.005","80.04.01.002"],
+									["80.04.01.004","80.04.01.005"],
+									["80.04.01.005","80.04.01.004"]
+								];
+							var proveraArray = [];
+							for(var j=0;j<nalozi[i].obracun.length;j++){
+								proveraArray.push(nalozi[i].obracun[j].code);
+							}
+							var nalogKonstatacije = false;
+							for(var j=0;j<kombinacije.length;j++){
+								if(arraysEqual(kombinacije[j],proveraArray)){
+									nalogKonstatacije = true;
+									break;
+								}
+							}
+							if(nalogKonstatacije){
+								naloziKonstatacije.push(nalozi[i]);
+								nalozi.splice(i,1);
+								i--;
+								//console.log("Nasao sam nalog gde je samo konstatacija");
+							}
+						}
+					}
+
 					
 
 					for(var i=0;i<nalozi.length;i++){
-						if(nalozi[i].prijemnica.datum.datum){
-							for(var j=0;j<nalozi[i].obracun.length;j++){
-								nalozi[i].obracun[j].kategorije = [];
-								for(var k=0;k<prices.length;k++){
-									if(nalozi[i].obracun[j].code==prices[k].code){
-										if(prices[k].hasOwnProperty("kategorije")){
-											for(var l=0;l<prices[k].kategorije.length;l++){
-												for(var q=0;q<informacije.length;q++){
-													if(nalozi[i].prijemnica.datum.datum.includes(informacije[q].broj)){
-														for(var w=0;w<informacije[q].kategorije.length;w++){
-															if(informacije[q].kategorije[w].ime==prices[k].kategorije[l]){
-																informacije[q].kategorije[w].iznos = informacije[q].kategorije[w].iznos + parseFloat(nalozi[i].obracun[j].quantity)*parseFloat(prices[k].price);
-															}
-														}
-													}
-												}
-											}	
+						//nadji index u informacijama
+						var informationIndex = -1;
+						for(var j=0;j<informacije.length;j++){
+							if(nalozi[i].prijemnica.datum.datum.includes(informacije[j].broj)){
+								informationIndex = j;
+								break;
+							}
+						}
+						if(informationIndex>=0){
+							if(podizvodjaci.indexOf(nalozi[i].majstor)<0){
+								//Poslovi Grada
+								for(var j=0;j<nalozi[i].obracun.length;j++){
+									//Prepravi da sifre konstatacije budu kategorisane kao poslednja stavka
+									var sifreZaKonstataciju = ["80.04.01.002","80.04.01.004","80.04.01.005"];
+									if(sifreZaKonstataciju.indexOf(nalozi[i].obracun[j].code)<0){
+										var nazivKategorije = "";
+										var cenaKategorije = 0;
+										for(var k=0;k<prices.length;k++){
+											if(prices[k].code==nalozi[i].obracun[j].code){
+												nazivKategorije = prices[k].kategorija;
+												cenaKategorije = parseFloat(prices[k].price);
+											}
+										}	
+									}else{
+										var nazivKategorije = "";
+										var cenaKategorije = 0;
+										if(nalozi[i].obracun[j].code=="80.04.01.002"){
+											cenaKategorije = 1150;
+										}else if(nalozi[i].obracun[j].code=="80.04.01.004"){
+											cenaKategorije = 4600;
+										}else if(nalozi[i].obracun[j].code=="80.04.01.005"){
+											cenaKategorije = 2300;
+										}
+										for(var k=0;k<prices.length;k++){
+											if(prices[k].code==nalozi[i].obracun[nalozi[i].obracun.length-1].code){
+												nazivKategorije = prices[k].kategorija;
+											}
 										}
 									}
+									
+									if(nazivKategorije!=""){
+										for(var k=0;k<informacije[informationIndex].kategorije.length;k++){
+											if(nazivKategorije==informacije[informationIndex].kategorije[k].ime){
+												informacije[informationIndex].kategorije[k].iznos = informacije[informationIndex].kategorije[k].iznos + parseFloat(nalozi[i].obracun[j].quantity)*cenaKategorije;
+												informacije[informationIndex].kategorije[k].brojNaloga++;
+											}
+										}	
+									}
+									
 								}
-							}
+							}else{
+								//Podizvodjac
+								for(var j=0;j<nalozi[i].obracun.length;j++){
+									//Prepravi da sifre konstatacije budu kategorisane kao poslednja stavka
+									var sifreZaKonstataciju = ["80.04.01.002","80.04.01.004","80.04.01.005"];
+									if(sifreZaKonstataciju.indexOf(nalozi[i].obracun[j].code)<0){
+										var nazivKategorije = "";
+										var cenaKategorije = 0;
+										for(var k=0;k<prices.length;k++){
+											if(prices[k].code==nalozi[i].obracun[j].code){
+												nazivKategorije = prices[k].kategorija;
+												cenaKategorije = parseFloat(prices[k].price);
+											}
+										}	
+									}else{
+										var nazivKategorije = "";
+										var cenaKategorije = 0;
+										if(nalozi[i].obracun[j].code=="80.04.01.002"){
+											cenaKategorije = 1150;
+										}else if(nalozi[i].obracun[j].code=="80.04.01.004"){
+											cenaKategorije = 4600;
+										}else if(nalozi[i].obracun[j].code=="80.04.01.005"){
+											cenaKategorije = 2300;
+										}
+										for(var k=0;k<prices.length;k++){
+											if(prices[k].code==nalozi[i].obracun[nalozi[i].obracun.length-1].code){
+												nazivKategorije = prices[k].kategorija;
+											}
+										}
+									}
+									
+									if(nazivKategorije!=""){
+										for(var k=0;k<informacijePodizvodjaci[informationIndex].kategorije.length;k++){
+											if(nazivKategorije==informacijePodizvodjaci[informationIndex].kategorije[k].ime){
+												informacijePodizvodjaci[informationIndex].kategorije[k].iznos = informacijePodizvodjaci[informationIndex].kategorije[k].iznos + parseFloat(nalozi[i].obracun[j].quantity)*cenaKategorije;
+												informacijePodizvodjaci[informationIndex].kategorije[k].brojNaloga++;
+											}
+										}	
+									}
+									
+								}
+							}	
 						}
 					}
 
 
-					var izolovaneKonstatacije = [];
-					izolovaneKonstatacije.push({broj:"13.2024",ime:"Укупно",iznos:0,brojNaloga:0});
-					for(var i=0;i<meseciJson.length;i++){
-						izolovaneKonstatacije.push({broj:meseciJson[i].string,ime:meseciJson[i].name,kategorije:[]});
+					//Anuliraj konstatacije
+					for(var i=0;i<informacije.length;i++){
+						for(var j=0;j<informacije[i].kategorije.length;j++){
+							if(informacije[i].kategorije[j].ime == "Konstatacija"){
+								informacije[i].kategorije[j].brojNaloga = 0;
+								informacije[i].kategorije[j].iznos = 0;
+							}
+						}
 					}
-					var sifreZaIzolovanuKonstataciju = ["80.04.01.002","80.04.01.005"];
-					for(var i=0;i<nalozi.length;i++){
-						if(nalozi[i].prijemnica.datum.datum){
-							if(nalozi[i].obracun.length<2){
-								var nalogValja = true;
-								for(var j=0;j<nalozi[i].obracun.length;j++){
-									if(sifreZaIzolovanuKonstataciju.indexOf(nalozi[i].obracun[j].code)<0){
-										nalogValja = false;
+					for(var i=0;i<naloziKonstatacije.length;i++){
+						var informationIndex = -1;
+						for(var j=0;j<informacije.length;j++){
+							if(nalozi[i].prijemnica.datum.datum.includes(informacije[j].broj)){
+								informationIndex = j;
+								break;
+							}
+						}
+
+						if(informationIndex>=0){
+							if(podizvodjaci.indexOf(nalozi[i].majstor)<0){
+								for(var j=0;j<informacije[informationIndex].kategorije.length;j++){
+									if(informacije[informationIndex].kategorije[j].ime=="Konstatacija"){
+										informacije[informationIndex].kategorije[j].iznos = informacije[informationIndex].kategorije[j].iznos + parseFloat(naloziKonstatacije[i].ukupanIznos);
+										informacije[informationIndex].kategorije[j].brojNaloga;
 									}
 								}
-								if(nalogValja){
-									izolovaneKonstatacije[0].iznos = izolovaneKonstatacije[0].iznos + parseFloat(nalozi[i].ukupanIznos);
-									izolovaneKonstatacije[0].brojNaloga++;
-								}
+							}else{
+								for(var j=0;j<informacijePodizvodjaci[informationIndex].kategorije.length;j++){
+									if(informacijePodizvodjaci[informationIndex].kategorije[j].ime=="Konstatacija"){
+										informacijePodizvodjaci[informationIndex].kategorije[j].iznos = informacijePodizvodjaci[informationIndex].kategorije[j].iznos + parseFloat(naloziKonstatacije[i].ukupanIznos);
+										informacijePodizvodjaci[informationIndex].kategorije[j].brojNaloga;
+									}
+								}	
 							}
 						}
 					}
 
-					for(var i=0;i<informacije[0].kategorije.length;i++){
-						for(var j=1;j<informacije.length;j++){
-							for(var k=0;k<informacije[j].kategorije.length;k++){
-								if(informacije[0].kategorije[i].ime==informacije[j].kategorije[k].ime){
-									informacije[0].kategorije[i].iznos = informacije[0].kategorije[i].iznos + informacije[j].kategorije[k].iznos;
-								}
-							}
-						}
-					}
+
+					
 
 					res.render("administracija/naloziPoKategorijama",{
 						pageTitle: "Категорије",
 						user: req.session.user,
 						informacije: informacije,
-						izolovaneKonstatacije: izolovaneKonstatacije
+						informacijePodizvodjaci: informacijePodizvodjaci
 					});
 				})
 				.catch((error)=>{

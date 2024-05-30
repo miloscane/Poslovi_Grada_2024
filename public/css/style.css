@@ -3909,13 +3909,45 @@ input[type=number] {
 }
 
 .autoKategorije .mesec .kategorije .kategorija{
-    width: calc(20% - 0px);
+    width: calc(25% - 0px);
     
     background-color:rgb(37,57,101);
     color:rgb(255,255,255);
     font-size:16px;
     border:1px solid rgb(255,255,255);
-    padding:5px;
+    padding:10px;
+}
+
+.autoKategorije .mesec .kategorije .kategorija .ime{
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:6px;
+}
+
+.autoKategorije .mesec .kategorije .kategorija .iznos .row{
+    font-size: 0;
+    margin-bottom:2px;
+}
+
+.autoKategorije .mesec .kategorije .kategorija .iznos .row:last-child{
+    padding-top:4px;
+    margin-top:4px;
+    border-top:1px solid rgb(255,255,255);
+}
+
+.autoKategorije .mesec .kategorije .kategorija .iznos .row .name{
+    font-size: 14px;
+    display:inline-block;
+    vertical-align: middle;
+    width:40%;
+}
+
+.autoKategorije .mesec .kategorije .kategorija .iznos .row .iznosDiv{
+    font-size: 14px;
+    display:inline-block;
+    vertical-align: middle;
+    width:60%;
+    font-style:italic;
 }
 
 .proveraLokacije input{

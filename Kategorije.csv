@@ -1,6 +1,4 @@
-﻿1;2;3;4;5;6;7;8;;;;;6;
- Broj stavke ; Sifra artikla ; Artikal ; JM ;Jedinična cena bez PDV-a ; Makimalna jedinična cena bez PDV-a  ; Okvirna kolicina ; Ukupna ponuđena cena bez PDV-a ; Line ID ;Stari cenovnik;Stari sa umanjenjem od 25%;umanjena cena 40%;umanjena cena 45%;
- 1 ; 80.01.01.001 ;" Zamena pocinkovane cevi 1/2"" do 2m1 "; M ;0,00;2.477,00;400;0,00; 328384 ;2.477,00;1857,75;1486,2;1.362,35;Zamena
+﻿ 1 ; 80.01.01.001 ;" Zamena pocinkovane cevi 1/2"" do 2m1 "; M ;0,00;2.477,00;400;0,00; 328384 ;2.477,00;1857,75;1486,2;1.362,35;Zamena
  2 ; 80.01.01.002 ;" Zamena pocinkovane cevi 3/4"" do 2m1 "; M ;0,00;2.588,00;300;0,00; 328385 ;2.588,00;1941;1552,8;1.423,40;Zamena
  3 ; 80.01.01.003 ;" Zamena pocinkovane cevi 1"" do 2m1 "; M ;0,00;3.254,00;200;0,00; 328386 ;3.254,00;2440,5;1952,4;1.789,70;Zamena
  4 ; 80.01.01.004 ;" Zamena pocinkovane cevi 5/4"" do 2m1 "; M ;0,00;3.474,00;100;0,00; 328387 ;3.474,00;2605,5;2084,4;1.910,70;Zamena
@@ -1629,7 +1627,3 @@
  1627 ; 80.04.01.006 ; Snimanje kanalizacionih cevi uređajem za TV inspekciju. ; kom ;0,00;8.000,00;90;0,00; 329794 ;8892;6669;4800;4.400,00;
  1628 ; 80.04.01.007 ; Nabavka i ugradnja mašinski šrafova za revizioni poklopac ; kom ;0,00;20,00;200;0,00; 329795 ;20,00;15;12;11,00;Zamena
  1629 ; 80.04.01.008 ; Sanacija kan. cevi sa unutrasnje strane poliuretanskim smolama. ; M ;0,00;40.000,00;100;0,00; 329796 ;40.000,00;30000;24000;22.000,00;Zamena
-Ukupno bez PDV-a;;;;;;;;;;;;;
-Ukupno sa PDV-om;;;;;;;;;;;;;
-;;;;;;;;;;;;;
-;;;;;4.346.720,10;;;;;;2608032,06;2390696,055;

@@ -1,9 +1,19 @@
 <%- include ("partials/header") -%>
 	<script>
 		var informacije = <%-JSON.stringify(informacije)%>;
-		console.log(informacije)
-		var izolovaneKonstatacije = <%-JSON.stringify(izolovaneKonstatacije)%>;
-		console.log(informacije)
+		for(var i=0;i<informacije.length;i++){
+			informacije[i].iznos = 0;
+			for(var j=0;j<informacije[i].kategorije.length;j++){
+				informacije[i].iznos = informacije[i].iznos + informacije[i].kategorije[j].iznos
+			}
+		}
+		var informacijePodizvodjaci = <%-JSON.stringify(informacijePodizvodjaci)%>;
+		for(var i=0;i<informacijePodizvodjaci.length;i++){
+			informacijePodizvodjaci[i].iznos = 0;
+			for(var j=0;j<informacijePodizvodjaci[i].kategorije.length;j++){
+				informacijePodizvodjaci[i].iznos = informacijePodizvodjaci[i].iznos + informacijePodizvodjaci[i].kategorije[j].iznos
+			}
+		}
 	</script>
 	<div class="pageWidth">
 		<div class="autoKategorije" id="auto-kategorije"></div>
@@ -13,7 +23,7 @@
 				mesec.setAttribute("class","mesec");
 					var title = document.createElement("DIV");
 					title.setAttribute("class","title");
-					title.innerHTML = informacije[i].ime;
+					title.innerHTML = informacije[i].ime +" / "+brojSaRazmacima(informacije[i].iznos + informacijePodizvodjaci[i].iznos);
 					mesec.appendChild(title);
 
 					var kategorije = document.createElement("DIV");
@@ -28,7 +38,47 @@
 
 							var iznos = document.createElement("DIV");
 							iznos.setAttribute("class","iznos");
-							iznos.innerHTML = brojSaRazmacima(informacije[i].kategorije[j].iznos);
+							//iznos.innerHTML	= "PG: " + brojSaRazmacima(informacije[i].kategorije[j].iznos)+"<br>Podizvodjaci: " +brojSaRazmacima(informacijePodizvodjaci[i].kategorije[j].iznos)+"<br>Ukupno: "+brojSaRazmacima(informacije[i].kategorije[j].iznos+informacijePodizvodjaci[i].kategorije[j].iznos);
+								var row = document.createElement("DIV");
+								row.setAttribute("class","row");
+									var nameDiv = document.createElement("DIV");
+									nameDiv.setAttribute("class","name");
+									nameDiv.innerHTML = "PG:";
+									row.appendChild(nameDiv);
+
+									var iznosDiv = document.createElement("DIV");
+									iznosDiv.setAttribute("class","iznosDiv");
+									iznosDiv.innerHTML = brojSaRazmacima(informacije[i].kategorije[j].iznos);
+									row.appendChild(iznosDiv);
+								iznos.appendChild(row);
+
+								var row = document.createElement("DIV");
+								row.setAttribute("class","row");
+									var nameDiv = document.createElement("DIV");
+									nameDiv.setAttribute("class","name");
+									nameDiv.innerHTML = "Podizv.:";
+									row.appendChild(nameDiv);
+
+									var iznosDiv = document.createElement("DIV");
+									iznosDiv.setAttribute("class","iznosDiv");
+									iznosDiv.innerHTML = brojSaRazmacima(informacijePodizvodjaci[i].kategorije[j].iznos);
+									row.appendChild(iznosDiv);
+								iznos.appendChild(row);
+								
+
+								var row = document.createElement("DIV");
+								row.setAttribute("class","row");
+									var nameDiv = document.createElement("DIV");
+									nameDiv.setAttribute("class","name");
+									nameDiv.innerHTML = "Ukupno:";
+									row.appendChild(nameDiv);
+
+									var iznosDiv = document.createElement("DIV");
+									iznosDiv.setAttribute("class","iznosDiv");
+									iznosDiv.innerHTML = brojSaRazmacima(informacijePodizvodjaci[i].kategorije[j].iznos+informacije[i].kategorije[j].iznos);
+									row.appendChild(iznosDiv);
+								iznos.appendChild(row);
+
 							kategorija.appendChild(iznos);
 						kategorije.appendChild(kategorija);
 					}
