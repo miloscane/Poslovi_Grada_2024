@@ -15,7 +15,24 @@
 					<div class="label">Штампај налог</div>
 				</div>
 			</div>
-			<div class="inputWrap printButton" style="margin-left:210px; display:inline-block;vertical-align: top;">
+			<div class="inputWrap printButton" style="margin-left:30px; display:inline-block;vertical-align: top;">
+				<div class="button" onclick="copyToViber(this)">
+					<div class="label">ВИБЕР</div>
+				</div>
+			</div>
+			<script>
+				function copyToViber(elem){
+					var text = nalog.broj+"\r\n*"+nalog.adresa+", "+nalog.radnaJedinica+"*\r\n\r\n"+nalog.opis+"\r\n\r\n"+nalog.zahtevalac+"\r\n\r\n"+"Klikni ovde za navigaciju do naloga:\r\n"+"https://www.google.com/maps/search/?api=1&query="+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+');
+					navigator.clipboard.writeText(text)
+					.then(()=>{
+						elem.innerHTML = "КОПИРАНО"
+					})
+					.catch((error)=>{
+						console.log(error)
+					})
+				}
+			</script>
+			<div class="inputWrap printButton" style="margin-left:30px; display:inline-block;vertical-align: top;">
 				<div class="button" onclick="saveNalog()">
 					<div class="label">САЧУВАЈ</div>
 				</div>

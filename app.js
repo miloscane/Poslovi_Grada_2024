@@ -941,6 +941,19 @@ request(geoCodeOptions, (error,response,body)=>{
 			}
 			cenovnik = prices;
 			console.log("Cenovnik inicijalizovan");
+
+			var kategorije = [];
+			for(var i=0;i<prices.length;i++){
+				if(prices[i].hasOwnProperty("kategorije")){
+					for(var j=0;j<prices[i].kategorije.length;j++){
+						if(kategorije.indexOf(prices[i].kategorije[j])<0){
+							kategorije.push(prices[i].kategorije[j])
+						}
+					}	
+				}
+			}
+
+			console.log(kategorije)
 			
 
 			//Ubacivanje prijemnica
@@ -2552,7 +2565,6 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
 });
-
 
 server.post('/prijemnice', async (req, res)=> {
 	if(req.session.user){
