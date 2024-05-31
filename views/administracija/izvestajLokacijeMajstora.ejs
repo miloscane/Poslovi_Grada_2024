@@ -1,13 +1,13 @@
 <%- include ("partials/header") -%>
 	<style>
 		.gm-style-iw{
-			padding:0px !important;
+			padding:2px !important;
 		}
 
 		.gm-style .gm-style-iw-d{
 			padding:0px !important;
 			margin-bottom:-10px;
-			margin-right:-10px;
+			margin-right:-12px;
 		}
 
 		.gm-ui-hover-effect{
@@ -18,8 +18,8 @@
 		<script>
 			var nalozi = <%-JSON.stringify(nalozi)%>;
 			var stops = <%-JSON.stringify(stops)%>;
-			var pauza = 5;//min
-			pauza = 5 * 60000
+			var pauza = 3;//min
+			pauza = pauza * 60000
 			//console.log(stops);
 			for(var i=0;i<stops.length;i++){
 				var stopStart = new Date(stops[i].gmtStopStart);
@@ -227,7 +227,7 @@
 				         }
 				    });
 				    var infowindow = new google.maps.InfoWindow({
-						content: "<a href=\"/nalog/"+nalozi[i].nalog+"\" style=\"color:rgb(31,52,101)\" target=\"_blank\">" + nalozi[i].nalog + "</a>"
+						content: nalozi[i].datum.timestamp+"<br>"+"<a href=\"/nalog/"+nalozi[i].nalog+"\" style=\"color:rgb(31,52,101)\" target=\"_blank\">" + nalozi[i].nalog + "</a>"
 					});
 					infowindow.open(map,marker);
 				    markers.push(marker)
@@ -251,7 +251,7 @@
 					         }
 					    });
 					    var infowindow = new google.maps.InfoWindow({
-							content: eval(stops[i].trajanje*1.66667e-5).toFixed(0) + " min"
+							content: getTimestamp(new Date(stops[i].gmtStopStart))+"<br>"+ eval(stops[i].trajanje*1.66667e-5).toFixed(0) + " min"
 						});
 						infowindow.open(map,marker);
 					    markers.push(marker);

@@ -91,6 +91,13 @@ function datetimeToReadable(datetime){
   return  dayString+"."+monthString+"."+yearString + ". - "+date.getHours()+":"+date.getMinutes();
 }
 
+function getTimestamp(date){
+  var currentDate = new Date(date);
+  var currentHour = currentDate.getHours().toString().length==1 ? "0"+currentDate.getHours() : currentDate.getHours();
+  var currentMinute = currentDate.getMinutes().toString().length==1 ? "0"+currentDate.getMinutes() : currentDate.getMinutes();
+  return  currentHour +":"+currentMinute;
+}
+
 function getMajstorByCode(majstorId){
   var majstor = {};
   if(majstori){
