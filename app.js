@@ -3763,7 +3763,7 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 		if(Number(req.session.user.role)==20){
 			var json = JSON.parse(req.body.json);
 			json.datum  = {};
-			var currentDate = new Date();
+			var currentDate = new Date(new Date().getTime()+2*3.6e+6);
 			var currentHour = currentDate.getHours().toString().length==1 ? "0"+currentDate.getHours() : currentDate.getHours();
 			var currentMinute = currentDate.getMinutes().toString().length==1 ? "0"+currentDate.getMinutes() : currentDate.getMinutes();
 			var timeStamp =  currentHour +":"+currentMinute;
@@ -3774,10 +3774,24 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 			.then((majstori)=>{
 				dodeljivaniNaloziDB.insertOne(json)
 					.then((dbResponse)=>{
-						res.render("message",{
-							pageTitle: "Мајстор послат на налог",
-							message: "<div class=\"text\">Успешно сте послали <b>"+majstori[0].ime+"</b> на налог број "+json.nalog+" - <b>"+json.adresa+"</b>, "+json.radnaJedinica+".<br>&nbsp;<br><b>Vreme:</b> "+json.datum.timestamp+"</div>",
-							user: req.session.user
+						var setObj	=	{ $set: {
+								majstor: json.majstor
+							}};
+						naloziDB.updateOne({broj:json.nalog},setObj)
+						.then((dbResponse) => {
+							res.render("message",{
+								pageTitle: "Мајстор послат на налог",
+								message: "<div class=\"text\">Успешно сте послали <b>"+majstori[0].ime+"</b> на налог број "+json.nalog+" - <b>"+json.adresa+"</b>, "+json.radnaJedinica+".<br>&nbsp;<br><b>Vreme:</b> "+json.datum.timestamp+"</div>",
+								user: req.session.user
+							});
+						})
+						.catch((error)=>{
+							logError(error);
+							res.render("message",{
+								pageTitle: "Грешка",
+								message: "<div class=\"text\">Грешка у бази података 3790.</div>",
+								user: req.session.user
+							});
 						});
 					})
 					.catch((error)=>{

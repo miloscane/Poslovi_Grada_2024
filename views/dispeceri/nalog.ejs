@@ -32,9 +32,14 @@
 					})
 				}
 			</script>
-			<div class="inputWrap printButton" style="margin-left:30px; display:inline-block;vertical-align: top;">
+			<div class="inputWrap printButton" style="margin-left:30px; display:inline-block;vertical-align: top;width:200px">
 				<div class="button" onclick="saveNalog()">
-					<div class="label">САЧУВАЈ</div>
+					<div class="label">САЧУВАЈ ИЗМЕНЕ</div>
+				</div>
+			</div>
+			<div class="inputWrap printButton" style="margin-left:30px; display:inline-block;vertical-align: top;width:200px">
+				<div class="button" onclick="majstorNaNalogu()">
+					<div class="label">ПОШАЉИ МАЈСТОРА</div>
 				</div>
 			</div>
 			<div class="boxesWrap">
@@ -214,8 +219,7 @@
 							<script>
 								var dodele = <%-JSON.stringify(dodele)%>;
 								for(var i=0;i<dodele.length;i++){
-									console
-									document.getElementById("dodele").innerHTML += eval(i+1)+". "+dodele[i].datum.datum + " "+dodele[i].datum.timestamp +" - "+getMajstorByCode(dodele[i].majstor).ime;
+									document.getElementById("dodele").innerHTML += "<br>"+eval(i+1)+". "+dodele[i].datum.datum + " "+dodele[i].datum.timestamp +" - "+getMajstorByCode(dodele[i].majstor).ime;
 								}
 							</script>
 							<div class="majstorNaNalogu" onclick="majstorNaNalogu()">
