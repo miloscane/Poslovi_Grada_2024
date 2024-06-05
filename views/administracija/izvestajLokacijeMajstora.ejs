@@ -16,9 +16,15 @@
 	</style>
 	<div class="pageWidth">
 		<script>
+			var magacin = {lat:44.813906,lng:20.443903}
 			var nalozi = <%-JSON.stringify(nalozi)%>;
+			nalozi.push({
+				nalog: "1111111",
+				datum:{timestamp: "/"},
+				coordinates:magacin
+			})
 			var stops = <%-JSON.stringify(stops)%>;
-			var pauza = 3;//min
+			var pauza = 5;//min
 			pauza = pauza * 60000
 			//console.log(stops);
 			for(var i=0;i<stops.length;i++){
@@ -218,19 +224,50 @@
 					content: contentString
 				});
 				infowindow.open(map,marker);*/
+
+				/*function arePointsNear(checkPoint,center){
+					var ky = 40000/360;
+					var kx = Math.cos(Math.PI*center.lat/180)*ky;
+					var dx = Math.abs(center.lng-checkPoint.lng)*kx;
+					var dy = Math.abs(center.lat-checkPoint.lat);
+					return Math.sqrt(dx*dx + dy*dy) <= radius/1000;
+				}*/
+
+				function haversine_distance(mk1, mk2) {
+					var R = 6371;//radius of eart in km //3958.8; // Radius of the Earth in miles
+					var rlat1 = mk1.lat * (Math.PI/180); // Convert degrees to radians
+					var rlat2 = mk2.lat * (Math.PI/180); // Convert degrees to radians
+					var difflat = rlat2-rlat1; // Radian difference (latitudes)
+					var difflon = (mk2.lng-mk1.lng) * (Math.PI/180); // Radian difference (longitudes)
+
+					var d = 2 * R * Math.asin(Math.sqrt(Math.sin(difflat/2)*Math.sin(difflat/2)+Math.cos(rlat1)*Math.cos(rlat2)*Math.sin(difflon/2)*Math.sin(difflon/2)));
+					return d;
+				}
+
+				var radius = 300;
 				for(var i=0;i<nalozi.length;i++){
 					marker = new google.maps.Marker({
 				         position: {lat: nalozi[i].coordinates.lat, lng: nalozi[i].coordinates.lng},
 				         map: map,
 				         icon:{
-				         	url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+				         	url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
 				         }
 				    });
 				    var infowindow = new google.maps.InfoWindow({
 						content: nalozi[i].datum.timestamp+"<br>"+"<a href=\"/nalog/"+nalozi[i].nalog+"\" style=\"color:rgb(31,52,101)\" target=\"_blank\">" + nalozi[i].nalog + "</a>"
 					});
 					infowindow.open(map,marker);
-				    markers.push(marker)
+				    markers.push(marker);
+				    var nalogCircle = new google.maps.Circle({
+				      strokeColor: "#6891fe",
+				      strokeOpacity: 0.8,
+				      strokeWeight: 2,
+				      fillColor: "#6891fe",
+				      fillOpacity: 0.35,
+				      map,
+				      center: {lat: nalozi[i].coordinates.lat, lng: nalozi[i].coordinates.lng},
+				      radius: radius,
+				    });
 				}
 
 				for(var i=0;i<stops.length;i++){
@@ -242,16 +279,40 @@
 						position.lat = stops[i].startLatitude;
 						position.lng = stops[i].startLongitude;
 					}
+
+
+					var isInsideAnyCircle = 0;
+					var brojNaloga = 0;
+					for(var j=0;j<nalozi.length;j++){
+						
+						/*var distanceFromCenter = Math.sqrt((position.lat-nalozi[j].coordinates.lat)**2+(position.lng-nalozi[j].coordinates.lng)**2);
+						console.log("position.lat: "+position.lat);
+						console.log("position.lng: "+position.lng);
+						console.log("nalozi[j].coordinates.lng: "+nalozi[j].coordinates.lng);
+						console.log("nalozi[j].coordinates.lat: "+nalozi[j].coordinates.lat);
+						console.log(distanceFromCenter);
+						console.log("-------------------------------------")
+						if(distanceFromCenter<radius/637100){
+							isInsideAnyCircle = true;
+							break;
+						}*/
+						if(haversine_distance(position,{lat:nalozi[j].coordinates.lat,lng:nalozi[j].coordinates.lng})<0.5){
+							isInsideAnyCircle = 1;
+							brojNaloga = nalozi[j].nalog;
+						}
+						console.log(haversine_distance(position,{lat:nalozi[j].coordinates.lat,lng:nalozi[j].coordinates.lng}));
+					}
+
 					if(stops[i].tip == "Pauza"){
 						marker = new google.maps.Marker({
 					         position: position,
 					         map: map,
 					         icon:{
-					         	url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+					         	url: isInsideAnyCircle==1 ? "https://maps.google.com/mapfiles/ms/icons/blue-dot.png" : "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
 					         }
 					    });
 					    var infowindow = new google.maps.InfoWindow({
-							content: getTimestamp(new Date(stops[i].gmtStopStart))+"<br>"+ eval(stops[i].trajanje*1.66667e-5).toFixed(0) + " min"
+							content: getTimestamp(new Date(stops[i].gmtStopStart))+"<br>"+ eval(stops[i].trajanje*1.66667e-5).toFixed(0) + " min<br>"//+brojNaloga
 						});
 						infowindow.open(map,marker);
 					    markers.push(marker);

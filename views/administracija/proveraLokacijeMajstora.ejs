@@ -39,7 +39,7 @@
 				<div class="inputWrap" style="margin-top:30px">
 					<div class="button" onclick="submitSearch()">Претражи</div>
 				</div>
-				<form method="POST" action="/proveraLokacijeMajstora" style="display:none" id="form">
+				<!--<form method="POST" action="/proveraLokacijeMajstora" style="display:none" id="form">
 					<input type="text" name="json" id="json">
 				</form>
 				<script>
@@ -61,6 +61,18 @@
 							document.getElementById("json").value = JSON.stringify(json);
 							loadGif();
 							document.getElementById("form").submit();
+						}else{
+							alert("Морате одабрати датум и мајстора");
+						}
+					}
+				</script>-->
+				<script>
+					function submitSearch(){
+						var date = document.getElementById("date").value;
+						var majstor = document.getElementById("majstori").value;
+						if(date && majstor){
+							loadGif();
+							window.location.href = "/izvestajLokacijeMajstora/"+encodeURIComponent(majstor)+"/"+encodeURIComponent(date);
 						}else{
 							alert("Морате одабрати датум и мајстора");
 						}

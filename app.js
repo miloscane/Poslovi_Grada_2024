@@ -3361,6 +3361,112 @@ server.post('/proveraLokacijeMajstora',async (req,res)=>{
 	}
 });
 
+
+server.get('/izvestajLokacijeMajstora/:majstorid/:date',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==25){
+			var idMajstora = decodeURIComponent(req.params.majstorid);
+			var date = decodeURIComponent(req.params.date);
+			dodeljivaniNaloziDB.find({majstor:idMajstora,"datum.datum":getDateAsStringForDisplay(new Date(date))}).toArray()
+			.then((dodeljivaniNalozi)=>{
+				majstoriDB.find({uniqueId:idMajstora}).toArray()
+				.then((majstori)=>{
+					if(majstori.length>0){
+						request(ntsOptions, (error,response,body)=>{
+							if(error){
+								logError(error)
+								res.render("message",{
+									pageTitle: "Грешка",
+									user: req.session.user,
+									message: "<div class=\"text\">Грешка у бази података 2921</div>"
+								});
+							}else{
+								var cookie = response.headers['set-cookie'];
+								var headers = {
+									'accept': 'application/json',
+							    'Cookie': cookie,
+							    'Content-Type': 'application/json'
+								}
+								var options = {
+								    url: 'http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true',
+								    method: 'GET',
+								    headers: headers
+								};
+								var idNavigacije = 0;
+								for(var i=0;i<navigacijaInfo.length;i++){
+									if(navigacijaInfo[i].idMajstora==idMajstora){
+										idNavigacije = navigacijaInfo[i].idNavigacije;
+										break;
+									}
+								}
+								if(idNavigacije==0){
+									res.render("message",{
+										pageTitle: "Грешка",
+										user: req.session.user,
+										message: "<div class=\"text\">Непознато возило за мајстора.</div>"
+									});
+								}else{
+									var yesterday = new Date(date);
+									yesterday.setDate(yesterday.getDate()+1);
+									var options = {
+									    url: 'https://app.nts-international.net/ntsapi/stops?vehicle='+idNavigacije+'&from='+date+' 00:00:00&to='+date+' 23:59:00&timzeone=UTC&version=2.3',
+									    method: 'GET',
+									    headers: headers
+									};
+									request(options, (error,response3,body3)=>{
+										if(error){
+											logError(error)
+										}else{
+											var stops = JSON.parse(response3.body)
+											res.render("administracija/izvestajLokacijeMajstora",{
+												pageTitle: "Извештај локације за "+majstori[0].ime+" за датум "+reshuffleDate(date),
+												user: req.session.user,
+												nalozi: dodeljivaniNalozi,
+												stops: stops
+											});
+										}
+									});
+								}
+								
+							}
+						});
+					}else{
+						res.render("message",{
+							pageTitle: "Грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Непознат мајстор.</div>"
+						});	
+					}
+				})
+				.catch((error)=>{
+					logError(error)
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у бази података 3382</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 2904</div>"
+				});	
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.get('/administracija/specifikacijePodizvodjaca',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
