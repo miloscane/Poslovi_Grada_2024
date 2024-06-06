@@ -1737,7 +1737,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
-						if(nalozi[i].prijemnica.datum.datum.includes(".04.2024")){
+						if(nalozi[i].prijemnica.datum.datum.includes(".05.2024")){
 							naloziToExport.push(nalozi[i])
 						}
 					}
@@ -1760,7 +1760,7 @@ request(geoCodeOptions, (error,response,body)=>{
 
 			var csvString = "Datum,Broj Fakture,Konto,Stranka,Prazno,Prazno,Datum,Datum,Prazno,Prazno,Duguje,Potrazuje,Prazno,Prazno\r\n";
 			for(var i=0;i<naloziToExport.length;i++){
-				var iznosBezPDVa = parseFloat(naloziToExport[i].ukupanIznos);
+				var iznosBezPDVa = parseFloat(naloziToExport[i].ukupanIznos)*0.675;
 				if(!isNaN(iznosBezPDVa)){
 					if(iznosBezPDVa<500000){
 						var iznosPDV = iznosBezPDVa*0.2;
@@ -1792,12 +1792,12 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<problemNalozi.length;i++){
 				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+",Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", , , , , , , , , , ,\r\n";
 			}
-			fs.writeFileSync("./Minimax-04-2024.csv",csvString,"utf8");
+			fs.writeFileSync("./Minimax-05-2024.csv",csvString,"utf8");
 			console.log("Written ")
 		})
 		.catch((error)=>{
 			console.log(error)
-		})	*/
+		})*/	
 
 
 		/*naloziDB.find({}).toArray()
@@ -1816,6 +1816,31 @@ request(geoCodeOptions, (error,response,body)=>{
 			console.log(error)
 		})*/
 
+		//Provera dupliranih naloga na specifikacijama kod podizvodjaca
+		/*specifikacijePodizvodjacaDB.find({}).toArray()
+		.then((specifikacije)=>{
+			var nalozi = [];
+			for(var i=0;i<specifikacije.length;i++){
+				for(var j=0;j<specifikacije[i].nalozi.length;j++){
+					nalozi.push(specifikacije[i].nalozi[j].broj)
+				}
+			}
+			for(var i=0;i<nalozi.length;i++){
+				var duplicateCounter = 0;
+				for(var j=0;j<nalozi.length;j++){
+					if(nalozi[i]==nalozi[j]){
+						duplicateCounter++;
+					}
+				}
+				if(duplicateCounter>1){
+					console.log("DUPLIKAAAT "+ nalozi[i].broj)
+				}
+			}
+			console.log("Gotovo")
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
 
 
 
