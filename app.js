@@ -2111,7 +2111,7 @@ server.get('/',async (req,res)=>{
 		res.redirect("/login");
 	}
 });
-
+ 
 server.get('/administracija',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
