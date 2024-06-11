@@ -1851,6 +1851,95 @@ request(geoCodeOptions, (error,response,body)=>{
 
 
 
+
+		//ZA Premijus
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var naloziToExport = [];
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].faktura.broj){
+					if(nalozi[i].faktura.broj.length>3){
+						if(nalozi[i].prijemnica.datum.datum.includes(".05.2024")){
+							naloziToExport.push(nalozi[i])
+						}
+					}
+					
+				}
+			}
+
+			for(var i=0;i<naloziToExport.length;i++){
+				if(naloziToExport[i].prijemnica.datum.datum){
+					if(naloziToExport[i].prijemnica.datum.datum.length>3){
+						var dateElements = naloziToExport[i].prijemnica.datum.datum.split(".");
+						naloziToExport[i].sorting = new Date(dateElements[2]+"-"+dateElements[1]+"-"+dateElements[0]).getTime();
+					}
+				}
+			}
+
+			naloziToExport.sort((a, b) => parseFloat(b.sorting) - parseFloat(a.sorting));
+
+			var problemNalozi = [];
+
+			var csvString = "Broj Fakture,Datum PDV,Iznos,Penal,Iznos Sa Penalom,PDV,Iznos sa penalom i PDV,PG Iznos, PG PDV,PG Iznos sa PDVom\r\n";
+			for(var i=0;i<naloziToExport.length;i++){
+				var iznosBezPDVa = parseFloat(naloziToExport[i].ukupanIznos).toFixed(2);
+				var iznosSaPDVom = iznosBezPDVa<=500000 ? eval(iznosBezPDVa*1.2).toFixed(2) : iznosBezPDVa;
+				var pdv = iznosBezPDVa<=500000 ? eval(iznosBezPDVa*0.2).toFixed(2) : 0;
+				var pgIznosBezPDVa = eval(parseFloat(naloziToExport[i].ukupanIznos)*0.675).toFixed(2);
+				var pgPdv = pgIznosBezPDVa<=500000 ? eval(iznosBezPDVa*0.675*0.2).toFixed(2) : 0;
+				var pgIznosSaPDVom = eval(parseFloat(naloziToExport[i].ukupanIznos)*0.675 + parseFloat(pgPdv)).toFixed(2);
+				var iznosPenala = eval(iznosBezPDVa * (100 - naloziToExport[i].faktura.penal)/100).toFixed(2);
+				if(!isNaN(iznosBezPDVa)){
+					datumPDV = naloziToExport[i].prijemnica.datum.datum;
+					csvString += naloziToExport[i].faktura.broj + "," + datumPDV + "," + iznosBezPDVa + "," + iznosPenala + "," + eval(parseFloat(iznosBezPDVa)-parseFloat(iznosPenala)) + "," + pdv + "," +eval(parseFloat(iznosBezPDVa)-parseFloat(iznosPenala)+parseFloat(pdv)) + "," + pgIznosBezPDVa + "," + pgPdv + "," + pgIznosSaPDVom + "\r\n"
+					if(iznosPenala>0){
+						console.log(iznosPenala)
+					}
+					//csvString += naloziToExport[i].faktura.broj + "," +datumPDV+ "," + iznosBezPDVa + "," + pdv + "," + iznosSaPDVom+"\r\n";
+					if(iznosBezPDVa==0){
+						naloziToExport[i].problem = "Iznos naloga je nula";
+						console.log("Nula")
+						problemNalozi.push(naloziToExport[i]);
+					}
+				}else{
+					naloziToExport[i].problem = "Nedefinisan iznos";
+					console.log("Nema iznos");
+					problemNalozi.push(naloziToExport[i]);
+				}
+			}
+			for(var i=0;i<problemNalozi.length;i++){
+				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
+			}
+			fs.writeFileSync("./Premijus-05-2024.csv",csvString,"utf8");
+			console.log("Written ")
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			for(var i=0;i<nalozi.length;i++){
+				if(podizvodjaci.indexOf(nalozi[i].majstor)>=0){
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(nalozi[i].obracun[j].code=="80.02.09.006"){
+							console.log(nalozi[i].broj)
+						}
+					}
+				}
+			}
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+
+
+
+
+
+
 	})
 	.catch(error => {
 		console.log(error)
@@ -6469,43 +6558,57 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 	}
 });
 
+server.get('/tv2', async (req, res)=> {
+  naloziDB.find({statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Storniran"]}}).toArray()
+  .then((nalozi)=>{
+      var naloziToSend = [];
+      for(var i=0;i<nalozi.length;i++){
+      	var nalogToPush = {};
+      	nalogToPush.coordinates = nalozi[i].coordinates;
+      	nalogToPush.broj = nalozi[i].broj;
+      	nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
+      	nalogToPush.statusNaloga = nalozi[i].statusNaloga;
+        naloziToSend.push(nalogToPush);
+      }
+      majstoriDB.find({}).toArray()
+      .then((majstori)=>{
+          res.render("tv2",{
+              majstori: majstori,
+              nalozi: naloziToSend,
+              pageTitle: "Мапа"
+          })
+      })
+      .catch((error)=>{
+          logError(error);
+          res.render("message",{
+              pageTitle: "Грешка",
+              user: req.session.user,
+              message: "<div class=\"text\">Грешка у бази података 5870.</div>"
+          });
+      });
+  })
+  .catch((error)=>{
+      logError(error);
+      res.render("message",{
+          pageTitle: "Грешка",
+          user: req.session.user,
+          message: "<div class=\"text\">Грешка у бази података 5871.</div>"
+      });
+  });
+});
+
 server.get('/tv', async (req, res)=> {
-    naloziDB.find({statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Storniran"]}}).toArray()
-    .then((nalozi)=>{
-        var naloziToSend = [];
-        for(var i=0;i<nalozi.length;i++){
-        	var nalogToPush = {};
-        	nalogToPush.coordinates = nalozi[i].coordinates;
-        	nalogToPush.broj = nalozi[i].broj;
-        	nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
-        	nalogToPush.statusNaloga = nalozi[i].statusNaloga;
-          naloziToSend.push(nalogToPush);
-        }
-        majstoriDB.find({}).toArray()
-        .then((majstori)=>{
-            res.render("tv",{
-                majstori: majstori,
-                nalozi: naloziToSend,
-                pageTitle: "Мапа"
-            })
-        })
-        .catch((error)=>{
-            logError(error);
-            res.render("message",{
-                pageTitle: "Грешка",
-                user: req.session.user,
-                message: "<div class=\"text\">Грешка у бази података 5870.</div>"
-            });
-        });
-    })
-    .catch((error)=>{
-        logError(error);
-        res.render("message",{
-            pageTitle: "Грешка",
-            user: req.session.user,
-            message: "<div class=\"text\">Грешка у бази података 5871.</div>"
-        });
-    });
+	majstoriDB.find({}).toArray()
+	.then((majstori)=>{
+		res.render("tv",{
+	    pageTitle: "Мапа",
+	    majstori: majstori
+	  })
+	})
+	.catch((error)=>{
+		logError(error);
+		res.send("Greska")
+	})
 });
 
 
@@ -6851,8 +6954,6 @@ io.on('connection', function(socket){
 				});
 			}
 		});
-		
-			
 	})
 
 	socket.on('lokacijaWomi', function(broj){
@@ -6949,8 +7050,65 @@ io.on('connection', function(socket){
 				});
 			}
 		});
-		
-			
+	})
+
+
+	socket.on('lokacijaTv2', function(broj){
+		request(ntsOptions, (error,response,body)=>{
+			if(error){
+				logError(error)
+			}else{
+				//console.log(response.headers['set-cookie']);
+				var cookie = response.headers['set-cookie'];
+				var headers = {
+					'accept': 'application/json',
+			    'Cookie': cookie,
+			    'Content-Type': 'application/json'
+				}
+				var allVehicleStops = [];
+				navigacijaInfo.forEach((value, index) =>{
+					var options = {
+					    url: 'https://app.nts-international.net/ntsapi/stops?vehicle='+value.idNavigacije+'&from='+getDateAsStringForInputObject(new Date())+' 00:00:00&to='+getDateAsStringForInputObject(new Date())+' 23:59:00&timzeone=UTC&version=2.3',
+					    method: 'GET',
+					    headers: headers
+					};
+					request(options, (error,response3,body3)=>{
+						if(error){
+							logError(error)
+						}else{
+							var stops = JSON.parse(response3.body)
+							allVehicleStops.push(stops);
+						}
+					});		
+				});
+				dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(new Date())}).toArray()
+				.then((dodeljivaniNalozi)=>{
+					naloziDB.find({statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Storniran"]}}).toArray()
+					.then((nedodeljeniNalozi)=>{
+						for(var i=0;i<nedodeljeniNalozi.length;i++){
+							for(var j=0;j<dodeljivaniNalozi.length;j++){
+								if(dodeljivaniNalozi[j].nalog == nedodeljeniNalozi[i].broj){
+									nedodeljeniNalozi.splice(i,1);
+									i--;
+								}
+							}
+						}
+						setTimeout(function(){
+							socket.emit("lokacijaTv2",allVehicleStops,navigacijaInfo,dodeljivaniNalozi,nedodeljeniNalozi)
+						},2000)
+					})
+					.catch((error)=>{
+						logError(error);
+					})
+					
+				})
+				.catch((error)=>{
+					logError(error);
+				})
+				
+				
+			}
+		});
 	})
 
 });

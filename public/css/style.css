@@ -3972,6 +3972,45 @@ input[type=number] {
     font-weight:500;
 }
 
+.tvMajstori{
+    position:fixed;
+    z-index:10000;
+    top:0;
+    bottom:0;
+    right:0;
+    background-color:rgb(37,57,101);
+    color:rgb(255,255,255);
+    padding:20px 20px;
+}
+
+
+.tvMajstori .title{
+    font-weight:500;
+    text-align:center;
+    margin-bottom:15px;
+    font-size:20px;
+}
+
+.tvMajstori .majstorWrap{
+    font-size:0;
+    margin-bottom:10px;
+    padding-bottom:10px;
+    border-bottom:1px solid rgb(255,255,255);
+}
+
+.tvMajstori .majstorWrap .status{
+    display:inline-block;
+    vertical-align: middle;
+    width:30px;
+}
+
+.tvMajstori .majstorWrap .text{
+    display:inline-block;
+    vertical-align: middle;
+    width:calc(100% - 30px);
+    font-size:16px;
+}
+
 
 
 @media screen and (max-width: 1100px) {
