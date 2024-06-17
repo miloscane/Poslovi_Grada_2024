@@ -109,7 +109,12 @@ request(geoCodeOptions, (error,response,body)=>{
 				console.log(error)
 			}else{
 				console.log("request2 received");
-				console.log(response2.body)
+				var array = JSON.parse(response2.body);
+				var csvString = "Broj Tablice,Opis,ID\r\n";
+				for(var i=0;i<array.length;i++){
+					csvString += array[i].licenceplate+","+array[i].description+","+array[i].id+"\r\n"
+				}
+				fs.writeFileSync("./Vozila.csv",csvString,"utf8");	
 			}
 		});
 	}
@@ -970,6 +975,11 @@ request(geoCodeOptions, (error,response,body)=>{
 		})
 		.catch((error)=>{
 			console.log(error)
+		})*/
+
+		/*majstoriDB.find({}).toArray()
+		.then((majstori)=>{
+			console.log(majstori)
 		})*/
 
 		pricesDB.find({}).toArray()
@@ -1893,12 +1903,11 @@ request(geoCodeOptions, (error,response,body)=>{
 				if(!isNaN(iznosBezPDVa)){
 					datumPDV = naloziToExport[i].prijemnica.datum.datum;
 					csvString += naloziToExport[i].faktura.broj + "," + datumPDV + "," + iznosBezPDVa + "," + iznosPenala + "," + eval(parseFloat(iznosBezPDVa)-parseFloat(iznosPenala)) + "," + pdv + "," +eval(parseFloat(iznosBezPDVa)-parseFloat(iznosPenala)+parseFloat(pdv)) + "," + pgIznosBezPDVa + "," + pgPdv + "," + pgIznosSaPDVom + "\r\n"
-					if(iznosPenala>0){
-						console.log(iznosPenala)
-					}
+					
 					//csvString += naloziToExport[i].faktura.broj + "," +datumPDV+ "," + iznosBezPDVa + "," + pdv + "," + iznosSaPDVom+"\r\n";
 					if(iznosBezPDVa==0){
 						naloziToExport[i].problem = "Iznos naloga je nula";
+						console.log(naloziToExport[i].broj)
 						console.log("Nula")
 						problemNalozi.push(naloziToExport[i]);
 					}
@@ -1911,12 +1920,15 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<problemNalozi.length;i++){
 				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
 			}
-			fs.writeFileSync("./Premijus-05-2024.csv",csvString,"utf8");
+			fs.writeFileSync("./PG-Premijus-05-2024.csv",csvString,"utf8");
 			console.log("Written ")
 		})
 		.catch((error)=>{
 			console.log(error)
 		})*/
+
+
+
 
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
@@ -2084,6 +2096,7 @@ request(geoCodeOptions, (error,response,body)=>{
 		})
 });*/
 
+
 server.get('/',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==5){
@@ -2100,6 +2113,8 @@ server.get('/',async (req,res)=>{
 			res.redirect("/spremniNalozi")
 		}else if(Number(req.session.user.role)==50){
 			res.redirect("/magacioner/stanje")
+		}else if(Number(req.session.user.role)==60){
+			res.redirect("/majstor/nalozi")
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -2241,10 +2256,40 @@ server.post('/login',async (req,res)=>{
 					});
 				}
 			}else{
-				res.render("messageNotLoggedIn",{
-					pageTitle: "Грешка",
-					message: "<div class=\"text\">Не постоји корисник са унетом електронском поштом.</div><div class=\"button\"><a href=\"/login\" onclick=\"loadGif()\">Покушај поново</a></div>"
-				});
+				majstoriDB.find({username:username}).toArray()
+				.then((majstori)=>{
+					if(majstori.length>0){
+						if(majstori[0].password==password){
+							var sessionObject	=	JSON.parse(JSON.stringify(majstori[0]));
+							delete sessionObject.password;
+							req.session.user	=	sessionObject;
+							req.session.user.role = 60;
+							req.session.user.name = req.session.user.ime;
+							if(loginJson.url){
+								res.redirect(loginJson.url);
+							}else{
+								res.redirect('/');
+							}
+						}else{
+							res.render("messageNotLoggedIn",{
+								pageTitle: "Грешка",
+								message: "<div class=\"text\">Унели сте погрешну лозинку.</div><div class=\"button\"><a href=\"/login\" onclick=\"loadGif()\">Покушај поново</a></div>"
+							});
+						}
+					}else{
+						res.render("messageNotLoggedIn",{
+							pageTitle: "Грешка",
+							message: "<div class=\"text\">Не постоји корисник са унетом електронском поштом.</div><div class=\"button\"><a href=\"/login\" onclick=\"loadGif()\">Покушај поново</a></div>"
+						});
+					}
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("messageNotLoggedIn",{
+						pageTitle: "Програмска грешка",
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 2263.</div><div class=\"button\"><a href=\"/login\" onclick=\"loadGif()\">Покушај поново</a></div>"
+					});
+				})
 			}
 		})
 		.catch(error => {
@@ -6611,6 +6656,144 @@ server.get('/tv', async (req, res)=> {
 	})
 });
 
+server.get('/majstor/nalozi', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==60){
+			var today = new Date();
+			today.setDate(today.getDate()-3);
+			dodeljivaniNaloziDB.find({majstor:req.session.user.uniqueId,"datum.datum":getDateAsStringForDisplay(today)}).toArray()
+			.then((nalozi)=>{
+				var brojeviNaloga = [];
+				for(var i=0;i<nalozi.length;i++){
+					if(brojeviNaloga.indexOf(nalozi[i].nalog)<0){
+						brojeviNaloga.push(nalozi[i].nalog);
+					}
+				}
+				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
+				.then((nalozi2)=>{
+					for(var i=0;i<nalozi.length;i++){
+						nalozi[i].izvestaji = [];
+						for(var j=0;j<nalozi2.length;j++){
+							if(nalozi2[j].broj==nalozi[i].nalog){
+								nalozi[i].opis = nalozi2[j].opis;
+								nalozi[i].zahtevalac = nalozi2[j].zahtevalac;
+							}
+						}
+					}
+					izvestajiDB.find({nalog:{$in:brojeviNaloga}}).toArray()
+					.then((izvestaji)=>{
+						for(var i=0;i<nalozi.length;i++){
+							for(var j=0;j<izvestaji.length;j++){
+								if(izvestaji[j].nalog==nalozi[i].nalog){
+									nalozi[i].izvestaji.push(izvestaji[j]);
+								}
+							}
+						}
+						res.render("majstor/nalozi",{
+							pageTitle: "Данашњи налози",
+							user: req.session.user,
+							nalozi: nalozi
+						});
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+	            pageTitle: "Грешка",
+	            user: req.session.user,
+	            message: "<div class=\"text\">Грешка у бази података 6690.</div>"
+		        });	
+					})
+					
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+            pageTitle: "Грешка",
+            user: req.session.user,
+            message: "<div class=\"text\">Грешка у бази података 6679.</div>"
+	        });	
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+            pageTitle: "Грешка",
+            user: req.session.user,
+            message: "<div class=\"text\">Грешка у бази података 6669.</div>"
+        });
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	} 
+});
+
+server.post('/izvestaj-majstora', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==60){
+				uploadSlika(req, res, function (error) {
+				    if (error) {
+				      logError(error);
+				      return res.render("message",{pageTitle: "Грешка",message: "<div class=\"text\">Дошло је до грешке приликом качења слика.</div>",user: req.session.user});
+				    }
+				    var nalogJson = JSON.parse(req.body.json);
+				    var izvestajJson = {};
+				    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
+				    izvestajJson.nalog		=	nalogJson.nalog;
+				    izvestajJson.datetime 	=	new Date().getTime();
+				    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
+				    izvestajJson.izvestaj	=	nalogJson.izvestaj;
+				    izvestajJson.user 		=	req.session.user;
+				    izvestajJson.photos		=	[];
+				    for(var i=0;i<req.files.length;i++){
+				    	izvestajJson.photos.push(req.files[i].transforms[0].location)
+				    }
+						izvestajiDB.insertOne(izvestajJson)
+						.then((dbResponse)=>{
+							var mailOptions = {
+								from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+								to: nalogJson.email,
+								subject: 'Нови извештај мајстора на налогу број '+nalogJson.nalog,
+								html: 'Поштовани/а '+nalogJson.dispecer+' <br>,'+izvestajJson.user.ime+' је окачио нови извештај за налог број '+izvestajJson.nalog+' / '+nalogJson.radnaJedinica+' / '+nalogJson.adresa+'.<br><a href=\"https://vik2024.poslovigrada.rs/nalog/'+izvestajJson.nalog+'\">Отвори налог на порталу</a>.'
+							};
+
+							transporter.sendMail(mailOptions, (error, info) => {
+								if (error) {
+									logError(error);
+									res.redirect("/majstor/nalozi");
+								}else{
+									res.redirect("/majstor/nalozi");
+								}
+							})
+						})
+						.catch((error)=>{
+							logError(error);
+							res.render("message",{
+								pageTitle: "Програмска грешка",
+								user:req.session.user,
+								message: "<div class=\"text\">Дошло је до грешке у бази податка 6784.</div>"
+							});
+						})
+						
+					
+					
+				});
+			
+		}else{
+			res.send("Nije definisan nivo korisnika");
+		}
+	}else{
+		res.redirect("/login");
+	}
+});
+
+console.log(hashString("GKZab1456!"));
 
 io.on('connection', function(socket){
 	socket.on('listaNalogaAdministracija', function(odDatuma,doDatuma,adresa,opstine){

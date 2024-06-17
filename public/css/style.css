@@ -4011,7 +4011,197 @@ input[type=number] {
     font-size:16px;
 }
 
+.majstorNalozi .row{
+    padding-bottom:10px;
+    border-bottom:1px solid rgb(32,51,100);
+}
 
+.majstorNalozi .row .flex{
+    display:flex;
+    flex-wrap: wrap;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+}
+
+.majstorNalozi .row:nth-child(even){
+    background-color:rgba(32,51,100,0.05);
+}
+
+.majstorNalozi .row .flex .block{
+    width: calc(25% - 20px);
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    margin:5px;
+    -webkit-transition:all ease 0.5s;
+    -moz-transition:all ease 0.5s;
+    -ms-transition:all ease 0.5s;
+    -o-transition:all ease 0.5s;
+    transition:all ease 0.5s;
+    padding:5px;
+    position:relative;
+}
+
+.majstorNalozi .row .flex .adresa span{
+    font-weight: 700;
+    color:rgb(32,51,100);
+    text-decoration: underline;
+}
+
+.majstorNalozi .buttonWrap{
+    text-align:center;
+    margin-top:5px;
+    position: absolute;
+    top: 150px;
+    right: 10px;
+}
+
+.majstorNalozi .buttonWrap .button{
+    font-size:18px;
+    padding:10px;
+    color:rgb(255,255,255);
+    font-weight:500;
+    display:inline-block;
+    width:auto;
+    background-color:rgb(2,121,49);
+}
+
+.majstorNalozi .moreButton{
+    font-size:18px;
+    padding:10px;
+    color:rgb(255,255,255);
+    font-weight:500;
+    background-color:rgb(2,121,49);
+    text-align:center;
+}
+
+.majstorNalozi .okaciIzvestaj{
+    font-size:18px;
+    padding:10px;
+    color:rgb(255,255,255);
+    font-weight:500;
+    background-color:rgb(2,121,49);
+    text-align:center;
+}
+
+.majstorNalozi .nalogOpened .moreButton{
+    background-color:rgb(150,0,0);
+}
+
+.majstorNalozi .izvestaji .buttonWrap{
+    text-align: center;
+    margin-top: 0px;
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-top:10px;
+    margin-bottom:40px;
+}
+
+.majstorNalozi .izvestaji .buttonWrap .button{
+    padding:4px;
+    width:150px;
+    margin:0 auto;
+    font-size:16px;
+    position:relative;
+}
+
+.majstorNalozi .izvestaji .buttonWrap .button .icon{
+    width:15px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.majstorNalozi .izvestaji .buttonWrap .button .label{
+    display: inline-block;
+    vertical-align: middle;
+    width: auto;
+    padding-left:7px;
+}
+
+.majstorNalozi .details{
+    padding-bottom:20px;
+}
+
+.majstorNalozi .details .title{
+    font-weight:500;
+    font-size:18px;
+    margin:10px auto;
+}
+
+.majstorNalozi .details textarea{
+    padding: 5px;
+    font-size: 14px;
+    color: rgb(37, 57, 101);
+    width: 100%;
+    outline: none;
+    box-shadow: 1px 1px 4px rgba(37, 57, 101, 0);
+    border: 1px solid rgb(37, 57, 101);
+    -webkit-transition: all ease 0.5s;
+    -moz-transition: all ease 0.5s;
+    -ms-transition: all ease 0.5s;
+    -o-transition: all ease 0.5s;
+    transition: all ease 0.5s;
+    height: 150px;
+    resize: none;
+}
+
+.majstorNalozi .izvestaji .izvestaj{
+    margin-bottom:10px;
+    border-bottom:1px solid rgba(0,0,0,0.1);
+    padding-top:10px;
+    padding-left:5px;
+}
+
+
+.majstorNalozi .izvestaji .izvestaj:nth-child(even){
+    background-color:rgba(0,0,0,0.05);
+}
+
+.majstorNalozi .izvestaji .izvestaj .timestamp{
+    font-size:12px;
+    font-style:italic;
+    font-weight:200;
+}
+
+.majstorNalozi .izvestaji .izvestaj .korisnik{
+    font-size:12px;
+    font-weight:500;
+}
+
+.majstorNalozi .izvestaji .izvestaj .text{
+    padding:5px 0;
+    padding-left:15px;
+    font-size:14px;
+}
+
+
+.majstorNalozi .izvestaji .photos .imagePreview{
+    width: 75px;
+    height:75px;
+    display:inline-block;
+    vertical-align: top;
+    margin:5px;
+    overflow:hidden;
+    border:1px solid rgb(37,57,101);
+    position:relative;
+    background-color:rgb(255,255,255);
+    cursor:pointer;
+    background-image:url(/images/loadGif.gif);
+    background-size:100px;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.majstorNalozi .izvestaji .photos .imagePreview .image{
+    position:absolute;
+    top:50%;
+    left:50%;
+    -webkit-transform: translate(-50%,-50%);
+    -moz-transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    -o-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+}
 
 @media screen and (max-width: 1100px) {
     .pageWidth{
@@ -4129,6 +4319,10 @@ input[type=number] {
 
     .stefan .boxesWrap .box .info .text{
         font-size:14px;
+    }
+
+    .majstorNalozi .row .flex .block{
+        width: calc(50% - 20px);
     }
 }
 

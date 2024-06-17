@@ -1,0 +1,253 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+		nalozi.reverse();
+		var jedinstveniBrojevi = [];
+	</script>
+	<div class="majstorNalozi">
+		<div class="pageWidth">
+			<div class="buttonWrap">
+				<div class="button" onclick="loadGif();location.reload()">Освежи</div>
+			</div>
+			<div id="nalozi"></div>
+			<script>
+				for(var i=0;i<nalozi.length;i++){
+					if(jedinstveniBrojevi.indexOf(nalozi[i].nalog)<0){
+						jedinstveniBrojevi.push(nalozi[i].broj);
+						var row = document.createElement("DIV");
+						row.setAttribute("class","row");
+						row.setAttribute("data-nalog",nalozi[i].nalog);
+						row.setAttribute("data-radnajedinica",nalozi[i].radnaJedinica);
+						row.setAttribute("data-email",nalozi[i].user.email);
+						row.setAttribute("data-dispecer",nalozi[i].user.name);
+						row.setAttribute("data-adresa",nalozi[i].adresa);
+						row.setAttribute("data-opened",0);
+							var flex = document.createElement("DIV");
+							flex.setAttribute("class","flex");
+								var block = document.createElement("DIV");
+								block.setAttribute("class","block radnaJedinica");
+								block.innerHTML = "<b>Општина:</b><br>"+nalozi[i].radnaJedinica;
+								flex.appendChild(block);
+
+								var block = document.createElement("DIV");
+								block.setAttribute("class","block adresa");
+								block.setAttribute("onclick","window.open('https://www.google.com/maps/search/?api=1&query="+nalozi[i].adresa.replace(/,/g, '%2C').replace(/ /g, '+')+"','_blank')");
+								block.innerHTML = "<b>Адреса:</b><br><span>"+nalozi[i].adresa+"</span>";
+								flex.appendChild(block);
+
+								var block = document.createElement("DIV");
+								block.setAttribute("class","block opis");
+								block.innerHTML = nalozi[i].opis;
+								flex.appendChild(block);
+							row.appendChild(flex);
+
+							var details = document.createElement("DIV");
+							details.setAttribute("class","details");
+							row.appendChild(details);
+
+							var moreButton = document.createElement("DIV");
+							moreButton.setAttribute("class","moreButton");
+							moreButton.setAttribute("onclick","openNalog(this)")
+							moreButton.innerHTML = "ОТВОРИ НАЛОГ";
+							row.appendChild(moreButton);
+							
+						document.getElementById("nalozi").appendChild(row);
+					}
+				}
+
+				function openNalog(elem){
+					var naloziElems = document.getElementsByClassName("row");
+					//prvo zatvori sve ostale naloge
+					for(var i=0;i<naloziElems.length;i++){
+						naloziElems[i].getElementsByClassName("details")[0].innerHTML = "";
+						naloziElems[i].getElementsByClassName("moreButton")[0].innerHTML = "ОТВОРИ НАЛОГ";
+						naloziElems[i].classList.remove("nalogOpened");
+					}
+					var nalog;
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].nalog==elem.parentElement.dataset.nalog){
+							nalog = JSON.parse(JSON.stringify(nalozi[i]));
+						}
+					}
+					if(Number(elem.parentElement.dataset.opened)==0){
+						//otvori nalog
+						elem.parentElement.dataset.opened = 1;
+						var detailsWrap = elem.parentElement.getElementsByClassName("details")[0];
+						var flex = document.createElement("DIV");
+						flex.setAttribute("class","flex");
+							var block = document.createElement("DIV");
+							block.setAttribute("class","block vreme");
+							block.innerHTML = "<b>Време доделе</b>:<br>"+nalog.datum.timestamp+"<br><a href=\"tel:"+nalog.user.telefon+"\">"+nalog.user.name+"</a>";
+							flex.appendChild(block);
+
+							var block = document.createElement("DIV");
+							block.setAttribute("class","block zahtevalac");
+							block.innerHTML = "<b>Контакт:</b><br><a href=\"tel:"+izvuciBroj(nalog.zahtevalac)+"\">"+nalog.zahtevalac+"</a>";
+							flex.appendChild(block);
+						detailsWrap.appendChild(flex);
+
+						var izvestaji = document.createElement("DIV");
+						izvestaji.setAttribute("class","izvestaji");
+
+							if(nalog.izvestaji.length>0){
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "ИЗВЕШТАЈИ";
+								izvestaji.appendChild(title);
+
+								var izvestajiWrap = document.createElement("DIV");
+								izvestajiWrap.setAttribute("class","izvestajiWrap");
+								izvestajiWrap.setAttribute("id","komentari");
+									for(var i=0;i<nalog.izvestaji.length;i++){
+										var izvestaj = document.createElement("DIV");
+										izvestaj.setAttribute("class","izvestaj");
+											var time = document.createElement("DIV");
+											time.setAttribute("class","timestamp");
+											time.innerHTML = vremePrijema(nalog.izvestaji[i].datetime);
+											izvestaj.appendChild(time);
+
+											var korisnik = document.createElement("DIV");
+											korisnik.setAttribute("class","korisnik");
+											korisnik.innerHTML = nalog.izvestaji[i].user.name;
+											izvestaj.appendChild(korisnik);
+
+											var text = document.createElement("DIV");
+											text.setAttribute("class","text");
+											text.innerHTML = nalog.izvestaji[i].izvestaj;
+											izvestaj.appendChild(text);
+
+											var photos = document.createElement("DIV");
+											photos.setAttribute("class","photos");
+												for(var j=0;j<nalog.izvestaji[i].photos.length;j++){
+													var photo = document.createElement("DIV");
+													photo.setAttribute("class","imagePreview");
+													photo.setAttribute("onclick","previewImage(this)");
+														var image = document.createElement("IMG");
+														image.setAttribute("class","image");
+														image.setAttribute("src",nalog.izvestaji[i].photos[j]);
+														photo.appendChild(image);
+													photos.appendChild(photo);
+												}
+											izvestaj.appendChild(photos);
+										izvestajiWrap.appendChild(izvestaj);
+									}
+								izvestaji.appendChild(izvestajiWrap);	
+							}
+							
+
+							var title = document.createElement("DIV");
+							title.setAttribute("class","title");
+							title.innerHTML = "НОВ ИЗВЕШТАЈ";
+							izvestaji.appendChild(title);
+
+							var novIzvestaj = document.createElement("DIV");
+							novIzvestaj.setAttribute("class","novIzvestaj");
+								var textarea = document.createElement("TEXTAREA");
+								textarea.setAttribute("placeholder","Текс извештаја");
+								textarea.setAttribute("id","tekst-izvestaja");
+								novIzvestaj.appendChild(textarea);
+
+								var previewImages = document.createElement("DIV");
+								previewImages.setAttribute("class","previewImages");
+								previewImages.setAttribute("id","preview-images");
+								novIzvestaj.appendChild(previewImages);
+
+								var form = document.createElement("FORM");
+								form.setAttribute("method","POST");
+								form.setAttribute("action","/izvestaj-majstora");
+								form.setAttribute("id","form");
+								form.setAttribute("style","display:none");
+								form.setAttribute("enctype","multipart/form-data");
+									var jsonInput = document.createElement("INPUT");
+									jsonInput.setAttribute("type","text");
+									jsonInput.setAttribute("name","json");
+									jsonInput.setAttribute("id","json");
+									form.appendChild(jsonInput);
+
+									var jsonInput = document.createElement("INPUT");
+									jsonInput.setAttribute("type","file");
+									jsonInput.setAttribute("id","slike-input");
+									jsonInput.setAttribute("name","image");
+									jsonInput.setAttribute("accept","image/*");
+									jsonInput.setAttribute("multiple","");
+									form.appendChild(jsonInput);
+								novIzvestaj.appendChild(form);
+
+								var buttonWrap = document.createElement("DIV");
+								buttonWrap.setAttribute("class","buttonWrap");
+									var button = document.createElement("DIV");
+									button.setAttribute("class","button");
+									button.setAttribute("onclick","document.getElementById('slike-input').click()");
+										var icon = document.createElement("DIV");
+										icon.setAttribute("class","icon");
+										icon.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/addImageIcon.png\">";
+										button.appendChild(icon);
+
+										var label = document.createElement("DIV");
+										label.setAttribute("class","label");
+										label.innerHTML = "Додај слике";
+										button.appendChild(label);
+									buttonWrap.appendChild(button);
+								novIzvestaj.appendChild(buttonWrap);
+								
+							izvestaji.appendChild(novIzvestaj);
+							var okaciIzvestaj = document.createElement("DIV");
+							okaciIzvestaj.setAttribute("class","okaciIzvestaj");
+							okaciIzvestaj.setAttribute("onclick","saveIzvestaj()");
+							okaciIzvestaj.innerHTML = "Окачи извештај";
+							izvestaji.appendChild(okaciIzvestaj);
+						detailsWrap.appendChild(izvestaji);
+						document.getElementById("slike-input").onchange = evt => {
+							document.getElementById("preview-images").innerHTML = "";
+							for(var i=0;i<document.getElementById("slike-input").files.length;i++){
+								var imagePreview =	document.createElement("DIV");
+								imagePreview.setAttribute("class","imagePreview");
+								imagePreview.setAttribute("onclick","previewImage(this)");
+									var image = document.createElement("IMG");
+									image.setAttribute("class","image");
+									image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
+									imagePreview.appendChild(image)
+								document.getElementById("preview-images").appendChild(imagePreview);
+							}
+							if(document.getElementById("slike-input").files.length>20){
+								alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 20 слика по извештају. Уколико желите да окачите више од 20 слика направите два извештаја.");
+								document.getElementById("preview-images").innerHTML = "";
+								document.getElementById("slike-input").value = "";
+							}
+						}
+						elem.innerHTML = "ЗАТВОРИ";
+						elem.parentElement.classList.add("nalogOpened");
+
+					}else if(Number(elem.parentElement.dataset.opened)==1){
+						elem.parentElement.dataset.opened = 0;
+					}
+				}
+
+				function saveIzvestaj(){
+					if(document.getElementById("tekst-izvestaja").value=="" && document.getElementById("slike-input").files.length==0){
+						alert("Нисте укуцали извештај нити окачили фотографију");
+					}else{
+						var json = {};
+						var naloziElems = document.getElementsByClassName("row");
+						for(var i=0;i<naloziElems.length;i++){
+							if(Number(naloziElems[i].dataset.opened)==1){
+								json.nalog = naloziElems[i].dataset.nalog;
+								json.radnaJedinica = naloziElems[i].dataset.radnajedinica;
+								json.email = naloziElems[i].dataset.email;
+								json.dispecer = naloziElems[i].dataset.dispecer;
+								json.adresa = naloziElems[i].dataset.adresa;
+								break;
+							}
+						}
+						json.izvestaj = document.getElementById("tekst-izvestaja").value;
+						document.getElementById("json").value = JSON.stringify(json);
+						//console.log(json)
+						loadGif();
+						document.getElementById("form").submit();
+					}
+					
+				}
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

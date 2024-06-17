@@ -123,6 +123,9 @@
 							</div>
 							<div class="menuItem"><a href="/magacioner/pretragaReversa" onclick="loadGif()">Претрага реверса</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
+						<% }else if(Number(user.role)==60){ %>
+							<div class="menuItem"><a href="/majstor/nalozi" onclick="loadGif()">Данашњи налози</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/majstor/profil" onclick="loadGif()">Мој профил</a><div class="rightBorder"></div></div>
 						<% } %>
 					</div>
 				</div>

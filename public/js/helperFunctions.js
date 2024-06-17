@@ -155,6 +155,16 @@ function haversine_distance(mk1, mk2) {
   return d;
 }
 
+function izvuciBroj(str){
+  var broj = "";
+  for(var i=0;i<str.length;i++){
+    if(!isNaN(Number(str[i]))){
+      broj += str[i];
+    }
+  }
+  return broj;
+}
+
 var definicijeProizvoda = [
                     {
                       "startCode":"01.01",
