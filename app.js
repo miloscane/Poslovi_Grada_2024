@@ -6793,8 +6793,6 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 	}
 });
 
-console.log(hashString("GKZab1456!"));
-
 io.on('connection', function(socket){
 	socket.on('listaNalogaAdministracija', function(odDatuma,doDatuma,adresa,opstine){
 		var dbFindStart	=	new Date().getTime();
