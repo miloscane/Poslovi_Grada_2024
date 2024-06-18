@@ -56,6 +56,7 @@
 				}
 
 				function openNalog(elem){
+					signaturePad.clear();
 					var naloziElems = document.getElementsByClassName("row");
 					//prvo zatvori sve ostale naloge
 					for(var i=0;i<naloziElems.length;i++){
@@ -128,6 +129,26 @@
 														photo.appendChild(image);
 													photos.appendChild(photo);
 												}
+												if(nalog.izvestaji[i].signature){
+													//console.log(nalog.izvestaji[i].signature)
+													var signCanvas = document.createElement("CANVAS");
+													signCanvas.setAttribute("width","1000");
+													signCanvas.setAttribute("height","1000");
+													photos.appendChild(signCanvas);
+													var signPad = new SignaturePad(signCanvas,{penColor: "rgb(0,0,0)"});
+													signPad.fromData(nalog.izvestaji[i].signature);
+													var photo = document.createElement("DIV");
+													photo.setAttribute("class","imagePreview");
+													photo.setAttribute("onclick","previewImage(this)");
+													photo.setAttribute("style","background:none");
+														var image = document.createElement("IMG");
+														image.setAttribute("class","image");
+														image.setAttribute("src",signPad.toDataURL());
+														photo.appendChild(image);
+													photos.appendChild(photo);
+													signCanvas.remove();
+												}
+
 											izvestaj.appendChild(photos);
 										izvestajiWrap.appendChild(izvestaj);
 									}
@@ -143,7 +164,7 @@
 							var novIzvestaj = document.createElement("DIV");
 							novIzvestaj.setAttribute("class","novIzvestaj");
 								var textarea = document.createElement("TEXTAREA");
-								textarea.setAttribute("placeholder","Текс извештаја");
+								textarea.setAttribute("placeholder","Текст извештаја");
 								textarea.setAttribute("id","tekst-izvestaja");
 								novIzvestaj.appendChild(textarea);
 
@@ -190,6 +211,21 @@
 									buttonWrap.appendChild(button);
 								novIzvestaj.appendChild(buttonWrap);
 								
+								var slikaPotpisa = document.createElement("DIV");
+								slikaPotpisa.setAttribute("id","slika-potpisa");
+								novIzvestaj.appendChild(slikaPotpisa);
+
+								var buttonWrap = document.createElement("DIV");
+								buttonWrap.setAttribute("class","buttonWrap");
+									var button = document.createElement("DIV");
+									button.setAttribute("class","button");
+									button.setAttribute("onclick","openPotpis()");
+									button.innerHTML = "Потпис станара";
+									buttonWrap.appendChild(button);
+								novIzvestaj.appendChild(buttonWrap);
+								
+
+
 							izvestaji.appendChild(novIzvestaj);
 							var okaciIzvestaj = document.createElement("DIV");
 							okaciIzvestaj.setAttribute("class","okaciIzvestaj");
@@ -224,7 +260,7 @@
 				}
 
 				function saveIzvestaj(){
-					if(document.getElementById("tekst-izvestaja").value=="" && document.getElementById("slike-input").files.length==0){
+					if(document.getElementById("tekst-izvestaja").value=="" && document.getElementById("slike-input").files.length==0 && !document.getElementById("slika-potpisa").dataset.signature){
 						alert("Нисте укуцали извештај нити окачили фотографију");
 					}else{
 						var json = {};
@@ -240,12 +276,55 @@
 							}
 						}
 						json.izvestaj = document.getElementById("tekst-izvestaja").value;
+						if(document.getElementById("slika-potpisa").dataset.signature){
+							json.signature = JSON.parse(document.getElementById("slika-potpisa").dataset.signature);
+						}
 						document.getElementById("json").value = JSON.stringify(json);
-						//console.log(json)
 						loadGif();
 						document.getElementById("form").submit();
 					}
 					
+				}
+			</script>
+			<div id="potpis-lightbox" style="display:none">
+				<div class="pgLogo"><img src="/favicon.png"></div>
+				<div class="stambenoLogo"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/stambenoLogo.png"></div>
+				<div class="closeButton" onclick="closePotpis();">САЧУВАЈ</div>
+				<div class="canvasWrap" id="canvas-wrap">
+					<canvas id="potpis-canvas"></canvas>
+				</div>
+			</div>
+			<script src="/js/signature.js"></script>
+			<script>
+				var canvas = document.getElementById("potpis-canvas");
+				function resizeCanvas(){
+					const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+    				canvas.width = canvas.offsetWidth * ratio;
+    				canvas.height = canvas.offsetHeight * ratio;
+    				canvas.getContext("2d").scale(ratio, ratio);
+    				signaturePad.fromData(signaturePad.toData());
+				}
+				window.addEventListener("resize", resizeCanvas);
+				
+				var signaturePad = new SignaturePad(canvas,{penColor: "rgb(0,0,0)"});
+				resizeCanvas();
+
+				function closePotpis(){
+					
+					if(!signaturePad.isEmpty()){
+						var signatureImage = document.createElement("IMG");
+						signatureImage.setAttribute("src",signaturePad.toDataURL());
+						document.getElementById("slika-potpisa").dataset.signature = JSON.stringify(signaturePad.toData());
+						document.getElementById("slika-potpisa").appendChild(signatureImage)
+						document.getElementById("potpis-lightbox").style.display = "none";
+					}
+				}
+
+				function openPotpis(){
+					document.getElementById("slika-potpisa").innerHTML = "";
+					document.getElementById("potpis-lightbox").style.display = "block";
+					signaturePad.clear();
+					resizeCanvas();
 				}
 			</script>
 		</div>

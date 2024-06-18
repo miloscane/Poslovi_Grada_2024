@@ -7,6 +7,7 @@
 		var ucinci = <%-JSON.stringify(ucinci)%>; 
 		var notAllowed = ["Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
 	</script>
+	<script src="/js/signature.js"></script>
 	<div class="pageWidth">
 		<div class="administracijaNalog nalog">
 			<div class="inputWrap printButton" style="display:inline-block;vertical-align: top;">
@@ -363,6 +364,24 @@
 									izvestajImage.setAttribute("src",izvestaji[i].photos[j])
 									izvestajPhoto.appendChild(izvestajImage);
 								izvestajPhotos.appendChild(izvestajPhoto);
+							}
+							if(izvestaji[i].signature){
+								var signCanvas = document.createElement("CANVAS");
+								signCanvas.setAttribute("width","1000");
+								signCanvas.setAttribute("height","1000");
+								izvestajPhotos.appendChild(signCanvas);
+								var signPad = new SignaturePad(signCanvas,{penColor: "rgb(0,0,0)"});
+								signPad.fromData(izvestaji[i].signature);
+								var photo = document.createElement("DIV");
+								photo.setAttribute("class","imagePreview");
+								photo.setAttribute("onclick","previewImage(this)");
+								photo.setAttribute("style","background:none");
+									var image = document.createElement("IMG");
+									image.setAttribute("class","image");
+									image.setAttribute("src",signPad.toDataURL());
+									photo.appendChild(image);
+								izvestajPhotos.appendChild(photo);
+								signCanvas.remove();
 							}
 							izvestajBox.appendChild(izvestajPhotos);
 						document.getElementById("komentari").appendChild(izvestajBox);

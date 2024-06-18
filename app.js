@@ -6660,7 +6660,7 @@ server.get('/majstor/nalozi', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==60){
 			var today = new Date();
-			today.setDate(today.getDate()-3);
+			today.setDate(today.getDate()-4);
 			dodeljivaniNaloziDB.find({majstor:req.session.user.uniqueId,"datum.datum":getDateAsStringForDisplay(today)}).toArray()
 			.then((nalozi)=>{
 				var brojeviNaloga = [];
@@ -6751,6 +6751,7 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 				    izvestajJson.izvestaj	=	nalogJson.izvestaj;
 				    izvestajJson.user 		=	req.session.user;
 				    izvestajJson.photos		=	[];
+				    izvestajJson.signature = nalogJson.signature ? nalogJson.signature : [];
 				    for(var i=0;i<req.files.length;i++){
 				    	izvestajJson.photos.push(req.files[i].transforms[0].location)
 				    }

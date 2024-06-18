@@ -14,15 +14,15 @@
 			display:none !important; 
 		}
 	</style>
-	<div class="pageWidth">
+	<div class="pageWidth izvestajLokacije">
 		<script>
-			var magacin = {lat:44.813906,lng:20.443903}
+			var magacin = {lat:44.813906,lng:20.443903};
 			var nalozi = <%-JSON.stringify(nalozi)%>;
 			nalozi.push({
 				nalog: "1111111",
 				datum:{timestamp: "/"},
 				coordinates:magacin
-			})
+			});
 			var stops = <%-JSON.stringify(stops)%>;
 			var pauza = 5;//min
 			pauza = pauza * 60000
@@ -31,18 +31,43 @@
 				var stopStart = new Date(stops[i].gmtStopStart);
 				var stopEnd = new Date(stops[i].gmtStopEnd);
 				var stopTime = stopEnd.getTime() - stopStart.getTime();
+				stops[i].stopstartdatetime = stopStart.getTime();
+				stops[i].stopstopdatetime = stopEnd.getTime();
 				if( stopTime > pauza){
 					stops[i].tip = "Pauza"
 				}else{
 					stops[i].tip = "Lokacija"
 				}
 				stops[i].trajanje = stopTime;
-			}
-			for(var i=0;i<stops.length;i++){
-				//console.log(stops[i].tip)
+				var position = {lat:0,lng:0}
+				if(stops[i].endLatitude>0){
+					position.lat = stops[i].endLatitude;
+					position.lng = stops[i].endLongitude;
+				}else{
+					position.lat = stops[i].startLatitude;
+					position.lng = stops[i].startLongitude;
+				}
+				stops[i].pozicija = position;
 			}
 		</script>
 		<div id="map"></div>
+		<div class="navInfo">
+			<div id="nav-info"></div>
+		</div>
+		<script>
+			for(var i=0;i<stops.length;i++){
+				if(stops[i].tip=="Pauza"){
+					var item2 = document.createElement("DIV");
+					item2.setAttribute("class","item");
+					item2.setAttribute("data-lat",stops[i].pozicija.lat);
+					item2.setAttribute("data-lng",stops[i].pozicija.lng);
+					item2.setAttribute("onclick","focusNav(this)");
+					item2.innerHTML = getTimestamp(new Date(stops[i].gmtStopStart))+" - "+getTimestamp(new Date(stops[i].gmtStopEnd))
+					document.getElementById("nav-info").appendChild(item2);
+				}
+				
+			}
+		</script>
 		<script>
 			var map;
 			var myLatLng;
@@ -172,5 +197,13 @@
 			
 		</script>
 		<script src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyAsUyoMs0Ba_6bPbtD5A5_1yOJXjjMYsMQ&amp;callback=initMap" async="" defer=""></script>
+		<script>
+			function focusNav(elem){
+				console.log(elem.dataset.lat)
+				console.log(elem.dataset.lng)
+				map.setCenter({lat:parseFloat(elem.dataset.lat), lng:parseFloat(elem.dataset.lng)});
+				map.setZoom(18)
+			}
+		</script>
 	</div>
 <%- include ("partials/footer") -%>
