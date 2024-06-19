@@ -6660,7 +6660,7 @@ server.get('/majstor/nalozi', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==60){
 			var today = new Date();
-			today.setDate(today.getDate()-4);
+			today.setDate(today.getDate());
 			dodeljivaniNaloziDB.find({majstor:req.session.user.uniqueId,"datum.datum":getDateAsStringForDisplay(today)}).toArray()
 			.then((nalozi)=>{
 				var brojeviNaloga = [];
