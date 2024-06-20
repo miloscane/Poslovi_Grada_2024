@@ -6604,7 +6604,7 @@ server.get('/uspesnoFakturisano',async (req,res)=>{
 	}
 });
 
-server.get('/portalStambenoNalozi', async (req, res)=> {
+/*server.get('/portalStambenoNalozi', async (req, res)=> {
 	var nalogJSON = {};
 	nalogJSON.datetime = new Date().getTime();
 	nalogJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
@@ -6622,9 +6622,29 @@ server.get('/portalStambenoNalozi', async (req, res)=> {
 			res.send("Database error");
 		})	
 	}
-});
+});*/
 
 server.post('/portalStambenoNalozi', async (req, res)=> {
+	var nalogJSON = {};
+	nalogJSON.datetime = new Date().getTime();
+	nalogJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
+	nalogJSON.reqBody = req.body;
+	nalogJSON.reqHeader = req.headers;
+	nalogJSON.source = "POST";
+	if(stambenoDB){
+		stambenoDB.insertOne(nalogJSON)
+		.then((dbResponse)=>{
+			res.status(200);
+			res.send("Ok");
+		}).catch((err)=>{
+			logError(err)
+			res.status(500);
+			res.send("Database error");
+		})	
+	}
+});
+
+server.post('/portalStambenoUgovori', async (req, res)=> {
 	var nalogJSON = {};
 	nalogJSON.datetime = new Date().getTime();
 	nalogJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
