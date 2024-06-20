@@ -6635,7 +6635,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 		stambenoDB.insertOne(nalogJSON)
 		.then((dbResponse)=>{
 			res.status(200);
-			res.send("Ok");
+			res.send("Ok Nalozi");
 		}).catch((err)=>{
 			logError(err)
 			res.status(500);
@@ -6655,7 +6655,7 @@ server.post('/portalStambenoUgovori', async (req, res)=> {
 		stambenoDB.insertOne(nalogJSON)
 		.then((dbResponse)=>{
 			res.status(200);
-			res.send("Ok");
+			res.send("Ok Ugovori");
 		}).catch((err)=>{
 			logError(err)
 			res.status(500);
