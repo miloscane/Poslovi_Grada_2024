@@ -80,7 +80,8 @@ request(geoCodeOptions, (error,response,body)=>{
 				console.log(error)
 			}else{
 				console.log("request2 received");
-				console.log(response2)
+				console.log(JSON.parse(response2.body));
+
 			}
 		});
 	}
@@ -793,6 +794,46 @@ http.listen(process.env.PORT, function(){
 					navigacijaInfo.push(info[i])
 				}
 			}
+			/*request(ntsOptions, (error,response,body)=>{
+				if(error){
+					console.log(error)
+				}else{
+					console.log("request recevied");
+					//console.log(response.headers['set-cookie']);
+					var cookie = response.headers['set-cookie'];
+					var headers = {
+						'accept': 'application/json',
+				    'Cookie': cookie,
+				    'Content-Type': 'application/json'
+					}
+					var options = {
+					    url: 'https://app.nts-international.net/ntsapi/allvehicles',
+					    method: 'GET',
+					    headers: headers
+					};
+					console.log("Request2 sent");
+					request(options, (error,response2,body2)=>{
+						if(error){
+							console.log(error)
+						}else{
+							console.log("request2 received");
+							var navVehicles = JSON.parse(response2.body);
+							for(var i=0;i<navVehicles.length;i++){
+								var vehicleFound = false;
+								for(var j=0;j<navigacijaInfo.length;j++){
+									if(Number(navigacijaInfo[j].idNavigacije)==navVehicles[i].id){
+										vehicleFound = true;
+										break;
+									}
+								}
+								if(!vehicleFound){
+									console.log(navVehicles[i])
+								}
+							}
+						}
+					});
+				}
+			});*/
 			console.log("Navigacija inicijalizovana");
 		})
 		.catch((error)=>{
@@ -4305,7 +4346,7 @@ server.post('/edit-nalog', async (req, res)=> {
 							.then((dbResponse)=>{
 								//if(Number(req.session.user.role)==30){
 									var ukupanIznos = 0;
-									for(var i=0;i<nalogJson.obracun;i++){
+									for(var i=0;i<nalogJson.obracun.length;i++){
 										for(var j=0;j<cenovnik.length;j++){
 											if(nalogJson.obracun[i].code==cenovnik[j].code){
 												ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
@@ -4406,7 +4447,7 @@ server.post('/edit-nalog', async (req, res)=> {
 						}else{
 							//nema izvestaja
 							var ukupanIznos = 0;
-							for(var i=0;i<nalogJson.obracun;i++){
+							for(var i=0;i<nalogJson.obracun.length;i++){
 								for(var j=0;j<cenovnik.length;j++){
 									if(nalogJson.obracun[i].code==cenovnik[j].code){
 										ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
