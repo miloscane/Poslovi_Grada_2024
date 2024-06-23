@@ -1,10 +1,26 @@
 <%- include ("partials/header") -%>
+	<style>
+		.gm-style-iw{
+			padding:2px !important;
+		}
+
+		.gm-style .gm-style-iw-d{
+			padding:0px !important;
+			margin-bottom:-10px;
+			margin-right:-12px;
+		}
+
+		.gm-ui-hover-effect{
+			display:none !important; 
+		}
+	</style>
 	<script>
 		var nalog = <%-JSON.stringify(nalog)%>;
 		var cenovnik = <%-JSON.stringify(cenovnik)%>;
 		var istorijat = <%-JSON.stringify(istorijat)%>;
 		var izvestaji = <%-JSON.stringify(izvestaji)%>; 
 		var ucinci = <%-JSON.stringify(ucinci)%>; 
+		var lokacijeMajstora = <%-JSON.stringify(lokacijeMajstora)%>;
 		var notAllowed = ["Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
 	</script>
 	<script src="/js/signature.js"></script>
@@ -103,10 +119,24 @@
 							<script>
 								var majstori = <%-JSON.stringify(majstori)%>;
 								for(var i=0;i<majstori.length;i++){
+									majstori[i].udaljenost = 1000;
+									for(var j=0;j<lokacijeMajstora.length;j++){
+										if(majstori[i].uniqueId==lokacijeMajstora[j].idMajstora){
+											majstori[i].udaljenost = haversine_distance(nalog.coordinates,{lat:lokacijeMajstora[j].gpsLat,lng:lokacijeMajstora[j].gpsLon})
+										}
+									}
+								}
+								majstori.sort((a, b) => a.udaljenost - b.udaljenost);
+								for(var i=0;i<majstori.length;i++){
 									if(!majstori[i].inactive){
 										var option = document.createElement("OPTION");
 										option.setAttribute("value",majstori[i].uniqueId);
-										option.innerHTML	=	majstori[i].ime;
+										if(majstori[i].udaljenost != 1000){
+											option.innerHTML	=	majstori[i].ime+" ("+majstori[i].udaljenost.toFixed(1)+"km)";
+										}else{
+											option.innerHTML	=	majstori[i].ime;	
+										}
+										
 										if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
 											document.getElementById("majstori-podizvodjaci").appendChild(option);
 										}else{
@@ -195,6 +225,64 @@
 							}
 						</script>
 					</div>
+				</div>
+				<div class="box">
+					<div id="map" style="height:300px;width:100%;left:auto:transform:none;"></div>
+					<script>
+						function initMap() {
+						    var myLatLng = {lat: nalog.coordinates.lat, lng: nalog.coordinates.lng}; // 51.896468, 4.419172
+						    var map = new google.maps.Map(document.getElementById('map'), {
+						        center: myLatLng,
+						        zoom: 13,
+						        styles: [{"elementType":"geometry","stylers":[{"color":"#f5f5f5"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#f5f5f5"}]},{"featureType":"administrative.land_parcel","elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#eeeeee"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#e5e5e5"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"road","elementType":"geometry","stylers":[{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#dadada"}]},{"featureType":"road.highway","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"road.local","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"transit.line","elementType":"geometry","stylers":[{"color":"#e5e5e5"}]},{"featureType":"transit.station","elementType":"geometry","stylers":[{"color":"#eeeeee"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#c9c9c9"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]}]
+						    });
+
+						    var bounds = new google.maps.LatLngBounds();
+
+						    var marker = new google.maps.Marker({
+						        position: myLatLng,
+						        map: map,
+						        icon: {
+						            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+						        }
+						    });
+						    bounds.extend(myLatLng);
+
+						    var infowindow = new google.maps.InfoWindow({
+						        content: "<div style='color:rgb(32,51,100)'>Налог</div>"
+						    });
+						    infowindow.open(map, marker);
+
+						    for (var i = 0; i < lokacijeMajstora.length; i++) {
+						        var position = {lat: lokacijeMajstora[i].gpsLat, lng: lokacijeMajstora[i].gpsLon};
+						        marker = new google.maps.Marker({
+						            position: position,
+						            map: map,
+						            icon: {
+						                url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+						            }
+						        });
+						        bounds.extend(position);
+
+						        var infowindow = new google.maps.InfoWindow({
+						            content: "<div style='color:rgb(32,51,100)'>" + lokacijeMajstora[i].imeMajstora + "</div>"
+						        });
+						        infowindow.open(map, marker);
+						    }
+
+						    map.fitBounds(bounds);
+						    
+						    setTimeout(function(){
+						    	map.setCenter(nalog.coordinates);
+						    	map.setZoom(15);
+						    },2000)
+						}
+
+
+
+
+					</script>
+					<script src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyAsUyoMs0Ba_6bPbtD5A5_1yOJXjjMYsMQ&amp;callback=initMap" async="" defer=""></script>
 				</div>
 			</div>
 			<div class="detalji">

@@ -3897,18 +3897,155 @@ server.get('/nalog/:broj',async (req,res)=>{
 									}else if(Number(req.session.user.role)==20){
 										dodeljivaniNaloziDB.find({nalog:req.params.broj}).toArray()
 										.then((dodele)=>{
-											res.render("dispeceri/nalog",{
-												pageTitle:"Налог број " + req.params.broj,
-												nalog: nalozi[0],
-												majstori: majstori,
-												cenovnik: cenovnik,
-												istorijat: istorijat,
-												izvestaji: izvestaji,
-												ucinci: ucinci,
-												dodele: dodele,
-												phoneAccessCode: phoneAccessCode,
-												user: req.session.user
+											request(ntsOptions, (error,response,body)=>{
+												if(error){
+													logError(error);
+													res.render("dispeceri/nalog",{
+														pageTitle:"Налог број " + req.params.broj,
+														nalog: nalozi[0],
+														majstori: majstori,
+														cenovnik: cenovnik,
+														istorijat: istorijat,
+														izvestaji: izvestaji,
+														ucinci: ucinci,
+														dodele: dodele,
+														phoneAccessCode: phoneAccessCode,
+														lokacijeMajstora: [],
+														user: req.session.user
+													});
+												}else{
+													var cookie = response.headers['set-cookie'];
+													var headers = {
+														'accept': 'application/json',
+												    'Cookie': cookie,
+												    'Content-Type': 'application/json'
+													}
+													var options = {
+													    url: 'http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true',
+													    method: 'GET',
+													    headers: headers
+													};
+													request(options, (error,response2,body2)=>{
+														if(error){
+															logError(error);
+															res.render("dispeceri/nalog",{
+																pageTitle:"Налог број " + req.params.broj,
+																nalog: nalozi[0],
+																majstori: majstori,
+																cenovnik: cenovnik,
+																istorijat: istorijat,
+																izvestaji: izvestaji,
+																ucinci: ucinci,
+																dodele: dodele,
+																phoneAccessCode: phoneAccessCode,
+																lokacijeMajstora: [],
+																user: req.session.user
+															});
+														}else{
+															var options = {
+															    url: 'https://app.nts-international.net/ntsapi/allvehicles',
+															    method: 'GET',
+															    headers: headers
+															};
+															request(options, (error,response3,body3)=>{
+																if(error){
+																	logError(error)
+																	res.render("dispeceri/nalog",{
+																		pageTitle:"Налог број " + req.params.broj,
+																		nalog: nalozi[0],
+																		majstori: majstori,
+																		cenovnik: cenovnik,
+																		istorijat: istorijat,
+																		izvestaji: izvestaji,
+																		ucinci: ucinci,
+																		dodele: dodele,
+																		phoneAccessCode: phoneAccessCode,
+																		lokacijeMajstora: [],
+																		user: req.session.user
+																	});
+																}else{
+																	try{
+																		var vehiclesInfo = JSON.parse(response3.body);
+																		try{
+																			var vehicleStates = JSON.parse(response2.body);
+
+																			for(var i=0;i<navigacijaInfo.length;i++){
+																				for(var j=0;j<vehicleStates.length;j++){
+																					if(navigacijaInfo[i].idNavigacije==vehicleStates[j].vehicleId){
+																						vehicleStates[j].imeMajstora = navigacijaInfo[i].imeMajstora;
+																						vehicleStates[j].idMajstora = navigacijaInfo[i].idMajstora;
+																						vehicleStates[j].nadimakMajstora = navigacijaInfo[i].nadimakMajstora;
+																						vehicleStates[j].brojTablice = navigacijaInfo[i].brojTablice;
+																						vehicleStates[j].brojVozila = navigacijaInfo[i].brojVozila;
+																						vehicleStates[j].tipVozila = navigacijaInfo[i].tipVozila;
+																						vehicleStates[j].statusVozila = navigacijaInfo[i].status;
+																					}
+																				}
+																			}
+
+																			for(var i=0;i<vehicleStates.length;i++){
+																				if(!vehicleStates[i].statusVozila){
+																					vehicleStates.splice(i,1);
+																					i--;
+																				}
+																			}
+
+																			res.render("dispeceri/nalog",{
+																				pageTitle:"Налог број " + req.params.broj,
+																				nalog: nalozi[0],
+																				majstori: majstori,
+																				cenovnik: cenovnik,
+																				istorijat: istorijat,
+																				izvestaji: izvestaji,
+																				ucinci: ucinci,
+																				dodele: dodele,
+																				phoneAccessCode: phoneAccessCode,
+																				lokacijeMajstora: vehicleStates,
+																				user: req.session.user
+																			});
+																		}catch(err){
+																			logError(err)
+																			res.render("dispeceri/nalog",{
+																				pageTitle:"Налог број " + req.params.broj,
+																				nalog: nalozi[0],
+																				majstori: majstori,
+																				cenovnik: cenovnik,
+																				istorijat: istorijat,
+																				izvestaji: izvestaji,
+																				ucinci: ucinci,
+																				dodele: dodele,
+																				phoneAccessCode: phoneAccessCode,
+																				lokacijeMajstora: [],
+																				user: req.session.user
+																			});
+																		}
+																	}catch(err){
+																		logError(err);
+																		res.render("dispeceri/nalog",{
+																			pageTitle:"Налог број " + req.params.broj,
+																			nalog: nalozi[0],
+																			majstori: majstori,
+																			cenovnik: cenovnik,
+																			istorijat: istorijat,
+																			izvestaji: izvestaji,
+																			ucinci: ucinci,
+																			dodele: dodele,
+																			phoneAccessCode: phoneAccessCode,
+																			lokacijeMajstora: [],
+																			user: req.session.user
+																		});
+																	}
+																}
+															});
+
+
+
+															
+														}
+													});
+												}
 											});
+											
 										})
 										.catch((error)=>{
 											logError(error);
