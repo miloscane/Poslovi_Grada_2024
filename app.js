@@ -3848,7 +3848,7 @@ server.post('/administracija/ponisti-specifikaciju',async (req,res)=>{
 
 server.get('/nalog/:broj',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20 || Number(req.session.user.role)==30){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20 || Number(req.session.user.role)==25 || Number(req.session.user.role)==30){
 			//administracija, dispeceri, podizvodjaci
 			naloziDB.find({broj:req.params.broj.toString()}).toArray()
 			.then((nalozi) => {
@@ -4056,6 +4056,29 @@ server.get('/nalog/:broj',async (req,res)=>{
 											});
 										})
 										
+									}else if(Number(req.session.user.role)==25){
+										dodeljivaniNaloziDB.find({nalog:req.params.broj}).toArray()
+										.then((dodele)=>{
+											res.render("kontrola/nalog",{
+												pageTitle:"Налог број " + req.params.broj,
+												nalog: nalozi[0],
+												majstori: majstori,
+												istorijat: istorijat,
+												izvestaji: izvestaji,
+												dodele: dodele,
+												ucinci: ucinci,
+												phoneAccessCode: phoneAccessCode,
+												user: req.session.user
+											});
+										})
+										.catch((error)=>{
+											logError(error);
+											res.render("message",{
+												pageTitle: "Грешка",
+												message: "<div class=\"text\">Дошло је до грешке у бази податка 4068.</div>",
+												user: req.session.user
+											});
+										})
 									}else if(Number(req.session.user.role)==30){
 										var obrada = ["Nalog u Stambenom","Spreman za fakturisanje","Spreman za obračun"];
 										if(obrada.indexOf(nalozi[0].statusNaloga)>=0){
@@ -4390,7 +4413,7 @@ server.get('/uspesanIzvestaj',async (req,res)=>{
 
 server.post('/edit-nalog', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20 || Number(req.session.user.role)==30){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20 || Number(req.session.user.role)==25 || Number(req.session.user.role)==30){
 				uploadSlika(req, res, function (error) {
 				    if (error) {
 				      logError(error);
@@ -4631,6 +4654,48 @@ server.post('/edit-nalog', async (req, res)=> {
 					}
 				});
 			
+		}else{
+			res.send("Nije definisan nivo korisnika");
+		}
+	}else{
+		res.redirect("/login");
+	}
+});
+
+server.post('/edit-nalog-kontrolor', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==25){
+			uploadSlika(req, res, function (error) {
+			    if (error) {
+			      logError(error);
+			      return res.render("message",{pageTitle: "Грешка",message: "<div class=\"text\">Дошло је до грешке приликом качења слика.</div>",user: req.session.user});
+			    }
+			    var nalogJson = JSON.parse(req.body.json);
+			    var izvestajJson = {};
+			    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
+			    izvestajJson.nalog		=	nalogJson.broj;
+			    izvestajJson.datetime 	=	new Date().getTime();
+			    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
+			    izvestajJson.izvestaj	=	nalogJson.izvestaj;
+			    izvestajJson.user 		=	req.session.user;
+			    izvestajJson.photos		=	[];
+			    for(var i=0;i<req.files.length;i++){
+			    	izvestajJson.photos.push(req.files[i].transforms[0].location)
+			    }
+
+			    izvestajiDB.insertOne(izvestajJson)
+					.then((dbResponse)=>{
+						res.redirect("/nalog/"+nalogJson.broj);
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user:req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 676.</div>"
+						});
+					})
+				});
 		}else{
 			res.send("Nije definisan nivo korisnika");
 		}
