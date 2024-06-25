@@ -3443,22 +3443,11 @@ server.get('/naloziPoKategorijama',async (req,res)=>{
 server.get('/proveraLokacijeMajstora',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==25){
-			majstoriDB.find({}).toArray()
-			.then((majstori)=>{
 				res.render("administracija/proveraLokacijeMajstora",{
 					pageTitle: "Провера локације мајстора",
 					user: req.session.user,
-					majstori: majstori
+					majstori: navigacijaInfo
 				});
-			})
-			.catch((error)=>{
-				logError(error);
-				res.render("message",{
-					pageTitle: "Грешка",
-					user: req.session.user,
-					message: "<div class=\"text\">Грешка у бази података 2872.</div>"
-				});
-			})
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -3593,9 +3582,11 @@ server.get('/izvestajLokacijeMajstora/:majstorid/:date',async (req,res)=>{
 								    headers: headers
 								};
 								var idNavigacije = 0;
+								var plate = "";
 								for(var i=0;i<navigacijaInfo.length;i++){
 									if(navigacijaInfo[i].idMajstora==idMajstora){
 										idNavigacije = navigacijaInfo[i].idNavigacije;
+										plate = navigacijaInfo[i].brojTablice;
 										break;
 									}
 								}
@@ -3619,7 +3610,7 @@ server.get('/izvestajLokacijeMajstora/:majstorid/:date',async (req,res)=>{
 										}else{
 											var stops = JSON.parse(response3.body)
 											res.render("administracija/izvestajLokacijeMajstora",{
-												pageTitle: "Извештај локације за "+majstori[0].ime+" за датум "+reshuffleDate(date),
+												pageTitle: "Извештај локације за "+majstori[0].ime+" / "+plate+" за датум "+reshuffleDate(date),
 												user: req.session.user,
 												nalozi: dodeljivaniNalozi,
 												stops: stops
