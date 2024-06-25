@@ -6828,7 +6828,9 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 		stambenoDB.insertOne(nalogJSON)
 		.then((dbResponse)=>{
 			res.status(200);
-			res.send("Ok Nalozi");
+			res.setHeader('Content-Type', 'application/json');
+			var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+			res.send(JSON.stringify(primerJson));
 		}).catch((err)=>{
 			logError(err)
 			res.status(500);
@@ -6848,7 +6850,9 @@ server.post('/portalStambenoUgovori', async (req, res)=> {
 		stambenoDB.insertOne(nalogJSON)
 		.then((dbResponse)=>{
 			res.status(200);
-			res.send("Ok Ugovori");
+			res.setHeader('Content-Type', 'application/json');
+			var primerJson = {"code":"200","message":"Primio sam podatke za ugovor.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+			res.send(JSON.stringify(primerJson));
 		}).catch((err)=>{
 			logError(err)
 			res.status(500);
