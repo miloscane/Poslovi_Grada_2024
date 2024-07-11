@@ -725,6 +725,8 @@ var errorDB;
 var navigacijaInfoDB;
 var dodeljivaniNaloziDB;
 
+		var stariCenovnikJsons = [];
+
 http.listen(process.env.PORT, function(){
 	console.log("Poslovi Grada 2024");
 	console.log("Server Started");
@@ -759,6 +761,54 @@ http.listen(process.env.PORT, function(){
 		stariProizvodiDB			=	client.db("Poslovi-Grada").collection('magacin-proizvodi-4');
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
+
+		/*console.log("POKUSAVAM STAMBENO")
+		stambenoDB.find({}).toArray()
+		.then((nalozi)=>{
+			console.log("STAMBENO")
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].reqBody.hasOwnProperty("order_headers")){
+					console.log(nalozi[i].reqBody.order_headers[0].broj_naloga)
+				}else{
+					console.log(nalozi[i].reqBody)
+				}
+				
+			}
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
+
+		/*stariCenovnikDB.find({}).toArray()
+		.then((stavke)=>{
+			stavke = stavke.sort((a, b) => {
+				if (a.code < b.code) {
+					return -1;
+				}
+			});
+			var csvString = "Sifra;Naziv;Kategorija\r\n";
+			for(var i=0;i<stavke.length;i++){
+				csvString += stavke[i].code+";"+stavke[i].name+";Kat\r\n"
+			}
+			fs.writeFileSync("./stariCenovnik.csv",csvString,"utf8");
+			console.log("WROTE")
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+		var stariCenovnikString = fs.readFileSync("Book12.csv",{encoding:"utf8"});
+		var stariCenovnikStringArray = stariCenovnikString.split("\r\n");
+		stariCenovnikStringArray.splice(0,1);
+		for(var i=0;i<stariCenovnikStringArray.length;i++){
+			var stariCenovnikArray = stariCenovnikStringArray[i].split(";");
+			var stariCenovnikJson = {};
+			stariCenovnikJson.code = stariCenovnikArray[0];
+			stariCenovnikJson.kategorija = stariCenovnikArray[2];
+			stariCenovnikJsons.push(stariCenovnikJson)
+		}
+		//console.log(stariCenovnikJsons);
+
 
 		//navigacija informacije
 		/*var vozila = fs.readFileSync("navigacija.csv",{encoding:"utf8"});
@@ -1911,7 +1961,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
-						if(nalozi[i].prijemnica.datum.datum.includes(".05.2024")){
+						if(nalozi[i].prijemnica.datum.datum.includes(".06.2024")){
 							naloziToExport.push(nalozi[i])
 						}
 					}
@@ -1961,7 +2011,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<problemNalozi.length;i++){
 				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
 			}
-			fs.writeFileSync("./PG-Premijus-05-2024.csv",csvString,"utf8");
+			fs.writeFileSync("./PG-Premijus-06-2024.csv",csvString,"utf8");
 			console.log("Written ")
 		})
 		.catch((error)=>{
@@ -2000,6 +2050,9 @@ request(geoCodeOptions, (error,response,body)=>{
 		logError(error);
 	});
 });
+
+console.log(hashString("sl0b0d@n.PosloviGrada"));
+console.log(hashString("m1lut1n.PosloviGrada"));
 
 
 /*server.get('/test', async (req,res)=>{
@@ -6824,19 +6877,47 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 	nalogJSON.reqBody = req.body;
 	nalogJSON.reqHeader = req.headers;
 	nalogJSON.source = "POST";
-	if(stambenoDB){
-		stambenoDB.insertOne(nalogJSON)
+	if(nalogJSON.reqBody.hasOwnProperty("note_details")){
+		var izvestajJson = {};
+		izvestajJson.uniqueId = generateId(5)+"--"+new Date().getTime();
+		izvestajJson.nalog = nalogJSON.reqBody.note_details.broj_naloga.toString();
+		izvestajJson.datetime = new Date().getTime();
+		izvestajJson.datum = getDateAsStringForDisplay(new Date());
+		izvestajJson.izvestaj = nalogJSON.reqBody.note_details.tekst_beleske;
+		izvestajJson.photos = [];
+		izvestajJson.user = {};
+		izvestajJson.user.email = "info@stambeno.com";
+		izvestajJson.user.name = "PORTAL STAMBENO";
+		izvestajiDB.insertOne(izvestajJson)
 		.then((dbResponse)=>{
 			res.status(200);
 			res.setHeader('Content-Type', 'application/json');
-			var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+			var primerJson = {"code":"200","message":"Primljena beleska","warnings":{"vrsta_promene":"Beleska","broj_naloga":nalogJSON.reqBody.note_details.broj_naloga}}
 			res.send(JSON.stringify(primerJson));
-		}).catch((err)=>{
-			logError(err)
-			res.status(500);
-			res.send("Database error");
-		})	
+		})
+		.catch((error)=>{
+			logError(error);
+			res.status(501);
+			res.setHeader('Content-Type', 'application/json');
+			var primerJson = {"code":"200","message":"Neuspesan prijem beleske"}
+			res.send(JSON.stringify(primerJson));
+		})
+	}else{
+		if(stambenoDB){
+			stambenoDB.insertOne(nalogJSON)
+			.then((dbResponse)=>{
+				res.status(200);
+				res.setHeader('Content-Type', 'application/json');
+				var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+				res.send(JSON.stringify(primerJson));
+			}).catch((err)=>{
+				logError(err)
+				res.status(500);
+				res.send("Database error");
+			})	
+		}
 	}
+	
 });
 
 server.post('/portalStambenoUgovori', async (req, res)=> {
@@ -7050,6 +7131,55 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 	}else{
 		res.redirect("/login");
 	}
+});
+
+server.get('/temp', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			stariUcinakMajstoraDB.find({}).toArray()
+			.then((ucinci)=>{
+				majstoriDB.find({}).toArray()
+				.then((majstori)=>{
+					for(var i=0;i<majstori.length;i++){
+						majstori[i].ucinci = [];
+						for(var j=0;j<ucinci.length;j++){
+							if(ucinci[j].majstor==majstori[i].uniqueId){
+								majstori[i].ucinci.push(ucinci[j]);
+							}
+						}
+					}
+					for(var i=0;i<majstori.length;i++){
+						if(majstori[i].ucinci.length==0){
+							majstori.splice(i,1);
+							i--;
+						}
+					}
+					res.render("temp",{
+						pageTitle: "Ucinak",
+						user: req.session.user,
+						majstori: majstori,
+						kategorije: stariCenovnikJsons
+					})
+				})
+				.catch((error)=>{
+					console.log(error);
+					res.send(error)
+				})
+			})
+			.catch((error)=>{
+				console.log(error);
+				res.send(error)
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	} 
 });
 
 io.on('connection', function(socket){

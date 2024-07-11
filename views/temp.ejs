@@ -1,0 +1,316 @@
+<%- include ("partials/header") -%>
+	<div class="pageWidth">
+		<div id="wrap">
+			<div class="button" onclick="stampaj()">stampaj</div>
+		</div>
+		<div style="overflow:hidden;height:1px;width:1px;">
+			<canvas id="logo-canvas" height="306" width="300"></canvas>
+			<script>
+				var logoCanvas = document.getElementById('logo-canvas');
+				var logoCanvasContext = logoCanvas.getContext('2d');
+				var logoLogoBlob;
+				function make_base3(){
+				  base_image3 = new Image();
+				  base_image3.crossOrigin="anonymous"
+				  base_image3.src = '/images/fakturaLogo.png';
+				  base_image3.onload = function(){
+				    logoCanvasContext.drawImage(base_image3, 0, 0);
+				    logoLogoBlob 	=	logoCanvas.toDataURL("image/png", 1.0);
+
+				  }
+				}
+				make_base3();
+			</script>
+		</div>
+		<script src="/js/pdf.js"></script>
+		<script src="/js/font.js"></script>
+		<script src="/js/font2.js"></script>
+		<script>
+			var mm = 3.7795275591;
+			doc = new jsPDF({
+				orientation: 'p',
+				unit: 'mm',
+				format: 'a4',
+				compress: true
+				//putOnlyUsedFonts:true
+			});
+			pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+			pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+			
+			//doc.getFontList("Helvetica");
+			doc.addFileToVFS("PTSans.ttf", PTSans);
+			doc.addFileToVFS("PTSansBold.ttf", PTSansBold);
+			doc.addFont('PTSans.ttf', 'PTSans', 'normal');
+			doc.addFont('PTSansBold.ttf', 'PTSans', 'bold');
+
+			doc.setFont('PTSans'); // set font
+			doc.getFontList("PTSans");
+
+			function stringArray(string,count){
+				return string.match(new RegExp('.{1,' + count + '}', 'g'));
+			}
+		</script>
+		<script>
+			var majstori = <%-JSON.stringify(majstori)%>;
+			var kategorije = <%-JSON.stringify(kategorije)%>;
+			//console.log(kategorije)
+			var meseci = ["2024-02","2024-03","2024-04","2024-05","2024-06"];
+			var meseciImena = ["Фебруар","Март","Април","Мај","Јун"];
+			var meseciDani = [25,25,25,25,25];
+			var meseciNalozi = [150,150,150,150,150];
+
+			for(var i=0;i<majstori.length;i++){
+				for(var j=0;j<majstori[i].ucinci.length;j++){
+					for(var k=0;k<majstori[i].ucinci[j].obracun.length;k++){
+						for(var l=0;l<kategorije.length;l++){
+							if(kategorije[l].code==majstori[i].ucinci[j].obracun[k].sifraArtikla){
+								majstori[i].ucinci[j].obracun[k].kategorija = kategorije[l].kategorija;
+								break;
+							}
+						}
+					}		
+				}
+			}
+
+			for(var i=0;i<majstori.length;i++){
+				for(var j=0;j<majstori[i].ucinci.length;j++){
+					majstori[i].ucinci[j].kategorije = [];
+					for(var k=0;k<majstori[i].ucinci[j].obracun.length;k++){
+						if(majstori[i].ucinci[j].kategorije.indexOf(majstori[i].ucinci[j].obracun[k].kategorija)<0){
+							if(majstori[i].ucinci[j].obracun[k].kategorija!="NEBITNO"){
+								majstori[i].ucinci[j].kategorije.push(majstori[i].ucinci[j].obracun[k].kategorija);	
+							}
+							//console.log("Nasao NEBITNBO")
+							
+						}
+					}
+				}
+			}
+
+			
+
+			for(var i=0;i<majstori.length;i++){
+				majstori[i].slozenUcinak = [];
+				for(var j=0;j<meseci.length;j++){
+					var json = {};
+					json.mesec = meseci[j];
+					json.mesecIme = meseciImena[j];
+					json.radniDani = meseciDani[j];
+					json.ostvarenoTest = [];
+					json.ostvarenoNalozi = [];
+					json.ocekivanoNalozi = meseciNalozi[j];
+					json.zamena = 0;
+					json.konstatacija = 0;
+					json.odgusenje = 0;
+					json.dezinfekcija = 0;
+					json.crpljenje = 0;
+					json.ostalo = 0;
+					json.ucinci = [];
+					majstori[i].slozenUcinak.push(json);
+				}
+			}
+
+			/*for(var i=0;i<majstori.length;i++){
+				for(var j=0;j<majstori[i].ucinci.length;j++){
+					for(var k=0;k<majstori[i].ucinci[j].kategorije.length;k++){
+						if(majstori[i].ucinci[j].kategorije.length==1 && majstori[i].ucinci[j].kategorije[0]=="Konstatacija"){
+							majstori[i].ucinci[j].glavnaKategorija = "Konstatacija";
+							//console.log(majstori[i].ucinci[j])
+							//console.log(majstori[i].ucinci[j].kategorije)
+						}
+					}
+				}
+			}*/
+
+			for(var i=0;i<majstori.length;i++){
+				for(var j=0;j<majstori[i].slozenUcinak.length;j++){
+					for(var k=0;k<majstori[i].ucinci.length;k++){
+						if(majstori[i].ucinci[k].datum.startsWith(majstori[i].slozenUcinak[j].mesec)){
+							majstori[i].slozenUcinak[j].ucinci.push(majstori[i].ucinci[k])
+						}
+					}
+				}
+			}
+			for(var i=0;i<majstori.length;i++){
+				for(var j=0;j<majstori[i].slozenUcinak.length;j++){
+					for(var k=0;k<majstori[i].slozenUcinak[j].ucinci.length;k++){
+						if(majstori[i].slozenUcinak[j].ostvarenoTest.indexOf(majstori[i].slozenUcinak[j].ucinci[k].datum)<0){
+							majstori[i].slozenUcinak[j].ostvarenoTest.push(majstori[i].slozenUcinak[j].ucinci[k].datum);
+						}
+					}
+				}
+			}
+			for(var i=0;i<majstori.length;i++){
+				for(var j=0;j<majstori[i].slozenUcinak.length;j++){
+					for(var k=0;k<majstori[i].slozenUcinak[j].ucinci.length;k++){
+						if(majstori[i].slozenUcinak[j].ostvarenoNalozi.indexOf(majstori[i].slozenUcinak[j].ucinci[k].brojNaloga)<0){
+							majstori[i].slozenUcinak[j].ostvarenoNalozi.push(majstori[i].slozenUcinak[j].ucinci[k].brojNaloga);
+						}
+					}
+				}
+			}
+			/*for(var i=0;i<majstori.length;i++){
+				for(var j=0;j<majstori[i].slozenUcinak.length;j++){
+					for(var k=0;k<majstori[i].slozenUcinak[j].ucinci.length;k++){
+						if(majstori[i].slozenUcinak[j].ucinci[k].glavnaKategorija=="Konstatacija"){
+							majstori[i].slozenUcinak[j].konstatacija = majstori[i].slozenUcinak[j].konstatacija + parseFloat(majstori[i].slozenUcinak[j].ucinci[k].ukupanIznos);
+						}
+					}
+				}
+			}*/
+			/*for(var i=0;i<majstori.length;i++){
+				for(var j=0;j<majstori[i].slozenUcinak.length;j++){
+					for(var k=0;k<majstori[i].slozenUcinak[j].ucinci.length;k++){
+						if(majstori[i].slozenUcinak[j].ucinci[k].glavnaKategorija=="Zamena"){
+							majstori[i].slozenUcinak[j].zamena++;
+						}else if(majstori[i].slozenUcinak[j].ucinci[k].glavnaKategorija=="Konstatacija"){
+							majstori[i].slozenUcinak[j].konstatacije++;
+						}else if(majstori[i].slozenUcinak[j].ucinci[k].glavnaKategorija=="Crpljenje"){
+							majstori[i].slozenUcinak[j].crpljenje++;
+						}else if(majstori[i].slozenUcinak[j].ucinci[k].glavnaKategorija=="Odgusenje"){
+							majstori[i].slozenUcinak[j].odgusenje++;
+						}else if(majstori[i].slozenUcinak[j].ucinci[k].glavnaKategorija=="Dezinfekcija"){
+							majstori[i].slozenUcinak[j].odgusenje++;
+						}else if(majstori[i].slozenUcinak[j].ucinci[k].glavnaKategorija=="Woma"){
+							majstori[i].slozenUcinak[j].odgusenje++;
+						}else{
+							console.log("NEMA "+majstori[i].slozenUcinak[j].ucinci[k].glavnaKategorija)
+						}
+					}
+				}
+			}*/
+
+
+			for(var i=0;i<majstori.length;i++){
+				for(var j=0;j<majstori[i].slozenUcinak.length;j++){
+					for(var k=0;k<majstori[i].slozenUcinak[j].ucinci.length;k++){
+						for(var l=0;l<majstori[i].slozenUcinak[j].ucinci[k].obracun.length;l++){
+							if(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].kategorija=="Zamena"){
+								majstori[i].slozenUcinak[j].zamena = majstori[i].slozenUcinak[j].zamena + parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].jedinicnaCena)*parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].izvedenaKolicina)
+							}else if(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].kategorija=="Konstatacija"){
+								majstori[i].slozenUcinak[j].konstatacija = majstori[i].slozenUcinak[j].konstatacija + parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].jedinicnaCena)*parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].izvedenaKolicina)
+							}else if(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].kategorija=="Odgusenje"){
+								majstori[i].slozenUcinak[j].odgusenje = majstori[i].slozenUcinak[j].odgusenje + parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].jedinicnaCena)*parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].izvedenaKolicina)
+							}else if(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].kategorija=="Dezinfekcija"){
+								majstori[i].slozenUcinak[j].dezinfekcija = majstori[i].slozenUcinak[j].dezinfekcija + parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].jedinicnaCena)*parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].izvedenaKolicina)
+							}else if(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].kategorija=="Crpljenje"){
+								majstori[i].slozenUcinak[j].crpljenje = majstori[i].slozenUcinak[j].crpljenje + parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].jedinicnaCena)*parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].izvedenaKolicina)
+							}else if(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].kategorija=="Woma"){
+								majstori[i].slozenUcinak[j].ostalo = majstori[i].slozenUcinak[j].ostalo + parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].jedinicnaCena)*parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].izvedenaKolicina)
+								//console.log(majstori[i].slozenUcinak[j].ucinci[k].obracun[l])
+							}else if(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].kategorija=="NEBITNO"){
+								majstori[i].slozenUcinak[j].ostalo = majstori[i].slozenUcinak[j].ostalo + parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].jedinicnaCena)*parseFloat(majstori[i].slozenUcinak[j].ucinci[k].obracun[l].izvedenaKolicina)
+								//console.log(majstori[i].slozenUcinak[j].ucinci[k].obracun[l])
+							}else{
+								//console.log(majstori[i].slozenUcinak[j].ucinci[k].obracun[l])
+							}
+						}
+					}
+				}
+			}
+
+			for(var i=0;i<majstori.length;i++){
+				for(var j=0;j<majstori[i].slozenUcinak.length;j++){
+					majstori[i].slozenUcinak[j].ukupno = majstori[i].slozenUcinak[j].zamena + majstori[i].slozenUcinak[j].konstatacija + majstori[i].slozenUcinak[j].odgusenje + majstori[i].slozenUcinak[j].dezinfekcija + majstori[i].slozenUcinak[j].crpljenje + majstori[i].slozenUcinak[j].ostalo;
+					//console.log(majstori[i].slozenUcinak[j].ukupno)
+
+
+				}
+			}
+
+			console.log(majstori);
+			function stampaj(){
+				for(var i=0;i<majstori.length;i++){
+					var yPos = 12;
+					var xPos = 12;
+					doc.addImage(logoLogoBlob, 'PNG', 5, 5, 150/mm, 153/mm,'','FAST');
+			        doc.setFontType("bold");
+					doc.setFontSize(16);
+			        doc.text("Послови Града доо",205,yPos,'right');
+			        doc.setFontType("normal");
+					doc.setFontSize(11);
+					yPos = yPos + 5;
+			        doc.text("Мије Ковачевића 9, 11000 Палилула",205,yPos,'right');
+					yPos = yPos + 5;
+			        doc.text("011/334-2325",205,yPos,'right');
+			        yPos = yPos + 5;
+			        doc.text("063/209-777",205,yPos,'right');
+					yPos = yPos + 5;
+			        doc.text("ПИБ: 114108334",205,yPos,'right');
+					yPos = yPos + 5;
+			        doc.text("МБ: 21972215",205,yPos,'right');
+					yPos = yPos + 5;
+			        doc.text("office@poslovigrada.rs",205,yPos,'right');
+			        yPos = yPos + 15;
+			        doc.setFontType("bold");
+					doc.setFontSize(20);
+			        doc.text("Преглед рада од фебруара 2024.",pageWidth/2,yPos,'center');
+			        yPos = yPos + 10;
+			        doc.setFontType("normal");
+			        doc.text(majstori[i].ime,pageWidth/2,yPos,'center');
+			        yPos = yPos + 10;
+			        doc.setFontType("bold");
+					doc.setFontSize(12);
+					doc.text("Месец",5,yPos+5);
+					doc.text(["Договорени","радни дани"],25,yPos);
+					doc.text(["Остварени","радни дани"],55,yPos);
+					doc.text(["Очекивано","налога"],80,yPos);
+					doc.text(["Остварено","налога"],105,yPos);
+					yPos = yPos + 12;
+			        doc.setFontType("normal");
+					doc.setFontSize(12);
+					for(var j=0;j<majstori[i].slozenUcinak.length;j++){
+						doc.text(majstori[i].slozenUcinak[j].mesecIme,5,yPos);
+						doc.text(majstori[i].slozenUcinak[j].radniDani.toString(),28,yPos);
+						doc.text(majstori[i].slozenUcinak[j].ostvarenoTest.length.toString(),58,yPos);
+						doc.text(majstori[i].slozenUcinak[j].ocekivanoNalozi.toString(),83,yPos);
+						doc.text(majstori[i].slozenUcinak[j].ostvarenoNalozi.length.toString(),108,yPos);
+						yPos = yPos + 5;
+					}
+					yPos = yPos + 4;
+					doc.setFontType("bold");
+					doc.setFontSize(16);
+					doc.text("Учинак по налозима",5,yPos);
+					doc.setFontSize(12);
+					yPos = yPos + 7;
+					doc.text("Месец",5,yPos);
+					doc.text("Конст.",25,yPos);
+					doc.text("Замена",45,yPos);
+					doc.text("Одгуш.",70,yPos);
+					doc.text("Црпљење",95,yPos);
+					doc.text("Дезинф.",125,yPos);
+					doc.text("Остало",155,yPos);
+					doc.setFontType("normal");
+					yPos = yPos + 5;
+					for(var j=0;j<majstori[i].slozenUcinak.length;j++){
+						doc.text(majstori[i].slozenUcinak[j].mesecIme,5,yPos);
+						doc.text(eval(majstori[i].slozenUcinak[j].konstatacija/majstori[i].slozenUcinak[j].ukupno*100).toFixed(1)+"% ",28,yPos);
+						doc.text(eval(majstori[i].slozenUcinak[j].zamena/majstori[i].slozenUcinak[j].ukupno*100).toFixed(1)+"% ",48,yPos);
+						doc.text(eval(majstori[i].slozenUcinak[j].odgusenje/majstori[i].slozenUcinak[j].ukupno*100).toFixed(1)+"% ",73,yPos);
+						doc.text(eval(majstori[i].slozenUcinak[j].crpljenje/majstori[i].slozenUcinak[j].ukupno*100).toFixed(1)+"% ",98,yPos);
+						doc.text(eval(majstori[i].slozenUcinak[j].dezinfekcija/majstori[i].slozenUcinak[j].ukupno*100).toFixed(1)+"% ".toString(),128,yPos);
+						doc.text(eval(majstori[i].slozenUcinak[j].ostalo/majstori[i].slozenUcinak[j].ukupno*100).toFixed(1)+"% ".toString(),158,yPos);
+						yPos = yPos + 5;
+					}
+					yPos = yPos + 10;
+					doc.setFontType("bold");
+					doc.text("Месец",5,yPos);
+					doc.text("Вредност",25,yPos);
+					doc.setFontType("normal");
+					yPos = yPos + 5;
+					for(var j=0;j<majstori[i].slozenUcinak.length;j++){
+						doc.text(majstori[i].slozenUcinak[j].mesecIme,5,yPos);
+						doc.text(brojSaRazmacima(majstori[i].slozenUcinak[j].ukupno)+" дин. ",28,yPos);
+						yPos = yPos + 5;
+					}
+					if(i<=majstori.length-1){
+						doc.addPage();
+					}
+					
+				}
+				window.open(doc.output('bloburl'), '_blank');
+			}
+			
+		</script>
+	</div>
+<%- include ("partials/footer") -%>
