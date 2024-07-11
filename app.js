@@ -6892,7 +6892,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 		.then((dbResponse)=>{
 			res.status(200);
 			res.setHeader('Content-Type', 'application/json');
-			var primerJson = {"code":"200","message":"Primljena beleska","warnings":{"vrsta_promene":"Beleska","broj_naloga":nalogJSON.reqBody.note_details.broj_naloga}}
+			var primerJson = {"code":"200","message":"Primljena beleska","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 			res.send(JSON.stringify(primerJson));
 		})
 		.catch((error)=>{
