@@ -6878,31 +6878,38 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 	nalogJSON.reqHeader = req.headers;
 	nalogJSON.source = "POST";
 	if(nalogJSON.reqBody.hasOwnProperty("note_details")){
-		console.log("Primljena beleska")
-		var izvestajJson = {};
-		izvestajJson.uniqueId = generateId(5)+"--"+new Date().getTime();
-		izvestajJson.nalog = nalogJSON.reqBody.note_details[0].broj_naloga.toString();
-		izvestajJson.datetime = new Date().getTime();
-		izvestajJson.datum = getDateAsStringForDisplay(new Date());
-		izvestajJson.izvestaj = nalogJSON.reqBody.note_details[0].tekst_beleske;
-		izvestajJson.photos = [];
-		izvestajJson.user = {};
-		izvestajJson.user.email = "info@stambeno.com";
-		izvestajJson.user.name = "PORTAL STAMBENO";
-		izvestajiDB.insertOne(izvestajJson)
-		.then((dbResponse)=>{
-			res.status(200);
+		try{
+			var izvestajJson = {};
+			izvestajJson.uniqueId = generateId(5)+"--"+new Date().getTime();
+			izvestajJson.nalog = nalogJSON.reqBody.note_details[0].broj_naloga.toString();
+			izvestajJson.datetime = new Date().getTime();
+			izvestajJson.datum = getDateAsStringForDisplay(new Date());
+			izvestajJson.izvestaj = nalogJSON.reqBody.note_details[0].tekst_beleske;
+			izvestajJson.photos = [];
+			izvestajJson.user = {};
+			izvestajJson.user.email = "info@stambeno.com";
+			izvestajJson.user.name = "PORTAL STAMBENO";
+			izvestajiDB.insertOne(izvestajJson)
+			.then((dbResponse)=>{
+				res.status(200);
+					res.setHeader('Content-Type', 'application/json');
+					var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+					res.send(JSON.stringify(primerJson));
+			})
+			.catch((error)=>{
+				logError(error);
+				res.status(501);
 				res.setHeader('Content-Type', 'application/json');
-				var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+				var primerJson = {"code":"501","message":"Neuspesan prijem beleske"}
 				res.send(JSON.stringify(primerJson));
-		})
-		.catch((error)=>{
-			logError(error);
+			})
+		}catch(err){
+			logError(err);
 			res.status(501);
 			res.setHeader('Content-Type', 'application/json');
-			var primerJson = {"code":"501","message":"Neuspesan prijem beleske"}
+			var primerJson = {"code":"501","message":"Neuspesan prijem beleske 2"}
 			res.send(JSON.stringify(primerJson));
-		})
+		}
 	}else{
 		if(stambenoDB){
 			stambenoDB.insertOne(nalogJSON)
