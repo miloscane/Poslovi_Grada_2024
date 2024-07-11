@@ -797,7 +797,7 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 
-		var stariCenovnikString = fs.readFileSync("Book12.csv",{encoding:"utf8"});
+		/*var stariCenovnikString = fs.readFileSync("Book12.csv",{encoding:"utf8"});
 		var stariCenovnikStringArray = stariCenovnikString.split("\r\n");
 		stariCenovnikStringArray.splice(0,1);
 		for(var i=0;i<stariCenovnikStringArray.length;i++){
@@ -806,7 +806,7 @@ http.listen(process.env.PORT, function(){
 			stariCenovnikJson.code = stariCenovnikArray[0];
 			stariCenovnikJson.kategorija = stariCenovnikArray[2];
 			stariCenovnikJsons.push(stariCenovnikJson)
-		}
+		}*/
 		//console.log(stariCenovnikJsons);
 
 
