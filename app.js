@@ -6878,6 +6878,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 	nalogJSON.reqHeader = req.headers;
 	nalogJSON.source = "POST";
 	if(nalogJSON.reqBody.hasOwnProperty("note_details")){
+		console.log("Primljena beleska")
 		var izvestajJson = {};
 		izvestajJson.uniqueId = generateId(5)+"--"+new Date().getTime();
 		izvestajJson.nalog = nalogJSON.reqBody.note_details.broj_naloga.toString();
@@ -6891,15 +6892,15 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 		izvestajiDB.insertOne(izvestajJson)
 		.then((dbResponse)=>{
 			res.status(200);
-			res.setHeader('Content-Type', 'application/json');
-			var primerJson = {"code":"200","message":"Primljena beleska","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-			res.send(JSON.stringify(primerJson));
+				res.setHeader('Content-Type', 'application/json');
+				var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+				res.send(JSON.stringify(primerJson));
 		})
 		.catch((error)=>{
 			logError(error);
 			res.status(501);
 			res.setHeader('Content-Type', 'application/json');
-			var primerJson = {"code":"200","message":"Neuspesan prijem beleske"}
+			var primerJson = {"code":"501","message":"Neuspesan prijem beleske"}
 			res.send(JSON.stringify(primerJson));
 		})
 	}else{
