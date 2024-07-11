@@ -724,6 +724,8 @@ var ucinakMajstoraDB;
 var errorDB;
 var navigacijaInfoDB;
 var dodeljivaniNaloziDB;
+var stambenoDB;
+var stambeno2DB;
 
 		var stariCenovnikJsons = [];
 
@@ -750,6 +752,7 @@ http.listen(process.env.PORT, function(){
 		specifikacijePodizvodjacaDB			=	client.db("Poslovi_Grada_2024").collection('specifikacijePodizvodjaca');
 		errorDB								=	client.db("Poslovi_Grada_2024").collection('errors');
 		stambenoDB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno');
+		stambenoDB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno2');
 		navigacijaInfoDB			=	client.db("Poslovi_Grada_2024").collection('NavigacijaInfo');
 		dodeljivaniNaloziDB		=	client.db("Poslovi_Grada_2024").collection('dodeljivaniNalozi');
 
@@ -6892,9 +6895,9 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 			izvestajiDB.insertOne(izvestajJson)
 			.then((dbResponse)=>{
 				res.status(200);
-					res.setHeader('Content-Type', 'application/json');
-					var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-					res.send(JSON.stringify(primerJson));
+				res.setHeader('Content-Type', 'application/json');
+				var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+				res.send(JSON.stringify(primerJson));
 			})
 			.catch((error)=>{
 				logError(error);
@@ -6910,9 +6913,115 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 			var primerJson = {"code":"501","message":"Neuspesan prijem beleske 2"}
 			res.send(JSON.stringify(primerJson));
 		}
+	}else if(nalogJSON.reqBody.hasOwnProperty("order_headers")){
+		var stambenoJson = JSON.parse(JSON.stringify(nalogJSON.reqBody.order_headers[0]));
+		naloziDB.find({broj:stambenoJson.broj_naloga.toString()}).toArray()
+		.then((nalozi)=>{
+			if(nalozi.length==0){
+				var currentDate = new Date();
+				var nalogJson	=	{
+					uniqueId: generateId(15) +"--"+ new Date().getTime().toString(),
+					digitalizacija: {
+						datetime: currentDate.getTime(),
+						datum: getDateAsStringForDisplay(currentDate),
+						stambeno: {
+							datum: stambenoJson.datum_izdavanja_naloga.split("T")[0],
+							vreme: stambenoJon.vreme_naloga,
+							brojZahteva: stambenoJson.broj_zahteva,
+							tipNaloga: stambenoJson.tip_naloga,
+							partija: stambenoJson.party_name,
+							nadzor: stambenoJson.dodeljen,
+							email: stambenoJson.email,
+							originalniNadzor: stambenoJson.originalni_nadzor,
+							primarniNadzoe: stambenoJson.primarni_nadzor,
+							rok: stambenoJson.inicijalniRok
+						},
+						korisnik: {
+							ime: "PORTAL STAMBENO",
+							id: "info@stambeno.com"
+						},
+						lokacija: ""
+					},
+					broj: stambenoJson.broj_naloga.toString(),
+					punaAdresa: stambenoJson.stambena_zajednica,
+					adresa: stambenoJson.stambena_zajednica.split(",")[0],
+					opis:stambenoJson.opis,
+					vrstaRada: stambenoJson.tip_naloga,
+					radnaJedinica: stambenoJson.radnaJedinica,
+					datum:{
+						punDatum: currentDate,
+						datum: getDateAsStringForDisplay(currentDate),
+						datetime: currentDate.getTime()
+					},
+					zahtevalac: stambenoJson.zahtevalac,
+					obracun:[],
+					ukupanIznos: 0,
+					ukupanIznosPodizvodjaca: 0,
+					kategorijeRadova: [],
+					statusNaloga: "Primljen",
+					majstor: "",
+					faktura:{
+						pdv:"35",
+						broj:"",
+						penal:0,
+						samoBroj:0,
+						premijus:{},
+						pg:{},
+						podizvodjac:{},
+						datum:{
+							datetime: 0,
+							datum: ""
+						}
+					},
+					prijemnica:{
+						broj: "",
+						validanObracun: false,//true ako se parsePrijemnice pokaze da radi posao
+						iznosSaCenovnika: 0,
+						datum:{
+							datetime: 0,
+							datum: ""
+						},
+						lokacija: ""
+					}
+				}
+				naloziDB.insertOne(nalogJson)
+				.then((dbResponse)=>{
+					res.status(200);
+					res.setHeader('Content-Type', 'application/json');
+					var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+					res.send(JSON.stringify(primerJson));
+				})
+				.catch((error)=>{
+					logError(error)
+					res.status(501);
+					res.setHeader('Content-Type', 'application/json');
+					var primerJson = {"code":"501","message":"Neuspesan prijem naloga"}
+					res.send(JSON.stringify(primerJson));
+				})
+			}else{
+				stambeno2DB.insertOne(stambenoJson)
+				.then((dbResponse)=>{
+					res.status(200);
+					res.setHeader('Content-Type', 'application/json');
+					var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+					res.send(JSON.stringify(primerJson));
+				}).catch((err)=>{
+					logError(err)
+					res.status(500);
+					res.send("Database error");
+				})
+			}
+		})
+		.catch((error)=>{
+			logError(error);
+			res.status(501);
+			res.setHeader('Content-Type', 'application/json');
+			var primerJson = {"code":"501","message":"Baza podataka"}
+			res.send(JSON.stringify(primerJson));
+		})
+		
 	}else{
-		if(stambenoDB){
-			stambenoDB.insertOne(nalogJSON)
+			stambeno2DB.insertOne(nalogJSON)
 			.then((dbResponse)=>{
 				res.status(200);
 				res.setHeader('Content-Type', 'application/json');
@@ -6923,7 +7032,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				res.status(500);
 				res.send("Database error");
 			})	
-		}
+		
 	}
 	
 });
