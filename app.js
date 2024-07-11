@@ -6881,10 +6881,10 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 		console.log("Primljena beleska")
 		var izvestajJson = {};
 		izvestajJson.uniqueId = generateId(5)+"--"+new Date().getTime();
-		izvestajJson.nalog = nalogJSON.reqBody.note_details.broj_naloga.toString();
+		izvestajJson.nalog = nalogJSON.reqBody.note_details[0].broj_naloga.toString();
 		izvestajJson.datetime = new Date().getTime();
 		izvestajJson.datum = getDateAsStringForDisplay(new Date());
-		izvestajJson.izvestaj = nalogJSON.reqBody.note_details.tekst_beleske;
+		izvestajJson.izvestaj = nalogJSON.reqBody.note_details[0].tekst_beleske;
 		izvestajJson.photos = [];
 		izvestajJson.user = {};
 		izvestajJson.user.email = "info@stambeno.com";
