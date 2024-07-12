@@ -6926,14 +6926,14 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						datum: getDateAsStringForDisplay(currentDate),
 						stambeno: {
 							datum: stambenoJson.datum_izdavanja_naloga.split("T")[0],
-							vreme: stambenoJon.vreme_naloga,
+							vreme: stambenoJson.vreme_naloga,
 							brojZahteva: stambenoJson.broj_zahteva,
 							tipNaloga: stambenoJson.tip_naloga,
 							partija: stambenoJson.party_name,
 							nadzor: stambenoJson.dodeljen,
 							email: stambenoJson.email,
 							originalniNadzor: stambenoJson.originalni_nadzor,
-							primarniNadzoe: stambenoJson.primarni_nadzor,
+							primarniNadzor: stambenoJson.primarni_nadzor,
 							rok: stambenoJson.inicijalniRok
 						},
 						korisnik: {
