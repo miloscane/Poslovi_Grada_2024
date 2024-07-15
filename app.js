@@ -6886,8 +6886,8 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 			izvestajJson.izvestaj = nalogJSON.reqBody.note_details[0].tekst_beleske;
 			izvestajJson.photos = [];
 			izvestajJson.user = {};
-			izvestajJson.user.email = "info@stambeno.com";
-			izvestajJson.user.name = "PORTAL STAMBENO";
+			izvestajJson.user.email = nalogJSON.reqBody.note_details[0].kreirao_belesku;
+			izvestajJson.user.name = "PORTAL STAMBENO <sup>"+nalogJSON.reqBody.note_details[0].kreirao_belesku+"</sup>";
 			izvestajiDB.insertOne(izvestajJson)
 			.then((dbResponse)=>{
 				res.status(200);
