@@ -6887,13 +6887,24 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 			izvestajJson.photos = [];
 			izvestajJson.user = {};
 			izvestajJson.user.email = nalogJSON.reqBody.note_details[0].kreirao_belesku;
-			izvestajJson.user.name = "PORTAL STAMBENO <sup>"+nalogJSON.reqBody.note_details[0].kreirao_belesku+"</sup>";
+			izvestajJson.user.name = "PORTAL STAMBENO <sub>"+nalogJSON.reqBody.note_details[0].kreirao_belesku+"</sub>";
 			izvestajiDB.insertOne(izvestajJson)
 			.then((dbResponse)=>{
-				res.status(200);
-				res.setHeader('Content-Type', 'application/json');
-				var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-				res.send(JSON.stringify(primerJson));
+				stambenoDB.insertOne(nalogJSON)
+				.then((dbResponse2)=>{
+					res.status(200);
+					res.setHeader('Content-Type', 'application/json');
+					var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+					res.send(JSON.stringify(primerJson));
+				})
+				.catch((error)=>{
+					logError(error);
+					res.status(501);
+					res.setHeader('Content-Type', 'application/json');
+					var primerJson = {"code":"501","message":"Neuspesan prijem beleske"}
+					res.send(JSON.stringify(primerJson));
+				})
+				
 			})
 			.catch((error)=>{
 				logError(error);
