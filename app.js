@@ -2054,10 +2054,6 @@ request(geoCodeOptions, (error,response,body)=>{
 	});
 });
 
-console.log(hashString("sl0b0d@n.PosloviGrada"));
-console.log(hashString("m1lut1n.PosloviGrada"));
-
-
 /*server.get('/test', async (req,res)=>{
 	console.log("-----------------------------------------------")
 	console.log("-----------------------------------------------")
@@ -6934,7 +6930,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 							email: stambenoJson.email,
 							originalniNadzor: stambenoJson.originalni_nadzor,
 							primarniNadzor: stambenoJson.primarni_nadzor,
-							rok: stambenoJson.inicijalniRok
+							rok: stambenoJson.inicijalni_rok
 						},
 						korisnik: {
 							ime: "PORTAL STAMBENO",
@@ -6984,20 +6980,96 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						lokacija: ""
 					}
 				}
-				naloziDB.insertOne(nalogJson)
-				.then((dbResponse)=>{
-					res.status(200);
-					res.setHeader('Content-Type', 'application/json');
-					var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-					res.send(JSON.stringify(primerJson));
-				})
-				.catch((error)=>{
-					logError(error)
-					res.status(501);
-					res.setHeader('Content-Type', 'application/json');
-					var primerJson = {"code":"501","message":"Neuspesan prijem naloga"}
-					res.send(JSON.stringify(primerJson));
-				})
+				var geoCodeHeader = {
+				    'accept': 'text/plain',
+				    'Content-Type': 'application/json'
+				};
+
+				var geoCodeOptions = {
+				    url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+encodeURIComponent(nalogJson.punaAdresa)+'&key='+process.env.googlegeocoding,
+				    method: 'GET',
+				    headers: geoCodeHeader
+				};
+				nalogJson.coordinates = {};
+
+				request(geoCodeOptions, (error,response,body)=>{
+					if(error){
+						console.log(error)
+					}else{
+						var json = JSON.parse(response.body);
+						if(json.hasOwnProperty("results")){
+							if(json.results.length>0){
+								if(json.results[0].hasOwnProperty("geometry")){
+									//console.log(json.results[0].geometry.location);
+									nalogJson.coordinates = json.results[0].geometry.location; 
+									naloziDB.insertOne(nalogJson)
+									.then((dbResponse)=>{
+										res.status(200);
+										res.setHeader('Content-Type', 'application/json');
+										var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+										res.send(JSON.stringify(primerJson));
+									})
+									.catch((error)=>{
+										logError(error)
+										res.status(501);
+										res.setHeader('Content-Type', 'application/json');
+										var primerJson = {"code":"501","message":"Neuspesan prijem naloga"}
+										res.send(JSON.stringify(primerJson));
+									})
+								}else{
+									nalogJson.coordinates = {}; 
+									naloziDB.insertOne(nalogJson)
+									.then((dbResponse)=>{
+										res.status(200);
+										res.setHeader('Content-Type', 'application/json');
+										var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+										res.send(JSON.stringify(primerJson));
+									})
+									.catch((error)=>{
+										logError(error)
+										res.status(501);
+										res.setHeader('Content-Type', 'application/json');
+										var primerJson = {"code":"501","message":"Neuspesan prijem naloga"}
+										res.send(JSON.stringify(primerJson));
+									})
+								}
+							}else{
+								nalogJson.coordinates = {}; 
+								naloziDB.insertOne(nalogJson)
+								.then((dbResponse)=>{
+									res.status(200);
+									res.setHeader('Content-Type', 'application/json');
+									var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+									res.send(JSON.stringify(primerJson));
+								})
+								.catch((error)=>{
+									logError(error)
+									res.status(501);
+									res.setHeader('Content-Type', 'application/json');
+									var primerJson = {"code":"501","message":"Neuspesan prijem naloga"}
+									res.send(JSON.stringify(primerJson));
+								})
+							}
+						}else{
+							nalogJson.coordinates = {}; 
+							naloziDB.insertOne(nalogJson)
+							.then((dbResponse)=>{
+								res.status(200);
+								res.setHeader('Content-Type', 'application/json');
+								var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+								res.send(JSON.stringify(primerJson));
+							})
+							.catch((error)=>{
+								logError(error)
+								res.status(501);
+								res.setHeader('Content-Type', 'application/json');
+								var primerJson = {"code":"501","message":"Neuspesan prijem naloga"}
+								res.send(JSON.stringify(primerJson));
+							})
+						}
+					}
+				});
+				
 			}else{
 				stambeno2DB.insertOne(stambenoJson)
 				.then((dbResponse)=>{
