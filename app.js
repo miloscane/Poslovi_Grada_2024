@@ -752,7 +752,7 @@ http.listen(process.env.PORT, function(){
 		specifikacijePodizvodjacaDB			=	client.db("Poslovi_Grada_2024").collection('specifikacijePodizvodjaca');
 		errorDB								=	client.db("Poslovi_Grada_2024").collection('errors');
 		stambenoDB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno');
-		stambenoDB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno2');
+		stambeno2DB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno2');
 		navigacijaInfoDB			=	client.db("Poslovi_Grada_2024").collection('NavigacijaInfo');
 		dodeljivaniNaloziDB		=	client.db("Poslovi_Grada_2024").collection('dodeljivaniNalozi');
 
