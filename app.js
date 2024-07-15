@@ -1841,7 +1841,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
-						if(nalozi[i].prijemnica.datum.datum.includes(".05.2024")){
+						if(nalozi[i].prijemnica.datum.datum.includes(".06.2024")){
 							naloziToExport.push(nalozi[i])
 						}
 					}
@@ -1901,7 +1901,7 @@ request(geoCodeOptions, (error,response,body)=>{
 		})
 		.catch((error)=>{
 			console.log(error)
-		})*/	
+		})*/
 
 
 		/*naloziDB.find({}).toArray()
@@ -6947,7 +6947,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 					adresa: stambenoJson.stambena_zajednica.split(",")[0],
 					opis:stambenoJson.opis,
 					vrstaRada: stambenoJson.tip_naloga,
-					radnaJedinica: stambenoJson.radnaJedinica,
+					radnaJedinica: stambenoJson.radna_jedinica,
 					datum:{
 						punDatum: currentDate,
 						datum: getDateAsStringForDisplay(currentDate),
