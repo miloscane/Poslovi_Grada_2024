@@ -765,6 +765,70 @@ http.listen(process.env.PORT, function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
+
+		/*console.log("STARTED STAMBENO")
+		stambenoDB.find({}).toArray()
+		.then((izvestaji)=>{
+			for(var i=0;i<izvestaji.length;i++){
+				if(izvestaji[i].reqBody.hasOwnProperty("note_details")){
+					if(izvestaji[i].date=="2024.7.15"){
+						console.log(izvestaji[i].reqBody)
+					}
+				}
+			}
+			console.log("OVER")
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
+
+		/*var radneJedinice = ["ČUKARICA","RAKOVICA","NOVI BEOGRAD","ZEMUN","ZVEZDARA","VRAČAR","VOŽDOVAC","STARI GRAD","PALILULA","SAVSKI VENAC"];
+		var meseci = ["02.2024","03.2024","04.2024","05.2024","06.2024"];
+		var radneJediniceObject = [];
+		for(var i=0;i<radneJedinice.length;i++){
+			var objct = {};
+			objct.radnaJedinica = radneJedinice[i];
+			objct.meseci = []
+			for(var j=0;j<meseci.length;j++){
+				var mscobjct = {};
+				mscobjct.mesec = meseci[j];
+				mscobjct.brojNaloga = 0;
+				objct.meseci.push(mscobjct)
+			}
+			radneJediniceObject.push(objct)
+		}
+
+		naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			console.log("Ukupno naloga: " + nalozi.length);
+			for(var i=0;i<nalozi.length;i++){
+				for(var j=0;j<radneJediniceObject.length;j++){
+					if(nalozi[i].radnaJedinica==radneJediniceObject[j].radnaJedinica){
+						for(var k=0;k<radneJediniceObject[j].meseci.length;k++){
+							if(nalozi[i].datum.datum.includes(radneJediniceObject[j].meseci[k].mesec)){
+								radneJediniceObject[j].meseci[k].brojNaloga++;
+							}
+						}
+					}
+				}
+			}
+			var ukupno = 0;
+			for(var i=0;i<radneJediniceObject.length;i++){
+				console.log(radneJediniceObject[i].radnaJedinica)
+				for(var j=0;j<radneJediniceObject[i].meseci.length;j++){
+					console.log(radneJediniceObject[i].meseci[j].mesec)
+					console.log(radneJediniceObject[i].meseci[j].brojNaloga)
+					ukupno = ukupno + radneJediniceObject[i].meseci[j].brojNaloga;
+					console.log("-----------")
+				}
+				console.log("------------------------------------------------------------")
+			}
+			console.log(ukupno)
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
 		/*console.log("POKUSAVAM STAMBENO")
 		stambenoDB.find({}).toArray()
 		.then((nalozi)=>{
@@ -3940,7 +4004,21 @@ server.get('/nalog/:broj',async (req,res)=>{
 									}else if(Number(req.session.user.role)==20){
 										dodeljivaniNaloziDB.find({nalog:req.params.broj}).toArray()
 										.then((dodele)=>{
-											request(ntsOptions, (error,response,body)=>{
+											
+											res.render("dispeceri/nalog",{
+												pageTitle:"Налог број " + req.params.broj,
+												nalog: nalozi[0],
+												majstori: majstori,
+												cenovnik: cenovnik,
+												istorijat: istorijat,
+												izvestaji: izvestaji,
+												ucinci: ucinci,
+												dodele: dodele,
+												phoneAccessCode: phoneAccessCode,
+												lokacijeMajstora: [],
+												user: req.session.user
+											});
+											/*request(ntsOptions, (error,response,body)=>{
 												if(error){
 													logError(error);
 													res.render("dispeceri/nalog",{
@@ -4087,7 +4165,7 @@ server.get('/nalog/:broj',async (req,res)=>{
 														}
 													});
 												}
-											});
+											});*/
 											
 										})
 										.catch((error)=>{

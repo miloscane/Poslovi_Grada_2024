@@ -1880,6 +1880,10 @@ input[type=number] {
     font-style:italic;
 }
 
+.nalog .izvestaji .izvestajBox .name sub{
+    font-weight:200;
+}
+
 .nalog .izvestaji .izvestajBox .text{
     margin-top:5px;
 }
