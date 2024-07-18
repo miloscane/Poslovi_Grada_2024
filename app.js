@@ -7378,7 +7378,6 @@ server.get('/tv2', async (req, res)=> {
 
 server.get('/tv', async (req, res)=> {
 	var today = new Date();
-	today.setDate(today.getDate()-1)
 	dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
 	.then((nalozi)=>{
 		majstoriDB.find({}).toArray()
