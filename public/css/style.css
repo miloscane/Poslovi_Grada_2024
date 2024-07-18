@@ -4269,6 +4269,62 @@ input[type=number] {
     margin:0 auto;
 }
 
+.majstorNalozi .statusWrap{
+    text-align: center;
+}
+
+.majstorNalozi .statusWrap .button{
+    font-size: 18px;
+    padding: 10px;
+    color: rgb(255, 255, 255);
+    font-weight: 500;
+    background-color: rgb(2, 121, 49);
+    text-align: center;
+}
+
+.tv #mek{
+    display:flex;
+    flex-wrap: wrap;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    margin-top:20px;
+    margin-bottom:40px;
+    background-color:rgb(37,57,101);
+}
+
+.tv .mekBox{
+    width: 100px;
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    margin:5px;
+    background-color:rgb(255,255,255);
+    color:rgb(37,57,101);
+    padding:10px;
+    position:relative;
+    border:1px solid rgb(100,100,100);
+    text-align: center;
+}
+
+.tv .mekBox .title{
+    font-weight:500;
+    font-size:14px;
+    padding-bottom:3px;
+    border-bottom:1px solid rgb(100,100,100);
+}
+
+.tv .mekBox .subTitle{
+    font-weight:300;
+    font-size:14px;
+    padding-bottom:3px;
+    border-bottom:1px solid rgb(100,100,100);
+}
+
+.tv .mekBox .statusWrap{
+    width:50px;
+    margin:0 auto;
+    margin-top:10px;
+}
+
 .izvestajLokacije .navInfo{
     position:fixed;
     top:100px;

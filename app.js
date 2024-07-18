@@ -707,6 +707,24 @@ function brojSaRazmacima(x) {
     return parts.join(",");
 }
 
+function dhm(t){
+    var cd = 24 * 60 * 60 * 1000,
+        ch = 60 * 60 * 1000,
+        d = Math.floor(t / cd),
+        h = Math.floor( (t - d * cd) / ch),
+        m = Math.round( (t - d * cd - h * ch) / 60000),
+        pad = function(n){ return n < 10 ? '0' + n : n; };
+  if( m === 60 ){
+    h++;
+    m = 0;
+  }
+  if( h === 24 ){
+    d++;
+    h = 0;
+  }
+  return [d, pad(h), pad(m)].join(':');
+}
+
 var navigacijaInfo = [];
 var cenovnik;
 var cenovnikHigh;
@@ -726,8 +744,7 @@ var navigacijaInfoDB;
 var dodeljivaniNaloziDB;
 var stambenoDB;
 var stambeno2DB;
-
-		var stariCenovnikJsons = [];
+var stariCenovnikJsons = [];
 
 http.listen(process.env.PORT, function(){
 	console.log("Poslovi Grada 2024");
@@ -841,6 +858,105 @@ http.listen(process.env.PORT, function(){
 				}
 				
 			}
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			console.log("Found nalozi");
+			istorijaNalogaDB.find({}).toArray()
+			.then((istorija)=>{
+				console.log("Found istorija");
+				for(var i=0;i<nalozi.length;i++){
+					if(podizvodjaci.indexOf(nalozi[i].majstor)>=0){
+						nalozi.splice(i,1);
+						i--;
+					}
+				}
+				for(var i=0;i<nalozi.length;i++){
+					if(nalozi[i].statusNaloga!="Fakturisan"){
+						nalozi.splice(i,1);
+						i--;
+					}
+				}
+				for(var i=0;i<nalozi.length;i++){
+					nalozi[i].istorija = [];
+					for(var j=0;j<istorija.length;j++){
+						if(nalozi[i].broj==istorija[j].broj){
+							nalozi[i].istorija.push(istorija[j]);
+						}
+					}
+				}
+
+				for(var i=0;i<nalozi.length;i++){
+					if(nalozi[i].istorija.length==0){
+						nalozi.splice(i,1);
+						i--;
+					}
+				}
+
+				for(var i=0;i<nalozi.length;i++){
+					if(nalozi[i].digitalizacija.datum.includes("07.2024")){
+						nalozi.splice(i,1);
+						i--;
+					}
+				}
+				for(var i=0;i<nalozi.length;i++){
+					for(var j=0;j<nalozi[i].istorija.length;j++){
+						if(nalozi[i].istorija[j].statusNaloga=="Završeno"){
+							if(nalozi[i].istorija[j-1]){
+								nalozi[i].vremeRada = nalozi[i].istorija[j-1].datetime - nalozi[i].digitalizacija.datetime;
+								nalozi[i].vremeRadaDisp = dhm(nalozi[i].vremeRada);
+								//console.log(nalozi[i].vremeRada);
+							}else{
+								nalozi[i].vremeRada = nalozi[i].istorija[j].datetime - nalozi[i].digitalizacija.datetime;
+								nalozi[i].vremeRadaDisp = dhm(nalozi[i].vremeRada);
+								//console.log("NE POSTOJI ISTORIJA PRE ZAVRSENO");
+								//console.log(nalozi[i].istorija)
+							}
+						}else{
+							nalozi[i].vremeRada = nalozi[i].istorija[nalozi[i].istorija.length-1].datetime - nalozi[i].digitalizacija.datetime;
+							nalozi[i].vremeRadaDisp = dhm(nalozi[i].vremeRada);
+							//console.log("NEMA STATUSA ZAVRSENO")
+						}
+					}
+				}
+				for(var i=0;i<nalozi.length;i++){
+					//console.log(nalozi[i].vremeRada);
+					if(nalozi[i].vremeRada<0){
+						console.log("VREME RADA NEGATIVNO!!!!")
+					}
+				}
+
+				for(var i=0;i<nalozi.length;i++){
+					if(nalozi[i].digitalizacija.datum.includes("02.2024")){
+						nalozi[i].mesec = "Februar";
+					}else if(nalozi[i].digitalizacija.datum.includes("03.2024")){
+						nalozi[i].mesec = "Mart";
+					}else if(nalozi[i].digitalizacija.datum.includes("04.2024")){
+						nalozi[i].mesec = "April";
+					}else if(nalozi[i].digitalizacija.datum.includes("05.2024")){
+						nalozi[i].mesec = "Maj";
+					}else if(nalozi[i].digitalizacija.datum.includes("06.2024")){
+						nalozi[i].mesec = "Jun";
+					}
+				}
+
+				var csvString = "Broj Naloga;Radna Jedinica;Mesec;Vreme zavrsetka;Vreme zavrsetka u sekundama\r\n";
+				for(var i=0;i<nalozi.length;i++){
+					csvString += nalozi[i].broj + ";" +nalozi[i].radnaJedinica + ";" + nalozi[i].mesec+";" +  nalozi[i].vremeRadaDisp + ";" + nalozi[i].vremeRada/1000+"\r\n";
+				}
+				fs.writeFileSync("./ucinakDispecera.csv",csvString,"utf8");
+
+
+				console.log("OVER!!")
+
+			})
+			.catch((error)=>{
+				console.log(error);
+			})
 		})
 		.catch((error)=>{
 			console.log(error);
@@ -4357,6 +4473,7 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 			json.datum.datetime = currentDate.getTime();
 			json.datum.datum = getDateAsStringForDisplay(currentDate);
 			json.datum.timestamp = timeStamp;
+			json.uniqueId = generateId(5)+"--"+currentDate.getTime();
 			majstoriDB.find({uniqueId:json.majstor}).toArray()
 			.then((majstori)=>{
 				dodeljivaniNaloziDB.insertOne(json)
@@ -7260,7 +7377,29 @@ server.get('/tv2', async (req, res)=> {
 });
 
 server.get('/tv', async (req, res)=> {
-	majstoriDB.find({}).toArray()
+	var today = new Date();
+	today.setDate(today.getDate()-1)
+	dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
+	.then((nalozi)=>{
+		majstoriDB.find({}).toArray()
+		.then((majstori)=>{
+			res.render("tv3",{
+				nalozi: nalozi,
+				pageTitle: "СТАТУС МАЈСТОРА",
+				majstori: majstori
+			})
+		})
+		.catch((error)=>{
+			logError(error);
+			res.send("Greska u bazi podataka")
+		})
+		
+	})
+	.catch((error)=>{
+		logError(error);
+		res.send("Greska u bazi podataka");
+	})
+	/*majstoriDB.find({}).toArray()
 	.then((majstori)=>{
 		res.render("tv",{
 	    pageTitle: "Мапа",
@@ -7270,7 +7409,7 @@ server.get('/tv', async (req, res)=> {
 	.catch((error)=>{
 		logError(error);
 		res.send("Greska")
-	})
+	})*/
 });
 
 server.get('/majstor/nalozi', async (req, res)=> {
@@ -7411,7 +7550,56 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 	}
 });
 
-server.get('/temp', async (req, res)=> {
+server.post('/statusOdMajstora', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==60){
+			var statusCode = req.body.code;
+			var uniqueId = req.body.statusid;
+			var currentDate = new Date();
+			var setObj = false;
+			if(Number(statusCode)==0){
+				setObj	=	{ $set: {
+					odlazak: {
+						datetime: new Date().getTime(),
+				    datum: getDateAsStringForDisplay(new Date())
+					}
+				}};
+			}else if(Number(statusCode)==1){
+				setObj	=	{ $set: {
+					dolazak: {
+						datetime: new Date().getTime(),
+				    datum: getDateAsStringForDisplay(new Date())
+					}
+				}};
+			}else if(Number(statusCode)==2){
+				setObj	=	{ $set: {
+					zavrsetak: {
+						datetime: new Date().getTime(),
+				    datum: getDateAsStringForDisplay(new Date())
+					}
+				}};
+			}
+			if(setObj){
+				dodeljivaniNaloziDB.updateOne({uniqueId:uniqueId},setObj)
+				.then((dbResponse)=>{
+					res.redirect("/majstor/nalozi?openmap=1")
+				})
+				.catch((error)=>{
+					logError(error);
+					res.send("Greska u bazi podataka");
+				})
+			}else{
+				res.send("Greska")
+			}
+		}else{
+			res.send("Nije definisan nivo korisnika");
+		}
+	}else{
+		res.redirect("/login");
+	}
+});
+
+/*server.get('/temp', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
 			stariUcinakMajstoraDB.find({}).toArray()
@@ -7458,7 +7646,7 @@ server.get('/temp', async (req, res)=> {
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	} 
-});
+});*/
 
 io.on('connection', function(socket){
 	socket.on('listaNalogaAdministracija', function(odDatuma,doDatuma,adresa,opstine){

@@ -1,0 +1,50 @@
+<%- include ("partials/header-nl") -%>
+<style>
+	.pageWidth{
+		width:100vw;
+	}
+</style>
+	<script src="/js/socket.js"></script>
+	<script>var socket  = io({});</script>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+		var majstori = <%-JSON.stringify(majstori)%>;
+	</script>
+	<div class="pageWidth" style="position:relative">
+		<div class="tv">
+			<div id="mek"></div>
+		</div>
+		<script>
+			for(var i=0;i<nalozi.length;i++){
+				var mekBox = document.createElement("DIV");
+				mekBox.setAttribute("class","mekBox");
+					var title = document.createElement("DIV");
+					title.setAttribute("class","title");
+					title.innerHTML = getMajstorByCode(nalozi[i].majstor).ime.split(" ")[0]+"<br>"+getMajstorByCode(nalozi[i].majstor).ime.split(" ")[1];
+					mekBox.appendChild(title);
+
+					var subTitle = document.createElement("DIV");
+					subTitle.setAttribute("class","subTitle");
+					subTitle.innerHTML = nalozi[i].nalog;
+					mekBox.appendChild(subTitle);
+
+					var statusWrap = document.createElement("DIV");
+					statusWrap.setAttribute("class","statusWrap");
+					if(nalozi[i].zavrsetak){
+						statusWrap.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png\">"
+					}else if(nalozi[i].dolazak){
+						statusWrap.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/dolazakIcon.png\">"
+					}else if(nalozi[i].odlazak){
+						statusWrap.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/odlazakIcon.png\">"
+					}else{
+						statusWrap.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">"
+					}
+					mekBox.appendChild(statusWrap);
+				document.getElementById("mek").appendChild(mekBox);
+			}
+			setTimeout(function(){
+				location.reload()
+			},300000)
+		</script>
+	</div>
+<%- include ("partials/footer") -%>

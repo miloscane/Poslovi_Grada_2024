@@ -21,6 +21,9 @@
 						row.setAttribute("data-email",nalozi[i].user.email);
 						row.setAttribute("data-dispecer",nalozi[i].user.name);
 						row.setAttribute("data-adresa",nalozi[i].adresa);
+						if(nalozi[i].uniqueId){
+							row.setAttribute("data-uniqueid",nalozi[i].uniqueId);
+						}
 						row.setAttribute("data-opened",0);
 							var flex = document.createElement("DIV");
 							flex.setAttribute("class","flex");
@@ -155,6 +158,30 @@
 								izvestaji.appendChild(izvestajiWrap);	
 							}
 							
+							var statusWrap = document.createElement("DIV");
+							statusWrap.setAttribute("class","statusWrap");
+							if(!nalog.odlazak){
+								var button = document.createElement("DIV");
+								button.setAttribute("class","button");
+								button.setAttribute("onclick","setStatus(0)");
+								button.innerHTML = "ИДЕМ НА НАЛОГ";
+								statusWrap.appendChild(button);
+							}else if(!nalog.dolazak){
+								var button = document.createElement("DIV");
+								button.setAttribute("class","button");
+								button.setAttribute("onclick","setStatus(1)");
+								button.innerHTML = "СТИГАО НА НАЛОГ";
+								statusWrap.appendChild(button);
+							}else if(!nalog.zavrsetak){
+								var button = document.createElement("DIV");
+								button.setAttribute("class","button");
+								button.setAttribute("onclick","setStatus(2)");
+								button.innerHTML = "ЗАВРШИО";
+								statusWrap.appendChild(button);
+							}
+
+							izvestaji.appendChild(statusWrap);
+
 
 							var title = document.createElement("DIV");
 							title.setAttribute("class","title");
@@ -326,7 +353,27 @@
 					signaturePad.clear();
 					resizeCanvas();
 				}
+
+				function setStatus(code){
+					var naloziElems = document.getElementsByClassName("row");
+					for(var i=0;i<naloziElems.length;i++){
+						if(Number(naloziElems[i].dataset.opened)==1){
+							if(naloziElems[i].dataset.uniqueid){
+								document.getElementById("status-id").value = naloziElems[i].dataset.uniqueid;
+								document.getElementById("status-code").value = code;
+								document.getElementById("status-form").submit();
+								loadGif();
+								break;
+							}
+							
+						}
+					}
+				}
 			</script>
+			<form method="POST" action="/statusOdMajstora" id="status-form" style="display:none">
+				<input type="text" id="status-id" name="statusid">
+				<input type="text" id="status-code" name="code">
+			</form>
 		</div>
 	</div>
 <%- include ("partials/footer") -%>
