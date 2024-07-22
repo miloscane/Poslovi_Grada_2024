@@ -1,6 +1,7 @@
 <%- include ("partials/header") -%>
 	<script>
 		var nalog = <%-JSON.stringify(nalog)%>;
+		var majstori = <%-JSON.stringify(majstori)%>;
 		var cenovnik = <%-JSON.stringify(cenovnik)%>;
 		var istorijat = <%-JSON.stringify(istorijat)%>;
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
@@ -9,13 +10,9 @@
 	<div class="pageWidth"> 
 		<div class="administracijaNalog nalog">
 			<div class="inputWrap printButton" style="width:400px">
-				<div class="button" onclick="window.open('<%=nalog.digitalizacija.lokacija%>','_blank')" style="display:inline-block;vertical-align: top;width:150px">
+				<div class="button" onclick="printObracun()" style="display:inline-block;vertical-align: top;width:150px">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
 					<div class="label">Штампај налог</div>
-				</div>
-				<div class="button" onclick="printObracun()" style="display:inline-block;vertical-align: top;width:200px">
-					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
-					<div class="label">Штампај обрачун</div>
 				</div>
 			</div>
 			<div class="boxesWrap">
@@ -434,12 +431,133 @@
 			</script>
 		</div>
 		<%- include ("partials/printer") -%>
+		<div style="overflow:hidden;height:1px;width:1px;">
+			<canvas id="logo-canvas" height="306" width="300"></canvas>
+			<script>
+				var logoCanvas = document.getElementById('logo-canvas');
+				var logoCanvasContext = logoCanvas.getContext('2d');
+				var logoLogoBlob;
+				function make_base3(){
+				  base_image3 = new Image();
+				  base_image3.crossOrigin="anonymous"
+				  base_image3.src = '/images/fakturaLogo.png';
+				  base_image3.onload = function(){
+				    logoCanvasContext.drawImage(base_image3, 0, 0);
+				    logoLogoBlob 	=	logoCanvas.toDataURL("image/png", 1.0);
+
+				  }
+				}
+				make_base3();
+			</script>
+		</div>
 		<script>
 			function printObracun(){
+				var doc = new jsPDF({
+					orientation: 'p',
+					unit: 'mm',
+					format: 'a4',
+					compress: true
+					//putOnlyUsedFonts:true
+				});
+				pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+				pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+				var yPos = 12;
+				var xPos = 12;
+				//doc.getFontList("Helvetica");
+				doc.addFileToVFS("PTSans.ttf", PTSans);
+				doc.addFileToVFS("PTSansBold.ttf", PTSansBold);
+				doc.addFont('PTSans.ttf', 'PTSans', 'normal');
+				doc.addFont('PTSansBold.ttf', 'PTSans', 'bold');
+				doc.setFont('PTSans'); // set font
+				doc.getFontList("PTSans");
+
+				doc.addImage(logoLogoBlob, 'PNG', 5, 5, 150/mm, 153/mm,'','FAST');
+		        doc.setFontType("bold");
+				doc.setFontSize(16);
+		        doc.text("Послови Града доо",205,yPos,'right');
+		        doc.setFontType("normal");
+				doc.setFontSize(11);
+				yPos = yPos + 5;
+		        doc.text("Мије Ковачевића 9, 11000 Палилула",205,yPos,'right');
+				yPos = yPos + 5;
+		        doc.text("011/334-2325",205,yPos,'right');
+		        yPos = yPos + 5;
+		        doc.text("063/209-777",205,yPos,'right');
+				yPos = yPos + 5;
+		        doc.text("ПИБ: 114108334",205,yPos,'right');
+				yPos = yPos + 5;
+		        doc.text("МБ: 21972215",205,yPos,'right');
+				yPos = yPos + 5;
+		        doc.text("office@poslovigrada.rs",205,yPos,'right');
+		        yPos = yPos + 10;
+		        doc.setFontType("bold");
+				doc.setFontSize(20);
+		        doc.text("Штампани извештај по налогу број "+nalog.broj,pageWidth/2,yPos,'center');
+		        doc.setFontType("normal");
+				doc.setFontSize(14);
+				yPos = yPos + 8;
+				var adresa = nalog.adresa ? nalog.adresa : " ";
+				doc.text(adresa + ", "+nalog.radnaJedinica + ", 11000 Beograd",pageWidth/2,yPos,'center');
+				yPos = yPos + 8;
+				doc.setFontType("bold");
+				doc.text("Извођач радова: ",5,yPos,'left');
+				doc.setFontType("normal");
+		        doc.text(getMajstorByCode(nalog.majstor).ime,47,yPos,'left');
+		        yPos = yPos + 8;
+				doc.setFontType("bold");
+				doc.text("Датум налога: ",5,yPos,'left');
+				doc.setFontType("normal");
+		        doc.text(nalog.datum.datum,47,yPos,'left');
+				yPos = yPos + 8;
+				doc.setFontType("bold");
+				doc.text("Одштампао: ",5,yPos,'left');
+				doc.setFontType("normal");
+		        doc.text(user.name+" датума "+ vremePrijema(new Date().getTime()),47,yPos,'left');
+				yPos = yPos + 8;
+				doc.setFontType("bold");
+				doc.text("Статус налога: ",5,yPos,'left');
+				doc.setFontType("normal");
+		        doc.text(nalog.statusNaloga,47,yPos,'left');
+				yPos = yPos + 8;
+				doc.setFontType("bold");
+				doc.text("Захтевалац: ",5,yPos,'left');
+				doc.setFontType("normal");
+		        doc.text(nalog.zahtevalac,47,yPos,'left');
+				yPos = yPos + 8;
+				doc.setFontType("bold");
+				doc.text("Опис квара: ",5,yPos,'left');
+				doc.setFontType("normal");
+		        doc.text(stringArray(nalog.opis,70),47,yPos,'left');
+		        yPos = yPos + 8;
+				doc.setFontType("bold");
+				doc.setFontSize(16);
+		        doc.text("Извештаји са терена:",5,yPos,'left');
+		        
+				doc.setFontType("normal");
+				doc.setFontSize(12);
+					yPos = yPos + 10;
+				for(var i=0;i<izvestaji.length;i++){
+					doc.setFontType("bold");
+					doc.text(izvestaji[i].user.name+" / "+vremePrijema(izvestaji[i].datetime)+" : ",5,yPos,'left');
+					yPos = yPos + 5;
+					doc.setFontType("normal");
+					var izvestajArray = stringArray(izvestaji[i].izvestaj,70) ? stringArray(izvestaji[i].izvestaj,70) : " ";
+
+					doc.text(izvestajArray,10,yPos,'left');
+					if(izvestajArray!=" "){
+						yPos = yPos + izvestajArray.length*8;
+					}
+					if(izvestaji[i].photos.length>0){
+						doc.text("Окачене фотографије.",10,yPos,'left');
+						yPos = yPos + 8;
+					}
+				}
+
+				yPos = yPos + 8;
 				doc.setFontSize(14);
 			    doc.setFontType("bold");
-			    var xOffset = 10;
-			    doc.text("Обрачун по налогу број: "+nalog.broj,xOffset,yPos);
+			    var xOffset = 5;
+			    doc.text("Обрачун по налогу",xOffset,yPos);
 			    doc.setFontSize(10);
 			    yPos= yPos+10;
 			    doc.setFontType("normal");
