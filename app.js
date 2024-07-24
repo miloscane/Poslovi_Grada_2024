@@ -40,7 +40,7 @@ var ntsOptions = {
 };
 
 var geoCodeOptions = {
-    url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+encodeURIComponent("Vidikovački Venac 90")+'&key='+process.env.googlegeocoding,
+    url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+encodeURIComponent("Vidikovački Venac 90")+',Beograd&key='+process.env.googlegeocoding,
     method: 'GET',
     headers: geoCodeHeader
 };
@@ -49,7 +49,7 @@ request(geoCodeOptions, (error,response,body)=>{
 	if(error){
 		console.log(error)
 	}else{
-		//console.log(response);
+		//console.log(response.body);
 		console.log("-------------------------");
 		var json = JSON.parse(response.body);
 		//console.log(json.results[0].geometry.location)
@@ -7192,7 +7192,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				};
 
 				var geoCodeOptions = {
-				    url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+encodeURIComponent(nalogJson.punaAdresa)+'&key='+process.env.googlegeocoding,
+				    url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+encodeURIComponent(nalogJson.adresa + ', Beograd')+'&key='+process.env.googlegeocoding,
 				    method: 'GET',
 				    headers: geoCodeHeader
 				};
