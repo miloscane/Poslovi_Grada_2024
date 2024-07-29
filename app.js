@@ -7377,7 +7377,7 @@ server.get('/tv2', async (req, res)=> {
 });
 
 server.get('/tv', async (req, res)=> {
-	var today = new Date();
+	/*var today = new Date();
 	dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
 	.then((nalozi)=>{
 		majstoriDB.find({}).toArray()
@@ -7397,8 +7397,8 @@ server.get('/tv', async (req, res)=> {
 	.catch((error)=>{
 		logError(error);
 		res.send("Greska u bazi podataka");
-	})
-	/*majstoriDB.find({}).toArray()
+	})*/
+	majstoriDB.find({}).toArray()
 	.then((majstori)=>{
 		res.render("tv",{
 	    pageTitle: "Мапа",
@@ -7408,7 +7408,7 @@ server.get('/tv', async (req, res)=> {
 	.catch((error)=>{
 		logError(error);
 		res.send("Greska")
-	})*/
+	})
 });
 
 server.get('/majstor/nalozi', async (req, res)=> {
