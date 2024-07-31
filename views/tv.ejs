@@ -15,8 +15,78 @@
 	}
 </style>
 	<script src="/js/socket.js"></script>
-	<script>var socket  = io({});var majstori = <%-JSON.stringify(majstori)%>;var magacin = {lat:44.813906,lng:20.443903}</script>
-	<div class="pageWidth" style="position:relative">
+	<script>
+		var socket  = io({});
+		var majstori = <%-JSON.stringify(majstori)%>;
+		var prisustvo = <%-JSON.stringify(prisustvo)%>;
+		var pomocnici = <%-JSON.stringify(pomocnici)%>;
+		var magacin = {lat:44.813906,lng:20.443903};
+	</script>
+	<div class="pageWidth" id="prisustvo" style="width:100vw">
+		<div class="ekipe">
+			<div id="ekipe" class="flex"></div>
+		</div>
+		<script>
+			for(var i=0;i<majstori.length;i++){
+				var majstorBlok = document.createElement("DIV");
+				majstorBlok.setAttribute("class","majstor flexBox");
+					var imeMajstora = document.createElement("DIV");
+					imeMajstora.setAttribute("class","ime");
+					imeMajstora.innerHTML = majstori[i].ime.split(" ")[0] + "<br>" + majstori[i].ime.split(" ")[1];
+					majstorBlok.appendChild(imeMajstora);
+
+					var inlines = document.createElement("DIV");
+					inlines.setAttribute("class","inlines");
+						var inline = document.createElement("DIV");
+						inline.setAttribute("class","inline");
+						inline.innerHTML = "Присутан:";
+						inlines.appendChild(inline);
+						
+						var inline = document.createElement("DIV");
+						inline.setAttribute("class","inline");
+						inline.innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
+						if(prisustvo.length>0){
+							for(var j=0;j<prisustvo[0].prisustvo.length;j++){
+								if(prisustvo[0].prisustvo[j].idMajstora==majstori[i].uniqueId){
+									if(Number(prisustvo[0].prisustvo[j].prisutan)==1){
+										inline.innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
+									}
+								}
+							}
+						}
+						inlines.appendChild(inline);
+					majstorBlok.appendChild(inlines);
+
+					var inlines = document.createElement("DIV");
+					inlines.setAttribute("class","pomocnik");
+						var inline = document.createElement("DIV");
+						inline.setAttribute("class","bolded");
+						inline.innerHTML = "Помоћник:";
+						inlines.appendChild(inline);
+						
+						var inline = document.createElement("DIV");
+						inline.setAttribute("class","selectWrap");
+						inline.innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕМА</span>";
+						if(prisustvo.length>0){
+							for(var j=0;j<prisustvo[0].prisustvo.length;j++){
+								if(prisustvo[0].prisustvo[j].idMajstora==majstori[i].uniqueId){
+									if(Number(prisustvo[0].prisustvo[j].pomocnik)>0){
+										for(var k=0;k<pomocnici.length;k++){
+											if(Number(pomocnici[k].broj)==Number(prisustvo[0].prisustvo[j].pomocnik)){
+												inline.innerHTML = "<span style=\"color:rgb(0,150,0)\">"+pomocnici[k].ime+"</span>";
+											}
+										}
+									}
+								}
+							}
+						}
+						inlines.appendChild(inline);
+					majstorBlok.appendChild(inlines);
+				document.getElementById("ekipe").appendChild(majstorBlok);
+			}
+		</script>
+	</div>
+	<div class="pageWidth" style="position:relative;display:none" id="mapa">
 		<div class="mapIndicators">
 			<div class="mapIndicator">
 				<div class="image">
@@ -94,6 +164,11 @@
 				}
 			}
 			
+			socket.on("ekipeStigle",function(){
+				loadGif();
+				location.reload();
+			})
+
 			socket.on("lokacijaTv2",function(allVehicleStops,navigacijaInfo,dodeljivaniNalozi,nedodeljeniNalozi){
 				try{
 					//console.log(navigacijaInfo)

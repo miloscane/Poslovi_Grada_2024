@@ -1,0 +1,289 @@
+<%- include ("partials/header") -%>
+	<script>
+		var pomocnici			=	<%-JSON.stringify(pomocnici)%>;
+		var prisutniPomocnici	=	<%-JSON.stringify(pomocnici)%>;
+		var majstori			=	<%-JSON.stringify(majstori)%>;
+		for(var i=0;i<majstori.length;i++){
+			if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
+				majstori.splice(i,1);
+				i--;
+			}
+		}
+		var prisustvo = [];
+	</script>
+	<div class="pageWidth"> 
+		<div class="ekipe">
+			<div class="inputWrap">
+				<input type="file" id="file" onchange="parseFile()">
+			</div>
+			<div class="majstori">
+				<div id="majstori" class="flex" data-initialized="0"></div>
+				<script>
+					for(var i=0;i<majstori.length;i++){
+						var majstorBlok = document.createElement("DIV");
+						majstorBlok.setAttribute("class","majstor flexBox");
+						majstorBlok.setAttribute("data-id",majstori[i].uniqueId);
+						majstorBlok.setAttribute("data-brojkartice",majstori[i].brojKartice);
+							var imeMajstora = document.createElement("DIV");
+							imeMajstora.setAttribute("class","ime");
+							imeMajstora.innerHTML = majstori[i].ime.split(" ")[0] + "<br>" + majstori[i].ime.split(" ")[1];
+							majstorBlok.appendChild(imeMajstora);
+
+							var inlines = document.createElement("DIV");
+							inlines.setAttribute("class","inlines");
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","inline");
+								inline.innerHTML = "Присутан:";
+								inlines.appendChild(inline);
+								
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","inline");
+								inline.innerHTML = "";
+								inlines.appendChild(inline);
+							majstorBlok.appendChild(inlines);
+
+							var inlines = document.createElement("DIV");
+							inlines.setAttribute("class","pomocnik");
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","bolded");
+								inline.innerHTML = "Помоћник:";
+								inlines.appendChild(inline);
+								
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","selectWrap");
+								inlines.appendChild(inline);
+							majstorBlok.appendChild(inlines);
+						document.getElementById("majstori").appendChild(majstorBlok);
+					}
+
+					function generateSelect(elem){
+						var select = document.createElement("SELECT");
+						select.setAttribute("class","pomocnikSelect");
+						select.setAttribute("oninput","pomocnikPicked(this)")
+							var nijedan = document.createElement("OPTION");
+							nijedan.setAttribute("value",0);
+							nijedan.innerHTML = "Нема";
+							select.appendChild(nijedan);
+							var slobodni = document.createElement("optgroup");
+							slobodni.setAttribute("label","Слободни");
+							for(var i=0;i<prisutniPomocnici.length;i++){
+								if(prisutniPomocnici[i].slobodan==1){
+									var option = document.createElement("OPTION");
+									option.setAttribute("value",prisutniPomocnici[i].broj);
+									option.innerHTML = prisutniPomocnici[i].ime;
+									slobodni.appendChild(option);
+								}
+							}
+							select.appendChild(slobodni); 
+
+							var dodeljeni = document.createElement("optgroup");
+							dodeljeni.setAttribute("label","Додељени");
+							for(var i=0;i<prisutniPomocnici.length;i++){
+								if(prisutniPomocnici[i].slobodan==0){
+									var option = document.createElement("OPTION");
+									option.setAttribute("value",prisutniPomocnici[i].broj);
+									option.innerHTML = prisutniPomocnici[i].ime;
+									dodeljeni.appendChild(option);
+								}
+							}
+							select.appendChild(dodeljeni);
+						elem.appendChild(select);
+					}
+
+					function pomocnikPicked(elem){
+						var pomocniciSelects = document.getElementsByClassName("selectWrap");
+						for(var i=0;i<pomocniciSelects.length;i++){
+							if(elem.parentElement!=pomocniciSelects[i]){
+								if(Number(pomocniciSelects[i].getElementsByTagName("SELECT")[0].value)==Number(elem.value)){
+									pomocniciSelects[i].getElementsByTagName("SELECT")[0].value = 0;
+									pomocniciSelects[i].dataset.pomocnik = 0;
+								}
+							}
+							
+						}
+						elem.parentElement.setAttribute("data-pomocnik",elem.value);
+						//OVDE PROVERI DAL JE NEGDE VEC DODELJEN ILI NE PA osnovu toga prebaci u slobodan ako nije, ovo ispod trenutno nema smisla
+						/*for(var i=0;i<prisutniPomocnici.length;i++){
+							prisutniPomocnici[i].slobodan = 1;
+						}*/
+						
+						for(var i=0;i<prisutniPomocnici.length;i++){
+							if(Number(prisutniPomocnici[i].broj)==Number(elem.value)){
+								prisutniPomocnici[i].slobodan = 0;
+							}
+						}
+
+						var selectedPomocnici = [];
+						for(var i=0;i<pomocniciSelects.length;i++){
+							if(pomocniciSelects[i].dataset.pomocnik){
+								if(Number(pomocniciSelects[i].dataset.pomocnik)!=0){
+									selectedPomocnici.push(Number(pomocniciSelects[i].dataset.pomocnik));
+								}
+							}
+						}
+						for(var i=0;i<prisutniPomocnici.length;i++){
+							if(selectedPomocnici.indexOf(Number(prisutniPomocnici[i].broj))<0){
+								prisutniPomocnici[i].slobodan = 1;
+							}
+						}
+
+						var majstoriElems = document.getElementsByClassName("majstor");
+						for(var i=0;i<majstoriElems.length;i++){
+							majstoriElems[i].getElementsByClassName("selectWrap")[0].innerHTML = "";
+							generateSelect(majstoriElems[i].getElementsByClassName("selectWrap")[0]);
+						}
+
+						
+						for(var i=0;i<pomocniciSelects.length;i++){
+							if(pomocniciSelects[i].dataset.pomocnik){
+								pomocniciSelects[i].getElementsByTagName("SELECT")[0].value = pomocniciSelects[i].dataset.pomocnik;
+							}
+						}
+
+						for(var i=0;i<pomocniciSelects.length;i++){
+							if(pomocniciSelects[i].getElementsByTagName("SELECT")[0].value==0){
+								pomocniciSelects[i].getElementsByTagName("SELECT")[0].style.color = "rgb(150,0,0)";
+							}else{
+								pomocniciSelects[i].getElementsByTagName("SELECT")[0].style.color = "rgb(0,150,0)";
+							}
+						}
+
+					}
+				</script>
+			</div>
+			<div class="buttonWrap">
+				<div class="button" onclick="saveForm()">САЧУВАЈ</div>
+			</div>
+			<div class="pomocnici">
+				<div id="pomocnici" class="flex"></div>
+				<script>
+					for(var i=0;i<pomocnici.length;i++){
+						var pomocnikBlok = document.createElement("DIV");
+						pomocnikBlok.setAttribute("class","pomocnikWrap flexBox");
+						pomocnikBlok.setAttribute("data-id",pomocnici[i].uniqueId);
+						pomocnikBlok.setAttribute("data-brojkartice",pomocnici[i].broj);
+							var imePomocnika = document.createElement("DIV");
+							imePomocnika.setAttribute("class","ime");
+							imePomocnika.innerHTML = pomocnici[i].ime.split(" ")[0] + "<br>"+pomocnici[i].ime.split(" ")[1];
+							pomocnikBlok.appendChild(imePomocnika);
+
+							var inlines = document.createElement("DIV");
+							inlines.setAttribute("class","inlines");
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","inline");
+								inline.innerHTML = "Присутан:";
+								inlines.appendChild(inline);
+								
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","inline");
+								inline.innerHTML = "";
+								inlines.appendChild(inline);
+							pomocnikBlok.appendChild(inlines);
+						document.getElementById("pomocnici").appendChild(pomocnikBlok);
+					}
+				</script>
+			</div>
+		</div>
+		<script>
+			function parseFile(){
+				prisustvo = [];
+				var input = document.getElementById('file');
+				var file = input.files[0];
+				var reader = new FileReader();
+				reader.onload = function() {
+					document.getElementById("majstori").dataset.initialized = 0;
+					var contents = reader.result;
+					var rowArray = contents.split("\r\n");
+					rowArray.splice(0,1);
+					var prisustvoArray = [];
+					for(var i=0;i<rowArray.length;i++){
+						var array = rowArray[i].split(",");
+						if(array[2].includes(getDateAsStringForInputObject(new Date()))){
+							if(array[3].includes("F1")){
+								var json = {};
+								json.broj = Number(array[0].replace(/"/g," "));
+								prisustvo.push(json);
+							}
+							
+						}
+						
+					}
+					var majstoriElems = document.getElementsByClassName("majstor");
+					for(var i=0;i<majstoriElems.length;i++){
+						majstoriElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
+						majstoriElems[i].dataset.prisutan = 0;
+					}
+					for(var i=0;i<prisustvo.length;i++){
+						for(var j=0;j<majstoriElems.length;j++){
+							if(Number(majstoriElems[j].dataset.brojkartice)==Number(prisustvo[i].broj)){
+								majstoriElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
+								majstoriElems[i].dataset.prisutan = 1;
+							}
+						}
+					}
+
+					var pomocniciElems = document.getElementsByClassName("pomocnikWrap");
+					for(var i=0;i<pomocniciElems.length;i++){
+						pomocniciElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
+					}
+					for(var i=0;i<prisustvo.length;i++){
+						for(var j=0;j<pomocniciElems.length;j++){
+							if(Number(pomocniciElems[j].dataset.brojkartice)==Number(prisustvo[i].broj)){
+								pomocniciElems[j].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
+							}
+						}
+					}
+
+					for(var i=0;i<prisutniPomocnici.length;i++){
+						var found = false;
+						for(var j=0;j<prisustvo.length;j++){
+							if(Number(prisustvo[j].broj)==prisutniPomocnici[i].broj){
+								found = true;
+							}
+						}
+						if(!found){
+							prisutniPomocnici.splice(i,1);
+							i--;
+						}
+					}
+
+					//PROVERA DAL JE SLOBODAN POMOCNIK
+					for(var i=0;i<prisutniPomocnici.length;i++){
+						prisutniPomocnici[i].slobodan = 1;
+					}
+
+
+					for(var i=0;i<majstoriElems.length;i++){
+						generateSelect(majstoriElems[i].getElementsByClassName("selectWrap")[0]);
+					}
+
+					document.getElementById("majstori").dataset.initialized = 1;
+				};
+  				reader.readAsText(file);
+			}
+
+			function saveForm(){
+				if(Number(document.getElementById("majstori").dataset.initialized) == 1){
+					var jsonArray = [];
+					var majstoriElems = document.getElementsByClassName("majstor");
+					for(var i=0;i<majstoriElems.length;i++){
+						var json = {};
+						json.idMajstora = majstoriElems[i].dataset.id;
+						json.prisutan = majstoriElems[i].dataset.prisutan;
+						json.pomocnik = majstoriElems[i].getElementsByTagName("SELECT")[0].value;
+						jsonArray.push(json);
+					}
+					document.getElementById("json").value = JSON.stringify(jsonArray);
+					document.getElementById("form").submit();
+					loadGif();	
+				}else{
+					alert("Погрешан документ.")
+				}
+				
+			}
+		</script>
+		<form method="POST" action="/ekipe" id="form" style="display:none">
+			<input type="text" name="json" id="json">
+		</form>
+	</div>
+<%- include ("partials/footer") -%>

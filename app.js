@@ -744,6 +744,7 @@ var navigacijaInfoDB;
 var dodeljivaniNaloziDB;
 var stambenoDB;
 var stambeno2DB;
+var pomocniciDB;
 var stariCenovnikJsons = [];
 
 http.listen(process.env.PORT, function(){
@@ -769,9 +770,11 @@ http.listen(process.env.PORT, function(){
 		specifikacijePodizvodjacaDB			=	client.db("Poslovi_Grada_2024").collection('specifikacijePodizvodjaca');
 		errorDB								=	client.db("Poslovi_Grada_2024").collection('errors');
 		stambenoDB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno');
-		stambeno2DB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno2');
+		stambeno2DB 					=	client.db("Poslovi_Grada_2024").collection('PortalStambeno2');
 		navigacijaInfoDB			=	client.db("Poslovi_Grada_2024").collection('NavigacijaInfo');
 		dodeljivaniNaloziDB		=	client.db("Poslovi_Grada_2024").collection('dodeljivaniNalozi');
+		pomocniciDB						=	client.db("Poslovi_Grada_2024").collection('Pomocnici');
+		prisustvoDB						=	client.db("Poslovi_Grada_2024").collection('Prisustvo');
 
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
@@ -782,6 +785,66 @@ http.listen(process.env.PORT, function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
+		//console.log(pomocnici)
+
+
+		/*majstoriDB.find({}).toArray()
+		.then((majstori)=>{
+
+			var statusString = fs.readFileSync("Status.csv",{encoding:"utf8"});
+			var statusArray = statusString.split("\r\n");
+			statusArray.splice(0,1);
+			var uniques = [];
+			var ljudi = [];
+			for(var i=0;i<statusArray.length;i++){
+				var statusArray2 = statusArray[i].split(",");
+				if(uniques.indexOf(statusArray2[0])<0){
+					uniques.push(statusArray2[0]);
+					var json = {};
+					json.broj = Number(statusArray2[0].replace(/"/g," "));
+					//json.brojString = statusArray2[0];
+					json.ime = statusArray2[1];
+					ljudi.push(json)
+				}
+			}
+
+			for(var i=0;i<ljudi.length;i++){
+				for(var j=0;j<majstori.length;j++){
+					//console.log(ljudi[i].broj + " vs " + majstori[j].brojKartice)
+					if(ljudi[i].broj==majstori[j].brojKartice){
+						ljudi.splice(i,1);
+						majstori[j].found = true;
+						i--;
+						break;
+					}
+				}
+			}
+
+			for(var i=0;i<ljudi.length;i++){
+				for(var j=0;j<pomocnici.length;j++){
+					//console.log(ljudi[i].broj + " vs " + majstori[j].brojKartice)
+					if(ljudi[i].broj==pomocnici[j].broj){
+						ljudi.splice(i,1);
+						pomocnici[j].found = true;
+						i--;
+						break;
+					}
+				}
+			}
+
+			for(var i=0;i<ljudi.length;i++){
+				if(!isNaN(Number(ljudi[i].ime.replace(/"/g," ")))){
+					ljudi.splice(i,1);
+					i--;
+				}
+			}
+			console.log(ljudi.length)
+			console.log("**********************")
+			console.log(ljudi)
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
 
 		/*console.log("STARTED STAMBENO")
 		stambenoDB.find({}).toArray()
@@ -7400,10 +7463,34 @@ server.get('/tv', async (req, res)=> {
 	})*/
 	majstoriDB.find({}).toArray()
 	.then((majstori)=>{
-		res.render("tv",{
-	    pageTitle: "Мапа",
-	    majstori: majstori
-	  })
+		for(var i=0;i<majstori.length;i++){
+			if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
+				majstori.splice(i,1);
+				i--;
+			}
+		}
+		var today = new Date();
+		prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
+		.then((prisustvo)=>{
+			pomocniciDB.find({}).toArray()
+			.then((pomocnici)=>{
+				res.render("tv",{
+			    pageTitle: "Мапа",
+			    prisustvo: prisustvo,
+			    pomocnici: pomocnici,
+			    majstori: majstori
+			  })
+			})
+			.catch((error)=>{
+				logError(error);
+				res.send("Greska 3")
+			})
+			
+		})
+		.catch((error)=>{
+			logError(error);
+			res.send("Greska 2")
+		})
 	})
 	.catch((error)=>{
 		logError(error);
@@ -7597,6 +7684,106 @@ server.post('/statusOdMajstora', async (req, res)=> {
 		res.redirect("/login");
 	}
 });
+
+
+
+
+server.get('/magacin/ekipe', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==25){
+			var today = new Date();
+			var yesterday = new Date();
+			yesterday.setDate(today.getDate()-1);
+			pomocniciDB.find({}).toArray()
+			.then((pomocnici)=>{
+				majstoriDB.find({}).toArray()
+				.then((majstori)=>{
+					res.render("magacioner/ekipe",{
+						pageTitle: "Екипе",
+						user: req.session.user,
+						pomocnici: pomocnici,
+						majstori: majstori
+					});
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+          pageTitle: "Грешка",
+          user: req.session.user,
+          message: "<div class=\"text\">Грешка у бази података 7622.</div>"
+        });	
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	} 
+});
+
+server.post('/ekipe', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==25){
+			var json = {}
+			json.prisustvo = JSON.parse(req.body.json);
+			json.datum = {};
+			json.datum.datum = getDateAsStringForDisplay(new Date());
+			json.datum.datetime = new Date().getTime();
+			json.user = req.session.user;
+			json.uniqueId = generateId(6) + "--" + new Date().getTime();
+			prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(new Date())}).toArray()
+			.then((prisustva)=>{
+				if(prisustva.length==0){
+					prisustvoDB.insertOne(json)
+					.then((dbResponse)=>{
+						res.redirect("/")
+						io.emit("ekipeStigle",1)
+					})
+					.catch((error)=>{
+						logError(error)
+						res.render("message",{
+		          pageTitle: "Грешка",
+		          user: req.session.user,
+		          message: "<div class=\"text\">Грешка у бази података 7725.</div>"
+		        });
+					})
+				}else{
+					prisustvoDB.replaceOne({uniqueId:prisustva[0].uniqueId},json)
+					.then((dbResponse)=>{
+						res.redirect("/");
+						io.emit("ekipeStigle",1);
+					})
+					.catch((error)=>{
+						logError(error)
+						res.render("message",{
+		          pageTitle: "Грешка",
+		          user: req.session.user,
+		          message: "<div class=\"text\">Грешка у бази података 7740.</div>"
+		        });
+					})
+				}
+			})
+			.catch((error)=>{
+				logError(error)
+				res.render("message",{
+          pageTitle: "Грешка",
+          user: req.session.user,
+          message: "<div class=\"text\">Грешка у бази података 7739.</div>"
+        });
+			})
+		}else{
+			res.send("Nije definisan nivo korisnika");
+		}
+	}else{
+		res.redirect("/login");
+	}
+});
+
 
 /*server.get('/temp', async (req, res)=> {
 	if(req.session.user){
