@@ -207,12 +207,24 @@
 										prisustvo.push(json);
 									}
 									
+								}else if(array[2].substr(2,1)=="-"){
+									var danas = getDateAsStringForInputObject(new Date());
+									var mesec = danas.split("-")[1];
+									var dan = danas.split("-")[2];
+									if(array[2].includes(dan+"-"+mesec)){
+										if(array[3].includes("F1")){
+											var json = {};
+											json.broj = Number(array[0].replace(/"/g," "));
+											prisustvo.push(json);
+										}
+									}
 								}
 							}
 						}
 						
 						
 					}
+					console.log(prisustvo)
 					var majstoriElems = document.getElementsByClassName("majstor");
 					for(var i=0;i<majstoriElems.length;i++){
 						majstoriElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
@@ -221,7 +233,7 @@
 					for(var i=0;i<prisustvo.length;i++){
 						for(var j=0;j<majstoriElems.length;j++){
 							if(Number(majstoriElems[j].dataset.brojkartice)==Number(prisustvo[i].broj)){
-								majstoriElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
+								majstoriElems[j].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
 								majstoriElems[i].dataset.prisutan = 1;
 							}
 						}
