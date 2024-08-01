@@ -785,8 +785,93 @@ http.listen(process.env.PORT, function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
-		//console.log(pomocnici)
+		/*var pomocnici = [
+				{
+					broj: 1,
+					ime: "Marko Vovna"
+				},
+				{
+					broj: 3,
+					ime: "Maksim Timofejev"
+				},
+				{
+					broj: 4,
+					ime: "Nenad Zekovic"
+				},
+				{
+					broj: 5,
+					ime: "Mladen Mihajlovic"
+				},
+				{
+					broj: 6,
+					ime: "Dragan Djukanovic"
+				},
+				{
+					broj: 11,
+					ime: "Ivan Fister"
+				},
+				{
+					broj: 12,
+					ime: "Ivica Jankovic"
+				},
+				{
+					broj: 17,
+					ime: "Nikola Stamenkovic"
+				},
+				{
+					broj: 19,
+					ime: "Uros Adamovic"
+				},
+				{
+					broj: 26,
+					ime: "Danijel Redzepovic"
+				},
+				{
+					broj: 47,
+					ime: "Nikola Cvetakovic"
+				},
+				{
+					broj: 51,
+					ime: "Milos Malcic"
+				},
+				{
+					broj: 59,
+					ime: "Vladimir Milosavljevic"
+				},
+				{
+					broj: 68,
+					ime: "Filip Spasic"
+				},
+				{
+					broj: 70,
+					ime: "Ramadan Krasnic"
+				},
+				{
+					broj: 71,
+					ime: "Predrag Stosic"
+				},
+				{
+					broj: 77,
+					ime: "Marko Brujic"
+				},
+				{
+					broj: 78,
+					ime: "Merim Ibraimov"
+				}
+			]
 
+		for(var i=0;i<pomocnici.length;i++){
+			pomocnici[i].uniqueId = generateId(6)+"--"+new Date().getTime();
+		}
+
+		//console.log(pomocnici)
+		pomocniciDB.insertMany(pomocnici)
+		.then((dbR)=>{
+			console.log(dbR)
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 
 		/*majstoriDB.find({}).toArray()
 		.then((majstori)=>{
@@ -7782,6 +7867,41 @@ server.post('/ekipe', async (req, res)=> {
 	}else{
 		res.redirect("/login");
 	}
+});
+
+server.get('/magacin/vozila', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==25){
+			navigacijaInfoDB.find({}).toArray()
+			.then((vozila)=>{
+				majstoriDB.find({}).toArray()
+				.then((majstori)=>{
+					res.render("magacioner/vozila",{
+						pageTitle: "Возила",
+						user: req.session.user,
+						vozila: vozila,
+						majstori: majstori
+					});
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+          pageTitle: "Грешка",
+          user: req.session.user,
+          message: "<div class=\"text\">Грешка у бази података 7622.</div>"
+        });	
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	} 
 });
 
 

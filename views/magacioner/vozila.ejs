@@ -1,52 +1,33 @@
 <%- include ("partials/header") -%>
 	<script>
-		var pomocnici			=	<%-JSON.stringify(pomocnici)%>;
-		var prisutniPomocnici	=	<%-JSON.stringify(pomocnici)%>;
-		var majstori			=	<%-JSON.stringify(majstori)%>;
+		var vozila		=	<%-JSON.stringify(vozila)%>;
+		var majstori	=	<%-JSON.stringify(majstori)%>;
 		for(var i=0;i<majstori.length;i++){
 			if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
 				majstori.splice(i,1);
 				i--;
 			}
 		}
-		var prisustvo = [];
 	</script>
 	<div class="pageWidth"> 
-		<div class="ekipe">
-			<div class="inputWrap">
-				<input type="file" id="file" onchange="parseFile()">
-			</div>
+		<div class="vozila ekipe">
 			<div class="majstori">
-				<div id="majstori" class="flex" data-initialized="0"></div>
+				<div id="majstori" class="flex"></div>
 				<script>
 					for(var i=0;i<majstori.length;i++){
 						var majstorBlok = document.createElement("DIV");
 						majstorBlok.setAttribute("class","majstor flexBox");
 						majstorBlok.setAttribute("data-id",majstori[i].uniqueId);
-						majstorBlok.setAttribute("data-brojkartice",majstori[i].brojKartice);
 							var imeMajstora = document.createElement("DIV");
 							imeMajstora.setAttribute("class","ime");
 							imeMajstora.innerHTML = majstori[i].ime.split(" ")[0] + "<br>" + majstori[i].ime.split(" ")[1];
 							majstorBlok.appendChild(imeMajstora);
 
 							var inlines = document.createElement("DIV");
-							inlines.setAttribute("class","inlines");
-								var inline = document.createElement("DIV");
-								inline.setAttribute("class","inline");
-								inline.innerHTML = "Присутан:";
-								inlines.appendChild(inline);
-								
-								var inline = document.createElement("DIV");
-								inline.setAttribute("class","inline");
-								inline.innerHTML = "";
-								inlines.appendChild(inline);
-							majstorBlok.appendChild(inlines);
-
-							var inlines = document.createElement("DIV");
-							inlines.setAttribute("class","pomocnik");
+							inlines.setAttribute("class","vozilo");
 								var inline = document.createElement("DIV");
 								inline.setAttribute("class","bolded");
-								inline.innerHTML = "Помоћник:";
+								inline.innerHTML = "Возило:";
 								inlines.appendChild(inline);
 								
 								var inline = document.createElement("DIV");
@@ -224,6 +205,7 @@
 						
 						
 					}
+					console.log(prisustvo)
 					var majstoriElems = document.getElementsByClassName("majstor");
 					for(var i=0;i<majstoriElems.length;i++){
 						majstoriElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
@@ -233,7 +215,7 @@
 						for(var j=0;j<majstoriElems.length;j++){
 							if(Number(majstoriElems[j].dataset.brojkartice)==Number(prisustvo[i].broj)){
 								majstoriElems[j].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
-								majstoriElems[j].dataset.prisutan = 1;
+								majstoriElems[i].dataset.prisutan = 1;
 							}
 						}
 					}
