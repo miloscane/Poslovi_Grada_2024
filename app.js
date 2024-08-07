@@ -1411,6 +1411,130 @@ request(geoCodeOptions, (error,response,body)=>{
 			}
 			cenovnik = prices;
 			console.log("Cenovnik inicijalizovan");
+			/*naloziDB.find({}).toArray()
+			.then((nalozi)=>{
+				var filterNalozi = [];
+				for(var i=0;i<nalozi.length;i++){
+					if(podizvodjaci.indexOf(nalozi[i].majstor)>=0){
+						filterNalozi.push(nalozi[i]);
+					}
+				}
+				var brojevi = [];
+				for(var i=0;i<filterNalozi.length;i++){
+					brojevi.push(filterNalozi.broj);
+				}
+				istorijaNalogaDB.find({broj:{$in:brojevi}}).toArray()
+				.then((istorija)=>{
+					for(var i=0;i<filterNalozi.length;i++){
+						filterNalozi.istorija = [];
+						for(var j=0;j<istorija.length;j++){
+							if(istorija[j].broj==filterNalozi[i].broj){
+								filterNalozi.istorija.push()
+							}
+						}
+					}
+					var podizvodjacJsons = [];
+					for(var i=0;i<podizvodjaci.length;i++){
+						var json = {};
+						json.id = podizvodjaci[i];
+						json.nalozi = [];
+						for(var j=0;j<filterNalozi.length;j++){
+							if(filterNalozi[j].majstor==podizvodjaci[i]){
+								json.nalozi.push(filterNalozi[j])
+							}
+						}
+						podizvodjacJsons.push(json);
+					}
+
+					majstoriDB.find({}).toArray()
+					.then((majstori)=>{
+						for(var i=0;i<podizvodjacJsons.length;i++){
+							for(var j=0;j<majstori.length;j++){
+								if(podizvodjacJsons[i].id==majstori[j].uniqueId){
+									podizvodjacJsons[i].ime = majstori[j].ime;
+								}
+							}
+						}
+						var meseci = [
+								{
+									mesec: "Februar",
+									str: "02.2024",
+									nalozi: []
+								},
+								{
+									mesec: "Mart",
+									str: "03.2024",
+									nalozi: []
+								},
+								{
+									mesec: "April",
+									str: "04.2024",
+									nalozi: []
+								},
+								{
+									mesec: "Maj",
+									str: "05.2024",
+									nalozi: []
+								},
+								{
+									mesec: "Jun",
+									str: "06.2024",
+									nalozi: []
+								},
+								{
+									mesec: "Jul",
+									str: "07.2024",
+									nalozi: []
+								},
+							];
+						for(var i=0;i<podizvodjacJsons.length;i++){
+							podizvodjacJsons[i].meseci = JSON.parse(JSON.stringify(meseci));
+							for(var j=0;j<podizvodjacJsons[i].meseci.length;j++){
+								for(var k=0;k<podizvodjacJsons[i].nalozi.length;k++){
+									if(podizvodjacJsons[i].nalozi[k].datum.datum.includes(podizvodjacJsons[i].meseci[j].str)){
+										podizvodjacJsons[i].meseci[j].nalozi.push(podizvodjacJsons[i].nalozi[k]);
+									}
+								}
+							}
+						}
+						for(var i=0;i<podizvodjacJsons.length;i++){
+							for(var j=0;j<podizvodjacJsons[i].meseci.length;j++){
+								podizvodjacJsons[i].meseci[j].iznos = 0;
+								podizvodjacJsons[i].meseci[j].brojNaloga = 0;
+								for(var k=0;k<podizvodjacJsons[i].meseci[j].nalozi.length;k++){
+									podizvodjacJsons[i].meseci[j].iznos = podizvodjacJsons[i].meseci[j].iznos + parseFloat(podizvodjacJsons[i].meseci[j].nalozi[k].ukupanIznos);
+									podizvodjacJsons[i].meseci[j].brojNaloga++;
+								}
+							}
+						}
+
+						for(var i=0;i<podizvodjacJsons.length;i++){
+							console.log(podizvodjacJsons[i].ime);
+							for(var j=0;j<podizvodjacJsons[i].meseci.length;j++){
+								console.log(podizvodjacJsons[i].meseci[j].mesec);
+								console.log("Broj naloga: "+podizvodjacJsons[i].meseci[j].brojNaloga);
+								console.log("Iznos: "+brojSaRazmacima(podizvodjacJsons[i].meseci[j].iznos));
+								console.log("-----------------------")
+							}
+							console.log("***************************************************************************************");
+						}
+
+
+
+
+					})
+					.catch((error)=>{
+						console.log(error);
+					})
+
+				})
+				.catch((error)=>{
+					console.log(error);
+				})
+			})
+			.catch((error)=>{
+				console.log(error);
+			})*/
 
 			/*var kategorije = [];
 			for(var i=0;i<prices.length;i++){
@@ -2284,7 +2408,7 @@ request(geoCodeOptions, (error,response,body)=>{
 
 
 
-		//ZA Premijus
+		//ZA PREMIJUS
 
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
@@ -2292,7 +2416,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
-						if(nalozi[i].prijemnica.datum.datum.includes(".06.2024")){
+						if(nalozi[i].prijemnica.datum.datum.includes(".07.2024")){
 							naloziToExport.push(nalozi[i])
 						}
 					}
@@ -2342,7 +2466,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<problemNalozi.length;i++){
 				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
 			}
-			fs.writeFileSync("./PG-Premijus-06-2024.csv",csvString,"utf8");
+			fs.writeFileSync("./PG-Premijus-07-2024.csv",csvString,"utf8");
 			console.log("Written ")
 		})
 		.catch((error)=>{
@@ -8182,8 +8306,11 @@ io.on('connection', function(socket){
 					statistika.osnovicaPG	= statistika.osnovicaPG + iznosNalogaPG;
 				}
 			}
+			for(var i=0;i<naloziToSend.length;i++){
+				naloziToSend[i].sorting = Number(naloziToSend[i].faktura.samoBroj);
+			}
 			naloziToSend = naloziToSend.sort((a, b) => {
-				if (a.faktura.samoBroj < b.faktura.samoBroj) {
+				if (a.sorting < b.sorting) {
 					return -1;
 				}
 			});

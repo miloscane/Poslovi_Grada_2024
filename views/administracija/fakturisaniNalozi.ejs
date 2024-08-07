@@ -141,7 +141,7 @@
 					document.getElementById("do-datuma").value="";
 					var startNumber = document.getElementById("od-fakture").value;
 					var endNumber = document.getElementById("do-fakture").value;
-					if(startNumber && endNumber && endNumber>startNumber){
+					if(startNumber && endNumber && Number(endNumber)>Number(startNumber)){
 						document.getElementById("table").innerHTML = "<img id='wait' src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/loadGif.gif'>";
 						document.getElementById("ukupno-naloga").innerHTML = "-";
 						document.getElementById("ukupan-iznos-naloga").innerHTML = "-";
