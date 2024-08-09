@@ -4865,7 +4865,7 @@ server.post('/editMajstorNaNalogu',async (req,res)=>{
 			dodeljivaniNaloziDB.find({uniqueId:req.body.id}).toArray()
 			.then((dodele)=>{
 				var json = JSON.parse(req.body.json);
-				if(dodele[0].user.email == req.session.user.email){
+				//if(dodele[0].user.email == req.session.user.email){
 					var zavrsetak = {};
 					if(json.status == "Zavrseno"){
 						var currentDate = new Date(new Date().getTime()+2*3.6e+6);
@@ -4898,13 +4898,13 @@ server.post('/editMajstorNaNalogu',async (req,res)=>{
 							user: req.session.user
 						});
 					})
-				}else{
-					res.render("message",{
-						pageTitle: "Грешка",
-						message: "<div class=\"text\">Не можете мењати туђу доделу.</div>",
-						user: req.session.user
-					});
-				}
+				//}else{
+					//res.render("message",{
+						//pageTitle: "Грешка",
+						//message: "<div class=\"text\">Не можете мењати туђу доделу.</div>",
+						//user: req.session.user
+					//});
+				//}
 			})
 			.catch((error)=>{
 				logError(error);
