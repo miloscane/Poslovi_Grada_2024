@@ -180,7 +180,10 @@
 					for(var i=0;i<majstorElems.length;i++){
 						majstorElems[i].getElementsByClassName("nalozi")[0].innerHTML = "";
 						for(var j=0;j<dodeljivaniNalozi.length;j++){
-							if(Number(dodeljivaniNalozi[i].deleted)!=1){
+
+							if(Number(dodeljivaniNalozi[j].deleted)!=1){
+
+								
 								if(dodeljivaniNalozi[j].majstor==majstorElems[i].dataset.id){
 									var nalogElem = document.createElement("DIV");
 									nalogElem.setAttribute("class","nalog");
