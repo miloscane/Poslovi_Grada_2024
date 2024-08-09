@@ -3308,6 +3308,58 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 	}
 });
 
+
+server.get('/kontrola/tv',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==25){
+			majstoriDB.find({}).toArray()
+			.then((majstori)=>{
+				for(var i=0;i<majstori.length;i++){
+					if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
+						majstori.splice(i,1);
+						i--;
+					}
+				}
+				var today = new Date();
+				prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
+				.then((prisustvo)=>{
+					pomocniciDB.find({}).toArray()
+					.then((pomocnici)=>{
+						res.render("kontrola/tv",{
+					    pageTitle: "ТВ",
+					    prisustvo: prisustvo,
+					    pomocnici: pomocnici,
+					    user: req.session.user,
+					    majstori: majstori
+					  })
+					})
+					.catch((error)=>{
+						logError(error);
+						res.send("Greska 3")
+					})
+					
+				})
+				.catch((error)=>{
+					logError(error);
+					res.send("Greska 2")
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.send("Greska")
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.post('/prijemnice', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
@@ -4859,6 +4911,7 @@ server.post('/deleteMajstorNaNalogu',async (req,res)=>{
 		res.redirect("/login")
 	}
 });
+
 server.post('/editMajstorNaNalogu',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==20){
