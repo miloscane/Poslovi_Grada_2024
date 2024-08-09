@@ -21,6 +21,7 @@
 		var prisustvo = <%-JSON.stringify(prisustvo)%>;
 		var pomocnici = <%-JSON.stringify(pomocnici)%>;
 		var magacin = {lat:44.813906,lng:20.443903};
+		var statusi = [{naziv:"Кренуо",value:"Odlazak"},{naziv:"Стигао",value:"Dolazak"},{naziv:"Завршио",value:"Zavrseno"}]
 	</script>
 	<div class="pageWidth" id="prisustvo" style="width:100vw">
 		<div class="ekipe">
@@ -210,6 +211,21 @@
 										radovi.setAttribute("class","inlineNalog radovi");
 										radovi.innerHTML = dodeljivaniNalozi[j].vremeRadova ? dodeljivaniNalozi[j].vremeRadova : "";
 										nalogElem.appendChild(radovi);
+
+										var statusElem = document.createElement("DIV");
+										statusElem.setAttribute("class","inlineNalog status");
+										var statusString = "";
+										for(var k=0;k<statusi.length;k++){
+											if(statusi[k].value==dodeljivaniNalozi[j].status){
+												statusString = statusi[k].naziv;
+											}
+										}
+										statusElem.innerHTML = statusString;
+										nalogElem.appendChild(statusElem);
+
+										var breakElem = document.createElement("DIV");
+										breakElem.setAttribute("class","break");
+										nalogElem.appendChild(breakElem);
 
 										var barWrap = document.createElement("DIV");
 										barWrap.setAttribute("class","inlineNalog barWrap");

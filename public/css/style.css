@@ -4528,6 +4528,9 @@ input[type=number] {
 
 .tv2Ekipe .majstor .nalozi .nalog{
     font-size:0;
+    maring-bottom:4px;
+    padding-bottom:4px;
+    border-bottom:1px solid rgba(0,0,0,0.3);
 }
 
 .tv2Ekipe .majstor .nalozi .nalog .inlineNalog{
@@ -4547,6 +4550,11 @@ input[type=number] {
 
 .tv2Ekipe .majstor .nalozi .nalog .dolazak{
     padding-right: 4px;
+}
+
+.tv2Ekipe .majstor .nalozi .nalog .status{
+    padding-left: 4px;
+    font-weight:500;
 }
 
 @media screen and (max-width: 1100px) {
