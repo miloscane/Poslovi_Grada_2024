@@ -4530,6 +4530,7 @@ input[type=number] {
     font-size:0;
     maring-bottom:4px;
     padding-bottom:4px;
+    padding-top:4px;
     border-bottom:1px solid rgba(0,0,0,0.3);
 }
 
