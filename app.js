@@ -2293,7 +2293,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
-						if(nalozi[i].prijemnica.datum.datum.includes(".06.2024")){
+						if(nalozi[i].prijemnica.datum.datum.includes(".07.2024")){
 							naloziToExport.push(nalozi[i])
 						}
 					}
@@ -2348,7 +2348,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<problemNalozi.length;i++){
 				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+",Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", , , , , , , , , , ,\r\n";
 			}
-			fs.writeFileSync("./Minimax-05-2024.csv",csvString,"utf8");
+			fs.writeFileSync("./Minimax-07-2024.csv",csvString,"utf8");
 			console.log("Written ")
 		})
 		.catch((error)=>{
@@ -4755,9 +4755,17 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 							}};
 						naloziDB.updateOne({broj:json.nalog},setObj)
 						.then((dbResponse) => {
+							var statusString = ""
+							if(json.status=="Odlazak"){
+								statusString = "послали";
+							}else if(json.status=="Dolazak"){
+								statusString = "регистровали долазак";
+							}else if(json.status=="Zavrseno"){
+								statusString = "регистровали завршетак радова";
+							}
 							res.render("message",{
 								pageTitle: "Мајстор послат на налог",
-								message: "<div class=\"text\">Успешно сте послали <b>"+majstori[0].ime+"</b> на налог број "+json.nalog+" - <b>"+json.adresa+"</b>, "+json.radnaJedinica+".<br>&nbsp;<br><b>Vreme:</b> "+json.datum.timestamp+"</div>",
+								message: "<div class=\"text\">Успешно сте "+statusString+" <b>"+majstori[0].ime+"</b> на налог број "+json.nalog+" - <b>"+json.adresa+"</b>, "+json.radnaJedinica+".<br>&nbsp;<br><b>Vreme:</b> "+json.datum.timestamp+"</div><br><a href=\"/nalog/"+json.nalog+"\">Повратак на налог</a></div>",
 								user: req.session.user
 							});
 						})
@@ -4784,6 +4792,125 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 				res.render("message",{
 					pageTitle: "Грешка",
 					message: "<div class=\"text\">Грешка у бази података 3545.</div>",
+					user: req.session.user
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Нисте овлашћени да шаљете мајстора на налог.</div>",
+				user: req.session.user
+			});
+		}
+	}else{
+		res.redirect("/login")
+	}
+});
+
+server.post('/deleteMajstorNaNalogu',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==20){
+			dodeljivaniNaloziDB.find({uniqueId:req.body.id}).toArray()
+			.then((dodele)=>{
+				if(dodele[0].user.email == req.session.user.email){
+					var setObj	=	{ $set: {
+								deleted: 1
+							}};
+					dodeljivaniNaloziDB.updateOne({uniqueId:req.body.id},setObj)
+					.then((dbResponse) => {
+						res.render("message",{
+							pageTitle: "Порука",
+							message: "<div class=\"text\">Успешно сте <b>обрисали</b> доделу.<br><a href=\"/nalog/"+dodele[0].nalog+"\">Повратак на налог</a></div>",
+							user: req.session.user
+						});
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Грешка",
+							message: "<div class=\"text\">Грешка у бази података 4827.</div>",
+							user: req.session.user
+						});
+					})
+				}else{
+					res.render("message",{
+						pageTitle: "Грешка",
+						message: "<div class=\"text\">Не можете мењати туђу доделу.</div>",
+						user: req.session.user
+					});
+				}
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Грешка у бази података 4821.</div>",
+					user: req.session.user
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Нисте овлашћени да шаљете мајстора на налог.</div>",
+				user: req.session.user
+			});
+		}
+	}else{
+		res.redirect("/login")
+	}
+});
+server.post('/editMajstorNaNalogu',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==20){
+			dodeljivaniNaloziDB.find({uniqueId:req.body.id}).toArray()
+			.then((dodele)=>{
+				var json = JSON.parse(req.body.json);
+				if(dodele[0].user.email == req.session.user.email){
+					var zavrsetak = {};
+					if(json.status == "Zavrseno"){
+						var currentDate = new Date(new Date().getTime()+2*3.6e+6);
+						var currentHour = currentDate.getHours().toString().length==1 ? "0"+currentDate.getHours() : currentDate.getHours();
+						var currentMinute = currentDate.getMinutes().toString().length==1 ? "0"+currentDate.getMinutes() : currentDate.getMinutes();
+						var timeStamp =  currentHour +":"+currentMinute;
+						zavrsetak.datum = getDateAsStringForDisplay(currentDate);
+						zavrsetak.datetime = currentDate.getTime();
+						zavrsetak.timestamp = timeStamp;
+					}
+					var setObj	=	{ $set: {
+								vremeDolaska: json.vremeDolaska,
+								vremeRadova: json.vremeRadova,
+								status: json.status,
+								zavrsetak: zavrsetak
+							}};
+					dodeljivaniNaloziDB.updateOne({uniqueId:json.uniqueId},setObj)
+					.then((dbResponse) => {
+						res.render("message",{
+							pageTitle: "Порука",
+							message: "<div class=\"text\">Успешно сте <b>изменили</b> доделу. <a href=\"/nalog/"+json.brojNaloga+"\">Повратак на налог</a></div>",
+							user: req.session.user
+						});
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Грешка",
+							message: "<div class=\"text\">Грешка у бази података 4827.</div>",
+							user: req.session.user
+						});
+					})
+				}else{
+					res.render("message",{
+						pageTitle: "Грешка",
+						message: "<div class=\"text\">Не можете мењати туђу доделу.</div>",
+						user: req.session.user
+					});
+				}
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Грешка у бази података 4821.</div>",
 					user: req.session.user
 				});
 			})
@@ -5924,6 +6051,70 @@ server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 						message: "<div class=\"text\">Дошло је до грешке у бази податка 281.</div>"
 					});
 				});
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
+server.get('/dispecer/dodeljeniNalozi',async (req,res)=>{
+	if(req.session.user){
+			if(Number(req.session.user.role)==20){
+				var today = new Date();
+				today.setDate(today.getDate());
+				dodeljivaniNaloziDB.find({radnaJedinica:{$in:req.session.user.opstine},"datum.datum":getDateAsStringForDisplay(today)}).toArray()
+				.then((dodeljeniNalozi)=>{
+					var brojeviNaloga = [];
+					for(var i=0;i<dodeljeniNalozi.length;i++){
+						brojeviNaloga.push(dodeljeniNalozi[i].nalog);
+					}
+					naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
+					.then((nalozi) => {
+						for(var i=0;i<nalozi.length;i++){
+							delete nalozi[i]._id;
+							delete nalozi[i].uniqueId;
+							delete nalozi[i].digitalizacija;
+							delete nalozi[i].opis;
+							delete nalozi[i].vrstaRada;
+							delete nalozi[i].kategorijeRadova;
+							delete nalozi[i].punaAdresa;
+							delete nalozi[i].obracun;
+							delete nalozi[i].ukupanIznos;
+							delete nalozi[i].faktura;
+							delete nalozi[i].prijemnica;
+						}
+						res.render("dispeceri/dodeljeniNalozi",{
+							pageTitle:"Додељени налози",
+							user: req.session.user,
+							nalozi: nalozi
+						})
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 281.</div>"
+						});
+					});
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 6081.</div>"
+					});
+				})
+
+				
 			
 		}else{
 			res.render("message",{

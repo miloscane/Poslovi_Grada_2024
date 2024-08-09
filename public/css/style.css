@@ -4435,6 +4435,119 @@ input[type=number] {
     transition:all ease 0.5s;
 }
 
+.novaDodela{
+    font-size:0;
+    text-align: center;
+    padding-top:10px;
+    margin-top:10px;
+    border-top:1px solid rgb(255,255,255);
+}
+
+.novaDodela .inline{
+    display:inline-block;
+    vertical-align: top;
+    font-size:16px;
+}
+
+.novaDodela .inline .note{
+    font-size:10px !important;
+}
+
+.novaDodela .inline:nth-child(2){
+    width:90px;
+}
+
+.novaDodela .inline:nth-child(3){
+    width:90px;
+}
+
+.stareDodele .dodela{
+    margin-bottom:10px;
+}
+
+.stareDodele .inline{
+    display:inline-block;
+    vertical-align: top;
+    font-size:16px;
+}
+
+.stareDodele .inline .note{
+    font-size:10px !important;
+}
+
+.stareDodele .inline:nth-child(2){
+    width:90px;
+}
+
+.stareDodele .inline:nth-child(3){
+    width:90px;
+}
+
+.stareDodele .majstor{
+    padding-right:15px;
+    width:200px;
+}
+
+.stareDodele .komanda{
+    display:inline-block;
+    vertical-align: middle;
+    width:15px;
+    cursor:pointer;
+}
+.stareDodele .komanda:nth-child(1){
+    margin-right:10px;
+}
+
+.stareDodele .komanda img{
+    display:block;
+}
+
+.ekipe .majstor .nalozi{
+    text-align:left;
+    margin-top:7px;
+    padding-top:7px;
+    border-top:1px solid rgb(31,52,100);
+}
+
+.tv2Ekipe .pomocnik{
+    text-align:left;
+}
+
+.tv2Ekipe .pomocnik .bolded{
+    display:inline-block;
+    vertical-align: middle;
+    font-size:10px;
+    padding-right:5px;
+}
+
+.tv2Ekipe .pomocnik .selectWrap{
+    display:inline-block;
+    vertical-align: middle;
+    font-size:10px;
+}
+
+.tv2Ekipe .majstor .nalozi .nalog{
+    font-size:0;
+}
+
+.tv2Ekipe .majstor .nalozi .nalog .inlineNalog{
+    font-size:12px;
+    display:inline-block;
+    vertical-align: top;
+}
+
+.tv2Ekipe .majstor .nalozi .nalog .broj{
+    padding-right:4px;
+    font-weight:600;
+}
+
+.tv2Ekipe .majstor .nalozi .nalog .break{
+    display:block;
+}
+
+.tv2Ekipe .majstor .nalozi .nalog .dolazak{
+    padding-right: 4px;
+}
 
 @media screen and (max-width: 1100px) {
     .pageWidth{

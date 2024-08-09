@@ -24,12 +24,13 @@
 	</script>
 	<div class="pageWidth" id="prisustvo" style="width:100vw">
 		<div class="ekipe">
-			<div id="ekipe" class="flex"></div>
+			<div id="ekipe" class="flex tv2Ekipe"></div>
 		</div>
 		<script>
 			for(var i=0;i<majstori.length;i++){
 				var majstorBlok = document.createElement("DIV");
 				majstorBlok.setAttribute("class","majstor flexBox");
+				majstorBlok.setAttribute("data-id",majstori[i].uniqueId);
 					var imeMajstora = document.createElement("DIV");
 					imeMajstora.setAttribute("class","ime");
 					imeMajstora.innerHTML = majstori[i].ime.split(" ")[0] + "<br>" + majstori[i].ime.split(" ")[1];
@@ -82,6 +83,10 @@
 						}
 						inlines.appendChild(inline);
 					majstorBlok.appendChild(inlines);
+
+					var naloziElem = document.createElement("DIV");
+					naloziElem.setAttribute("class","nalozi");
+					majstorBlok.appendChild(naloziElem);
 				document.getElementById("ekipe").appendChild(majstorBlok);
 			}
 		</script>
@@ -171,6 +176,48 @@
 
 			socket.on("lokacijaTv2",function(allVehicleStops,navigacijaInfo,dodeljivaniNalozi,nedodeljeniNalozi){
 				try{
+					var majstorElems = document.getElementsByClassName("majstor");
+					for(var i=0;i<majstorElems.length;i++){
+						majstorElems[i].getElementsByClassName("nalozi")[0].innerHTML = "";
+						for(var j=0;j<dodeljivaniNalozi.length;j++){
+							if(dodeljivaniNalozi[j].majstor==majstorElems[i].dataset.id){
+								var nalogElem = document.createElement("DIV");
+								nalogElem.setAttribute("class","nalog");
+									var broj = document.createElement("DIV");
+									broj.setAttribute("class","inlineNalog broj");
+									broj.innerHTML = dodeljivaniNalozi[j].nalog;
+									nalogElem.appendChild(broj);
+									
+									var radnaJedinica = document.createElement("DIV");
+									radnaJedinica.setAttribute("class","inlineNalog radnaJedinica");
+									radnaJedinica.innerHTML = dodeljivaniNalozi[j].radnaJedinica;
+									nalogElem.appendChild(radnaJedinica);
+
+									var breakElem = document.createElement("DIV");
+									breakElem.setAttribute("class","break");
+									nalogElem.appendChild(breakElem);
+
+									var dolazak = document.createElement("DIV");
+									dolazak.setAttribute("class","inlineNalog dolazak");
+									dolazak.innerHTML = dodeljivaniNalozi[j].vremeDolaska ? dodeljivaniNalozi[j].vremeDolaska : "";
+									nalogElem.appendChild(dolazak);
+
+									var radovi = document.createElement("DIV");
+									radovi.setAttribute("class","inlineNalog radovi");
+									radovi.innerHTML = dodeljivaniNalozi[j].vremeRadova ? dodeljivaniNalozi[j].vremeRadova : "";
+									nalogElem.appendChild(radovi);
+
+									var barWrap = document.createElement("DIV");
+									barWrap.setAttribute("class","inlineNalog barWrap");
+									barWrap.setAttribute("data-dolazak",dodeljivaniNalozi[j].vremeDolaska);
+									barWrap.setAttribute("data-radovi",dodeljivaniNalozi[j].vremeRadova);
+									barWrap.innerHTML = "<div class=\"barFill\"></div>";
+									nalogElem.appendChild(barWrap);
+
+								majstorElems[i].getElementsByClassName("nalozi")[0].appendChild(nalogElem);
+							}
+						}
+					}
 					//console.log(navigacijaInfo)
 					for(var i=0;i<markers.length;i++){
 						markers[i].setMap(null);
