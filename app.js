@@ -7603,10 +7603,25 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 			.then((dbResponse)=>{
 				stambenoDB.insertOne(nalogJSON)
 				.then((dbResponse2)=>{
-					res.status(200);
-					res.setHeader('Content-Type', 'application/json');
-					var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-					res.send(JSON.stringify(primerJson));
+					naloziDB.find({}).toArray()
+					.then((nalozi)=>{
+						if(nalogJSON.reqBody.note_details[0].kreirao_belesku.includes("stambeno") || nalogJSON.reqBody.note_details[0].kreirao_belesku.includes("STAMBENO")){
+							io.emit("notification","noviKomentar","<div class=\"title\">KOMENTAR STAMBENOG</div><div class=\"text\"><a href=\"/nalog/"+nalozi[0].broj+"\" target=\"blank\">"+nalozi[0].broj+"</a> - <span class=\"adresa\">"+nalozi[0].adresa+"</span> - <span class=\"radnaJedinica\">"+nalozi[0].radnaJedinica+"</span></span></div>",nalozi[0].radnaJedinica)
+						}
+						
+						res.status(200);
+						res.setHeader('Content-Type', 'application/json');
+						var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+						res.send(JSON.stringify(primerJson));
+					})
+					.catch((error)=>{
+						logError(error);
+						res.status(501);
+						res.setHeader('Content-Type', 'application/json');
+						var primerJson = {"code":"501","message":"Neuspesan prijem beleske"}
+						res.send(JSON.stringify(primerJson));
+					})
+					
 				})
 				.catch((error)=>{
 					logError(error);

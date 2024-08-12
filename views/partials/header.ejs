@@ -120,21 +120,42 @@
 				}
 				if(!notificationExists){
 					if(type=="noviNalog"){
-						if(user.opstine.indexOf(condition)>=0){
-							var notificationElem = document.createElement("DIV");
-							notificationElem.setAttribute("class","notification");
-								var contents = document.createElement("DIV");
-								contents.setAttribute("class","contents");
-								contents.innerHTML = htmlString;
-								notificationElem.appendChild(contents);
+						if(user.opstine instanceof Array){
+							if(user.opstine.indexOf(condition)>=0){
+								var notificationElem = document.createElement("DIV");
+								notificationElem.setAttribute("class","notification");
+									var contents = document.createElement("DIV");
+									contents.setAttribute("class","contents");
+									contents.innerHTML = htmlString;
+									notificationElem.appendChild(contents);
 
-								var close = document.createElement("DIV");
-								close.setAttribute("class","close");
-								close.setAttribute("onclick","this.parentElement.style.display=\"none\"");
-								close.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
-								notificationElem.appendChild(close);
-							document.getElementById("notifications").appendChild(notificationElem);
+									var close = document.createElement("DIV");
+									close.setAttribute("class","close");
+									close.setAttribute("onclick","this.parentElement.style.display=\"none\"");
+									close.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
+									notificationElem.appendChild(close);
+								document.getElementById("notifications").appendChild(notificationElem);
+							}	
 						}
+					}else if(type=="noviKomentar"){
+						if(user.opstine instanceof Array){
+							if(user.opstine.indexOf(condition)>=0){
+								var notificationElem = document.createElement("DIV");
+								notificationElem.setAttribute("class","notification");
+									var contents = document.createElement("DIV");
+									contents.setAttribute("class","contents");
+									contents.innerHTML = htmlString;
+									notificationElem.appendChild(contents);
+
+									var close = document.createElement("DIV");
+									close.setAttribute("class","close");
+									close.setAttribute("onclick","this.parentElement.style.display=\"none\"");
+									close.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
+									notificationElem.appendChild(close);
+								document.getElementById("notifications").appendChild(notificationElem);
+							}
+						}
+						
 					}
 					
 				}
