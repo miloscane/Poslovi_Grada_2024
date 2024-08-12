@@ -7713,6 +7713,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				    headers: geoCodeHeader
 				};
 				nalogJson.coordinates = {};
+				io.emit("notification","noviNalog","<div class=\"title\">NOVI NALOG</div><div class=\"text\"><a href=\"/nalog/"+nalogJson.broj+"\" target=\"blank\">"+nalogJson.broj+"</a> - <span class=\"adresa\">"+nalogJson.adresa+"</span> - <span class=\"radnaJedinica\">"+nalogJson.radnaJedinica+"</span></span></div>",nalogJson.radnaJedinica)
 
 				request(geoCodeOptions, (error,response,body)=>{
 					if(error){
@@ -8323,6 +8324,7 @@ server.get('/magacin/vozila', async (req, res)=> {
 });*/
 
 io.on('connection', function(socket){
+
 	socket.on('listaNalogaAdministracija', function(odDatuma,doDatuma,adresa,opstine){
 		var dbFindStart	=	new Date().getTime();
 		naloziDB.find({}).toArray()

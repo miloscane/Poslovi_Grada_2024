@@ -109,6 +109,36 @@
 				}
 				
 			});
+
+			socket.on("notification",function(type,htmlString,condition){
+				var currentNotificationElems = document.getElementById("notifications").getElementsByClassName("notification");
+				var notificationExists = false;
+				for(var i=0;i<currentNotificationElems.length;i++){
+					if(currentNotificationElems[i].getElementsByClassName("contents")[0].innerHTML == htmlString){
+						notificationExists = true;
+					}
+				}
+				if(!notificationExists){
+					if(type=="noviNalog"){
+						if(user.opstine.indexOf(condition)>=0){
+							var notificationElem = document.createElement("DIV");
+							notificationElem.setAttribute("class","notification");
+								var contents = document.createElement("DIV");
+								contents.setAttribute("class","contents");
+								contents.innerHTML = htmlString;
+								notificationElem.appendChild(contents);
+
+								var close = document.createElement("DIV");
+								close.setAttribute("class","close");
+								close.setAttribute("onclick","this.parentElement.style.display=\"none\"");
+								close.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
+								notificationElem.appendChild(close);
+							document.getElementById("notifications").appendChild(notificationElem);
+						}
+					}
+					
+				}
+			})
 		</script>
 		<script>
 			function loadGif(){
@@ -120,5 +150,6 @@
 			}
 			stopLoadGif()
 		</script>
+		<div id="notifications"></div>
 		<div id="page-wrap">
 			<%- include ("partials/menu") -%>
