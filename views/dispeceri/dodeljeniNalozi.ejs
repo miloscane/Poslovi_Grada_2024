@@ -1,6 +1,7 @@
 <%- include ("partials/header") -%>
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
+		console.log(nalozi)
 	</script>
 	<div class="pageWidth">
 		<div class="otvoreniNalozi">
@@ -14,7 +15,6 @@
 								<td><div class="value redniBroj">Редни број</div></td>
 								<td><div class="value brojNaloga">Број налога</div></td>
 								<td><div class="value ikonica"></div></td>
-								<td><div class="value datumNaloga">Датум налога</div></td>
 								<td><div class="value radnaJedinica">Радна јединица</div></td>
 								<td><div class="value adresa">Адреса</div></td>
 								<td><div class="value status">Статус</div></td>
@@ -36,9 +36,9 @@
 						}
 					}
 
-					var statusToShow = document.getElementById("status-naloga").value;
+					var statusToShow = "Svi";
 
-					for(var i=0;i<nalozi.length;i++){
+					/*for(var i=0;i<nalozi.length;i++){
 						//isfiltriraj ovde
 						if(opstineToShow.indexOf(nalozi[i].radnaJedinica)>=0){
 							var nalogToPush = {};
@@ -60,30 +60,12 @@
 							
 						}
 						
-					}
+					}*/
+					var naloziToShow = nalozi;
 
-					var zakazani		=	0;
-					var finalizacija	=	0;
-					var voma			=	0;
-					var neizvrseni		=	0;
 					document.getElementById("table").innerHTML = "";
 					var table = document.createElement("TABLE");
 					for(var i=0;i<naloziToShow.length;i++){
-						if(naloziToShow[i].statusNaloga == "Zakazan"){
-							zakazani++;
-						}
-
-						if(naloziToShow[i].statusNaloga == "Finalizacija"){
-							finalizacija++;
-						}
-
-						if(naloziToShow[i].statusNaloga == "Potrebna WOMA"){
-							voma++;
-						}
-
-						if(naloziToShow[i].statusNaloga == "Primljen"){
-							neizvrseni++;
-						}
 						var tr = document.createElement("TR");
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
@@ -118,13 +100,6 @@
 							
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
-								div.setAttribute("class","value datumNaloga");
-								div.innerHTML = naloziToShow[i].datum;
-								td.appendChild(div);
-							tr.appendChild(td);
-							
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
 								div.setAttribute("class","value radnaJedinica");
 								div.innerHTML = naloziToShow[i].radnaJedinica;
 								td.appendChild(div);
@@ -149,11 +124,6 @@
 						table.appendChild(tr);
 					}
 					document.getElementById("table").appendChild(table);
-					document.getElementById("ukupno-prikazanih-naloga").innerHTML	=	naloziToShow.length;
-					document.getElementById("zakazani-nalozi").innerHTML			=	zakazani;
-					document.getElementById("nalozi-za-finalizaciju").innerHTML		=	finalizacija;
-					document.getElementById("nalozi-za-vomu").innerHTML				=	voma;
-					document.getElementById("neizvrseni-nalozi").innerHTML			=	neizvrseni;
 				}
 
 				generateTable();

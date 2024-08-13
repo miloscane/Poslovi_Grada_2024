@@ -69,6 +69,7 @@
 										input.setAttribute("class","radnaJedinicaCheckbox");
 										input.setAttribute("value",user.opstine[i]);
 										input.setAttribute("oninput","generateTable()");
+										input.setAttribute("oncontextmenu","event.preventDefault();rightClickCheckbox(this)");
 										input.checked = true;
 										checkboxWrap.appendChild(input);
 									checkboxWrapper.appendChild(checkboxWrap);
@@ -77,6 +78,7 @@
 									label.setAttribute("class","label");
 									label.setAttribute("onclick","checkboxLabelClick(this)")
 									label.innerHTML	=	user.opstine[i];
+									label.setAttribute("oncontextmenu","event.preventDefault();rightClickCheckbox(this)");
 									checkboxWrapper.appendChild(label);
 								document.getElementById("filter-opstine-checkboxes").appendChild(checkboxWrapper);
 							}
@@ -87,6 +89,15 @@
 								}else{
 									elem.parentElement.getElementsByTagName("INPUT")[0].checked = true;
 								}
+								generateTable();
+							}
+
+							function rightClickCheckbox(elem){
+								var checkboxElems = elem.parentElement.parentElement.getElementsByTagName("INPUT");
+								for(var i=0;i<checkboxElems.length;i++){
+									checkboxElems[i].checked = false;
+								}
+								elem.parentElement.getElementsByTagName("INPUT")[0].checked = true;
 								generateTable();
 							}
 						</script>
