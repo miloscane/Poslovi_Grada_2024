@@ -5266,7 +5266,7 @@ server.post('/edit-nalog', async (req, res)=> {
 																				from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
 																				to: 'marija.slijepcevic@poslovigrada.rs',
 																				subject: 'Завршен враћен налог '+nalogJson.broj,
-																				html: 'Ћао Марија,<br>Враћен налог подизвођача је поново завршен.<br>Број налога: <a href=\"'+process.env.siteurl++'/nalog/'+nalogJson.broj+'\">'+nalogJson.broj+'</a><br>Позз.',
+																				html: 'Ћао Марија,<br>Враћен налог подизвођача је поново завршен.<br>Број налога: <a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">'+nalogJson.broj+'</a><br>Позз.',
 																			};
 
 																			transporter.sendMail(mailOptions, (error, info) => {
@@ -5363,7 +5363,7 @@ server.post('/edit-nalog', async (req, res)=> {
 											from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
 											to: 'marija.slijepcevic@poslovigrada.rs',
 											subject: 'Завршен враћен налог '+nalogJson.broj,
-											html: 'Ћао Марија,<br>Враћен налог подизвођача је поново завршен.<br>Број налога: <a href=\"'+process.env.siteurl++'/nalog/'+nalogJson.broj+'\">'+nalogJson.broj+'</a><br>Позз.',
+											html: 'Ћао Марија,<br>Враћен налог подизвођача је поново завршен.<br>Број налога: <a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">'+nalogJson.broj+'</a><br>Позз.',
 										};
 
 										transporter.sendMail(mailOptions, (error, info) => {

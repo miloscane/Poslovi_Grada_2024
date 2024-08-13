@@ -125,6 +125,7 @@
 					document.getElementById("ukupno-prikazanih-naloga").innerHTML = naloziToShow.length;
 					document.getElementById("table").innerHTML = "";
 					var table = document.createElement("TABLE");
+					naloziToShow.sort(function(a,b){return b.obracunatNaPortalu-a.obracunatNaPortalu});
 					for(var i=0;i<naloziToShow.length;i++){
 						var tr = document.createElement("TR");
 							var td = document.createElement("TD");
