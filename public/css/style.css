@@ -4558,6 +4558,29 @@ input[type=number] {
     font-weight:500;
 }
 
+.tv2Ekipe .barWrap{
+    padding:2px 0;
+    border:1px solid rgb(100,100,100);
+    border-radius:3px;
+    overflow:hidden;
+}
+
+.tv2Ekipe .barWrap .barFill{
+    height:2px;
+    background-color:rgb(0,150,0);
+}
+
+.tv2Ekipe .nalog {
+    position:relative;
+}
+
+.tv2Ekipe .nalog .statusIcon{
+    position:absolute;
+    top:2px;
+    right:2px;
+    width:15px;
+}
+
 #notifications{
     position:fixed;
     top:20px;

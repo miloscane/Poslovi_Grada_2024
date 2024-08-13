@@ -231,7 +231,25 @@
 										barWrap.setAttribute("class","inlineNalog barWrap");
 										barWrap.setAttribute("data-dolazak",dodeljivaniNalozi[j].vremeDolaska);
 										barWrap.setAttribute("data-radovi",dodeljivaniNalozi[j].vremeRadova);
-										barWrap.innerHTML = "<div class=\"barFill\"></div>";
+										var vremeDolaska = new Date();
+										vremeDolaska.setHours(Number(dodeljivaniNalozi[j].vremeDolaska.split(":")[0]),Number(dodeljivaniNalozi[j].vremeDolaska.split(":")[1]),0);
+										var vremeZavrsetka = new Date();
+										vremeZavrsetka = new Date(vremeDolaska.getTime()+Number(dodeljivaniNalozi[j].vremeRadova.split(":")[0])*3.6E6+Number(dodeljivaniNalozi[j].vremeRadova.split(":")[0])*60000);
+
+
+										var trenutnoVreme = new Date();
+										var procenat = (trenutnoVreme.getTime() - vremeDolaska.getTime()) / (vremeZavrsetka.getTime() - vremeDolaska.getTime())*100;
+										var color = procenat>98 && dodeljivaniNalozi[j].status!="Zavrseno" ? "rgb(150,0,0)" : "rgb(0,150,0)";
+										barWrap.innerHTML = "<div class=\"barFill\" style=\"width:"+procenat.toFixed(2)+"%;background-color:"+color+"\"></div>";
+										barWrap.setAttribute("style","width:100%");
+
+										if(dodeljivaniNalozi[j].status=="Zavrseno"){
+											var statusWrap = document.createElement("DIV");
+											statusWrap.setAttribute("class","statusIcon");
+											statusWrap.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png\">";
+											nalogElem.appendChild(statusWrap);
+										}
+
 										nalogElem.appendChild(barWrap);
 
 									majstorElems[i].getElementsByClassName("nalozi")[0].appendChild(nalogElem);
