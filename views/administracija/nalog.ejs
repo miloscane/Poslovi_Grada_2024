@@ -52,7 +52,20 @@
 								<option value="Storniran">Сторниран</option>
 							</select>
 						</div>
-						<div class="note"></div>
+						<div class="note">
+							<div id="podizvodjac-obracunat">
+								<input type="checkbox" id="obracunat-na-portalu" style="width:auto;width:20px;height:20px;" onclick="saveNalog()"> Обрачунат на порталу
+							</div>
+							<script>
+								console.log(nalog.obracunatNaPortalu)
+								if(nalog.obracunatNaPortalu){
+									document.getElementById("obracunat-na-portalu").checked = nalog.obracunatNaPortalu;
+								}
+								if(podizvodjaci.indexOf(nalog.majstor)<0){
+									document.getElementById("podizvodjac-obracunat").style.display="none";
+								}
+							</script>
+						</div>
 					</div>
 				</div>
 				<div class="box">
@@ -121,7 +134,7 @@
 						<div class="note" id="prijemnica-note"></div>
 					</div>
 					<script>
-						if(nalog.prijemnica.broj!=""){////////////////////////////
+						if(nalog.prijemnica.broj!=""){
 							document.getElementById("valid-status-icon").src = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png";
 							document.getElementById("valid-status-text").innerHTML = "Валидиран";
 							document.getElementById("valid-status-date").innerHTML = nalog.prijemnica.datum.datum;
@@ -508,6 +521,7 @@
 					nalogJson.broj = nalog.broj;
 					nalogJson.status = document.getElementById("status-naloga").value;
 					nalogJson.majstor = document.getElementById("majstor-naloga").value;
+					nalogJson.obracunatNaPortalu = document.getElementById("obracunat-na-portalu").checked;
 					nalogJson.obracun = [];
 					var obracuni = document.getElementById("obracun-wrap").getElementsByClassName("row");
 					var ukupanIznos = 0;
@@ -539,6 +553,7 @@
 					nalogJson.stariNalog.kategorijeRadova	=	nalog.kategorijeRadova ? nalog.kategorijeRadova : [];
 					document.getElementById("json").value = JSON.stringify(nalogJson);
 					loadGif();
+					console.log(nalogJson)
 					document.getElementById("form").submit();
 				}
 

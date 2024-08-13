@@ -236,7 +236,6 @@
 										var vremeZavrsetka = new Date();
 										vremeZavrsetka = new Date(vremeDolaska.getTime()+Number(dodeljivaniNalozi[j].vremeRadova.split(":")[0])*3.6E6+Number(dodeljivaniNalozi[j].vremeRadova.split(":")[0])*60000);
 
-
 										var trenutnoVreme = new Date();
 										var procenat = (trenutnoVreme.getTime() - vremeDolaska.getTime()) / (vremeZavrsetka.getTime() - vremeDolaska.getTime())*100;
 										var color = procenat>98 && dodeljivaniNalozi[j].status!="Zavrseno" ? "rgb(150,0,0)" : "rgb(0,150,0)";

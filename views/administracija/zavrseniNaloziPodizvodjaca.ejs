@@ -111,6 +111,7 @@
 							nalogToPush.adresa = nalozi[i].adresa;
 							nalogToPush.statusNaloga = nalozi[i].statusNaloga;
 							nalogToPush.majstor = nalozi[i].majstor;
+							nalogToPush.obracunatNaPortalu = nalozi[i].obracunatNaPortalu;
 							var ukupanIznos = 0;
 							for(var j=0;j<nalozi[i].obracun.length;j++){
 								ukupanIznos = ukupanIznos + parseFloat(getPriceItemByCode(nalozi[i].obracun[j].code).price)*parseFloat(nalozi[i].obracun[j].quantity);
@@ -143,7 +144,12 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value ikonica");
-								div.innerHTML = "<img src=''>";
+								if(naloziToShow[i].obracunatNaPortalu){
+									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png'>";
+								}else{
+									div.innerHTML = "<img src=''>";
+								}
+								
 								td.appendChild(div);
 							tr.appendChild(td);
 							

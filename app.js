@@ -2492,6 +2492,24 @@ request(geoCodeOptions, (error,response,body)=>{
 			console.log(error)
 		})*/
 
+		/*var naloziString = fs.readFileSync("nalozi.csv",{encoding:"utf8"});
+		var naloziArray = naloziString.split("\r\n");
+		naloziArray.splice(0,1);
+		console.log(naloziArray);
+		for(var i=0;i<naloziArray.length;i++){
+			naloziArray[i] = naloziArray[i].substring(0, naloziArray[i].length - 1);
+		}
+		var setObj	=	{ $set: {
+			obracunatNaPortalu: true
+		}};
+		naloziDB.updateMany({broj:{$in:naloziArray}},setObj)
+		.then((dbResponse)=>{
+			console.log(dbResponse)
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
+
 
 
 
@@ -5121,8 +5139,9 @@ server.post('/edit-nalog', async (req, res)=> {
 				    for(var i=0;i<req.files.length;i++){
 				    	izvestajJson.photos.push(req.files[i].transforms[0].location)
 				    }
-					if(nalogJson.status==nalogJson.stariNalog.statusNaloga && nalogJson.majstor==nalogJson.stariNalog.majstor && JSON.stringify(nalogJson.kategorijeRadova)==JSON.stringify(nalogJson.stariNalog.kategorijeRadova) && JSON.stringify(nalogJson.obracun)==JSON.stringify(nalogJson.stariNalog.obracun)){
+					if( nalogJson.obracunatNaPortalu==nalogJson.stariNalog.obracunatNaPortalu && nalogJson.status==nalogJson.stariNalog.statusNaloga && nalogJson.majstor==nalogJson.stariNalog.majstor && JSON.stringify(nalogJson.kategorijeRadova)==JSON.stringify(nalogJson.stariNalog.kategorijeRadova) && JSON.stringify(nalogJson.obracun)==JSON.stringify(nalogJson.stariNalog.obracun)){
 						//nema izmena na nalogu
+						console.log("BEZ IZEMANAAAA")
 						if(izvestajJson.izvestaj!="" || izvestajJson.photos.length>0){
 							//ima izvestaja
 							izvestajiDB.insertOne(izvestajJson)
@@ -5210,6 +5229,7 @@ server.post('/edit-nalog', async (req, res)=> {
 										obracun: nalogJson.obracun,
 										//kategorijeRadova: nalogJson.kategorijeRadova,
 										ukupanIznos: ukupanIznos,
+										obracunatNaPortalu: nalogJson.obracunatNaPortalu,
 										izmenio: req.session.user
 									}};
 
@@ -5310,6 +5330,7 @@ server.post('/edit-nalog', async (req, res)=> {
 								majstor: nalogJson.majstor,
 								obracun: nalogJson.obracun,
 								//kategorijeRadova: nalogJson.kategorijeRadova,
+								obracunatNaPortalu: nalogJson.obracunatNaPortalu,
 								ukupanIznos: ukupanIznos,
 								izmenio: req.session.user
 							}};
@@ -7608,11 +7629,24 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						if(nalogJSON.reqBody.note_details[0].kreirao_belesku.includes("stambeno") || nalogJSON.reqBody.note_details[0].kreirao_belesku.includes("STAMBENO")){
 							io.emit("notification","noviKomentar","<div class=\"title\">KOMENTAR STAMBENOG</div><div class=\"text\"><a href=\"/nalog/"+nalozi[0].broj+"\" target=\"blank\">"+nalozi[0].broj+"</a> - <span class=\"adresa\">"+nalozi[0].adresa+"</span> - <span class=\"radnaJedinica\">"+nalozi[0].radnaJedinica+"</span></span></div>",nalozi[0].radnaJedinica)
 						}
+						var testInsert = {};
+						testInsert.type = "TEST";
+						testInsert.json = reqBody.note_details[0];
+						stambeno2DB.insertOne(testInsert)
+						.then((dbResponse2)=>{
+							res.status(200);
+							res.setHeader('Content-Type', 'application/json');
+							var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+							res.send(JSON.stringify(primerJson));
+						})
+						.catch((error)=>{
+							logError(error);
+							res.status(501);
+							res.setHeader('Content-Type', 'application/json');
+							var primerJson = {"code":"501","message":"Neuspesan prijem beleske"}
+							res.send(JSON.stringify(primerJson));
+						})
 						
-						res.status(200);
-						res.setHeader('Content-Type', 'application/json');
-						var primerJson = {"code":"200","message":"Primio sam podatke za belesku.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-						res.send(JSON.stringify(primerJson));
 					})
 					.catch((error)=>{
 						logError(error);
