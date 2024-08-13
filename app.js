@@ -7718,7 +7718,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						}
 						var testInsert = {};
 						testInsert.type = "TEST";
-						testInsert.json = reqBody.note_details[0];
+						testInsert.json = nalogJson.reqBody.note_details[0];
 						stambeno2DB.insertOne(testInsert)
 						.then((dbResponse2)=>{
 							res.status(200);
