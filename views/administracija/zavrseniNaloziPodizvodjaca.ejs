@@ -111,7 +111,7 @@
 							nalogToPush.adresa = nalozi[i].adresa;
 							nalogToPush.statusNaloga = nalozi[i].statusNaloga;
 							nalogToPush.majstor = nalozi[i].majstor;
-							nalogToPush.obracunatNaPortalu = nalozi[i].obracunatNaPortalu;
+							nalogToPush.obracunatNaPortalu = nalozi[i].obracunatNaPortalu ? nalozi[i].obracunatNaPortalu : false;
 							var ukupanIznos = 0;
 							for(var j=0;j<nalozi[i].obracun.length;j++){
 								ukupanIznos = ukupanIznos + parseFloat(getPriceItemByCode(nalozi[i].obracun[j].code).price)*parseFloat(nalozi[i].obracun[j].quantity);
@@ -125,7 +125,8 @@
 					document.getElementById("ukupno-prikazanih-naloga").innerHTML = naloziToShow.length;
 					document.getElementById("table").innerHTML = "";
 					var table = document.createElement("TABLE");
-					naloziToShow.sort(function(a,b){return b.obracunatNaPortalu-a.obracunatNaPortalu});
+					naloziToShow.sort((a,b) => a.obracunatNaPortalu - b.obracunatNaPortalu);
+					
 					for(var i=0;i<naloziToShow.length;i++){
 						var tr = document.createElement("TR");
 							var td = document.createElement("TD");
