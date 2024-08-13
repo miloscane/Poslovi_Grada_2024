@@ -19,13 +19,27 @@
 			</div>
 			<div class="header">
 				<div class="identity">
-					<div class="pageWidth">
+					<div class="pageWidth" style="position:relative">
 						<div class="logo">
 							<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png" width="50">
 						</div>
 						<div class="naslov">
 							<div class="title">Послови Града</div>
 							<div class="subTitle">ВиК Портал</div>
+						</div>
+						<div class="brzaPretraga">
+							<input type="number" id="brza-pretraga-broj" oninput="brzaPretraga(this)" placeholder="Брза претрага налога">
+							<script>
+								function brzaPretraga(elem){
+									var brojNaloga = elem.value;
+									if(brojNaloga.toString().length==7){
+										if(!isNaN(Number(brojNaloga))){
+											loadGif()
+											window.location.href = "/nalog/"+brojNaloga;
+										}
+									}
+								}
+							</script>
 						</div>
 					</div>
 				</div>

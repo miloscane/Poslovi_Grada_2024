@@ -38,29 +38,7 @@
 
 					var statusToShow = "Svi";
 
-					/*for(var i=0;i<nalozi.length;i++){
-						//isfiltriraj ovde
-						if(opstineToShow.indexOf(nalozi[i].radnaJedinica)>=0){
-							var nalogToPush = {};
-							nalogToPush.broj = nalozi[i].broj;
-							nalogToPush.datum = nalozi[i].datum.datum;
-							nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
-							nalogToPush.adresa = nalozi[i].adresa;
-							nalogToPush.statusNaloga = nalozi[i].statusNaloga;
-							nalogToPush.majstor = nalozi[i].majstor;
-							
-							if(statusToShow=="Svi"){
-								naloziToShow.push(nalogToPush);
-							}else{
-								if(nalozi[i].statusNaloga==statusToShow){
-									naloziToShow.push(nalogToPush);
-								}
-							}
-							
-							
-						}
-						
-					}*/
+					
 					var naloziToShow = nalozi;
 
 					document.getElementById("table").innerHTML = "";

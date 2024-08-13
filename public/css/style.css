@@ -4581,6 +4581,45 @@ input[type=number] {
     width:15px;
 }
 
+.brzaPretraga{
+    position:absolute;
+    right:0;
+    top:50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.brzaPretraga input{
+    border:1px solid rgb(31,52,100);
+    color:rgb(100,100,100);
+    font-weight:500;
+    font-size:16px;
+    -webkit-transition:all ease 0.5s;
+    -moz-transition:all ease 0.5s;
+    -ms-transition:all ease 0.5s;
+    -o-transition:all ease 0.5s;
+    transition:all ease 0.5s;
+    box-shadow:2px 2px 2px rgba(0,0,0,0);
+    padding:5px 10px;
+    border-radius:3px;
+    outline:none;
+    width:200px;
+    font-weight:500;
+}
+
+.brzaPretraga input::placeholder{
+    opacity:0.4;
+    font-weight:200;
+}
+
+.brzaPretraga input:focus{
+    box-shadow:2px 2px 2px rgba(0,0,0,0.6);
+}
+
+
 #notifications{
     position:fixed;
     top:20px;
