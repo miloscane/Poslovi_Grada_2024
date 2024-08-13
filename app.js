@@ -5141,7 +5141,6 @@ server.post('/edit-nalog', async (req, res)=> {
 				    }
 					if( nalogJson.obracunatNaPortalu==nalogJson.stariNalog.obracunatNaPortalu && nalogJson.status==nalogJson.stariNalog.statusNaloga && nalogJson.majstor==nalogJson.stariNalog.majstor && JSON.stringify(nalogJson.kategorijeRadova)==JSON.stringify(nalogJson.stariNalog.kategorijeRadova) && JSON.stringify(nalogJson.obracun)==JSON.stringify(nalogJson.stariNalog.obracun)){
 						//nema izmena na nalogu
-						console.log("BEZ IZEMANAAAA")
 						if(izvestajJson.izvestaj!="" || izvestajJson.photos.length>0){
 							//ima izvestaja
 							izvestajiDB.insertOne(izvestajJson)
@@ -5262,7 +5261,25 @@ server.post('/edit-nalog', async (req, res)=> {
 																		logError(error);
 																		res.redirect("/nalog/"+nalogJson.broj);
 																	}else{
-																		res.redirect("/nalog/"+nalogJson.broj);
+																		if(nalogJson.stariNalog.status == "Vraćen" && nalogJson.status=="Završeno"){
+																			var mailOptions = {
+																				from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+																				to: 'marija.slijepcevic@poslovigrada.rs',
+																				subject: 'Завршен враћен налог '+nalogJson.broj,
+																				html: 'Ћао Марија,<br>Враћен налог подизвођача је поново завршен.<br>Број налога: <a href=\"'+process.env.siteurl++'/nalog/'+nalogJson.broj+'\">'+nalogJson.broj+'</a><br>Позз.',
+																			};
+
+																			transporter.sendMail(mailOptions, (error, info) => {
+																				if (error) {
+																					logError(error);
+																					res.redirect("/nalog/"+nalogJson.broj);
+																				}else{
+																					res.redirect("/nalog/"+nalogJson.broj);
+																				}
+																			});
+																		}else{
+																			res.redirect("/nalog/"+nalogJson.broj);
+																		}
 																	}
 																});
 															}else{
@@ -5341,7 +5358,26 @@ server.post('/edit-nalog', async (req, res)=> {
 								nalogJson.stariNalog.datetime = new Date().getTime();
 								istorijaNalogaDB.insertOne(nalogJson.stariNalog)
 								.then((dbResponse3)=>{
-									res.redirect("/nalog/"+nalogJson.broj);
+									if(nalogJson.stariNalog.status == "Vraćen" && nalogJson.status=="Završeno"){
+										var mailOptions = {
+											from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+											to: 'marija.slijepcevic@poslovigrada.rs',
+											subject: 'Завршен враћен налог '+nalogJson.broj,
+											html: 'Ћао Марија,<br>Враћен налог подизвођача је поново завршен.<br>Број налога: <a href=\"'+process.env.siteurl++'/nalog/'+nalogJson.broj+'\">'+nalogJson.broj+'</a><br>Позз.',
+										};
+
+										transporter.sendMail(mailOptions, (error, info) => {
+											if (error) {
+												logError(error);
+												res.redirect("/nalog/"+nalogJson.broj);
+											}else{
+												res.redirect("/nalog/"+nalogJson.broj);
+											}
+										});
+									}else{
+										res.redirect("/nalog/"+nalogJson.broj);
+									}
+									
 								})
 								.catch((error)=>{
 									logError(error);
