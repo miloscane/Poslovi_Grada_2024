@@ -1411,6 +1411,24 @@ request(geoCodeOptions, (error,response,body)=>{
 			}
 			cenovnik = prices;
 			console.log("Cenovnik inicijalizovan");
+
+			/*naloziDB.find({}).toArray()
+			.then((nalozi)=>{
+				var kategorije = [];
+				console.log("BROJ NALOGA PO MESECIMA:")
+				var meseci = [{str:"05.2024",ime:"Maj 2024",nalozi:0},{str:"06.2024",ime:"Jun 2024",nalozi:0},{str:"07.2024",ime:"Jul 2024",nalozi:0},{str:"08.2024",ime:"Avgust 2024",nalozi:0}];
+				for(var i=0;i<meseci.length;i++){
+					for(var j=0;j<nalozi.length;j++){
+						if(nalozi[j].datum.datum.includes(meseci[i].str)){
+							meseci[i].nalozi++;
+						}
+					}
+					console.log(meseci[i].ime + ": " + meseci[i].nalozi);
+				}
+			})
+			.catch((error)=>{
+				console.log(error);
+			})*/
 			/*naloziDB.find({}).toArray()
 			.then((nalozi)=>{
 				var filterNalozi = [];
@@ -2416,7 +2434,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
-						if(nalozi[i].prijemnica.datum.datum.includes(".07.2024")){
+						if(nalozi[i].prijemnica.datum.datum.includes(".08.2024")){
 							naloziToExport.push(nalozi[i])
 						}
 					}
@@ -2510,6 +2528,34 @@ request(geoCodeOptions, (error,response,body)=>{
 			console.log(error);
 		})*/
 
+		/*izvestajiDB.find({"user.name":{$regex:"PORTAL"},datum:"15.08.2024"}).toArray()
+		.then((izvestaji)=>{
+			console.log("Ukupno izvestaja: " + izvestaji.length)
+			var duplicates = [];
+			for(var i=0;i<izvestaji.length;i++){
+				for(var j=0;j<izvestaji.length;j++){
+					if(izvestaji[i].izvestaj==izvestaji[j].izvestaj && izvestaji[i].uniqueId!=izvestaji[j].uniqueId){
+						if(duplicates.indexOf(izvestaji[j].uniqueId)<0){
+							duplicates.push(izvestaji[j].uniqueId);
+						}
+					}
+				}
+			}
+			console.log("Dupliranih: "+duplicates.length);
+			izvestajiDB.deleteMany({uniqueId:{$in:duplicates}})
+			.then((dbResponse)=>{
+				console.log(dbResponse)
+			})
+			.catch((error)=>{
+				console.log(error)
+			})
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
+
+
+		
 
 
 
@@ -8060,6 +8106,7 @@ server.get('/tv', async (req, res)=> {
 			}
 		}
 		var today = new Date();
+		today.setDate(today.getDate()-1);
 		prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
 		.then((prisustvo)=>{
 			pomocniciDB.find({}).toArray()
@@ -8288,12 +8335,37 @@ server.get('/magacin/ekipe', async (req, res)=> {
 			.then((pomocnici)=>{
 				majstoriDB.find({}).toArray()
 				.then((majstori)=>{
-					res.render("magacioner/ekipe",{
-						pageTitle: "Екипе",
-						user: req.session.user,
-						pomocnici: pomocnici,
-						majstori: majstori
-					});
+					prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(yesterday)}).toArray()
+					.then((prisustvoJuce)=>{
+						prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(yesterday)}).toArray()
+						.then((prisustvoDanas)=>{
+							res.render("magacioner/ekipe",{
+								pageTitle: "Екипе",
+								user: req.session.user,
+								pomocnici: pomocnici,
+								prisustvoJuce: prisustvoJuce[0],
+								prisustvoDanas: prisustvoDanas[0],
+								majstori: majstori
+							});
+						})
+						.catch((error)=>{
+							logError(error);
+							res.render("message",{
+			          pageTitle: "Грешка",
+			          user: req.session.user,
+			          message: "<div class=\"text\">Грешка у бази података 7622.</div>"
+			        });
+						})
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+		          pageTitle: "Грешка",
+		          user: req.session.user,
+		          message: "<div class=\"text\">Грешка у бази података 7622.</div>"
+		        });
+					})
+					
 				})
 			})
 			.catch((error)=>{
@@ -8932,7 +9004,9 @@ io.on('connection', function(socket){
 						}
 					});		
 				});
-				dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(new Date())}).toArray()
+				var today = new Date();
+				today.setDate(today.getDate()-1);
+				dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
 				.then((dodeljivaniNalozi)=>{
 					naloziDB.find({statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Storniran"]}}).toArray()
 					.then((nedodeljeniNalozi)=>{

@@ -4661,6 +4661,53 @@ input[type=number] {
     font-style:italic;
 }
 
+.tv2Ekipe .opstine{
+    display:flex;
+    flex-wrap: wrap;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+}
+
+.tv2Ekipe .opstine .opstina{
+    width: calc(33.333% - 20px);
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    margin:5px;
+    padding:20px;
+    padding-top:30px;
+    position:relative;
+    border:2px solid rgb(32,51,100);
+}
+
+
+.tv2Ekipe .opstine .opstina .title{
+    position:absolute;
+    top:5px;
+    left:5px;
+    font-size:16px;
+    font-weight:700;
+}
+
+
+.tv2Ekipe .opstine .majstoriNaOpstini{
+    display:flex;
+    flex-wrap: wrap;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+}
+
+.tv2Ekipe .opstine .majstoriNaOpstini .majstor{
+    width: 150px;
+    -webkit-box-flex: 1;
+    margin:5px;
+    padding:5px;
+    position:relative;
+    border:1px solid rgba(32,51,100,0.3);
+}
+
+.tv2Ekipe .opstine .majstoriNaOpstini .majstor .ime{
+    font-size:14px;
+}
 
 
 @media screen and (max-width: 1100px) {
