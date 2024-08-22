@@ -4526,6 +4526,22 @@ input[type=number] {
     font-size:10px;
 }
 
+.ekipe .trecaLica{
+    text-align:left;
+}
+
+.ekipe .trecaLica .bolded{
+    display:inline-block;
+    vertical-align: middle;
+    font-size:10px;
+    padding-right:5px;
+}
+
+.ekipe .trecaLica .trecaLicaWrap{
+    display:inline-block;
+    vertical-align: middle;
+}
+
 .tv2Ekipe .majstor .nalozi .nalog{
     font-size:0;
     maring-bottom:4px;
@@ -4707,6 +4723,15 @@ input[type=number] {
 
 .tv2Ekipe .opstine .majstoriNaOpstini .majstor .ime{
     font-size:14px;
+}
+
+.tv2Ekipe .opstine .majstoriNaOpstini .majstor .tip{
+    background-color:rgb(32,51,100);
+    color:rgb(255,255,255);
+    padding:2px;
+    text-align:center;
+    font-size:12px;
+    font-weight:600;
 }
 
 

@@ -30,19 +30,6 @@
 							majstorBlok.appendChild(imeMajstora);
 
 							var inlines = document.createElement("DIV");
-							inlines.setAttribute("class","inlines");
-								var inline = document.createElement("DIV");
-								inline.setAttribute("class","inline");
-								inline.innerHTML = "Присутан:";
-								inlines.appendChild(inline);
-								
-								var inline = document.createElement("DIV");
-								inline.setAttribute("class","inline");
-								inline.innerHTML = "";
-								inlines.appendChild(inline);
-							majstorBlok.appendChild(inlines);
-
-							var inlines = document.createElement("DIV");
 							inlines.setAttribute("class","pomocnik");
 								var inline = document.createElement("DIV");
 								inline.setAttribute("class","bolded");
@@ -51,6 +38,19 @@
 								
 								var inline = document.createElement("DIV");
 								inline.setAttribute("class","selectWrap");
+								inlines.appendChild(inline);
+							majstorBlok.appendChild(inlines);
+
+							var inlines = document.createElement("DIV");
+							inlines.setAttribute("class","trecaLica");
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","bolded");
+								inline.innerHTML = "Трећа лица:";
+								inlines.appendChild(inline);
+								
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","trecaLicaWrap");
+								inline.innerHTML = "<input type=\"checkbox\" class=\"trecaLicaBox\">"
 								inlines.appendChild(inline);
 							majstorBlok.appendChild(inlines);
 						document.getElementById("majstori").appendChild(majstorBlok);
@@ -226,26 +226,30 @@
 					}
 					var majstoriElems = document.getElementsByClassName("majstor");
 					for(var i=0;i<majstoriElems.length;i++){
-						majstoriElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
+						//majstoriElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
 						majstoriElems[i].dataset.prisutan = 0;
+						majstoriElems[i].getElementsByClassName("ime")[0].style.color = "rgb(150,0,0)";
 					}
 					for(var i=0;i<prisustvo.length;i++){
 						for(var j=0;j<majstoriElems.length;j++){
 							if(Number(majstoriElems[j].dataset.brojkartice)==Number(prisustvo[i].broj)){
-								majstoriElems[j].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
+								//majstoriElems[j].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
 								majstoriElems[j].dataset.prisutan = 1;
+								majstoriElems[j].getElementsByClassName("ime")[0].style.color = "rgb(0,150,0)";
 							}
 						}
 					}
 
 					var pomocniciElems = document.getElementsByClassName("pomocnikWrap");
 					for(var i=0;i<pomocniciElems.length;i++){
-						pomocniciElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
+						//pomocniciElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
+						pomocniciElems[i].getElementsByClassName("ime")[0].style.color = "rgb(150,0,0)";
 					}
 					for(var i=0;i<prisustvo.length;i++){
 						for(var j=0;j<pomocniciElems.length;j++){
 							if(Number(pomocniciElems[j].dataset.brojkartice)==Number(prisustvo[i].broj)){
-								pomocniciElems[j].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
+								//pomocniciElems[j].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
+								pomocniciElems[j].getElementsByClassName("ime")[0].style.color = "rgb(0,150,0)";
 							}
 						}
 					}
@@ -280,18 +284,22 @@
 
 			function saveForm(){
 				if(Number(document.getElementById("majstori").dataset.initialized) == 1){
-					var jsonArray = [];
+					var jsonObject = {};
+					jsonObject.ekipe = [];
+					jsonObject.pomocnici = prisutniPomocnici;
 					var majstoriElems = document.getElementsByClassName("majstor");
 					for(var i=0;i<majstoriElems.length;i++){
 						var json = {};
 						json.idMajstora = majstoriElems[i].dataset.id;
 						json.prisutan = majstoriElems[i].dataset.prisutan;
-						json.pomocnik = majstoriElems[i].getElementsByTagName("SELECT")[0].value;
-						jsonArray.push(json);
+						json.pomocnik = majstoriElems[i].getElementsByClassName("pomocnikSelect")[0].value;
+						json.trecaLica = majstoriElems[i].getElementsByClassName("trecaLicaBox")[0].checked;
+						jsonObject.ekipe.push(json);
 					}
-					document.getElementById("json").value = JSON.stringify(jsonArray);
-					document.getElementById("form").submit();
-					loadGif();	
+					document.getElementById("json").value = JSON.stringify(jsonObject);
+					console.log(jsonObject)
+					//document.getElementById("form").submit();
+					//loadGif();	
 				}else{
 					alert("Погрешан документ.")
 				}

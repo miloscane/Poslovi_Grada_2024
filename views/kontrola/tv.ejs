@@ -23,73 +23,217 @@
 		var magacin = {lat:44.813906,lng:20.443903};
 		var statusi = [{naziv:"Кренуо",value:"Odlazak"},{naziv:"Стигао",value:"Dolazak"},{naziv:"Завршио",value:"Zavrseno"}]
 	</script>
-	<div class="pageWidth" id="prisustvo" style="width:100vw">
-		<div class="ekipe">
+	<div class="pageWidth tv2Ekipe" id="prisustvo" style="width:100vw">
+		<!--<div class="ekipe">
 			<div id="ekipe" class="flex tv2Ekipe"></div>
-		</div>
+		</div>-->
+		<div class="opstine" id="opstine"></div>
 		<script>
-			for(var i=0;i<majstori.length;i++){
-				var majstorBlok = document.createElement("DIV");
-				majstorBlok.setAttribute("class","majstor flexBox");
-				majstorBlok.setAttribute("data-id",majstori[i].uniqueId);
-					var imeMajstora = document.createElement("DIV");
-					imeMajstora.setAttribute("class","ime");
-					imeMajstora.innerHTML = majstori[i].ime.split(" ")[0] + "<br>" + majstori[i].ime.split(" ")[1];
-					majstorBlok.appendChild(imeMajstora);
+			for(var i=0;i<radneJedinice.length;i++){
+				var opstina = document.createElement("DIV");
+				opstina.setAttribute("class","opstina");
+				opstina.setAttribute("data-opstina",radneJedinice[i]);
+					var majstoriNaOpstini = document.createElement("DIV");
+					majstoriNaOpstini.setAttribute("class","majstoriNaOpstini");
+					opstina.appendChild(majstoriNaOpstini);
 
-					var inlines = document.createElement("DIV");
-					inlines.setAttribute("class","inlines");
-						var inline = document.createElement("DIV");
-						inline.setAttribute("class","inline");
-						inline.innerHTML = "Присутан:";
-						inlines.appendChild(inline);
-						
-						var inline = document.createElement("DIV");
-						inline.setAttribute("class","inline");
-						inline.innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
-						if(prisustvo.length>0){
-							for(var j=0;j<prisustvo[0].prisustvo.length;j++){
-								if(prisustvo[0].prisustvo[j].idMajstora==majstori[i].uniqueId){
-									if(Number(prisustvo[0].prisustvo[j].prisutan)==1){
-										inline.innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
-									}
+					var title = document.createElement("DIV");
+					title.setAttribute("class","title");
+					title.innerHTML = radneJedinice[i];
+					opstina.appendChild(title);
+				document.getElementById("opstine").appendChild(opstina);
+			}
+
+			var opstina = document.createElement("DIV");
+			opstina.setAttribute("class","opstina");
+			opstina.setAttribute("data-opstina","Slobodni");
+				var majstoriNaOpstini = document.createElement("DIV");
+				majstoriNaOpstini.setAttribute("class","majstoriNaOpstini");
+				majstoriNaOpstini.setAttribute("id","slobodni");
+				opstina.appendChild(majstoriNaOpstini);
+
+				var title = document.createElement("DIV");
+				title.setAttribute("class","title");
+				title.innerHTML = "SLOBODNI";
+				opstina.appendChild(title);
+			document.getElementById("opstine").appendChild(opstina);
+
+			var opstina = document.createElement("DIV");
+			opstina.setAttribute("class","opstina");
+			opstina.setAttribute("data-opstina","Odsutni");
+				var majstoriNaOpstini = document.createElement("DIV");
+				majstoriNaOpstini.setAttribute("class","majstoriNaOpstini");
+				majstoriNaOpstini.setAttribute("id","odsutni");
+				opstina.appendChild(majstoriNaOpstini);
+
+				var title = document.createElement("DIV");
+				title.setAttribute("class","title");
+				title.innerHTML = "ODSUTNI";
+				opstina.appendChild(title);
+			document.getElementById("opstine").appendChild(opstina);
+
+
+
+			var opstineElems = document.getElementsByClassName("opstina");
+
+			function generateBoxes(dodeljivaniNalozi){
+				for(var i=0;i<opstineElems.length;i++){
+					opstineElems[i].getElementsByClassName("majstoriNaOpstini")[0].innerHTML = "";
+				}
+				var neprisutni = [];
+				var slobodni = [];
+				for(var i=0;i<majstori.length;i++){
+					var prisutan = false;
+					if(prisustvo.length>0){
+						for(var j=0;j<prisustvo[0].prisustvo.length;j++){
+							if(prisustvo[0].prisustvo[j].idMajstora==majstori[i].uniqueId){
+								if(Number(prisustvo[0].prisustvo[j].prisutan)==1){
+									prisutan = true;
 								}
 							}
 						}
-						inlines.appendChild(inline);
-					majstorBlok.appendChild(inlines);
+					}
+					if(prisutan){	
+						var majstorBlok = document.createElement("DIV");
+						majstorBlok.setAttribute("class","majstor flexBox");
+						majstorBlok.setAttribute("data-id",majstori[i].uniqueId);
+							var tipMajstora = document.createElement("DIV");
+							tipMajstora.setAttribute("class","tip");
+							tipMajstora.innerHTML = majstori[i].tip ? majstori[i].tip : "VIK";
+							majstorBlok.appendChild(tipMajstora);
 
-					var inlines = document.createElement("DIV");
-					inlines.setAttribute("class","pomocnik");
-						var inline = document.createElement("DIV");
-						inline.setAttribute("class","bolded");
-						inline.innerHTML = "Помоћник:";
-						inlines.appendChild(inline);
-						
-						var inline = document.createElement("DIV");
-						inline.setAttribute("class","selectWrap");
-						inline.innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕМА</span>";
-						if(prisustvo.length>0){
-							for(var j=0;j<prisustvo[0].prisustvo.length;j++){
-								if(prisustvo[0].prisustvo[j].idMajstora==majstori[i].uniqueId){
-									if(Number(prisustvo[0].prisustvo[j].pomocnik)>0){
-										for(var k=0;k<pomocnici.length;k++){
-											if(Number(pomocnici[k].broj)==Number(prisustvo[0].prisustvo[j].pomocnik)){
-												inline.innerHTML = "<span style=\"color:rgb(0,150,0)\">"+pomocnici[k].ime+"</span>";
+							var imeMajstora = document.createElement("DIV");
+							imeMajstora.setAttribute("class","ime");
+							imeMajstora.innerHTML = majstori[i].ime.split(" ")[0] + "<br>" + majstori[i].ime.split(" ")[1];
+							majstorBlok.appendChild(imeMajstora);
+
+							var inlines = document.createElement("DIV");
+							inlines.setAttribute("class","pomocnik");
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","bolded");
+								inline.innerHTML = "Помоћник:";
+								inlines.appendChild(inline);
+								
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","selectWrap");
+								inline.innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕМА</span>";
+								if(prisustvo.length>0){
+									for(var j=0;j<prisustvo[0].prisustvo.length;j++){
+										if(prisustvo[0].prisustvo[j].idMajstora==majstori[i].uniqueId){
+											if(Number(prisustvo[0].prisustvo[j].pomocnik)>0){
+												for(var k=0;k<pomocnici.length;k++){
+													if(Number(pomocnici[k].broj)==Number(prisustvo[0].prisustvo[j].pomocnik)){
+														inline.innerHTML = "<span style=\"color:rgb(0,150,0)\">"+pomocnici[k].ime+"</span>";
+													}
+												}
 											}
 										}
 									}
 								}
-							}
-						}
-						inlines.appendChild(inline);
-					majstorBlok.appendChild(inlines);
+								inlines.appendChild(inline);
+							majstorBlok.appendChild(inlines);
 
-					var naloziElem = document.createElement("DIV");
-					naloziElem.setAttribute("class","nalozi");
-					majstorBlok.appendChild(naloziElem);
-				document.getElementById("ekipe").appendChild(majstorBlok);
+							var naloziElem = document.createElement("DIV");
+							naloziElem.setAttribute("class","nalozi");
+							var poslednjaOpstina = false;
+							for(var j=0;j<dodeljivaniNalozi.length;j++){
+								if(Number(dodeljivaniNalozi[j].deleted)!=1){
+									if(dodeljivaniNalozi[j].majstor==majstori[i].uniqueId){
+										poslednjaOpstina = dodeljivaniNalozi[i].radnaJedinica;
+										var nalogElem = document.createElement("DIV");
+										nalogElem.setAttribute("class","nalog");
+											var broj = document.createElement("DIV");
+											broj.setAttribute("class","inlineNalog broj");
+											broj.innerHTML = dodeljivaniNalozi[j].nalog;
+											nalogElem.appendChild(broj);
+											
+											var radnaJedinica = document.createElement("DIV");
+											radnaJedinica.setAttribute("class","inlineNalog radnaJedinica");
+											radnaJedinica.innerHTML = dodeljivaniNalozi[j].radnaJedinica;
+											nalogElem.appendChild(radnaJedinica);
+
+											var breakElem = document.createElement("DIV");
+											breakElem.setAttribute("class","break");
+											nalogElem.appendChild(breakElem);
+
+											var dolazak = document.createElement("DIV");
+											dolazak.setAttribute("class","inlineNalog dolazak");
+											dolazak.innerHTML = dodeljivaniNalozi[j].vremeDolaska ? dodeljivaniNalozi[j].vremeDolaska : "";
+											nalogElem.appendChild(dolazak);
+
+											var radovi = document.createElement("DIV");
+											radovi.setAttribute("class","inlineNalog radovi");
+											radovi.innerHTML = dodeljivaniNalozi[j].vremeRadova ? dodeljivaniNalozi[j].vremeRadova : "";
+											nalogElem.appendChild(radovi);
+
+											var statusElem = document.createElement("DIV");
+											statusElem.setAttribute("class","inlineNalog status");
+											var statusString = "";
+											for(var k=0;k<statusi.length;k++){
+												if(statusi[k].value==dodeljivaniNalozi[j].status){
+													statusString = statusi[k].naziv;
+												}
+											}
+											statusElem.innerHTML = statusString;
+											nalogElem.appendChild(statusElem);
+
+											var breakElem = document.createElement("DIV");
+											breakElem.setAttribute("class","break");
+											nalogElem.appendChild(breakElem);
+
+											var barWrap = document.createElement("DIV");
+											barWrap.setAttribute("class","inlineNalog barWrap");
+											barWrap.setAttribute("data-dolazak",dodeljivaniNalozi[j].vremeDolaska);
+											barWrap.setAttribute("data-radovi",dodeljivaniNalozi[j].vremeRadova);
+											var vremeDolaska = new Date();
+											vremeDolaska.setHours(Number(dodeljivaniNalozi[j].vremeDolaska.split(":")[0]),Number(dodeljivaniNalozi[j].vremeDolaska.split(":")[1]),0);
+											var vremeZavrsetka = new Date();
+											vremeZavrsetka = new Date(vremeDolaska.getTime()+Number(dodeljivaniNalozi[j].vremeRadova.split(":")[0])*3.6E6+Number(dodeljivaniNalozi[j].vremeRadova.split(":")[0])*60000);
+
+											var trenutnoVreme = new Date();
+											var procenat = (trenutnoVreme.getTime() - vremeDolaska.getTime()) / (vremeZavrsetka.getTime() - vremeDolaska.getTime())*100;
+											var color = procenat>98 && dodeljivaniNalozi[j].status!="Zavrseno" ? "rgb(150,0,0)" : "rgb(0,150,0)";
+											barWrap.innerHTML = "<div class=\"barFill\" style=\"width:"+procenat.toFixed(2)+"%;background-color:"+color+"\"></div>";
+											barWrap.setAttribute("style","width:100%");
+
+											if(dodeljivaniNalozi[j].status=="Zavrseno"){
+												var statusWrap = document.createElement("DIV");
+												statusWrap.setAttribute("class","statusIcon");
+												statusWrap.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png\">";
+												nalogElem.appendChild(statusWrap);
+											}
+
+											nalogElem.appendChild(barWrap);
+
+										naloziElem.appendChild(nalogElem);
+									}
+								}
+							}
+						majstorBlok.appendChild(naloziElem);
+						if(poslednjaOpstina){
+							for(var j=0;j<opstineElems.length;j++){
+								if(opstineElems[j].dataset.opstina==poslednjaOpstina){
+									opstineElems[j].getElementsByClassName("majstoriNaOpstini")[0].appendChild(majstorBlok);
+								}
+							}
+						}else{
+							slobodni.push(majstori[i].ime)
+						}
+					}else{
+						neprisutni.push(majstori[i].ime);
+						//console.log(majstori[i].ime)
+					}
+				}
+
+				for(var i=0;i<neprisutni.length;i++){
+					document.getElementById("odsutni").innerHTML += neprisutni[i]+"<br>";
+				}
+
+				for(var i=0;i<slobodni.length;i++){
+					document.getElementById("slobodni").innerHTML += slobodni[i]+"<br>";
+				}
 			}
+			
 		</script>
 	</div>
 	<div class="pageWidth" style="position:relative;display:none" id="mapa">
@@ -154,7 +298,7 @@
 			socket.emit("lokacijaTv2",1)
 			setInterval(function(){
 				socket.emit("lokacijaTv2",1)
-			},360000)
+			},300000)
 
 			markers = [];
 
@@ -173,11 +317,16 @@
 			socket.on("ekipeStigle",function(){
 				loadGif();
 				location.reload();
-			})
+			});
 
 			socket.on("lokacijaTv2",function(allVehicleStops,navigacijaInfo,dodeljivaniNalozi,nedodeljeniNalozi){
 				try{
-					var majstorElems = document.getElementsByClassName("majstor");
+					console.log(dodeljivaniNalozi)
+					generateBoxes(dodeljivaniNalozi);
+
+
+
+					/*var majstorElems = document.getElementsByClassName("majstor");
 					for(var i=0;i<majstorElems.length;i++){
 						majstorElems[i].getElementsByClassName("nalozi")[0].innerHTML = "";
 						for(var j=0;j<dodeljivaniNalozi.length;j++){
@@ -231,14 +380,31 @@
 										barWrap.setAttribute("class","inlineNalog barWrap");
 										barWrap.setAttribute("data-dolazak",dodeljivaniNalozi[j].vremeDolaska);
 										barWrap.setAttribute("data-radovi",dodeljivaniNalozi[j].vremeRadova);
-										barWrap.innerHTML = "<div class=\"barFill\"></div>";
+										var vremeDolaska = new Date();
+										vremeDolaska.setHours(Number(dodeljivaniNalozi[j].vremeDolaska.split(":")[0]),Number(dodeljivaniNalozi[j].vremeDolaska.split(":")[1]),0);
+										var vremeZavrsetka = new Date();
+										vremeZavrsetka = new Date(vremeDolaska.getTime()+Number(dodeljivaniNalozi[j].vremeRadova.split(":")[0])*3.6E6+Number(dodeljivaniNalozi[j].vremeRadova.split(":")[0])*60000);
+
+										var trenutnoVreme = new Date();
+										var procenat = (trenutnoVreme.getTime() - vremeDolaska.getTime()) / (vremeZavrsetka.getTime() - vremeDolaska.getTime())*100;
+										var color = procenat>98 && dodeljivaniNalozi[j].status!="Zavrseno" ? "rgb(150,0,0)" : "rgb(0,150,0)";
+										barWrap.innerHTML = "<div class=\"barFill\" style=\"width:"+procenat.toFixed(2)+"%;background-color:"+color+"\"></div>";
+										barWrap.setAttribute("style","width:100%");
+
+										if(dodeljivaniNalozi[j].status=="Zavrseno"){
+											var statusWrap = document.createElement("DIV");
+											statusWrap.setAttribute("class","statusIcon");
+											statusWrap.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png\">";
+											nalogElem.appendChild(statusWrap);
+										}
+
 										nalogElem.appendChild(barWrap);
 
 									majstorElems[i].getElementsByClassName("nalozi")[0].appendChild(nalogElem);
 								}
 							}
 						}
-					}
+					}*/
 					//console.log(navigacijaInfo)
 					for(var i=0;i<markers.length;i++){
 						markers[i].setMap(null);

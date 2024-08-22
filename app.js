@@ -1416,14 +1416,101 @@ request(geoCodeOptions, (error,response,body)=>{
 			.then((nalozi)=>{
 				var kategorije = [];
 				console.log("BROJ NALOGA PO MESECIMA:")
-				var meseci = [{str:"05.2024",ime:"Maj 2024",nalozi:0},{str:"06.2024",ime:"Jun 2024",nalozi:0},{str:"07.2024",ime:"Jul 2024",nalozi:0},{str:"08.2024",ime:"Avgust 2024",nalozi:0}];
+				var meseci = [{str:"05.2024",ime:"Maj 2024",nalozi:0,podizvodjaci:0,naloziPG:0,lokalniKvarPG:0,lokalniKvarPodizvodjaci:0,odgusenjePG:0,odgusenjePodizvodjaci:0,crpljenjePG:0,crpljenjePodizvodjaci:0,liftPG:0,liftPodizvodjaci:0},{str:"06.2024",ime:"Jun 2024",nalozi:0,podizvodjaci:0,naloziPG:0,lokalniKvarPG:0,lokalniKvarPodizvodjaci:0,odgusenjePG:0,odgusenjePodizvodjaci:0,crpljenjePG:0,crpljenjePodizvodjaci:0,liftPG:0,liftPodizvodjaci:0},{str:"07.2024",ime:"Jul 2024",nalozi:0,podizvodjaci:0,naloziPG:0,lokalniKvarPG:0,lokalniKvarPodizvodjaci:0,odgusenjePG:0,odgusenjePodizvodjaci:0,crpljenjePG:0,crpljenjePodizvodjaci:0,liftPG:0,liftPodizvodjaci:0},{str:"08.2024",ime:"Avgust 2024",nalozi:0,podizvodjaci:0,naloziPG:0,lokalniKvarPG:0,lokalniKvarPodizvodjaci:0,odgusenjePG:0,odgusenjePodizvodjaci:0,crpljenjePG:0,crpljenjePodizvodjaci:0,liftPG:0,liftPodizvodjaci:0}];
 				for(var i=0;i<meseci.length;i++){
 					for(var j=0;j<nalozi.length;j++){
+						var lokalniKvar = false;
+						for(var k=0;k<nalozi[j].obracun.length;k++){
+							if(nalozi[j].obracun.length==2){
+								if((nalozi[j].obracun[0].code=="80.04.01.002" || nalozi[j].obracun[0].code=="80.04.01.005") && (nalozi[j].obracun[1].code=="80.04.01.002" || nalozi[j].obracun[1].code=="80.04.01.005")){
+									lokalniKvar = true;
+								}
+							}
+						}
+						var odgusenje = false;
+
+						for(var k=0;k<nalozi[j].obracun.length;k++){
+							if(nalozi[j].obracun[k].code=="80.02.09.005"){
+								if(parseFloat(nalozi[j].ukupanIznos)<20000){
+									odgusenje = true;
+								}
+							}
+						}
+
+						var crpljenje = false;
+
+						for(var k=0;k<nalozi[j].obracun.length;k++){
+							if(nalozi[j].obracun[k].code=="80.02.09.019"){
+									crpljenje = true;
+							}
+						}
+
+						var lift = false;
+
+						for(var k=0;k<nalozi[j].obracun.length;k++){
+							if(nalozi[j].obracun[k].code=="80.02.09.009"){
+									lift = true;
+							}
+						}
+
 						if(nalozi[j].datum.datum.includes(meseci[i].str)){
 							meseci[i].nalozi++;
+							if(podizvodjaci.indexOf(nalozi[j].majstor)>=0){
+								meseci[i].podizvodjaci++;
+								if(lokalniKvar){
+									meseci[i].lokalniKvarPodizvodjaci++;
+								}
+
+								if(odgusenje){
+									meseci[i].odgusenjePodizvodjaci++;
+								}
+
+								if(crpljenje){
+									meseci[i].crpljenjePodizvodjaci++;
+								}
+
+								if(lift){
+									meseci[i].liftPodizvodjaci++;
+								}
+							}else{
+								meseci[i].naloziPG++;
+								if(lokalniKvar){
+									meseci[i].lokalniKvarPG++;
+								}
+
+								if(odgusenje){
+									meseci[i].odgusenjePG++;
+								}
+
+								if(crpljenje){
+									meseci[i].crpljenjePG++;
+								}
+
+								if(lift){
+									meseci[i].liftPG++;
+								}
+							}
 						}
+
+
 					}
-					console.log(meseci[i].ime + ": " + meseci[i].nalozi);
+					console.log(meseci[i].ime);
+					console.log("Ukupno naloga: " + meseci[i].nalozi);
+					console.log("Poslovi Grada: " + meseci[i].naloziPG);
+					console.log("Podizvodjaci: " + meseci[i].podizvodjaci);
+					console.log("------");
+					console.log("Lokalni Kvar PG: " + meseci[i].lokalniKvarPG);
+					console.log("Lokalni Kvar Podizvodjaci: " + meseci[i].lokalniKvarPodizvodjaci);
+					console.log("------");
+					console.log("Odgusenje PG: " + meseci[i].odgusenjePG);
+					console.log("Odgusenje Podizvodjaci: " + meseci[i].odgusenjePodizvodjaci);
+					console.log("------");
+					console.log("Crpljenje PG: " + meseci[i].crpljenjePG);
+					console.log("Crpljenje Podizvodjaci: " + meseci[i].crpljenjePodizvodjaci);
+					console.log("------");
+					console.log("Lift PG: " + meseci[i].liftPG);
+					console.log("Lift Podizvodjaci: " + meseci[i].liftPodizvodjaci);
+					console.log("**********************************************")
 				}
 			})
 			.catch((error)=>{
@@ -8112,7 +8199,7 @@ server.get('/tv', async (req, res)=> {
 			pomocniciDB.find({}).toArray()
 			.then((pomocnici)=>{
 				res.render("tv",{
-			    pageTitle: "Мапа",
+			    pageTitle: "Екипе",
 			    prisustvo: prisustvo,
 			    pomocnici: pomocnici,
 			    majstori: majstori

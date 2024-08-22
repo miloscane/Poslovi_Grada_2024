@@ -97,6 +97,11 @@
 						var majstorBlok = document.createElement("DIV");
 						majstorBlok.setAttribute("class","majstor flexBox");
 						majstorBlok.setAttribute("data-id",majstori[i].uniqueId);
+							var tipMajstora = document.createElement("DIV");
+							tipMajstora.setAttribute("class","tip");
+							tipMajstora.innerHTML = majstori[i].tip ? majstori[i].tip : "VIK";
+							majstorBlok.appendChild(tipMajstora);
+
 							var imeMajstora = document.createElement("DIV");
 							imeMajstora.setAttribute("class","ime");
 							imeMajstora.innerHTML = majstori[i].ime.split(" ")[0] + "<br>" + majstori[i].ime.split(" ")[1];
