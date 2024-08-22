@@ -8106,7 +8106,7 @@ server.get('/tv', async (req, res)=> {
 			}
 		}
 		var today = new Date();
-		today.setDate(today.getDate()-1);
+		//today.setDate(today.getDate()-1);
 		prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
 		.then((prisustvo)=>{
 			pomocniciDB.find({}).toArray()
@@ -9005,7 +9005,7 @@ io.on('connection', function(socket){
 					});		
 				});
 				var today = new Date();
-				today.setDate(today.getDate()-1);
+				//today.setDate(today.getDate()-1);
 				dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
 				.then((dodeljivaniNalozi)=>{
 					naloziDB.find({statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Storniran"]}}).toArray()
