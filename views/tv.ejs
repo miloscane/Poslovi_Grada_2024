@@ -84,15 +84,16 @@
 				var slobodni = [];
 				for(var i=0;i<majstori.length;i++){
 					var prisutan = false;
-					if(prisustvo.length>0){
-						for(var j=0;j<prisustvo[0].prisustvo.length;j++){
-							if(prisustvo[0].prisustvo[j].idMajstora==majstori[i].uniqueId){
-								if(Number(prisustvo[0].prisustvo[j].prisutan)==1){
+					if(prisustvo.prisustvo.ekipe.length>0){
+						for(var j=0;j<prisustvo.prisustvo.ekipe.length;j++){
+							if(prisustvo.prisustvo.ekipe[j].idMajstora==majstori[i].uniqueId){
+								if(Number(prisustvo.prisustvo.ekipe[j].prisutan)==1){
 									prisutan = true;
 								}
 							}
 						}
 					}
+
 					if(prisutan){	
 						var majstorBlok = document.createElement("DIV");
 						majstorBlok.setAttribute("class","majstor flexBox");
@@ -117,12 +118,12 @@
 								var inline = document.createElement("DIV");
 								inline.setAttribute("class","selectWrap");
 								inline.innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕМА</span>";
-								if(prisustvo.length>0){
-									for(var j=0;j<prisustvo[0].prisustvo.length;j++){
-										if(prisustvo[0].prisustvo[j].idMajstora==majstori[i].uniqueId){
-											if(Number(prisustvo[0].prisustvo[j].pomocnik)>0){
+								if(prisustvo.prisustvo.ekipe.length>0){
+									for(var j=0;j<prisustvo.prisustvo.ekipe.length;j++){
+										if(prisustvo.prisustvo.ekipe[j].idMajstora==majstori[i].uniqueId){
+											if(Number(prisustvo.prisustvo.ekipe[j].pomocnik)>0){
 												for(var k=0;k<pomocnici.length;k++){
-													if(Number(pomocnici[k].broj)==Number(prisustvo[0].prisustvo[j].pomocnik)){
+													if(Number(pomocnici[k].broj)==Number(prisustvo.prisustvo.ekipe[j].pomocnik)){
 														inline.innerHTML = "<span style=\"color:rgb(0,150,0)\">"+pomocnici[k].ime+"</span>";
 													}
 												}
@@ -133,13 +134,14 @@
 								inlines.appendChild(inline);
 							majstorBlok.appendChild(inlines);
 
+
 							var naloziElem = document.createElement("DIV");
 							naloziElem.setAttribute("class","nalozi");
 							var poslednjaOpstina = false;
 							for(var j=0;j<dodeljivaniNalozi.length;j++){
 								if(Number(dodeljivaniNalozi[j].deleted)!=1){
 									if(dodeljivaniNalozi[j].majstor==majstori[i].uniqueId){
-										poslednjaOpstina = dodeljivaniNalozi[i].radnaJedinica;
+										poslednjaOpstina = dodeljivaniNalozi[j].radnaJedinica;
 										var nalogElem = document.createElement("DIV");
 										nalogElem.setAttribute("class","nalog");
 											var broj = document.createElement("DIV");
@@ -321,7 +323,7 @@
 
 			socket.on("lokacijaTv2",function(allVehicleStops,navigacijaInfo,dodeljivaniNalozi,nedodeljeniNalozi){
 				try{
-					console.log(dodeljivaniNalozi)
+					//console.log(dodeljivaniNalozi)
 					generateBoxes(dodeljivaniNalozi);
 
 

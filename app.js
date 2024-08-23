@@ -8200,7 +8200,7 @@ server.get('/tv', async (req, res)=> {
 			.then((pomocnici)=>{
 				res.render("tv",{
 			    pageTitle: "Екипе",
-			    prisustvo: prisustvo,
+			    prisustvo: prisustvo[0],
 			    pomocnici: pomocnici,
 			    majstori: majstori
 			  })
