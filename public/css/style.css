@@ -4418,6 +4418,17 @@ input[type=number] {
     text-align:left;
 }
 
+.ekipe .flex .flexBox .vozilo .bolded{
+    font-size:14px;
+    font-weight:500;
+    text-align:left;
+}
+
+.ekipe .flex .flexBox .vozilo select{
+    width:100%;
+    text-align:left;
+}
+
 .ekipe .button{
     background-color:rgb(2,121,49);
     border:2px solid rgba(37,57,101,0);
@@ -4730,7 +4741,7 @@ input[type=number] {
     color:rgb(255,255,255);
     padding:2px;
     text-align:center;
-    font-size:12px;
+    font-size:14px;
     font-weight:600;
 }
 

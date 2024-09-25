@@ -1910,7 +1910,7 @@ request(geoCodeOptions, (error,response,body)=>{
 
 
 		//ubacivanje cena za ucinak
-		var cenovnikUcinak = fs.readFileSync("./cenovnikUcinak.csv",{encoding:"utf8"});
+		/*var cenovnikUcinak = fs.readFileSync("./cenovnikUcinak.csv",{encoding:"utf8"});
 		var cenovnikUcinakArray = cenovnikUcinak.split("\r\n");
 		cenovnikUcinakArray.splice(0,1);
 		for(var i=0;i<4;i++){
@@ -1924,7 +1924,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			cenovnikJson.price = parseFloat(cenovnikUcinakArray2[9].split(".").join(""));
 			//console.log(cenovnikJson);
 			cenovnikUcinakJsons.push(cenovnikJson);
-		}
+		}*/
 
 		
 
@@ -2392,7 +2392,7 @@ request(geoCodeOptions, (error,response,body)=>{
 
 		//ZA KNJIGOVODJU
 
-		/*naloziDB.find({}).toArray()
+		/*xnaloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
 			for(var i=0;i<nalozi.length;i++){
@@ -2642,7 +2642,19 @@ request(geoCodeOptions, (error,response,body)=>{
 		})*/
 
 
-		
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var ukupanIznos = 0;
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].prijemnica.datum.datum.includes("07.2024")){
+					ukupanIznos += parseFloat(nalozi[i].ukupanIznos);
+				}
+			}
+			console.log(brojSaRazmacima(ukupanIznos))
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 
 
 
@@ -2791,7 +2803,6 @@ request(geoCodeOptions, (error,response,body)=>{
 			res.send("bad");
 		})
 });*/
-
 
 server.get('/',async (req,res)=>{
 	if(req.session.user){
@@ -8426,14 +8437,27 @@ server.get('/magacin/ekipe', async (req, res)=> {
 					.then((prisustvoJuce)=>{
 						prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(yesterday)}).toArray()
 						.then((prisustvoDanas)=>{
-							res.render("magacioner/ekipe",{
-								pageTitle: "Екипе",
-								user: req.session.user,
-								pomocnici: pomocnici,
-								prisustvoJuce: prisustvoJuce[0],
-								prisustvoDanas: prisustvoDanas[0],
-								majstori: majstori
-							});
+							navigacijaInfoDB.find({}).toArray()
+							.then((vozila)=>{
+								res.render("magacioner/ekipe",{
+									pageTitle: "Екипе",
+									user: req.session.user,
+									pomocnici: pomocnici,
+									prisustvoJuce: prisustvoJuce[0],
+									prisustvoDanas: prisustvoDanas[0],
+									vozila: vozila,
+									majstori: majstori
+								});
+							})
+							.catch((error)=>{
+								logError(error);
+								res.render("message",{
+				          pageTitle: "Грешка",
+				          user: req.session.user,
+				          message: "<div class=\"text\">Грешка у бази података 7622.</div>"
+				        });
+							})
+							
 						})
 						.catch((error)=>{
 							logError(error);
@@ -8565,7 +8589,7 @@ server.get('/magacin/vozila', async (req, res)=> {
 		}
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
-	} 
+	}
 });
 
 

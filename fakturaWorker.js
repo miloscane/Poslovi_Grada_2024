@@ -455,7 +455,7 @@ function generatePremijusPrekoPolaMilBezPenala(info){
 	      '<cbc:TaxableAmount currencyID="RSD">'+parseFloat(info.iznos).toFixed(2)+'</cbc:TaxableAmount>'+
 	      '<cbc:TaxAmount currencyID="RSD">0.0</cbc:TaxAmount>'+
 	      '<cac:TaxCategory>'+
-	        '<cbc:ID>AE</cbc:ID>'+
+	        '<cbc:ID>AE20</cbc:ID>'+
 	        '<cbc:Percent>0</cbc:Percent>'+
 	        '<cbc:TaxExemptionReasonCode>PDV-RS-10-2-3</cbc:TaxExemptionReasonCode>'+
 	        '<cac:TaxScheme>'+
@@ -480,7 +480,7 @@ function generatePremijusPrekoPolaMilBezPenala(info){
 	    '<cac:Item>'+
 	      '<cbc:Name>'+'HITNI I NEODLOŽNI RADOVI I TEKUĆE POPRAVKE-VIK RADOVI-'+info.adresa+' NARUDŽBENICA BR. '+info.brojNaloga+'</cbc:Name>'+
 	      '<cac:ClassifiedTaxCategory>'+
-	        '<cbc:ID>AE</cbc:ID>'+
+	        '<cbc:ID>AE20</cbc:ID>'+
 	        '<cbc:Percent>0</cbc:Percent>'+
 	        '<cac:TaxScheme>'+
 	          '<cbc:ID>VAT</cbc:ID>'+

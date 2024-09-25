@@ -1,8 +1,13 @@
 <%- include ("partials/header") -%>
+	
 	<script>
 		var pomocnici			=	<%-JSON.stringify(pomocnici)%>;
 		var prisutniPomocnici	=	<%-JSON.stringify(pomocnici)%>;
 		var majstori			=	<%-JSON.stringify(majstori)%>;
+		var vozila			=	<%-JSON.stringify(vozila)%>;
+		for(var i=0;i<vozila.length;i++){
+			vozila[i].slobodno = 1;
+		}
 		for(var i=0;i<majstori.length;i++){
 			if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
 				majstori.splice(i,1);
@@ -38,6 +43,18 @@
 								
 								var inline = document.createElement("DIV");
 								inline.setAttribute("class","selectWrap");
+								inlines.appendChild(inline);
+							majstorBlok.appendChild(inlines);
+
+							var inlines = document.createElement("DIV");
+							inlines.setAttribute("class","vozilo");
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","bolded");
+								inline.innerHTML = "Возило:";
+								inlines.appendChild(inline);
+								
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","voziloSelectWrap");
 								inlines.appendChild(inline);
 							majstorBlok.appendChild(inlines);
 
@@ -83,6 +100,40 @@
 									var option = document.createElement("OPTION");
 									option.setAttribute("value",prisutniPomocnici[i].broj);
 									option.innerHTML = prisutniPomocnici[i].ime;
+									dodeljeni.appendChild(option);
+								}
+							}
+							select.appendChild(dodeljeni);
+						elem.appendChild(select);
+					}
+
+					function generateVozilaSelect(elem){
+						var select = document.createElement("SELECT");
+						select.setAttribute("class","voziloSelect");
+						select.setAttribute("oninput","voziloPicked(this)")
+							var nijedan = document.createElement("OPTION");
+							nijedan.setAttribute("value",0);
+							nijedan.innerHTML = "Ниједно";
+							select.appendChild(nijedan);
+							var slobodni = document.createElement("optgroup");
+							slobodni.setAttribute("label","Слободна");
+							for(var i=0;i<vozila.length;i++){
+								if(vozila[i].slobodno==1){
+									var option = document.createElement("OPTION");
+									option.setAttribute("value",vozila[i].idNavigacije);
+									option.innerHTML = vozila[i].brojTablice;
+									slobodni.appendChild(option);
+								}
+							}
+							select.appendChild(slobodni); 
+
+							var dodeljeni = document.createElement("optgroup");
+							dodeljeni.setAttribute("label","Додељена");
+							for(var i=0;i<vozila.length;i++){
+								if(vozila[i].slobodno==0){
+									var option = document.createElement("OPTION");
+									option.setAttribute("value",vozila[i].idNavigacije);
+									option.innerHTML = vozila[i].brojTablice;
 									dodeljeni.appendChild(option);
 								}
 							}
@@ -145,6 +196,60 @@
 								pomocniciSelects[i].getElementsByTagName("SELECT")[0].style.color = "rgb(150,0,0)";
 							}else{
 								pomocniciSelects[i].getElementsByTagName("SELECT")[0].style.color = "rgb(0,150,0)";
+							}
+						}
+
+					}
+
+					function voziloPicked(elem){
+						var vozilaSelects = document.getElementsByClassName("voziloSelectWrap");
+						for(var i=0;i<vozilaSelects.length;i++){
+							if(elem.parentElement!=vozilaSelects[i]){
+								if(Number(vozilaSelects[i].getElementsByTagName("SELECT")[0].value)==Number(elem.value)){
+									vozilaSelects[i].getElementsByTagName("SELECT")[0].value = 0;
+									vozilaSelects[i].dataset.vozilo = 0;
+								}
+							}
+							
+						}
+						elem.parentElement.setAttribute("data-vozilo",elem.value);
+						//OVDE PROVERI DAL JE NEGDE VEC DODELJEN ILI NE PA osnovu toga prebaci u slobodan ako nije, ovo ispod trenutno nema smisla
+						/*for(var i=0;i<prisutniPomocnici.length;i++){
+							prisutniPomocnici[i].slobodan = 1;
+						}*/
+						
+						for(var i=0;i<vozila.length;i++){
+							if(Number(vozila[i].idNavigacije)==Number(elem.value)){
+								vozila[i].slobodno = 0;
+							}
+						}
+
+						var selectedVozila = [];
+						for(var i=0;i<vozilaSelects.length;i++){
+							if(vozilaSelects[i].dataset.vozilo){
+								if(Number(vozilaSelects[i].dataset.vozilo)!=0){
+									selectedVozila.push(Number(vozilaSelects[i].dataset.vozilo));
+								}
+							}
+						}
+						console.log(selectedVozila);
+						for(var i=0;i<vozila.length;i++){
+							if(selectedVozila.indexOf(Number(vozila[i].idNavigacije))<0){
+								vozila[i].slobodno = 1;
+							}
+						}
+
+
+						var majstoriElems = document.getElementsByClassName("majstor");
+						for(var i=0;i<majstoriElems.length;i++){
+							majstoriElems[i].getElementsByClassName("voziloSelectWrap")[0].innerHTML = "";
+							generateVozilaSelect(majstoriElems[i].getElementsByClassName("voziloSelectWrap")[0]);
+						}
+
+						
+						for(var i=0;i<vozilaSelects.length;i++){
+							if(vozilaSelects[i].dataset.vozilo){
+								vozilaSelects[i].getElementsByTagName("SELECT")[0].value = vozilaSelects[i].dataset.vozilo;
 							}
 						}
 
@@ -275,7 +380,10 @@
 
 					for(var i=0;i<majstoriElems.length;i++){
 						generateSelect(majstoriElems[i].getElementsByClassName("selectWrap")[0]);
+						generateVozilaSelect(majstoriElems[i].getElementsByClassName("voziloSelectWrap")[0]);
 					}
+					//OVDE UBACI ISTORIJU OD JUCE
+
 
 					document.getElementById("majstori").dataset.initialized = 1;
 				};
@@ -294,6 +402,7 @@
 						json.prisutan = majstoriElems[i].dataset.prisutan;
 						json.pomocnik = majstoriElems[i].getElementsByClassName("pomocnikSelect")[0].value;
 						json.trecaLica = majstoriElems[i].getElementsByClassName("trecaLicaBox")[0].checked;
+						json.vozilo = majstoriElems[i].getElementsByClassName("voziloSelect")[0].value;
 						jsonObject.ekipe.push(json);
 					}
 					document.getElementById("json").value = JSON.stringify(jsonObject);
