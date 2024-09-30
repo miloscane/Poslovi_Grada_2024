@@ -5272,6 +5272,7 @@ server.post('/edit-nalog', async (req, res)=> {
 				      return res.render("message",{pageTitle: "Грешка",message: "<div class=\"text\">Дошло је до грешке приликом качења слика.</div>",user: req.session.user});
 				    }
 				    var nalogJson = JSON.parse(req.body.json);
+				    //console.log(nalogJson);
 				    var izvestajJson = {};
 				    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
 				    izvestajJson.nalog		=	nalogJson.broj;
@@ -5359,11 +5360,15 @@ server.post('/edit-nalog', async (req, res)=> {
 								//if(Number(req.session.user.role)==30){
 									var ukupanIznos = 0;
 									for(var i=0;i<nalogJson.obracun.length;i++){
-										for(var j=0;j<cenovnik.length;j++){
-											if(nalogJson.obracun[i].code==cenovnik[j].code){
-												ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
-												break;
+										if(!nalogJson.obracun[i].price){
+											for(var j=0;j<cenovnik.length;j++){
+												if(nalogJson.obracun[i].code==cenovnik[j].code){
+													ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
+													break;
+												}
 											}
+										}else{
+											ukupanIznos = ukupanIznos + parseFloat(nalogJson.obracun[i].price);
 										}
 									}
 									var setObj	=	{ $set: {
@@ -5479,11 +5484,15 @@ server.post('/edit-nalog', async (req, res)=> {
 							//nema izvestaja
 							var ukupanIznos = 0;
 							for(var i=0;i<nalogJson.obracun.length;i++){
-								for(var j=0;j<cenovnik.length;j++){
-									if(nalogJson.obracun[i].code==cenovnik[j].code){
-										ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
-										break;
+								if(!nalogJson.obracun[i].price){
+									for(var j=0;j<cenovnik.length;j++){
+										if(nalogJson.obracun[i].code==cenovnik[j].code){
+											ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
+											break;
+										}
 									}
+								}else{
+									ukupanIznos = ukupanIznos + parseFloat(nalogJson.obracun[i].price);
 								}
 							}
 							var setObj	=	{ $set: {

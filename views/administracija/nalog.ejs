@@ -1,6 +1,7 @@
 <%- include ("partials/header") -%>
 	<script>
 		var nalog = <%-JSON.stringify(nalog)%>;
+		console.log(nalog);
 		var cenovnik = <%-JSON.stringify(cenovnik)%>;
 		var istorijat = <%-JSON.stringify(istorijat)%>;
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
@@ -532,7 +533,14 @@
 							var obracunJson = {};
 							obracunJson.code		= 	obracunElem.getElementsByClassName("sifra")[0].getElementsByTagName("INPUT")[0].value;
 							obracunJson.quantity	= 	obracunElem.getElementsByClassName("kolicina")[0].getElementsByTagName("INPUT")[0].value;
-							var iznosStavke = getPriceByCode(obracunJson.code) ? parseFloat(getPriceByCode(obracunJson.code).price)*obracunJson.quantity : 0;
+							if(obracunJson.code=="80.04.02.001"){
+								var iznosStavke = parseFloat(obracunElem.getElementsByClassName("ukupno")[0].innerHTML.replace(/ /g,'').replace(',','.'));
+								obracunJson.price = iznosStavke;
+								//console.log(iznosStavke)
+							}else{
+								var iznosStavke = getPriceByCode(obracunJson.code) ? parseFloat(getPriceByCode(obracunJson.code).price)*obracunJson.quantity : 0;	
+							}
+							
 							ukupanIznos = ukupanIznos + iznosStavke;
 							nalogJson.obracun.push(obracunJson);
 						}
