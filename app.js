@@ -5758,15 +5758,156 @@ server.get('/dispeceri',async (req,res)=>{
 server.get('/administracijaMajstora',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
-			res.render("administracija/administracijaMajstora",{
-				pageTitle:"Администрација мајстора",
-				user: req.session.user
+			majstoriDB.find({}).toArray()
+			.then((majstori)=>{
+				for (var i = majstori.length - 1; i >= 0; i--) {
+			    if (podizvodjaci.indexOf(majstori[i].uniqueId) >= 0) {
+			      majstori.splice(i, 1); 
+			    }
+				}
+				pomocniciDB.find({}).toArray()
+				.then((pomocnici)=>{
+					res.render("administracija/administracijaMajstora",{
+						pageTitle:"Администрација мајстора",
+						majstori: majstori,
+						pomocnici: pomocnici,
+						user: req.session.user
+					});
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 5770.</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				
 			})
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
 				user: req.session.user,
 				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
+server.get('/administracijaMajstora/:id',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			majstoriDB.find({uniqueId:req.params.id}).toArray()
+			.then((majstori)=>{
+				if(majstori.length>0){
+					res.render("administracija/administracijaMajstoraEdit",{
+						pageTitle: "Администрација помоћника",
+						type: "Мајстор",
+						majstor: majstori[0],
+						user: req.session.user
+					});
+				}else{
+					pomocniciDB.find({}).toArray()
+					.then((pomocnici)=>{
+						if(pomocnici.length>0){
+							res.render("administracija/administracijaMajstoraEdit",{
+								pageTitle: "Администрација помоћника",
+								type: "Помоћник",
+								majstor: pomocnici[0],
+								user: req.session.user
+							});
+						}else{
+							res.render("message",{
+								pageTitle: "Грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">Непостојећи мајстор.</div>"
+							});
+						}
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 5816.</div>"
+						});
+					})
+				}
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 5840.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
+server.post('/izmenaMajstora',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var json = JSON.parse(req.body.json);
+			var setObj	=	{ $set: {
+											brojKartice:json.brojKartice,
+											sluzbeniBroj:json.sluzbeniBroj,
+											privatniBroj:json.privatniBroj,
+											jmbg:json.jmbg,
+											brojLicneKarte:json.brojLicneKarte,
+											adresaStanovanja:json.adresaStanovanja,
+											beleske:json.beleske,
+											aktivan:json.aktivan,
+											tipRada:json.tipRada
+										}
+								};
+
+			if(json.tip=="Мајстор"){
+				majstoriDB.updateOne({uniqueId:json.uniqueId},setObj)
+				.then((dbResponse)=>{
+					res.redirect("/administracijaMajstora/"+json.uniqueId);
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 5884.</div>"
+					})
+				})
+			}else{
+				pomocniciDB.updateOne({uniqueId:json.uniqueId},setObj)
+				.then((dbResponse)=>{
+					res.redirect("/administracijaMajstora/"+json.uniqueId);
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 5884.</div>"
+					})
+				})
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да прави измене мајстора.</div>"
 			});
 		}
 	}else{

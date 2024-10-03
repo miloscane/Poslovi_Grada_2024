@@ -1,0 +1,180 @@
+<%- include ("partials/header") -%>
+<script>
+	var majstor = <%-JSON.stringify(majstor)%>;
+	
+	function checkboxPicked(elem){
+		if(elem.checked){
+			elem.parentElement.parentElement.classList.add("checkboxActive")
+		}else{
+			elem.parentElement.parentElement.classList.remove("checkboxActive")
+		}
+	}
+</script>
+<div class="administracijaMajstoraEdit">
+	<div class="pageWidth">
+		<div class="blueWrap">
+			<div class="infoWrap">
+				<div class="ime"><%=majstor.ime%></div>
+				<div class="glavniTip"><%=type%></div>
+				<div class="mainBorder"></div>
+				<div class="inputWrap">
+					<div class="checkboxWrap">
+						<div class="checkboxWrapper">
+							<input value="Odgusenje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+						</div>
+						<div class="checkboxName">Одгушење</div>
+					</div>
+					<div class="checkboxWrap">
+						<div class="checkboxWrapper">
+							<input value="Zamena" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+						</div>
+						<div class="checkboxName">Замена</div>
+					</div>
+					<div class="checkboxWrap">
+						<div class="checkboxWrapper">
+							<input value="Crpljenje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+						</div>
+						<div class="checkboxName">Црпљење</div>
+					</div>
+					<div class="checkboxWrap">
+						<div class="checkboxWrapper">
+							<input value="Kopanje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+						</div>
+						<div class="checkboxName">Копање</div>
+					</div>
+					<div class="checkboxWrap">
+						<div class="checkboxWrapper">
+							<input value="Finalizacija" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+						</div>
+						<div class="checkboxName">Финализација</div>
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Број картице</div>
+					<div class="inputWrapper">
+						<input type="number" id="broj-kartice">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Службени телефон</div>
+					<div class="inputWrapper">
+						<input type="text" id="sluzbeni-broj">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Приватни телефон</div>
+					<div class="inputWrapper">
+						<input type="text" id="privatni-broj">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">ЈМБГ</div>
+					<div class="inputWrapper">
+						<input type="text" id="jmbg">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Број личне карте</div>
+					<div class="inputWrapper">
+						<input type="text" id="broj-licne-karte">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Адреса становања</div>
+					<div class="inputWrapper">
+						<input type="text" id="adresa-stanovanja">
+					</div>
+				</div>
+				<div class="textareaInput">
+					<div class="name">Белешке (вештине, напомене и слично)</div>
+					<div class="textareaWrapper">
+						<textarea id="beleske"></textarea>
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Активан</div>
+					<div class="inputWrapper" style="text-align:left">
+						<input type="checkbox" id="aktivan" style="width:20px;height:20px">
+					</div>
+				</div>
+				<div class="inputWrap" style="margin-top:15px;width:300px">
+					<div class="button" onclick="saveIzmene()">Сачувај измене</div>
+				</div>
+			</div>
+		</div>
+		<form method="post" style="display:none" id="form" action="/izmenaMajstora">
+			<input type="text" name="json" id="json">
+		</form>
+		<script>
+			if(majstor.brojKartice){
+				document.getElementById("broj-kartice").value = majstor.brojKartice;
+			}
+
+			if(majstor.broj){
+				document.getElementById("broj-kartice").value = majstor.broj;
+			}
+
+			if(majstor.sluzbeniBroj){
+				document.getElementById("sluzbeni-broj").value = majstor.sluzbeniBroj;
+			}
+
+			if(majstor.privatniBroj){
+				document.getElementById("privatni-broj").value = majstor.privatniBroj;
+			}
+
+			if(majstor.jmbg){
+				document.getElementById("jmbg").value = majstor.jmbg;
+			}
+
+			if(majstor.brojLicneKarte){
+				document.getElementById("broj-licne-karte").value = majstor.brojLicneKarte;
+			}
+
+			if(majstor.adresaStanovanja){
+				document.getElementById("adresa-stanovanja").value = majstor.adresaStanovanja;
+			}
+
+			if(majstor.beleske){
+				document.getElementById("beleske").value = majstor.beleske;
+			}
+
+			if(majstor.aktivan){
+				document.getElementById("aktivan").checked = true;
+			}
+
+			if(majstor.tipRada){
+				var tipovi = document.getElementsByClassName("tipRadnika");
+				for(var i=0;i<tipovi.length;i++){
+					if(majstor.tipRada.indexOf(tipovi[i].value)>=0){
+						tipovi[i].checked = true;
+					}
+				}
+			}
+			
+			function saveIzmene(){
+				var izmenaJson = {};
+				izmenaJson.uniqueId = majstor.uniqueId;
+				izmenaJson.tip = "<%=type%>";
+				izmenaJson.brojKartice = Number(document.getElementById("broj-kartice").value);
+				izmenaJson.sluzbeniBroj = document.getElementById("sluzbeni-broj").value;
+				izmenaJson.privatniBroj = document.getElementById("privatni-broj").value;
+				izmenaJson.jmbg = document.getElementById("jmbg").value;
+				izmenaJson.brojLicneKarte = document.getElementById("broj-licne-karte").value;
+				izmenaJson.adresaStanovanja = document.getElementById("adresa-stanovanja").value;
+				izmenaJson.beleske = document.getElementById("beleske").value;
+				izmenaJson.aktivan = document.getElementById("aktivan").checked;
+				izmenaJson.tipRada = [];
+				var tipovi = document.getElementsByClassName("tipRadnika");
+				for(var i=0;i<tipovi.length;i++){
+					if(tipovi[i].checked){
+						izmenaJson.tipRada.push(tipovi[i].value)
+					}
+				}
+				document.getElementById("json").value = JSON.stringify(izmenaJson);
+				loadGif();
+				document.getElementById("form").submit();
+			}
+		</script>
+	</div>
+</div>
+<%- include ("partials/footer") -%>

@@ -1,11 +1,43 @@
 <%- include ("partials/header") -%>
-<div class="message">
+<script>
+	var majstori = <%-JSON.stringify(majstori)%>;
+	var pomocnici = <%-JSON.stringify(pomocnici)%>;
+</script>
+<div class="administracijaMajstora">
 	<div class="pageWidth">
-		<div class="blueWrap">
-			<div class="pageWidth">
-				<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/programerIcon.png"></div>
-				<div class="message">Страница у изради. Имајте стрпљења :) ВиК неће стати!</div>		
-			</div>
+		<div class="majstori">
+			<div class="title">Мајстори</div>
+			<div id="lista-majstora" class="majstorList"></div>
+			<script>
+				for(var i=0;i<majstori.length;i++){
+					var majstorBlok = document.createElement("DIV");
+					majstorBlok.setAttribute("class","majstorBlok");
+					if(!majstori[i].aktivan){majstorBlok.classList.add("majstorBlokInactive")}
+						var imeMajstora = document.createElement("DIV");
+						imeMajstora.setAttribute("class","ime");
+						imeMajstora.setAttribute("onclick","window.location.href='/administracijaMajstora/"+majstori[i].uniqueId+"'");
+						imeMajstora.innerHTML = majstori[i].ime;
+						majstorBlok.appendChild(imeMajstora);
+					document.getElementById("lista-majstora").appendChild(majstorBlok);
+				}
+			</script>
+		</div>
+		<div class="pomocnici">
+			<div class="title">Помоћници</div>
+			<div id="lista-pomocnika" class="majstorList"></div>
+			<script>
+				for(var i=0;i<pomocnici.length;i++){
+					var majstorBlok = document.createElement("DIV");
+					majstorBlok.setAttribute("class","majstorBlok");
+					if(!pomocnici[i].aktivan){majstorBlok.classList.add("majstorBlokInactive")}
+						var imeMajstora = document.createElement("DIV");
+						imeMajstora.setAttribute("class","ime");
+						imeMajstora.setAttribute("onclick","window.location.href='/administracijaMajstora/"+pomocnici[i].uniqueId+"'");
+						imeMajstora.innerHTML = pomocnici[i].ime;
+						majstorBlok.appendChild(imeMajstora);
+					document.getElementById("lista-pomocnika").appendChild(majstorBlok);
+				}
+			</script>
 		</div>
 	</div>
 </div>
