@@ -33,11 +33,22 @@
 								function brzaPretraga(elem){
 									var brojNaloga = elem.value;
 									if(brojNaloga.toString().length==7){
-										if(!isNaN(Number(brojNaloga))){
-											loadGif()
-											window.location.href = "/nalog/"+brojNaloga;
+										if(Number(user.role)==50){
+											if(!isNaN(Number(brojNaloga))){
+												loadGif()
+												window.location.href = "/brzaPretragaReversa/"+brojNaloga;
+											}
+										}else{
+											if(!isNaN(Number(brojNaloga))){
+												loadGif()
+												window.location.href = "/nalog/"+brojNaloga;
+											}
 										}
 									}
+									
+									
+									
+										
 								}
 							</script>
 						</div>

@@ -7699,6 +7699,63 @@ server.get('/magacioner/pretragaReversa',async (req,res)=>{
 });
 
 
+server.get('/brzaPretragaReversa/:brojNaloga', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			magacinReversiDB.find({nalog:req.params.brojNaloga}).toArray()
+			.then((reversi)=>{
+				naloziDB.find({broj:req.params.brojNaloga.toString()}).toArray()
+				.then((nalozi)=>{
+					majstoriDB.find({}).toArray()
+					.then((majstori)=>{
+						res.render("magacioner/rezultatPretrage",{
+							pageTitle: "Резлтати претраге реверса по налогу "+req.params.brojNaloga,
+							user: req.session.user,
+							reversi: reversi,
+							majstori: majstori,
+							nalozi: nalozi
+						});
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 3261.</div>"
+						});
+					})
+					
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 3264.</div>"
+					});
+				})
+				
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3261.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	} 
+});
+
 server.post('/pretraga-reversa', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==50){
