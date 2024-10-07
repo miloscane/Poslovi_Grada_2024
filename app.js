@@ -2392,7 +2392,7 @@ request(geoCodeOptions, (error,response,body)=>{
 
 		//ZA KNJIGOVODJU
 
-		/*xnaloziDB.find({}).toArray()
+		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
 			for(var i=0;i<nalozi.length;i++){
@@ -2521,7 +2521,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
-						if(nalozi[i].prijemnica.datum.datum.includes(".08.2024")){
+						if(nalozi[i].prijemnica.datum.datum.includes(".09.2024")){
 							naloziToExport.push(nalozi[i])
 						}
 					}
@@ -2571,7 +2571,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<problemNalozi.length;i++){
 				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
 			}
-			fs.writeFileSync("./PG-Premijus-07-2024.csv",csvString,"utf8");
+			fs.writeFileSync("./PG-Premijus-09-2024.csv",csvString,"utf8");
 			console.log("Written ")
 		})
 		.catch((error)=>{
@@ -2656,10 +2656,105 @@ request(geoCodeOptions, (error,response,body)=>{
 			console.log(error)
 		})*/
 
+		/*
+			crpljenje 35.04.16.017, 35.04.16.006, 35.04.16.012, 35.04.16.013
+			lift 35.04.16.005, 35.04.16.010
+			odgusenje 35.03.14.001, 35.03.14.007, 35.03.14.005
+		*/
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var meseci = [{ime:"Mart 2024",nalozi:0,odgusenja:0,crpljenja:0,str:"03.2024"},{ime:"April 2024",nalozi:0,odgusenja:0,crpljenja:0,str:"04.2024"},{ime:"Maj 2024",nalozi:0,odgusenja:0,crpljenja:0,str:"05.2024"},{ime:"Jun 2024",nalozi:0,odgusenja:0,crpljenja:0,str:"06.2024"},{ime:"Jul 2024",nalozi:0,odgusenja:0,crpljenja:0,str:"07.2024"},{ime:"Avgust 2024",nalozi:0,odgusenja:0,crpljenja:0,str:"08.2024"},{ime:"Septembar 2024",nalozi:0,odgusenja:0,crpljenja:0,str:"09.2024"}];
+			//Stari Hermina
+			//mart do januar
+			for(var i=0;i<nalozi.length;i++){
+				for(var j=0;j<meseci.length;j++){
+					if(nalozi[i].datum.datum.includes(meseci[j].str)){
+						meseci[j].nalozi++;
+
+						var odgusenje = false;
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							//80.02.09.001, 80.02.09.002, 80.02.09.004
+							if(nalozi[i].obracun[k].code=="80.02.09.005" || nalozi[i].obracun[k].code=="80.02.09.001" || nalozi[i].obracun[k].code=="80.02.09.002" || nalozi[i].obracun[k].code=="80.02.09.004"){
+								odgusenje = true;
+								meseci[j].odgusenja++;
+								break;
+							}
+						}
+
+						var crpljenje = false;
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							//80.02.09.010,011,012,
+							if(nalozi[i].obracun[k].code=="80.02.09.019" || nalozi[i].obracun[k].code=="80.02.09.010" || nalozi[i].obracun[k].code=="80.02.09.011" || nalozi[i].obracun[k].code=="80.02.09.012"){
+									crpljenje = true;
+									meseci[j].crpljenja++;
+									break;
+							}
+						}
+
+						var lift = false;
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							if(nalozi[i].obracun[k].code=="80.02.09.009"){
+									lift = true;
+									meseci[j].crpljenja++;
+							}
+						}
+					}
+				}
+			}
+			console.log(meseci);
+
+			nalozi2023DB.find({}).toArray()
+			.then((stariNalozi)=>{
+				var meseciStari = [{ime:"Mart 2023",nalozi:0,odgusenja:0,crpljenja:0,str:"03.2023"},{ime:"April 2023",nalozi:0,odgusenja:0,crpljenja:0,str:"04.2023"},{ime:"Maj 2023",nalozi:0,odgusenja:0,crpljenja:0,str:"05.2023"},{ime:"Jun 2023",nalozi:0,odgusenja:0,crpljenja:0,str:"06.2023"},{ime:"Jul 2023",nalozi:0,odgusenja:0,crpljenja:0,str:"07.2023"},{ime:"Avgust 2023",nalozi:0,odgusenja:0,crpljenja:0,str:"08.2023"},{ime:"Septembar 2023",nalozi:0,odgusenja:0,crpljenja:0,str:"09.2023"}];
+				for(var i=0;i<stariNalozi.length;i++){
+					for(var j=0;j<meseciStari.length;j++){
+						if(stariNalozi[i].datum.includes(meseciStari[j].str)){
+							meseciStari[j].nalozi++;
+							var odgusenje = false;
+							for(var k=0;k<stariNalozi[i].fakturisanje.length;k++){
+								//35.03.14.001, 35.03.14.007, 35.03.14.005
+								if(stariNalozi[i].fakturisanje[k].sifraArtikla == "35.03.14.001" || stariNalozi[i].fakturisanje[k].sifraArtikla == "35.03.14.007" || stariNalozi[i].fakturisanje[k].sifraArtikla == "35.03.14.005"){
+									odgusnje = true;
+									meseciStari[j].odgusenja++;
+									break;
+								}
+							}
+
+							var crpljenje = false;
+							for(var k=0;k<stariNalozi[i].fakturisanje.length;k++){
+								//35.04.16.017, 35.04.16.006, 35.04.16.012, 35.04.16.013
+								if(stariNalozi[i].fakturisanje[k].sifraArtikla == "35.04.16.017" || stariNalozi[i].fakturisanje[k].sifraArtikla == "35.04.16.006" || stariNalozi[i].fakturisanje[k].sifraArtikla == "35.04.16.012" || stariNalozi[i].fakturisanje[k].sifraArtikla == "35.04.16.013"){
+									crpljenje = true;
+									meseciStari[j].crpljenja++;
+									break;
+								}
+							}
+
+							var lift = false;
+							for(var k=0;k<stariNalozi[i].fakturisanje.length;k++){
+								//35.04.16.005, 35.04.16.010
+								if(stariNalozi[i].fakturisanje[k].sifraArtikla == "35.04.16.005" || stariNalozi[i].fakturisanje[k].sifraArtikla == "35.04.16.010"){
+									lift = true;
+									meseciStari[j].crpljenja++;
+									break
+								}
+							}
+						}
+						
 
 
 
+					}
+				}
+				console.log("------------------------------------");
+				console.log("STARI UGOVOR");
+				console.log(meseciStari);
+			})
 
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 
 	})
 	.catch(error => {
@@ -5811,7 +5906,7 @@ server.get('/administracijaMajstora/:id',async (req,res)=>{
 						user: req.session.user
 					});
 				}else{
-					pomocniciDB.find({}).toArray()
+					pomocniciDB.find({uniqueId:req.params.id}).toArray()
 					.then((pomocnici)=>{
 						if(pomocnici.length>0){
 							res.render("administracija/administracijaMajstoraEdit",{
