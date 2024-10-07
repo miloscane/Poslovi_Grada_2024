@@ -42,7 +42,7 @@
 			</div>
 			<script>
 				function copyToViber(elem){
-					var text = nalog.broj+"\r\n*"+nalog.adresa+", "+nalog.radnaJedinica+"*\r\n\r\n"+nalog.opis+"\r\n\r\n"+nalog.zahtevalac+"\r\n\r\n"+"Klikni ovde za navigaciju do naloga:\r\n"+"https://www.google.com/maps/search/?api=1&query="+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+');
+					var text = nalog.broj+"\r\n*"+nalog.adresa+", "+nalog.radnaJedinica+"*\r\n\r\n"+nalog.opis+"\r\n\r\n"+nalog.zahtevalac+"\r\n\r\n"//+"Klikni ovde za navigaciju do naloga:\r\n"+"https://www.google.com/maps/search/?api=1&query="+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+');
 					navigator.clipboard.writeText(text)
 					.then(()=>{
 						elem.innerHTML = "КОПИРАНО"
