@@ -2542,21 +2542,23 @@ request(geoCodeOptions, (error,response,body)=>{
 
 			var problemNalozi = [];
 
-			var csvString = "Broj Fakture,Datum PDV,Iznos,Penal,Iznos Sa Penalom,PDV,Iznos sa penalom i PDV,PG Iznos, PG PDV,PG Iznos sa PDVom\r\n";
+			var csvString = "Broj Fakture,Datum PDV,Iznos/Osnovica,Penal,PDV,Iznos sa penalom i PDV,PG Iznos/Osnovica,PG PDV,PG Penal,PG Iznos sa PDVom\r\n";
 			for(var i=0;i<naloziToExport.length;i++){
-				var iznosBezPDVa = parseFloat(naloziToExport[i].ukupanIznos).toFixed(2);
-				var iznosSaPDVom = iznosBezPDVa<=500000 ? eval(iznosBezPDVa*1.2).toFixed(2) : iznosBezPDVa;
-				var pdv = iznosBezPDVa<=500000 ? eval(iznosBezPDVa*0.2).toFixed(2) : 0;
-				var pgIznosBezPDVa = eval(parseFloat(naloziToExport[i].ukupanIznos)*0.675).toFixed(2);
-				var pgPdv = pgIznosBezPDVa<=500000 ? eval(iznosBezPDVa*0.675*0.2).toFixed(2) : 0;
-				var pgIznosSaPDVom = eval(parseFloat(naloziToExport[i].ukupanIznos)*0.675 + parseFloat(pgPdv)).toFixed(2);
-				var iznosPenala = eval(iznosBezPDVa * (100 - naloziToExport[i].faktura.penal)/100).toFixed(2);
-				if(!isNaN(iznosBezPDVa)){
+				var osnovica = parseFloat(naloziToExport[i].ukupanIznos);
+				var iznosPenala = eval(osnovica* (100 - naloziToExport[i].faktura.penal)/100);
+				var pdv = osnovica<=500000 ? osnovica*0.2 : 0;
+				var iznosSaPenalomIPdv = osnovica + pdv - iznosPenala;
+				var pgOsnovica = osnovica * 0.675;
+				var pgPdv = pgOsnovica <=500000 ? pgOsnovica*0.2 : 0;
+				var pgPenal = iznosPenala;
+				var pgIznosSaPDVom = pgOsnovica + pgPdv - pgPenal;
+
+				if(!isNaN(osnovica)){
 					datumPDV = naloziToExport[i].prijemnica.datum.datum;
-					csvString += naloziToExport[i].faktura.broj + "," + datumPDV + "," + iznosBezPDVa + "," + iznosPenala + "," + eval(parseFloat(iznosBezPDVa)-parseFloat(iznosPenala)) + "," + pdv + "," +eval(parseFloat(iznosBezPDVa)-parseFloat(iznosPenala)+parseFloat(pdv)) + "," + pgIznosBezPDVa + "," + pgPdv + "," + pgIznosSaPDVom + "\r\n"
+					csvString += naloziToExport[i].faktura.broj + "," + datumPDV + "," + osnovica.toFixed(2) + "," + iznosPenala.toFixed(2) + "," + pdv.toFixed(2) + "," + iznosSaPenalomIPdv.toFixed(2) + "," +pgOsnovica.toFixed(2) + "," + pgPdv.toFixed(2) + "," + pgPenal.toFixed(2) + "," + pgIznosSaPDVom.toFixed(2) + "\r\n"
 					
 					//csvString += naloziToExport[i].faktura.broj + "," +datumPDV+ "," + iznosBezPDVa + "," + pdv + "," + iznosSaPDVom+"\r\n";
-					if(iznosBezPDVa==0){
+					if(osnovica==0){
 						naloziToExport[i].problem = "Iznos naloga je nula";
 						console.log(naloziToExport[i].broj)
 						console.log("Nula")
@@ -2571,7 +2573,7 @@ request(geoCodeOptions, (error,response,body)=>{
 			for(var i=0;i<problemNalozi.length;i++){
 				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
 			}
-			fs.writeFileSync("./PG-Premijus-09-2024.csv",csvString,"utf8");
+			fs.writeFileSync("./PG-Premijus-09-2024-6.csv",csvString,"utf8");
 			console.log("Written ")
 		})
 		.catch((error)=>{
@@ -2754,6 +2756,16 @@ request(geoCodeOptions, (error,response,body)=>{
 		})
 		.catch((error)=>{
 			console.log(error)
+		})*/
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			for(var i=0;i<nalozi.length;i++){
+				if(Number(nalozi[i].broj)<1741461){
+					console.log(nalozi[i].broj)
+				}	
+			}
+			console.log("FINISHED")
 		})*/
 
 	})
@@ -8230,6 +8242,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 							brojZahteva: stambenoJson.broj_zahteva,
 							tipNaloga: stambenoJson.tip_naloga,
 							partija: stambenoJson.party_name,
+							vik: stambenoJson.partija,
 							nadzor: stambenoJson.dodeljen,
 							email: stambenoJson.email,
 							originalniNadzor: stambenoJson.originalni_nadzor,
@@ -8309,6 +8322,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 									nalogJson.coordinates = json.results[0].geometry.location; 
 									naloziDB.insertOne(nalogJson)
 									.then((dbResponse)=>{
+
 										res.status(200);
 										res.setHeader('Content-Type', 'application/json');
 										var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
