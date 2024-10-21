@@ -2758,15 +2758,126 @@ request(geoCodeOptions, (error,response,body)=>{
 			console.log(error)
 		})*/
 
+		/*var stambenoNalozi = fs.readFileSync("Book1.csv",{encoding:"utf8"});
+		var rowsArray = stambenoNalozi.split("\n");
+		rowsArray.splice(0,1);
+		var ukupanIznos = 0;
+		var stambeno = [];
+		for(var i=0;i<rowsArray.length;i++){
+			var rowArray = rowsArray[i].split(";");
+			var json = {};
+			json.brojNaloga = rowArray[0];
+			json.iznos = parseFloat(rowArray[1]);
+			ukupanIznos = ukupanIznos + json.iznos;
+			json.iznosPortal = 0;
+			json.naPortalu = 0;
+			stambeno.push(json);
+			if(isNaN(json.iznos)){
+				console.log(json.brojNaloga)
+			}
+
+		}
+		naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			console.log("Started");
+			for(var i=0;i<stambeno.length;i++){
+				for(var j=0;j<nalozi.length;j++){
+					if(nalozi[j].broj==stambeno[i].brojNaloga.toString()){
+						stambeno[i].iznosPortal = parseFloat(nalozi[j].ukupanIznos);
+						stambeno[i].naPortalu++;
+					}
+				}
+			}
+			var missmatch = 0;
+			for(var i=0;i<stambeno.length;i++){
+				/*if(stambeno[i].naPortalu==0 || stambeno[i].naPortalu>1){
+					console.log(stambeno[i])
+				}
+				if(stambeno[i].iznos!=Math.floor(stambeno[i].iznosPortal)){
+					missmatch++;
+					console.log(stambeno[i])
+				}
+			}
+			console.log("FINISHED!!!")
+		})*/
+
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
+			var ukupanIznos = 0;
 			for(var i=0;i<nalozi.length;i++){
-				if(Number(nalozi[i].broj)<1741461){
-					console.log(nalozi[i].broj)
-				}	
+				if(nalozi[i].prijemnica.broj!=""){
+					ukupanIznos = ukupanIznos + parseFloat(nalozi[i].ukupanIznos);
+				}
 			}
-			console.log("FINISHED")
+			console.log(brojSaRazmacima(ukupanIznos))
+		})
+		.catch((err)=>{
+			console.log(err)
 		})*/
+
+		/*naloziDB.find({}).toArray()
+			.then((nalozi) => {
+				var ukupnoNaloga = 0;
+				var ukupnoObracunataVrednostNaloga = 0;
+				var ukupnoFakturisanIznos = 0;
+				var ukupnoFakturisanihNaloga = 0;
+				var ukupnoNefakturisanIznos = 0;
+				var ukupnoNefakturisanihNaloga = 0;
+				var ukupnoNezavrsenihNaloga = 0;
+				var ukupnoNeobracunatihNaloga = 0;
+				var ukupnoSpremnihIznos = 0;
+				var ukupnoSpremnihNaloga = 0;
+				var ukupnoRealizovano = 0;
+				for(var i=0;i<nalozi.length;i++){
+					var nalog = nalozi[i];
+					ukupnoNaloga++;
+					if(!isNaN(parseFloat(nalog.ukupanIznos))){
+						ukupnoObracunataVrednostNaloga = ukupnoObracunataVrednostNaloga +parseFloat(nalog.ukupanIznos);
+					}
+					if(nalog.statusNaloga=="Fakturisan"){
+						ukupnoFakturisanihNaloga++;
+						ukupnoFakturisanIznos = ukupnoFakturisanIznos + parseFloat(nalog.ukupanIznos);
+					}else if(nalog.statusNaloga=="Završeno" || nalog.statusNaloga=="Spreman za fakturisanje" || nalog.statusNaloga=="Nalog u Stambenom"){
+						ukupnoNefakturisanihNaloga++;
+						if(!isNaN(parseFloat(nalog.ukupanIznos))){
+							ukupnoNefakturisanIznos = ukupnoNefakturisanIznos + parseFloat(nalog.ukupanIznos);
+						}
+						
+					}
+
+					if(nalog.statusNaloga=="Spreman za fakturisanje"){
+						if(!isNaN(parseFloat(nalog.ukupanIznos))){
+							ukupnoSpremnihIznos = ukupnoSpremnihIznos + parseFloat(nalog.ukupanIznos);
+						}
+						ukupnoSpremnihNaloga++;
+					}
+
+					if(nalog.radnaJedinica=="ZVEZDARA" && nalog.statusNaloga != "Završeno" && nalog.statusNaloga != "Fakturisan" && nalog.statusNaloga != "Spreman za fakturisanje"){
+						ukupnoNezavrsenihNaloga++;
+					}
+
+					if(parseFloat(nalog.ukupanIznos)==0 || isNaN(parseFloat(nalog.ukupanIznos))){
+						ukupnoNeobracunatihNaloga++;
+					}
+				}
+
+				var informacijeJson = {};
+				informacijeJson.ukupnoNaloga = ukupnoNaloga;
+				informacijeJson.ukupnoObracunataVrednostNaloga = ukupnoObracunataVrednostNaloga;
+				informacijeJson.ukupnoFakturisanIznos = ukupnoFakturisanIznos;
+				informacijeJson.ukupnoFakturisanihNaloga = ukupnoFakturisanihNaloga;
+				informacijeJson.ukupnoNefakturisanIznos = ukupnoNefakturisanIznos;
+				informacijeJson.ukupnoNefakturisanihNaloga = ukupnoNefakturisanihNaloga;
+				informacijeJson.ukupnoNezavrsenihNaloga = ukupnoNezavrsenihNaloga;
+				informacijeJson.ukupnoNeobracunatihNaloga = ukupnoNeobracunatihNaloga;
+				informacijeJson.ukupnoSpremnihIznos = ukupnoSpremnihIznos;
+				informacijeJson.ukupnoSpremnihNaloga = ukupnoSpremnihNaloga;
+				informacijeJson.ukupnoRealizovano = ukupnoSpremnihIznos + ukupnoFakturisanIznos;
+				console.log(ukupnoNezavrsenihNaloga++)
+			})
+			.catch((error)=>{
+				console.log(error);
+			});*/
 
 	})
 	.catch(error => {
@@ -5864,7 +5975,7 @@ server.get('/dispeceri',async (req,res)=>{
 
 server.get('/administracijaMajstora',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			majstoriDB.find({}).toArray()
 			.then((majstori)=>{
 				for (var i = majstori.length - 1; i >= 0; i--) {
@@ -5907,7 +6018,7 @@ server.get('/administracijaMajstora',async (req,res)=>{
 
 server.get('/administracijaMajstora/:id',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			majstoriDB.find({uniqueId:req.params.id}).toArray()
 			.then((majstori)=>{
 				if(majstori.length>0){
@@ -5967,7 +6078,7 @@ server.get('/administracijaMajstora/:id',async (req,res)=>{
 
 server.post('/izmenaMajstora',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			var json = JSON.parse(req.body.json);
 			var setObj	=	{ $set: {
 											brojKartice:json.brojKartice,
@@ -8908,6 +9019,9 @@ server.get('/magacin/vozila', async (req, res)=> {
 	}
 });
 
+server.get('/checkin/:nfcid/:uniqueId', async (req, res)=> {
+
+})
 
 /*server.get('/temp', async (req, res)=> {
 	if(req.session.user){
