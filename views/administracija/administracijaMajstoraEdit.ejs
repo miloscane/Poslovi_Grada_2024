@@ -56,6 +56,12 @@
 					</div>
 				</div>
 				<div class="singleLineInput">
+					<div class="name">Очекивани учинак</div>
+					<div class="inputWrapper">
+						<input type="number" id="ocekivani-ucinak">
+					</div>
+				</div>
+				<div class="singleLineInput">
 					<div class="name">Службени телефон</div>
 					<div class="inputWrapper">
 						<input type="text" id="sluzbeni-broj">
@@ -110,6 +116,10 @@
 				document.getElementById("broj-kartice").value = majstor.brojKartice;
 			}
 
+			if(majstor.ocekivaniUcinak){
+				document.getElementById("ocekivani-ucinak").value = majstor.ocekivaniUcinak;
+			}
+
 			if(majstor.sluzbeniBroj){
 				document.getElementById("sluzbeni-broj").value = majstor.sluzbeniBroj;
 			}
@@ -159,6 +169,7 @@
 				izmenaJson.adresaStanovanja = document.getElementById("adresa-stanovanja").value;
 				izmenaJson.beleske = document.getElementById("beleske").value;
 				izmenaJson.aktivan = document.getElementById("aktivan").checked;
+				izmenaJson.ocekivaniUcinak = document.getElementById("ocekivani-ucinak").value;
 				izmenaJson.tipRada = [];
 				var tipovi = document.getElementsByClassName("tipRadnika");
 				for(var i=0;i<tipovi.length;i++){

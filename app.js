@@ -6118,6 +6118,7 @@ server.post('/izmenaMajstora',async (req,res)=>{
 			var json = JSON.parse(req.body.json);
 			var setObj	=	{ $set: {
 											brojKartice:json.brojKartice,
+											ocekivaniUcinak:json.ocekivaniUcinak,
 											sluzbeniBroj:json.sluzbeniBroj,
 											privatniBroj:json.privatniBroj,
 											jmbg:json.jmbg,
