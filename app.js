@@ -2879,6 +2879,42 @@ request(geoCodeOptions, (error,response,body)=>{
 				console.log(error);
 			});*/
 
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			console.log(" ");
+			console.log(" ");
+			var codes = ["80.01.16.004","80.01.16.005"];
+			var prices = [460,35];
+			for(var i=0;i<codes.length;i++){
+				var ukupno = 0;
+				var ukupnoNaloga = 0;
+				var podizvodjaciCifra = 0;
+				var podizvodjaciNalozi = 0;
+				for(var j=0;j<nalozi.length;j++){
+					for(var k=0;k<nalozi[j].obracun.length;k++){
+						if(nalozi[j].obracun[k].code==codes[i]){
+							ukupno = ukupno + parseFloat(nalozi[j].obracun[k].quantity)*prices[i];
+							ukupnoNaloga++;
+							if(podizvodjaci.indexOf(nalozi[j].majstor)>=0){
+								podizvodjaciCifra = podizvodjaciCifra + parseFloat(nalozi[j].obracun[k].quantity)*prices[i];
+								podizvodjaciNalozi++;
+							}
+							break;
+						}
+					}
+				}
+				console.log("Statistika za sifru "+codes[i])
+				console.log("Ukupno: "+brojSaRazmacima(ukupno) + "["+ukupnoNaloga+" naloga]")
+				console.log("Podizvodjaci: "+brojSaRazmacima(podizvodjaciCifra) + "["+podizvodjaciNalozi+" naloga]");
+				console.log("Poslovi Grada: "+brojSaRazmacima(ukupno-podizvodjaciCifra) + "["+eval(ukupnoNaloga-podizvodjaciNalozi)+" naloga]")
+				console.log("---------------------------------------------------------------")
+			}
+			
+		})
+		.catch((err)=>{
+			console.log(err)
+		})*/
+
 	})
 	.catch(error => {
 		console.log(error)
