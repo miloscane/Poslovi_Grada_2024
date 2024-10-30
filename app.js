@@ -8544,7 +8544,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				
 			}else{
 				//Nalog Postoji, pokusaj da ubacis obracun (mozda i da stavis status vracen), al proveri da li je mozda u statusu fakturisan
-				console.log("TU SI!!!")
+				//console.log("TU SI!!!")
 				if(nalozi[0].statusNaloga!="Fakturisan"){
 					var obracun = [];
 					for(var i=0;i<stambenoJson.order_lines.length;i++){
@@ -8562,22 +8562,30 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 							}
 						}
 					}
-					var setObj	=	{ $set: {
-						obracun: obracun,
-						ukupanIznos: ukupanIznos
-					}};
-					naloziDB.updateOne({uniqueId:nalozi[0].uniqueId},setObj)
-					.then((dbResponse)=>{
+					if(obracun.length>0){
+						var setObj	=	{ $set: {
+							obracun: obracun,
+							ukupanIznos: ukupanIznos
+						}};
+						naloziDB.updateOne({uniqueId:nalozi[0].uniqueId},setObj)
+						.then((dbResponse)=>{
+							res.status(200);
+							res.setHeader('Content-Type', 'application/json');
+							var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+							res.send(JSON.stringify(primerJson));
+						})
+						.catch((error)=>{
+							logError(err);
+							res.status(500);
+							res.send("Database error");
+						})	
+					}else{
 						res.status(200);
 						res.setHeader('Content-Type', 'application/json');
-						var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+						var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog bez obracuna.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 						res.send(JSON.stringify(primerJson));
-					})
-					.catch((error)=>{
-						logError(err);
-						res.status(500);
-						res.send("Database error");
-					})
+					}
+					
 
 				}else{
 					res.status(200);
