@@ -749,7 +749,7 @@ var stariCenovnikJsons = [];
 
 http.listen(process.env.PORT, function(){
 	console.log("Poslovi Grada 2024");
-	console.log("Server Started");
+	console.log("Server Started v1.4");
 	console.log("Connecting to database....");
 	var dbConnectionStart	=	new Date().getTime();
 	client.connect()
@@ -775,6 +775,7 @@ http.listen(process.env.PORT, function(){
 		dodeljivaniNaloziDB		=	client.db("Poslovi_Grada_2024").collection('dodeljivaniNalozi');
 		pomocniciDB						=	client.db("Poslovi_Grada_2024").collection('Pomocnici');
 		prisustvoDB						=	client.db("Poslovi_Grada_2024").collection('Prisustvo');
+		portalStambenoTestDB	=	client.db("Poslovi_Grada_2024").collection('portalStambenoTest');
 
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
@@ -8301,6 +8302,13 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 	nalogJSON.reqBody = req.body;
 	nalogJSON.reqHeader = req.headers;
 	nalogJSON.source = "POST";
+	portalStambenoTestDB.insertOne(nalogJSON)
+	.then((dbResponseTest)=>{
+
+	})
+	.catch((error)=>{
+		logError(error)
+	})
 	if(nalogJSON.reqBody.hasOwnProperty("note_details")){
 		try{
 			var izvestajJson = {};
