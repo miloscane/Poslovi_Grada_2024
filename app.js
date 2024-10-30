@@ -8342,10 +8342,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						//})
 						//.catch((error)=>{
 							//logError(error);
-							res.status(501);
-							res.setHeader('Content-Type', 'application/json');
-							//var primerJson = {"code":"501","message":"Neuspesan prijem beleske"}
-							res.send(JSON.stringify(primerJson));
+							
 						//})
 						
 					})
@@ -8547,6 +8544,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				
 			}else{
 				//Nalog Postoji, pokusaj da ubacis obracun (mozda i da stavis status vracen), al proveri da li je mozda u statusu fakturisan
+				console.log("TU SI!!!")
 				if(nalozi[0].statusNaloga!="Fakturisan"){
 					var obracun = [];
 					for(var i=0;i<stambenoJson.order_lines.length;i++){
