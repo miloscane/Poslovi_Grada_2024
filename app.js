@@ -1869,6 +1869,81 @@ request(geoCodeOptions, (error,response,body)=>{
 				console.log(error)
 			})*/ 
 
+			var marijaString = fs.readFileSync("marijaNalozi2.csv",{encoding:"utf8"});
+			var marijaStringArray = marijaString.split("\r\n");
+			var naloziZaPretragu = [];
+			for(var i=1;i<marijaStringArray.length;i++){
+				naloziZaPretragu.push(Number(marijaStringArray[i].split(";")[0]));
+			}
+			var naloziZaCSV = [];
+			for(var j=0;j<naloziZaPretragu.length;j++){
+				var json = {};
+				json.broj = naloziZaPretragu[j];
+				json.iznos = 0;	
+				naloziZaCSV.push(json);
+			}
+			stambeno2DB.find({broj_naloga:{$in:naloziZaPretragu}}).toArray()
+			.then((stambeno)=>{
+				for(var i=0;i<stambeno.length;i++){
+					var obracun = [];
+					for(var j=0;j<stambeno[i].order_lines.length;j++){
+						var json = {};
+						json.code = stambeno[i].order_lines[j].sifra_artikla;
+						json.quantity = stambeno[i].order_lines[j].kolicina_dobavljaca;
+						obracun.push(json);
+					}
+					var ukupanIznos = 0;
+					for(var j=0;j<obracun.length;j++){
+						for(var k=0;k<cenovnik.length;k++){
+							if(obracun[j].code==cenovnik[k].code){
+								ukupanIznos = ukupanIznos + cenovnik[k].price*obracun[j].quantity;
+								break;
+							}
+						}
+					}
+
+					for(var j=0;j<naloziZaCSV.length;j++){
+						if(naloziZaCSV[j].broj==stambeno[i].broj_naloga){
+							naloziZaCSV[j].iznos = ukupanIznos;
+						}
+					}
+				}
+
+				for(var i=0;i<naloziZaPretragu.length;i++){
+					naloziZaPretragu[i] = naloziZaPretragu[i].toString();
+				}
+
+				naloziDB.find({broj:{$in:naloziZaPretragu}}).toArray()
+				.then((nasiNalozi)=>{
+					console.log(nasiNalozi.length)
+					for(var i=0;i<naloziZaCSV.length;i++){
+						if(naloziZaCSV[i].iznos==0){
+							for(var j=0;j<nasiNalozi.length;j++){
+								//console.log(naloziZaCSV[i].broj.toString() + " vs "+nasiNalozi[j].broj)
+								if(naloziZaCSV[i].broj.toString()==nasiNalozi[j].broj){
+									naloziZaCSV[i].iznos = nasiNalozi[j].ukupanIznos;
+									break;
+								}
+							}
+						}
+					}
+
+					var csvString = "Broj naloga, Iznos\r\n";
+					for(var i=0;i<naloziZaCSV.length;i++){
+						csvString+= naloziZaCSV[i].broj+","+naloziZaCSV[i].iznos+"\r\n"
+					}
+					fs.writeFileSync("./MARIJA2.csv",csvString,"utf8");
+					console.log("Wrote Marija");
+				})
+				.catch((error)=>{
+					console.log(error)
+				})
+				
+			})
+			.catch((error)=>{
+				console.log(error)
+			})
+
 		})
 		.catch((error)=>{
 			logError(error);
@@ -2915,6 +2990,8 @@ request(geoCodeOptions, (error,response,body)=>{
 		.catch((err)=>{
 			console.log(err)
 		})*/
+
+
 
 	})
 	.catch(error => {
@@ -9169,6 +9246,30 @@ server.get('/checkin/:nfcid/:uniqueId', async (req, res)=> {
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	} 
 });*/
+
+server.post('/nalozi/:stringdata',async (req,res)=>{
+	var receivedString	=	req.params.stringdata;
+	var naloziArray		=	receivedString.split("_");
+	naloziDB.find({broj:{$in:naloziArray}}).toArray()
+	.then((nalozi)=>{
+		var sendString = "ODGOVOR#";
+		for(var i=0;i<naloziArray.length;i++){
+			var iznosNaloga = "0";
+			for(var j=0;j<nalozi.length;j++){
+				if(naloziArray[i]==nalozi[j].broj){
+					iznosNaloga = nalozi[j].ukupanIznos;
+					break;
+				}
+			}
+			sendString 	=	sendString + iznosNaloga + ":";
+			res.send(sendString);
+		}
+	})
+	.catch((error)=>{
+		console.log(error);
+		res.send("Greska u bazi podataka");
+	})
+});
 
 io.on('connection', function(socket){
 
