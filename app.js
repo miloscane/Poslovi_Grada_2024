@@ -9272,6 +9272,55 @@ server.post('/nalozi/:stringdata',async (req,res)=>{
 	})
 });
 
+server.get('/majstorCheckIn/:servertoken/:tagId',async (req,res)=>{
+	if(req.params.servertoken==process.env.servertoken){
+		majstoriDB.find({brojKartice:Number(req.params.tagId)}).toArray()
+		.then((majstori)=>{
+			if(majstori.length>0){
+				res.render("majstorCheckedIn",{
+					pageTitle: "Успешно очитано",
+					majstor: majstori[0],
+					majstorType: 0
+				})
+			}else{
+				pomocniciDB.find({brojKartice:Number(req.params.tagId)}).toArray()
+				.then((pomocnici)=>{
+					if(pomocnici.length>0){
+						res.render("majstorCheckedIn",{
+							pageTitle: "Успешно очитано",
+							majstor: pomocnici[0],
+							majstorType: 0
+						})	;
+					}else{
+						res.render("majstorCheckedIn",{
+							pageTitle: "Непозната картица",
+							majstor: false,
+							majstorType: 0
+						})
+					}
+					
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("messageNotLoggedIn",{
+						pageTitle: "Грешка",
+						message: "<div class=\"text\">Greska u bazi podataka</div>"
+					});
+				})
+			}
+		})
+		.catch((error)=>{
+			logError(error);
+			res.render("messageNotLoggedIn",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Greska u bazi podataka</div>"
+			});
+		})
+	}else{
+		res.send("Greska u tokenu")
+	}
+});
+
 io.on('connection', function(socket){
 
 	socket.on('listaNalogaAdministracija', function(odDatuma,doDatuma,adresa,opstine){
