@@ -9263,6 +9263,7 @@ server.post('/nalozi/:stringdata',async (req,res)=>{
 			}
 			sendString 	=	sendString + iznosNaloga + ":";
 		}
+		sendString = sendString.substring(0,sendString.length-1)
 		res.send(sendString);
 	})
 	.catch((error)=>{
