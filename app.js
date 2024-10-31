@@ -9262,8 +9262,8 @@ server.post('/nalozi/:stringdata',async (req,res)=>{
 				}
 			}
 			sendString 	=	sendString + iznosNaloga + ":";
-			res.send(sendString);
 		}
+		res.send(sendString);
 	})
 	.catch((error)=>{
 		console.log(error);
