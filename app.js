@@ -1869,7 +1869,7 @@ request(geoCodeOptions, (error,response,body)=>{
 				console.log(error)
 			})*/ 
 
-			var marijaString = fs.readFileSync("marijaNalozi2.csv",{encoding:"utf8"});
+			/*var marijaString = fs.readFileSync("marijaNalozi2.csv",{encoding:"utf8"});
 			var marijaStringArray = marijaString.split("\r\n");
 			var naloziZaPretragu = [];
 			for(var i=1;i<marijaStringArray.length;i++){
@@ -1947,7 +1947,7 @@ request(geoCodeOptions, (error,response,body)=>{
 		})
 		.catch((error)=>{
 			logError(error);
-		});
+		});*/
 
 		stariCenovnikDB.find({}).toArray()
 		.then((prices)=>{
