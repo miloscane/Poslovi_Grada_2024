@@ -4,12 +4,10 @@
 				<script>
 					var majstor = false;
 					majstor = <%- JSON.stringify(majstor)%>;
-					console.log(majstor);
 					var majstorType = <%=majstorType%>;
-					console.log(majstorType);
 					var serverToken = window.location.href.split("/")[4];
 				</script>
-				<div style="overflow:hidden">
+				<div style="width:1px;height:1px;overflow:hidden">
 					<input type="text" id="tag-input">
 				</div>
 				<script>
