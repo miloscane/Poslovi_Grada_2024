@@ -3,22 +3,24 @@
 	<script>
 		var pomocnici			=	<%-JSON.stringify(pomocnici)%>;
 		var prisutniPomocnici	=	<%-JSON.stringify(pomocnici)%>;
-		var checkIns			=	<%-JSON.stringify(checkIns)%>;
-		for(var i=0;i<prisutniPomocnici.length;i++){
-			prisutniPomocnici[i].slobodan = 1;
-		}
 		var majstori			=	<%-JSON.stringify(majstori)%>;
 		var vozila				=	<%-JSON.stringify(vozila)%>;
 		for(var i=0;i<vozila.length;i++){
 			vozila[i].slobodno = 1;
 		}
-		var ekipe				=	<%-JSON.stringify(ekipe)%>;
-		console.log(ekipe)
-
+		for(var i=0;i<majstori.length;i++){
+			if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
+				majstori.splice(i,1);
+				i--;
+			}
+		}
 		var prisustvo = [];
 	</script>
 	<div class="pageWidth"> 
 		<div class="ekipe">
+			<div class="inputWrap">
+				<input type="file" id="file" onchange="parseFile()">
+			</div>
 			<div class="majstori">
 				<div id="majstori" class="flex" data-initialized="0"></div>
 				<script>
@@ -84,7 +86,7 @@
 							for(var i=0;i<prisutniPomocnici.length;i++){
 								if(prisutniPomocnici[i].slobodan==1){
 									var option = document.createElement("OPTION");
-									option.setAttribute("value",prisutniPomocnici[i].brojKartice);
+									option.setAttribute("value",prisutniPomocnici[i].broj);
 									option.innerHTML = prisutniPomocnici[i].ime;
 									slobodni.appendChild(option);
 								}
@@ -96,7 +98,7 @@
 							for(var i=0;i<prisutniPomocnici.length;i++){
 								if(prisutniPomocnici[i].slobodan==0){
 									var option = document.createElement("OPTION");
-									option.setAttribute("value",prisutniPomocnici[i].brojKartice);
+									option.setAttribute("value",prisutniPomocnici[i].broj);
 									option.innerHTML = prisutniPomocnici[i].ime;
 									dodeljeni.appendChild(option);
 								}
@@ -157,7 +159,7 @@
 						}*/
 						
 						for(var i=0;i<prisutniPomocnici.length;i++){
-							if(Number(prisutniPomocnici[i].brojKartice)==Number(elem.value)){
+							if(Number(prisutniPomocnici[i].broj)==Number(elem.value)){
 								prisutniPomocnici[i].slobodan = 0;
 							}
 						}
@@ -171,7 +173,7 @@
 							}
 						}
 						for(var i=0;i<prisutniPomocnici.length;i++){
-							if(selectedPomocnici.indexOf(Number(prisutniPomocnici[i].brojKartice))<0){
+							if(selectedPomocnici.indexOf(Number(prisutniPomocnici[i].broj))<0){
 								prisutniPomocnici[i].slobodan = 1;
 							}
 						}
@@ -264,7 +266,7 @@
 						var pomocnikBlok = document.createElement("DIV");
 						pomocnikBlok.setAttribute("class","pomocnikWrap flexBox");
 						pomocnikBlok.setAttribute("data-id",pomocnici[i].uniqueId);
-						pomocnikBlok.setAttribute("data-brojkartice",pomocnici[i].brojKartice);
+						pomocnikBlok.setAttribute("data-brojkartice",pomocnici[i].broj);
 							var imePomocnika = document.createElement("DIV");
 							imePomocnika.setAttribute("class","ime");
 							imePomocnika.innerHTML = pomocnici[i].ime.split(" ")[0] + "<br>"+pomocnici[i].ime.split(" ")[1];
@@ -274,7 +276,7 @@
 							inlines.setAttribute("class","inlines");
 								var inline = document.createElement("DIV");
 								inline.setAttribute("class","inline");
-								inline.innerHTML = "";
+								inline.innerHTML = "Присутан:";
 								inlines.appendChild(inline);
 								
 								var inline = document.createElement("DIV");
@@ -287,38 +289,109 @@
 				</script>
 			</div>
 		</div>
-
 		<script>
-			var majstoriElems = document.getElementsByClassName("majstor");
-			var pomocniciElems = document.getElementsByClassName("pomocnikWrap");
-			for(var i=0;i<majstoriElems.length;i++){
-				generateSelect(majstoriElems[i].getElementsByClassName("selectWrap")[0]);
-				generateVozilaSelect(majstoriElems[i].getElementsByClassName("voziloSelectWrap")[0]);
-			}
-
-			if(ekipe.datum){
-				for(var i=0;i<majstoriElems.length;i++){
-					for(var j=0;j<ekipe.prisustvo.ekipe.length;j++){
-						if(majstoriElems[i].dataset.id==ekipe.prisustvo.ekipe[j].idMajstora){
-							if(Number(ekipe.prisustvo.ekipe[j].pomocnik)!=0){
-								majstoriElems[i].getElementsByClassName("pomocnikSelect")[0].value = ekipe.prisustvo.ekipe[j].pomocnik;
-								majstoriElems[i].getElementsByClassName("pomocnikSelect")[0].dispatchEvent(new Event('input'));
+			function parseFile(){
+				prisustvo = [];
+				var input = document.getElementById('file');
+				var file = input.files[0];
+				var reader = new FileReader();
+				reader.onload = function() {
+					document.getElementById("majstori").dataset.initialized = 0;
+					var contents = reader.result;
+					var rowArray = contents.split("\r\n");
+					rowArray.splice(0,1);
+					var prisustvoArray = [];
+					for(var i=0;i<rowArray.length;i++){
+						var array = rowArray[i].split(",");
+						if(array[2]){
+							if(array[3]){
+								if(array[2].includes(getDateAsStringForInputObject(new Date()))){
+									if(array[3].includes("F1")){
+										var json = {};
+										json.broj = Number(array[0].replace(/"/g," "));
+										prisustvo.push(json);
+									}
+									
+								}else if(array[2].substr(2,1)=="-"){
+									var danas = getDateAsStringForInputObject(new Date());
+									var mesec = danas.split("-")[1];
+									var dan = danas.split("-")[2];
+									if(array[2].includes(dan+"-"+mesec)){
+										if(array[3].includes("F1")){
+											var json = {};
+											json.broj = Number(array[0].replace(/"/g," "));
+											prisustvo.push(json);
+										}
+									}
+								}
 							}
-							majstoriElems[i].getElementsByClassName("trecaLicaBox")[0].checked = ekipe.prisustvo.ekipe[j].trecaLica;
-							if(Number(ekipe.prisustvo.ekipe[j].vozilo)!=0){
-								majstoriElems[i].getElementsByClassName("voziloSelect")[0].value = ekipe.prisustvo.ekipe[j].vozilo;
-								majstoriElems[i].getElementsByClassName("voziloSelect")[0].dispatchEvent(new Event('input'));
-							}
-							break;
 						}
 						
+						
 					}
-				}	
+					var majstoriElems = document.getElementsByClassName("majstor");
+					for(var i=0;i<majstoriElems.length;i++){
+						//majstoriElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
+						majstoriElems[i].dataset.prisutan = 0;
+						majstoriElems[i].getElementsByClassName("ime")[0].style.color = "rgb(150,0,0)";
+					}
+					for(var i=0;i<prisustvo.length;i++){
+						for(var j=0;j<majstoriElems.length;j++){
+							if(Number(majstoriElems[j].dataset.brojkartice)==Number(prisustvo[i].broj)){
+								//majstoriElems[j].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
+								majstoriElems[j].dataset.prisutan = 1;
+								majstoriElems[j].getElementsByClassName("ime")[0].style.color = "rgb(0,150,0)";
+							}
+						}
+					}
+
+					var pomocniciElems = document.getElementsByClassName("pomocnikWrap");
+					for(var i=0;i<pomocniciElems.length;i++){
+						//pomocniciElems[i].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(150,0,0)\">НЕ</span>";
+						pomocniciElems[i].getElementsByClassName("ime")[0].style.color = "rgb(150,0,0)";
+					}
+					for(var i=0;i<prisustvo.length;i++){
+						for(var j=0;j<pomocniciElems.length;j++){
+							if(Number(pomocniciElems[j].dataset.brojkartice)==Number(prisustvo[i].broj)){
+								//pomocniciElems[j].getElementsByClassName("inlines")[0].getElementsByClassName("inline")[1].innerHTML = "<span style=\"color:rgb(0,150,0)\">ДА</span>";
+								pomocniciElems[j].getElementsByClassName("ime")[0].style.color = "rgb(0,150,0)";
+							}
+						}
+					}
+
+					for(var i=0;i<prisutniPomocnici.length;i++){
+						var found = false;
+						for(var j=0;j<prisustvo.length;j++){
+							if(Number(prisustvo[j].broj)==prisutniPomocnici[i].broj){
+								found = true;
+							}
+						}
+						if(!found){
+							prisutniPomocnici.splice(i,1);
+							i--;
+						}
+					}
+
+					//PROVERA DAL JE SLOBODAN POMOCNIK
+					for(var i=0;i<prisutniPomocnici.length;i++){
+						prisutniPomocnici[i].slobodan = 1;
+					}
+
+
+					for(var i=0;i<majstoriElems.length;i++){
+						generateSelect(majstoriElems[i].getElementsByClassName("selectWrap")[0]);
+						generateVozilaSelect(majstoriElems[i].getElementsByClassName("voziloSelectWrap")[0]);
+					}
+					//OVDE UBACI ISTORIJU OD JUCE
+
+
+					document.getElementById("majstori").dataset.initialized = 1;
+				};
+  				reader.readAsText(file);
 			}
-			
 
 			function saveForm(){
-				//if(Number(document.getElementById("majstori").dataset.initialized) == 1){
+				if(Number(document.getElementById("majstori").dataset.initialized) == 1){
 					var jsonObject = {};
 					jsonObject.ekipe = [];
 					jsonObject.pomocnici = prisutniPomocnici;
@@ -336,37 +409,11 @@
 					//console.log(jsonObject)
 					document.getElementById("form").submit();
 					loadGif();	
-				//}else{
-					//alert("Погрешан документ.")
-				//}
+				}else{
+					alert("Погрешан документ.")
+				}
 				
 			}
-
-			function handleCheckIns(){
-				for(var i=0;i<majstoriElems.length;i++){
-					for(var j=0;j<checkIns.length;j++){
-						if(Number(checkIns[j].brojKartice)==Number(majstoriElems[i].dataset.brojkartice)){
-							majstoriElems[i].getElementsByClassName("ime")[0].style.color="rgb(0,200,0)";
-							break;
-						}
-					}
-				}
-
-				for(var i=0;i<pomocniciElems.length;i++){
-					for(var j=0;j<checkIns.length;j++){
-						if(Number(checkIns[j].brojKartice)==Number(pomocniciElems[i].dataset.brojkartice)){
-							pomocniciElems[i].getElementsByClassName("ime")[0].style.color="rgb(0,200,0)";
-							break;
-						}
-					}
-				}
-			}
-			handleCheckIns();
-
-			socket.on("majstorCheckedIn",function(json){
-				checkIns.push(json);
-				handleCheckIns();
-			});
 		</script>
 		<form method="POST" action="/ekipe" id="form" style="display:none">
 			<input type="text" name="json" id="json">

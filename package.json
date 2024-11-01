@@ -26,6 +26,6 @@
     "pdf-parse": "^1.1.1",
     "request": "^2.88.2",
     "sharp": "^0.33.2",
-    "socket.io": "^4.7.4"
+    "socket.io": "^4.8.1"
   }
 }

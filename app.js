@@ -745,6 +745,8 @@ var dodeljivaniNaloziDB;
 var stambenoDB;
 var stambeno2DB;
 var pomocniciDB;
+var checkInMajstoraDB;
+var ekipeDB;
 var stariCenovnikJsons = [];
 
 http.listen(process.env.PORT, function(){
@@ -776,6 +778,8 @@ http.listen(process.env.PORT, function(){
 		pomocniciDB						=	client.db("Poslovi_Grada_2024").collection('Pomocnici');
 		prisustvoDB						=	client.db("Poslovi_Grada_2024").collection('Prisustvo');
 		portalStambenoTestDB	=	client.db("Poslovi_Grada_2024").collection('portalStambenoTest');
+		checkInMajstoraDB			=	client.db("Poslovi_Grada_2024").collection('checkInMajstora');
+		ekipeDB								=	client.db("Poslovi_Grada_2024").collection('Ekipe');
 
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
@@ -8776,53 +8780,41 @@ server.get('/tv2', async (req, res)=> {
 });
 
 server.get('/tv', async (req, res)=> {
-	/*var today = new Date();
-	dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
-	.then((nalozi)=>{
-		majstoriDB.find({}).toArray()
-		.then((majstori)=>{
-			res.render("tv3",{
-				nalozi: nalozi,
-				pageTitle: "СТАТУС МАЈСТОРА",
-				majstori: majstori
-			})
-		})
-		.catch((error)=>{
-			logError(error);
-			res.send("Greska u bazi podataka")
-		})
-		
-	})
-	.catch((error)=>{
-		logError(error);
-		res.send("Greska u bazi podataka");
-	})*/
+	var date = new Date();
+	var year = date.getFullYear();
+	var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
+	var date = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
+	
 	majstoriDB.find({}).toArray()
 	.then((majstori)=>{
 		for(var i=0;i<majstori.length;i++){
-			if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
+			if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0 || !majstori[i].aktivan){
 				majstori.splice(i,1);
 				i--;
 			}
 		}
-		var today = new Date();
-		//today.setDate(today.getDate()-1);
-		prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
-		.then((prisustvo)=>{
-			pomocniciDB.find({}).toArray()
-			.then((pomocnici)=>{
+		pomocniciDB.find({}).toArray()
+		.then((pomocnici)=>{
+			for(var i=0;i<pomocnici.length;i++){
+				if(!pomocnici[i].aktivan){
+					pomocnici.splice(i,1);
+					i--;
+				}
+			}
+			checkInMajstoraDB.find({year:year,month:month,date:date}).toArray()
+			.then((checkIns)=>{
 				res.render("tv",{
-			    pageTitle: "Екипе",
-			    prisustvo: prisustvo[0],
+			    pageTitle: "Прозор",
 			    pomocnici: pomocnici,
-			    majstori: majstori
-			  })
+			    majstori: majstori,
+			    checkIns: checkIns
+			  });
 			})
 			.catch((error)=>{
 				logError(error);
-				res.send("Greska 3")
+				res.send("Greska 3")	
 			})
-			
+
 		})
 		.catch((error)=>{
 			logError(error);
@@ -9031,24 +9023,41 @@ server.get('/magacin/ekipe', async (req, res)=> {
 			var today = new Date();
 			var yesterday = new Date();
 			yesterday.setDate(today.getDate()-1);
+			var date = new Date();
+			var year = date.getFullYear();
+			var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
+			var date = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
+
 			pomocniciDB.find({}).toArray()
 			.then((pomocnici)=>{
+				for(var i=0;i<pomocnici.length;i++){
+					if(!pomocnici[i].aktivan){
+						pomocnici.splice(i,1);
+						i--
+					}
+				}
 				majstoriDB.find({}).toArray()
 				.then((majstori)=>{
-					prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(yesterday)}).toArray()
-					.then((prisustvoJuce)=>{
-						prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(yesterday)}).toArray()
-						.then((prisustvoDanas)=>{
-							navigacijaInfoDB.find({}).toArray()
-							.then((vozila)=>{
+					for(var i=0;i<majstori.length;i++){
+						if(!majstori[i].aktivan || podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
+							majstori.splice(i,1);
+							i--
+						}
+					}
+					navigacijaInfoDB.find({}).toArray()
+					.then((vozila)=>{
+						checkInMajstoraDB.find({year:year,month:month,date:date}).toArray()
+						.then((checkIns)=>{
+							ekipeDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
+							.then((ekipe)=>{
 								res.render("magacioner/ekipe",{
 									pageTitle: "Екипе",
 									user: req.session.user,
 									pomocnici: pomocnici,
-									prisustvoJuce: prisustvoJuce[0],
-									prisustvoDanas: prisustvoDanas[0],
 									vozila: vozila,
-									majstori: majstori
+									majstori: majstori,
+									checkIns: checkIns,
+									ekipe: ekipe.length>0 ? ekipe[ekipe.length-1] : {}
 								});
 							})
 							.catch((error)=>{
@@ -9069,6 +9078,7 @@ server.get('/magacin/ekipe', async (req, res)=> {
 			          message: "<div class=\"text\">Грешка у бази података 7622.</div>"
 			        });
 						})
+						
 					})
 					.catch((error)=>{
 						logError(error);
@@ -9078,7 +9088,6 @@ server.get('/magacin/ekipe', async (req, res)=> {
 		          message: "<div class=\"text\">Грешка у бази података 7622.</div>"
 		        });
 					})
-					
 				})
 			})
 			.catch((error)=>{
@@ -9111,13 +9120,13 @@ server.post('/ekipe', async (req, res)=> {
 			json.datum.datetime = new Date().getTime();
 			json.user = req.session.user;
 			json.uniqueId = generateId(6) + "--" + new Date().getTime();
-			prisustvoDB.find({"datum.datum":getDateAsStringForDisplay(new Date())}).toArray()
+			ekipeDB.find({"datum.datum":getDateAsStringForDisplay(new Date())}).toArray()
 			.then((prisustva)=>{
 				if(prisustva.length==0){
-					prisustvoDB.insertOne(json)
+					ekipeDB.insertOne(json)
 					.then((dbResponse)=>{
 						res.redirect("/")
-						io.emit("ekipeStigle",1)
+						io.emit("ekipeStigle",1);
 					})
 					.catch((error)=>{
 						logError(error)
@@ -9128,7 +9137,7 @@ server.post('/ekipe', async (req, res)=> {
 		        });
 					})
 				}else{
-					prisustvoDB.replaceOne({uniqueId:prisustva[0].uniqueId},json)
+					ekipeDB.replaceOne({uniqueId:prisustva[0].uniqueId},json)
 					.then((dbResponse)=>{
 						res.redirect("/");
 						io.emit("ekipeStigle",1);
@@ -9274,28 +9283,86 @@ server.post('/nalozi/:stringdata',async (req,res)=>{
 
 server.get('/majstorCheckIn/:servertoken/:tagId',async (req,res)=>{
 	if(req.params.servertoken==process.env.servertoken){
+		var date = new Date();
+		var year = date.getFullYear();
+		var datetime = date.getTime();
+		var minutes = date.getMinutes().toString().length>1 ? date.getMinutes() : "0" + date.getMinutes(); 
+		var hours = date.getHours().toString().length>1 ? date.getHours() : "0" + date.getHours(); 
+		var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
+		var date = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
+		var vreme = date +"."+month+"."+year+" <i>"+hours+":"+minutes+"</i>";
 		majstoriDB.find({brojKartice:Number(req.params.tagId)}).toArray()
 		.then((majstori)=>{
 			if(majstori.length>0){
-				res.render("majstorCheckedIn",{
-					pageTitle: "Успешно очитано",
-					majstor: majstori[0],
-					majstorType: 0
+				var json = {};
+				json.uniqueId = majstori[0].uniqueId;
+				json.brojKartice = majstori[0].brojKartice;
+				json.datetime = datetime;
+				json.month = month;
+				json.date = date;
+				json.year = year;
+				json.timestamp = hours+":"+minutes;
+				checkInMajstoraDB.insertOne(json)
+				.then((dbResponse)=>{
+					io.emit("majstorCheckedIn",json)
+					res.render("majstorCheckedIn",{
+						pageTitle: "Успешно чекирање",
+						message: "САМО ГАС!",
+						majstor: majstori[0],
+						kartica: 0,
+						vreme: vreme,
+						majstorType: 1
+					})
 				})
+				.catch((error)=>{
+					logError(error)
+					res.render("messageNotLoggedIn",{
+						pageTitle: "Грешка",
+						message: "<div class=\"text\">Greska u bazi podataka</div>"
+					});
+				})
+				
 			}else{
 				pomocniciDB.find({brojKartice:Number(req.params.tagId)}).toArray()
 				.then((pomocnici)=>{
 					if(pomocnici.length>0){
-						res.render("majstorCheckedIn",{
-							pageTitle: "Успешно очитано",
-							majstor: pomocnici[0],
-							majstorType: 0
-						})	;
+
+						var json = {};
+						json.uniqueId = pomocnici[0].uniqueId;
+						json.brojKartice = pomocnici[0].brojKartice;
+						json.datetime = datetime;
+						json.month = month;
+						json.date = date;
+						json.year = year;
+						json.timestamp = hours+":"+minutes;
+						checkInMajstoraDB.insertOne(json)
+						.then((dbResponse)=>{
+							io.emit("majstorCheckedIn",json)
+							res.render("majstorCheckedIn",{
+								pageTitle: "Успешно чекирањe",
+								message: "САМО ГАС!",
+								majstor: pomocnici[0],
+								kartica: 0,
+								vreme: vreme,
+								majstorType: 0
+							});
+						})
+						.catch((error)=>{
+							logError(error)
+							res.render("messageNotLoggedIn",{
+								pageTitle: "Грешка",
+								message: "<div class=\"text\">Greska u bazi podataka</div>"
+							});
+						})
+						
 					}else{
 						res.render("majstorCheckedIn",{
-							pageTitle: "Непозната картица",
-							majstor: false,
-							majstorType: 0
+							pageTitle: "Непозната картица. Obavestite magacionera!",
+							majstor: {ime:"КО СТЕ ВИ!?!?"},
+							message: "САМО ГАС!",
+							majstorType: 0,
+							vreme: vreme,
+							kartica: req.params.tagId
 						})
 					}
 					
