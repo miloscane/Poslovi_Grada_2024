@@ -9284,6 +9284,7 @@ server.post('/nalozi/:stringdata',async (req,res)=>{
 server.get('/majstorCheckIn/:servertoken/:tagId',async (req,res)=>{
 	if(req.params.servertoken==process.env.servertoken){
 		var date = new Date();
+		date = new Date(date.getTime()+3.6e+6)
 		var year = date.getFullYear();
 		var datetime = date.getTime();
 		var minutes = date.getMinutes().toString().length>1 ? date.getMinutes() : "0" + date.getMinutes(); 

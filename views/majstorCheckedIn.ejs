@@ -18,21 +18,24 @@
 					if (!e) e = window.event;
 					var keyCode = e.code || e.key;
 					if (keyCode == 'Enter'){
-						loadGif()
+						loadGif();
 					  window.location.href = "/majstorCheckIn/"+serverToken + "/"+document.getElementById("tag-input").value;
 					}
 				}
         
 				</script>
-				<% if (typeof kartica!="undefined") { %>
+				
 					<div class="majstorCheckIn">
 						<div class="title"><%-majstor.ime%></div>
 						<div class="vreme"><%-vreme%></div>
-						<div class="srecanRad"><%- message%></div>
+						<% if (Number(kartica)==0) { %>
+							<div class="srecanRad"><%- kartica%></div>
+						<% }else{ %>
+							<div class="srecanRad"><%- message%></div>
+						<% } %>	
 					</div>
-				<% }else{ %>
 					<div class="message">Број картице: <%=kartica%></div>	
-				<% } %>	
+				
 			</div>
 		</div>
 	</div><!--page wrap-->
