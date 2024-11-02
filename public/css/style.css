@@ -4889,6 +4889,10 @@ input[type=number] {
     color:rgb(31,52,100);
 }
 
+.tv3{
+    width:100vw !important;
+}
+
 .tv3 .prisustvoWrap{
     margin-bottom:10px;
 }
@@ -4918,6 +4922,64 @@ input[type=number] {
 .tv3 .prisustvoWrap .items .item .ucinakTarget{
     color:rgb(100,100,100);
     font-size:12px;
+}
+
+.tv3 .boxesWrap{
+    display:flex;
+    flex-wrap: wrap;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+}
+
+
+.tv3 .boxesWrap .opstina{
+    width: calc(33.333% - 20px);
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    margin:5px;
+    padding:20px;
+    padding-top:30px;
+    position:relative;
+    border:2px solid rgb(32,51,100);
+}
+
+.tv3 .boxesWrap .opstina .title{
+    position:absolute;
+    top:3px;
+    left:3px;
+}
+
+.tv3 .majstoriNaOpstini .ekipaElem{
+    display:inline-block;
+    vertical-align: middle;
+    border:1px solid rgb(31,52,100);
+    padding:4px;
+    margin:5px;
+    width:200px;
+}
+
+.tv3 .majstoriNaOpstini .majstor{
+    color:rgb(31,52,100);
+    font-size:14px;
+    font-weight:600;
+}
+
+.tv3 .majstoriNaOpstini .subTitle{
+    font-weight:600;
+    font-size:11px;
+}
+
+.tv3 .majstoriNaOpstini .separator{
+    margin:3px 0;
+    width:50px;
+    height:1px;
+    background-color:rgb(31,52,100);
+}
+
+
+.tv3 .majstoriNaOpstini .pomocnik, .tv3 .majstoriNaOpstini .vozilo{
+    font-size:11px;
+    font-weight:300;
 }
 
 @media screen and (max-width: 1100px) {

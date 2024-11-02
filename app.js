@@ -8798,9 +8798,10 @@ server.get('/tv2', async (req, res)=> {
 
 server.get('/tv', async (req, res)=> {
 	var date = new Date();
-	var year = date.getFullYear();
+	var year = new Date().getFullYear();
+	date.setDate(date.getDate()-1)
 	var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
-	var date = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
+	var dateStr = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
 	
 	majstoriDB.find({}).toArray()
 	.then((majstori)=>{
@@ -8818,14 +8819,40 @@ server.get('/tv', async (req, res)=> {
 					i--;
 				}
 			}
-			checkInMajstoraDB.find({year:year,month:month,date:date}).toArray()
+			checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()
 			.then((checkIns)=>{
-				res.render("tv",{
-			    pageTitle: "Прозор",
-			    pomocnici: pomocnici,
-			    majstori: majstori,
-			    checkIns: checkIns
-			  });
+		    ekipeDB.find({"datum.datum":getDateAsStringForDisplay(date)}).toArray()
+		    .then((ekipe)=>{
+		    	dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(date)}).toArray()
+		    	.then((dodele)=>{
+		    		navigacijaInfoDB.find({}).toArray()
+		    		.then((vozila)=>{
+		    			res.render("tv",{
+						    pageTitle: "Прозор",
+						    pomocnici: pomocnici,
+						    majstori: majstori,
+						    checkIns: checkIns,
+						    ekipe: ekipe[0],
+						    vozila: vozila,
+						    dodele: dodele
+						  });
+		    		})
+		    		.catch((error)=>{
+		    			logError(error);
+							res.send("Greska 6")	
+		    		})
+		    		
+		    	})
+		    	.catch((error)=>{
+		    		logError(error);
+						res.send("Greska 5")	
+		    	})
+		    })
+		    .catch((error)=>{
+		    	logError(error);
+					res.send("Greska 4")	
+		    })
+				
 			})
 			.catch((error)=>{
 				logError(error);
@@ -9067,15 +9094,41 @@ server.get('/magacin/ekipe', async (req, res)=> {
 						.then((checkIns)=>{
 							ekipeDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
 							.then((ekipe)=>{
-								res.render("magacioner/ekipe",{
-									pageTitle: "Екипе",
-									user: req.session.user,
-									pomocnici: pomocnici,
-									vozila: vozila,
-									majstori: majstori,
-									checkIns: checkIns,
-									ekipe: ekipe.length>0 ? ekipe[ekipe.length-1] : {}
-								});
+								if(ekipe.length==0){
+									today.setDate(today.getDate()-1)
+									ekipeDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
+									.then((ekipeJuce)=>{
+										//console.log(ekipeJuce)
+										res.render("magacioner/ekipe",{
+											pageTitle: "Екипе",
+											user: req.session.user,
+											pomocnici: pomocnici,
+											vozila: vozila,
+											majstori: majstori,
+											checkIns: checkIns,
+											ekipe: ekipeJuce[ekipeJuce.length-1]
+										});
+									})
+									.catch((error)=>{
+										logError(error);
+										res.render("message",{
+						          pageTitle: "Грешка",
+						          user: req.session.user,
+						          message: "<div class=\"text\">Грешка у бази података 7622.</div>"
+						        });
+									})
+								}else{
+									res.render("magacioner/ekipe",{
+										pageTitle: "Екипе",
+										user: req.session.user,
+										pomocnici: pomocnici,
+										vozila: vozila,
+										majstori: majstori,
+										checkIns: checkIns,
+										ekipe: ekipe[ekipe.length-1]
+									});
+								}
+								
 							})
 							.catch((error)=>{
 								logError(error);
@@ -9143,7 +9196,7 @@ server.post('/ekipe', async (req, res)=> {
 					ekipeDB.insertOne(json)
 					.then((dbResponse)=>{
 						res.redirect("/")
-						io.emit("ekipeStigle",1);
+						io.emit("ekipeStigle",json);
 					})
 					.catch((error)=>{
 						logError(error)
@@ -9157,7 +9210,7 @@ server.post('/ekipe', async (req, res)=> {
 					ekipeDB.replaceOne({uniqueId:prisustva[0].uniqueId},json)
 					.then((dbResponse)=>{
 						res.redirect("/");
-						io.emit("ekipeStigle",1);
+						io.emit("ekipeStigle",json);
 					})
 					.catch((error)=>{
 						logError(error)
