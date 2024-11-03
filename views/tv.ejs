@@ -1,4 +1,7 @@
 <%- include ("partials/header-nl") -%>
+<style>
+	.gm-style-iw-chr{display:none}
+</style>
 	<script src="/js/socket.js"></script>
 	<script>
 		var socket  = io({});
@@ -7,6 +10,7 @@
 		var checkIns = <%-JSON.stringify(checkIns)%>;
 		var ekipe = <%-JSON.stringify(ekipe)%>;
 		var dodele = <%-JSON.stringify(dodele)%>;
+		console.log(dodele)
 		var vozila = <%-JSON.stringify(vozila)%>;
 		var statusi = [{naziv:"Кренуо",value:"Odlazak"},{naziv:"Стигао",value:"Dolazak"},{naziv:"Завршио",value:"Zavrseno"}];
 		function getPomocnikByCard(card){
@@ -46,8 +50,28 @@
 		  }
 		  return vozilo
 		}
+
+
+		const today = new Date();
+		const year = today.getFullYear();
+		const month = today.getMonth();
+		let workdaysCount = 0;
+
+		// Loop from today until the last day of the month
+		for (let day = today.getDate(); day <= new Date(year, month + 1, 0).getDate(); day++) {
+			const date = new Date(year, month, day);
+			const dayOfWeek = date.getDay();
+
+			// Check if the day is a weekday (Monday-Friday)
+			if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+			  workdaysCount++;
+			}
+		}
+
+		console.log("Ostalo radnih dana: " + workdaysCount)
+
 	</script>
-	<div class="pageWidth tv3">
+	<div class="pageWidth tv3" id="pregled-ekipa">
 		<div class="prisustvoWrap">
 			<div class="title">Мајстори</div>
 			<div class="items" id="majstori"></div>
@@ -138,123 +162,302 @@
 
 			socket.on("majstorCheckedIn",function(json){
 				checkIns.push(json);
-				handleCheckIns();
+				handleUpdate();
+			});
+
+			socket.on("majstorNaNalogu",function(json){
+				dodele.push(json);
+				handleUpdate();
+			});
+
+			socket.on("ekipeStigle",function(json){
+				ekipe = json;
+				handleUpdate();
 			});
 
 			var majstoriWraps = document.getElementsByClassName("majstoriNaOpstini");
 
 			function handleUpdate(){
-				for(var i=0;i<majstoriWraps.length;i++){
-					majstoriWraps[i].innerHTML = "";
-				}
+				if(ekipe.prisustvo){
+					for(var i=0;i<majstoriWraps.length;i++){
+						majstoriWraps[i].innerHTML = "";
+					}
 
-				for(var i=0;i<ekipe.prisustvo.ekipe.length;i++){
-					//console.log(ekipe.prisustvo.ekipe[i])
-					var majstorJson = getMajstorByCode(ekipe.prisustvo.ekipe[i].idMajstora);
-					var pomocnikJson = getPomocnikByCard(ekipe.prisustvo.ekipe[i].pomocnik);
-					var voziloJson = getVoziloById(ekipe.prisustvo.ekipe[i].vozilo);
-					var ekipaElem = document.createElement("DIV");
-					ekipaElem.setAttribute("class","ekipaElem");
-						var majstor = document.createElement("DIV");
-						majstor.setAttribute("class","majstor");
-						majstor.innerHTML = majstorJson.ime;
-						var majstorCheckedIn = false;
-						for(var j=0;j<checkIns.length;j++){
-							if(Number(checkIns[j].brojKartice)==Number(majstorJson.brojKartice)){
-								majstorCheckedIn = true;
-							}
-						}
-						ekipaElem.appendChild(majstor);
-
-
-						var subTitle = document.createElement("DIV");
-						subTitle.setAttribute("class","subTitle");
-						subTitle.innerHTML = "Потребан учинак:";
-						ekipaElem.appendChild(subTitle);
-
-						var separator = document.createElement("DIV");
-						separator.setAttribute("class","separator");
-						ekipaElem.appendChild(separator);
-
-						var subTitle = document.createElement("DIV");
-						subTitle.setAttribute("class","subTitle");
-						subTitle.innerHTML = "Помоћник";
-						ekipaElem.appendChild(subTitle);
-
-						var pomocnik = document.createElement("DIV");
-						pomocnik.setAttribute("class","pomocnik");
-						pomocnik.innerHTML = pomocnikJson.ime;
-						ekipaElem.appendChild(pomocnik);
-
-
-						var separator = document.createElement("DIV");
-						separator.setAttribute("class","separator");
-						ekipaElem.appendChild(separator);
-
-						var subTitle = document.createElement("DIV");
-						subTitle.setAttribute("class","subTitle");
-						subTitle.innerHTML = "Возило";
-						ekipaElem.appendChild(subTitle);
-
-						var vozilo = document.createElement("DIV");
-						vozilo.setAttribute("class","vozilo");
-						vozilo.innerHTML = voziloJson.brojTablice ? voziloJson.brojTablice : "-";
-						ekipaElem.appendChild(vozilo);
-
-						var separator = document.createElement("DIV");
-						separator.setAttribute("class","separator");
-						ekipaElem.appendChild(separator);
-
-						var subTitle = document.createElement("DIV");
-						subTitle.setAttribute("class","subTitle");
-						subTitle.innerHTML = "Налози";
-						ekipaElem.appendChild(subTitle);
-
-						var naloziWrap = document.createElement("DIV");
-						naloziWrap.setAttribute("class","naloziWrap");
-						var radnaJedinica = "";
-						for(var j=0;j<dodele.length;j++){
-							if(dodele[j].majstor == majstorJson.uniqueId){
-								radnaJedinica = dodele[j].radnaJedinica;
-								var row = document.createElement("DIV");
-								row.setAttribute("class","row");
-									var brojNaloga = document.createElement("DIV");
-									brojNaloga.setAttribute("class","brojNaloga");
-									brojNaloga.innerHTML = dodele[j].nalog;
-									row.appendChild(brojNaloga);
-
-									var opstina = document.createElement("DIV");
-									opstina.setAttribute("class","brojNaloga");
-									opstina.innerHTML = dodele[j].radnaJedinica;
-									row.appendChild(opstina);
-
-									var statusNaloga = document.createElement("DIV");
-									statusNaloga.setAttribute("class","status");
-									statusNaloga.innerHTML = dodele[j].status;
-									row.appendChild(statusNaloga);
-								naloziWrap.appendChild(row);
-							}
-						}
-						ekipaElem.appendChild(naloziWrap);
-					if(majstorCheckedIn){
-						if(radnaJedinica!=""){
-							for(var j=0;j<majstoriWraps.length;j++){
-								if(majstoriWraps[j].parentElement.dataset.opstina==radnaJedinica){
-									majstoriWraps[j].appendChild(ekipaElem);
-									break;
+					for(var i=0;i<ekipe.prisustvo.ekipe.length;i++){
+						var majstorJson = getMajstorByCode(ekipe.prisustvo.ekipe[i].idMajstora);
+						var pomocnikJson = getPomocnikByCard(ekipe.prisustvo.ekipe[i].pomocnik);
+						var voziloJson = getVoziloById(ekipe.prisustvo.ekipe[i].vozilo);
+						var ekipaElem = document.createElement("DIV");
+						ekipaElem.setAttribute("class","ekipaElem");
+							var majstor = document.createElement("DIV");
+							majstor.setAttribute("class","majstor");
+							majstor.innerHTML = majstorJson.ime;
+							var majstorCheckedIn = false;
+							for(var j=0;j<checkIns.length;j++){
+								if(Number(checkIns[j].brojKartice)==Number(majstorJson.brojKartice)){
+									majstorCheckedIn = true;
 								}
 							}
+							ekipaElem.appendChild(majstor);
+
+
+							var subTitle = document.createElement("DIV");
+							subTitle.setAttribute("class","subTitle");
+							subTitle.innerHTML = "Потребан учинак:";
+							ekipaElem.appendChild(subTitle);
+
+							var ucinak = document.createElement("DIV");
+							ucinak.setAttribute("class","ucinak");
+							ucinak.innerHTML = brojSaRazmacima(eval((parseFloat(majstorJson.ocekivaniUcinak)-parseFloat(majstorJson.ucinak))/workdaysCount));
+							ekipaElem.appendChild(ucinak);
+
+							var separator = document.createElement("DIV");
+							separator.setAttribute("class","separator");
+							ekipaElem.appendChild(separator);
+
+							var subTitle = document.createElement("DIV");
+							subTitle.setAttribute("class","subTitle");
+							subTitle.innerHTML = "Помоћник";
+							ekipaElem.appendChild(subTitle);
+
+							var pomocnik = document.createElement("DIV");
+							pomocnik.setAttribute("class","pomocnik");
+							pomocnik.innerHTML = pomocnikJson.ime;
+							ekipaElem.appendChild(pomocnik);
+
+
+							var separator = document.createElement("DIV");
+							separator.setAttribute("class","separator");
+							ekipaElem.appendChild(separator);
+
+							var subTitle = document.createElement("DIV");
+							subTitle.setAttribute("class","subTitle");
+							subTitle.innerHTML = "Возило";
+							ekipaElem.appendChild(subTitle);
+
+							var vozilo = document.createElement("DIV");
+							vozilo.setAttribute("class","vozilo");
+							vozilo.setAttribute("onclick","showOnMap(\""+majstorJson.uniqueId+"\")");
+							vozilo.innerHTML = voziloJson.brojTablice ? voziloJson.brojTablice : "-";
+							ekipaElem.appendChild(vozilo);
+
+							var separator = document.createElement("DIV");
+							separator.setAttribute("class","separator");
+							ekipaElem.appendChild(separator);
+
+							var subTitle = document.createElement("DIV");
+							subTitle.setAttribute("class","subTitle");
+							subTitle.innerHTML = "Налози";
+							ekipaElem.appendChild(subTitle);
+
+							var naloziWrap = document.createElement("DIV");
+							naloziWrap.setAttribute("class","naloziWrap");
+							var radnaJedinica = "";
+							for(var j=0;j<dodele.length;j++){
+								if(dodele[j].majstor == majstorJson.uniqueId){
+									radnaJedinica = dodele[j].radnaJedinica;
+									var row = document.createElement("DIV");
+									row.setAttribute("class","row");
+										var timestamp = document.createElement("DIV");
+										timestamp.setAttribute("class","timestamp");
+										timestamp.innerHTML=dodele[j].datum.timestamp;
+										row.appendChild(timestamp);
+
+										var brojNaloga = document.createElement("DIV");
+										brojNaloga.setAttribute("class","brojNaloga");
+										brojNaloga.innerHTML = dodele[j].nalog;
+										row.appendChild(brojNaloga);
+
+										var opstina = document.createElement("DIV");
+										opstina.setAttribute("class","radnaJedinica");
+										opstina.innerHTML = dodele[j].radnaJedinica;
+										row.appendChild(opstina);
+
+										var statusNaloga = document.createElement("DIV");
+										statusNaloga.setAttribute("class","status");
+										statusNaloga.innerHTML = dodele[j].status;
+										row.appendChild(statusNaloga);
+									naloziWrap.appendChild(row);
+								}
+							}
+							ekipaElem.appendChild(naloziWrap);
+
+							var specijalniStatusi = document.createElement("DIV");
+							specijalniStatusi.setAttribute("class","specials");
+								if(ekipe.prisustvo.ekipe[i].trecaLica){
+									var special = document.createElement("DIV");
+									special.setAttribute("class","special");
+									special.innerHTML = "III";
+									specijalniStatusi.appendChild(special);
+								}
+
+								if(ekipe.prisustvo.ekipe[i].trecaLica){
+									var special = document.createElement("DIV");
+									special.setAttribute("class","special");
+									special.innerHTML = "D";
+									specijalniStatusi.appendChild(special);
+								}
+							ekipaElem.appendChild(specijalniStatusi);
+						if(majstorCheckedIn){
+							if(radnaJedinica!=""){
+								for(var j=0;j<majstoriWraps.length;j++){
+									if(majstoriWraps[j].parentElement.dataset.opstina==radnaJedinica){
+										majstoriWraps[j].appendChild(ekipaElem);
+										break;
+									}
+								}
+							}else{
+								document.getElementById("slobodni").appendChild(ekipaElem)
+							}
+							
 						}else{
-							document.getElementById("slobodni").appendChild(ekipaElem)
+							document.getElementById("odsutni").appendChild(ekipaElem)
 						}
 						
-					}else{
-						document.getElementById("odsutni").appendChild(ekipaElem)
-					}
-					
+					}	
 				}
+				
 			}
 			handleUpdate()
 		</script>	
 	</div>
+	<div id="map-wrap" style="display:none">
+		<div id="map"></div>	
+		<div class="closeMap" onclick="document.getElementById('pregled-ekipa').style.display='block';document.getElementById('map-wrap').style.display='none';">X</div>
+	</div>
+	<script>
+		let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+		let vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
+		document.getElementById("map").style.width = vw+"px";
+		document.getElementById("map").style.height = eval(vh-180)+"px";
+		function initMap() {
+			myLatLng = {lat: 44.800003, lng: 20.45006};//51.896468, 4.419172
+			map = new google.maps.Map(document.getElementById('map'), {
+				center: myLatLng,
+				zoom: 14,
+				styles: [{"elementType":"geometry","stylers":[{"color":"#f5f5f5"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#f5f5f5"}]},{"featureType":"administrative.land_parcel","elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#eeeeee"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#e5e5e5"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"road","elementType":"geometry","stylers":[{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#dadada"}]},{"featureType":"road.highway","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"road.local","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"transit.line","elementType":"geometry","stylers":[{"color":"#e5e5e5"}]},{"featureType":"transit.station","elementType":"geometry","stylers":[{"color":"#eeeeee"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#c9c9c9"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]}]
+			});
+		}
+
+		socket.emit("lokacijaTv3",1);
+		setInterval(function(){
+			socket.emit("lokacijaTv3",1);
+		},10000)
+		var markers = [];
+
+		socket.on("lokacijaTv3Response",function(json){
+			if(json.type==-1){
+				console.log("Doslo je do greske: "+json.json);
+			}else if(json.type==1){
+				if(ekipe.prisustvo){
+					for(var i=0;i<json.json.length;i++){
+						for(var j=0;j<ekipe.prisustvo.ekipe.length;j++){
+							if(Number(ekipe.prisustvo.ekipe[j].vozilo)==json.json[i].vehicleId){
+								ekipe.prisustvo.ekipe[j].lat = json.json[i].gpsLat;
+								ekipe.prisustvo.ekipe[j].lng = json.json[i].gpsLon;
+								break;
+							}
+						}
+					}
+				}
+			}
+		});
+
+		function showOnMap(majstorId){
+			document.getElementById('pregled-ekipa').style.display='none';
+			document.getElementById('map-wrap').style.display='block';
+			if(ekipe.prisustvo){
+				// Clear existing markers
+				for (var i = 0; i < markers.length; i++) {
+				  markers[i].setMap(null);
+				}
+				markers = [];  // Clear the markers array
+
+				// Create a LatLngBounds object to adjust map bounds based on markers
+				const bounds = new google.maps.LatLngBounds();
+
+				// Loop through `ekipe` data and create markers based on the conditions
+				for (var i = 0; i < ekipe.prisustvo.ekipe.length; i++) {
+				  if (ekipe.prisustvo.ekipe[i].idMajstora == majstorId) {
+				    let position = { lat: ekipe.prisustvo.ekipe[i].lat, lng: ekipe.prisustvo.ekipe[i].lng };
+				    let marker = new google.maps.Marker({
+				      position: position,
+				      map: map,
+				      icon: {
+				        url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+				      },
+				    });
+
+				    // Add position to bounds
+				    bounds.extend(position);
+
+				    let infowindow = new google.maps.InfoWindow({
+				      content: "<div style=\"text-align:center\">" + getMajstorByCode(majstorId).ime + "<br>" + getVoziloById(ekipe.prisustvo.ekipe[i].vozilo).brojTablice + "</div>",
+				    });
+				    infowindow.open(map, marker);
+
+				    markers.push(marker);
+
+				    for (var j = 0; j < dodele.length; j++) {
+				      if (dodele[j].majstor == majstorId) {
+				        let position = { lat: dodele[j].coordinates.lat, lng: dodele[j].coordinates.lng };
+				        let marker = new google.maps.Marker({
+				          position: position,
+				          map: map,
+				          icon: {
+				            url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+				          },
+				        });
+
+				        bounds.extend(position);
+
+				        let infowindow = new google.maps.InfoWindow({
+				          content: "<div style=\"text-align:center\">" + dodele[j].nalog + "</div>",
+				        });
+				        infowindow.open(map, marker);
+
+				        markers.push(marker);
+				      }
+				    }
+				  }
+				}
+
+				// Fit the map to include all marker positions once bounds are fully extended
+				map.fitBounds(extendBounds(bounds, 0.5));	
+			}
+			
+		}
+
+		function isMarkerInBounds(map, position) {
+			const bounds = map.getBounds();
+			console.log(map.getBounds())
+			return bounds && bounds.contains(position);
+		}
+
+		// Function to adjust the zoom to fit the marker within map bounds
+		function adjustZoomToFitMarker(map, position) {
+			const maxZoomOutLevel = 9;  // Minimum zoom level to prevent over-zooming out
+			while (!isMarkerInBounds(map, position) && map.getZoom() > maxZoomOutLevel) {
+				map.setZoom(map.getZoom() - 1);
+				map.setCenter(position);  // Center map on the marker position
+			}
+		}
+
+		// Function to extend bounds with padding
+		function extendBounds(bounds, paddingFactor = 0.1) {
+			const ne = bounds.getNorthEast();
+			const sw = bounds.getSouthWest();
+
+			const latPadding = (ne.lat() - sw.lat()) * paddingFactor;
+			const lngPadding = (ne.lng() - sw.lng()) * paddingFactor;
+
+			// Extend the bounds by creating new LatLng points with added padding
+			bounds.extend(new google.maps.LatLng(ne.lat() + latPadding, ne.lng() + lngPadding));
+			bounds.extend(new google.maps.LatLng(sw.lat() - latPadding, sw.lng() - lngPadding));
+
+			return bounds;
+		}
+
+	</script>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3&key=<%-mapKey%>&amp;callback=initMap" async="" defer=""></script>
 <%- include ("partials/footer") -%>

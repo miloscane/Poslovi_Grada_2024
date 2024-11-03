@@ -4553,6 +4553,23 @@ input[type=number] {
     vertical-align: middle;
 }
 
+
+.ekipe .dezurstvo{
+    text-align:left;
+}
+
+.ekipe .dezurstvo .bolded{
+    display:inline-block;
+    vertical-align: middle;
+    font-size:10px;
+    padding-right:5px;
+}
+
+.ekipe .dezurstvo .dezurstvoWrap{
+    display:inline-block;
+    vertical-align: middle;
+}
+
 .tv2Ekipe .majstor .nalozi .nalog{
     font-size:0;
     maring-bottom:4px;
@@ -4956,12 +4973,18 @@ input[type=number] {
     padding:4px;
     margin:5px;
     width:200px;
+    position:relative;
 }
 
 .tv3 .majstoriNaOpstini .majstor{
     color:rgb(31,52,100);
     font-size:14px;
     font-weight:600;
+}
+
+.tv3 .majstoriNaOpstini .ucinak{
+    font-size:11px;
+    font-weight:200;
 }
 
 .tv3 .majstoriNaOpstini .subTitle{
@@ -4980,6 +5003,54 @@ input[type=number] {
 .tv3 .majstoriNaOpstini .pomocnik, .tv3 .majstoriNaOpstini .vozilo{
     font-size:11px;
     font-weight:300;
+}
+
+.tv3 .majstoriNaOpstini .naloziWrap .row{
+    font-size:11px;
+}
+
+.tv3 .majstoriNaOpstini .naloziWrap .row .timestamp{
+    font-size:10px;
+    font-weight:200;
+}
+
+.tv3 .majstoriNaOpstini .naloziWrap .row:not(:first-child) .timestamp{
+    margin-top:5px;
+}
+
+.tv3 .majstoriNaOpstini .naloziWrap .row .brojNaloga, .tv3 .majstoriNaOpstini .naloziWrap .row .radnaJedinica, .tv3 .majstoriNaOpstini .naloziWrap .row .status{
+    display:inline-block;
+    vertical-align: middle;
+    padding-right:3px;
+}
+
+.tv3 .majstoriNaOpstini .naloziWrap .row .status{
+    padding-right:0px;
+}
+
+.tv3 .majstoriNaOpstini .specials{
+    position:absolute;
+    top:3px;
+    right:3px;
+}
+
+#map-wrap{
+    position:relative;
+}
+
+#map-wrap .closeMap{
+    position:absolute;
+    top:10px;
+    right:10px;
+    font-size:40px;
+    background-color:rgb(31,52,100);
+    color:rgb(255,255,255);
+    border-radius:50px;
+    width:50px;
+    height:50px;
+    line-height: 50px;
+    text-align:center;
+    cursor:pointer;
 }
 
 @media screen and (max-width: 1100px) {

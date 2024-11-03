@@ -13,7 +13,6 @@
 			vozila[i].slobodno = 1;
 		}
 		var ekipe				=	<%-JSON.stringify(ekipe)%>;
-		console.log(ekipe)
 
 		var prisustvo = [];
 	</script>
@@ -66,6 +65,19 @@
 								var inline = document.createElement("DIV");
 								inline.setAttribute("class","trecaLicaWrap");
 								inline.innerHTML = "<input type=\"checkbox\" class=\"trecaLicaBox\">"
+								inlines.appendChild(inline);
+							majstorBlok.appendChild(inlines);
+
+							var inlines = document.createElement("DIV");
+							inlines.setAttribute("class","dezurstvo");
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","bolded");
+								inline.innerHTML = "Дежуран:";
+								inlines.appendChild(inline);
+								
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","dezurstvoWrap");
+								inline.innerHTML = "<input type=\"checkbox\" class=\"dezurstvoBox\">"
 								inlines.appendChild(inline);
 							majstorBlok.appendChild(inlines);
 						document.getElementById("majstori").appendChild(majstorBlok);
@@ -230,7 +242,7 @@
 								}
 							}
 						}
-						console.log(selectedVozila);
+
 						for(var i=0;i<vozila.length;i++){
 							if(selectedVozila.indexOf(Number(vozila[i].idNavigacije))<0){
 								vozila[i].slobodno = 1;
@@ -329,6 +341,7 @@
 						json.prisutan = majstoriElems[i].dataset.prisutan;
 						json.pomocnik = majstoriElems[i].getElementsByClassName("pomocnikSelect")[0].value;
 						json.trecaLica = majstoriElems[i].getElementsByClassName("trecaLicaBox")[0].checked;
+						json.dezurstvo = majstoriElems[i].getElementsByClassName("dezurstvoBox")[0].checked;
 						json.vozilo = majstoriElems[i].getElementsByClassName("voziloSelect")[0].value;
 						jsonObject.ekipe.push(json);
 					}

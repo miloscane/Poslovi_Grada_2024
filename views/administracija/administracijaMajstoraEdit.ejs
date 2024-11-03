@@ -91,6 +91,12 @@
 						<input type="text" id="adresa-stanovanja">
 					</div>
 				</div>
+				<div class="singleLineInput">
+					<div class="name">Веза са старим порталом</div>
+					<div class="inputWrapper">
+						<input type="text" id="veza-sa-starim-portalom">
+					</div>
+				</div>
 				<div class="textareaInput">
 					<div class="name">Белешке (вештине, напомене и слично)</div>
 					<div class="textareaWrapper">
@@ -118,6 +124,10 @@
 
 			if(majstor.ocekivaniUcinak){
 				document.getElementById("ocekivani-ucinak").value = majstor.ocekivaniUcinak;
+			}
+
+			if(majstor.vezaSaStarimPortalom){
+				document.getElementById("veza-sa-starim-portalom").value = majstor.vezaSaStarimPortalom;
 			}
 
 			if(majstor.sluzbeniBroj){
@@ -170,6 +180,7 @@
 				izmenaJson.beleske = document.getElementById("beleske").value;
 				izmenaJson.aktivan = document.getElementById("aktivan").checked;
 				izmenaJson.ocekivaniUcinak = document.getElementById("ocekivani-ucinak").value;
+				izmenaJson.vezaSaStarimPortalom = document.getElementById("veza-sa-starim-portalom").value;
 				izmenaJson.tipRada = [];
 				var tipovi = document.getElementsByClassName("tipRadnika");
 				for(var i=0;i<tipovi.length;i++){

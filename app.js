@@ -5300,6 +5300,7 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 			.then((majstori)=>{
 				dodeljivaniNaloziDB.insertOne(json)
 					.then((dbResponse)=>{
+						io.emit("majstorNaNalogu",json)
 						var setObj	=	{ $set: {
 								majstor: json.majstor
 							}};
@@ -6208,6 +6209,7 @@ server.post('/izmenaMajstora',async (req,res)=>{
 											adresaStanovanja:json.adresaStanovanja,
 											beleske:json.beleske,
 											aktivan:json.aktivan,
+											vezaSaStarimPortalom:json.vezaSaStarimPortalom,
 											tipRada:json.tipRada
 										}
 								};
@@ -8799,13 +8801,15 @@ server.get('/tv2', async (req, res)=> {
 server.get('/tv', async (req, res)=> {
 	var date = new Date();
 	var year = new Date().getFullYear();
-	date.setDate(date.getDate()-1)
+	//date.setDate(date.getDate()-2)
 	var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
 	var dateStr = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
 	
 	majstoriDB.find({}).toArray()
 	.then((majstori)=>{
+		var majstorIdArray = [];
 		for(var i=0;i<majstori.length;i++){
+			majstorIdArray.push(majstori[i].uniqueId)
 			if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0 || !majstori[i].aktivan){
 				majstori.splice(i,1);
 				i--;
@@ -8827,15 +8831,35 @@ server.get('/tv', async (req, res)=> {
 		    	.then((dodele)=>{
 		    		navigacijaInfoDB.find({}).toArray()
 		    		.then((vozila)=>{
-		    			res.render("tv",{
-						    pageTitle: "Прозор",
-						    pomocnici: pomocnici,
-						    majstori: majstori,
-						    checkIns: checkIns,
-						    ekipe: ekipe[0],
-						    vozila: vozila,
-						    dodele: dodele
-						  });
+
+		    			stariUcinakMajstoraDB.find({majstor:{$in:majstorIdArray},datum:{$regex:year+"-"+month}}).toArray()
+		    			.then((ucinci)=>{
+		    				for(var i=0;i<majstori.length;i++){
+		    					majstori[i].ucinak = 0;
+
+		    					for(var j=0;j<ucinci.length;j++){
+		    						if(majstori[i].uniqueId==ucinci[j].majstor){
+		    							majstori[i].ucinak = majstori[i].ucinak + parseFloat(ucinci[j].ukupanIznos);
+		    						}
+		    					}
+		    				}
+		    				res.render("tv",{
+							    pageTitle: "Прозор",
+							    pomocnici: pomocnici,
+							    majstori: majstori,
+							    checkIns: checkIns,
+							    ekipe: ekipe.length==0 ? {} : ekipe[0],
+							    vozila: vozila,
+							    mapKey: process.env.googlegeocoding,
+							    dodele: dodele
+							  });
+
+		    			})
+		    			.catch((error)=>{
+		    				logError(error);
+								res.send("Greska 7")	
+		    			})
+		    			
 		    		})
 		    		.catch((error)=>{
 		    			logError(error);
@@ -9095,8 +9119,30 @@ server.get('/magacin/ekipe', async (req, res)=> {
 							ekipeDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
 							.then((ekipe)=>{
 								if(ekipe.length==0){
-									today.setDate(today.getDate()-1)
+									/*today.setDate(today.getDate()-1)
 									ekipeDB.find({"datum.datum":getDateAsStringForDisplay(today)}).toArray()
+									.then((ekipeJuce)=>{
+										//console.log(ekipeJuce)
+										res.render("magacioner/ekipe",{
+											pageTitle: "Екипе",
+											user: req.session.user,
+											pomocnici: pomocnici,
+											vozila: vozila,
+											majstori: majstori,
+											checkIns: checkIns,
+											ekipe: ekipeJuce[ekipeJuce.length-1]
+										});
+									})
+									.catch((error)=>{
+										logError(error);
+										res.render("message",{
+						          pageTitle: "Грешка",
+						          user: req.session.user,
+						          message: "<div class=\"text\">Грешка у бази података 7622.</div>"
+						        });
+									})*/
+									//today.setDate(today.getDate()-1)
+									ekipeDB.find({}).toArray()
 									.then((ekipeJuce)=>{
 										//console.log(ekipeJuce)
 										res.render("magacioner/ekipe",{
@@ -9964,7 +10010,46 @@ io.on('connection', function(socket){
 		});
 	})
 
+
+	socket.on('lokacijaTv3', function(broj){
+		request(ntsOptions, (error,response,body)=>{
+			if(error){
+				console.log(error);
+				socket.emit("lokacijaTv3Response",{type:-1,json:error.toString()})
+			}else{
+				var cookie = response.headers['set-cookie'];
+				var headers = {
+					'accept': 'application/json',
+			    'Cookie': cookie,
+			    'Content-Type': 'application/json'
+				}
+				var options = {
+				    url: 'https://app.nts-international.net/ntsapi/allvehiclestate',
+				    method: 'GET',
+				    headers: headers
+				};
+				request(options, (error,response2,body2)=>{
+					if(error){
+						console.log(error)
+						socket.emit("lokacijaTv3Response",{type:-1,json:error.toString()})
+					}else{
+						try{
+							var responseJson = JSON.parse(response2.body);
+							socket.emit("lokacijaTv3Response",{type:1,json:responseJson})
+						}catch(error){
+							console.log(error);
+							socket.emit("lokacijaTv3Response",{type:-1,json:error.toString()})
+						}
+
+					}
+				});
+			}
+		});
+	})
+
 });
+
+
 
 process.on('SIGINT', function(){
 	client.close();
