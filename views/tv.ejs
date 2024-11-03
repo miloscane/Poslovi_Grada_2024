@@ -10,7 +10,6 @@
 		var checkIns = <%-JSON.stringify(checkIns)%>;
 		var ekipe = <%-JSON.stringify(ekipe)%>;
 		var dodele = <%-JSON.stringify(dodele)%>;
-		console.log(dodele)
 		var vozila = <%-JSON.stringify(vozila)%>;
 		var statusi = [{naziv:"Кренуо",value:"Odlazak"},{naziv:"Стигао",value:"Dolazak"},{naziv:"Завршио",value:"Zavrseno"}];
 		function getPomocnikByCard(card){
@@ -71,34 +70,7 @@
 		console.log("Ostalo radnih dana: " + workdaysCount)
 
 	</script>
-	<div class="pageWidth tv3" id="pregled-ekipa">
-		<div class="prisustvoWrap">
-			<div class="title">Мајстори</div>
-			<div class="items" id="majstori"></div>
-			<script>
-				for(var i=0;i<majstori.length;i++){
-					var item = document.createElement("DIV");
-					item.setAttribute("class","item");
-					item.setAttribute("data-brojkartice",majstori[i].brojKartice);
-					item.innerHTML = "<div class=\"majstorItem\">"+majstori[i].ime+"</div><div class=\"ucinakTarget\">"+brojSaRazmacima(parseFloat(majstori[i].ocekivaniUcinak)/26)+"</div>";
-					document.getElementById("majstori").appendChild(item);
-				}
-			</script>
-		</div>	
-		<div class="prisustvoWrap">
-			<div class="title">Помоћници</div>
-			<div class="items" id="pomocnici"></div>
-			<script>
-				for(var i=0;i<pomocnici.length;i++){
-					var item = document.createElement("DIV");
-					item.setAttribute("class","item majstorItem");
-					item.setAttribute("data-brojkartice",pomocnici[i].brojKartice);
-					item.innerHTML =  "<div class=\"majstorItem\">"+pomocnici[i].ime+"</div>";
-					document.getElementById("pomocnici").appendChild(item);
-				}
-			</script>
-		</div>	
-
+	<div class="pageWidth tv3" id="pregled-ekipa">	
 		<div class="boxesWrap" id="box"></div>
 		<script>
 			for(var i=0;i<radneJedinice.length;i++){
@@ -405,7 +377,7 @@
 				          position: position,
 				          map: map,
 				          icon: {
-				            url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+				            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
 				          },
 				        });
 
