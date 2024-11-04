@@ -270,7 +270,213 @@
 					</div>
 					<div class="box noHover">
 						<div class="info">
-							<div class="title">Категорије радова</div>
+							<div class="text stareDodele" id="dodele">
+								
+							</div>
+							<script>
+								var dodele = <%-JSON.stringify(dodele)%>;
+								for(var i=0;i<dodele.length;i++){
+									if(Number(dodele[i].deleted)!=1){
+										console.log(dodele[i])
+										var dodela = document.createElement("DIV");
+										dodela.setAttribute("data-id",dodele[i].uniqueId);
+										dodela.setAttribute("class","dodela");
+
+											var inline = document.createElement("DIV");
+											inline.setAttribute("class","inline");
+												var majstor = document.createElement("DIV");
+												majstor.setAttribute("class","majstor");
+												majstor.innerHTML = "<span style=\"font-weight:500\">"+getMajstorByCode(dodele[i].majstor).ime+"</span><br><span style=\"font-weight:200;font-size:10px\">"+dodele[i].datum.datum +" "+dodele[i].datum.timestamp+" "+dodele[i].user.name+"</span>";
+												inline.appendChild(majstor);  
+											dodela.appendChild(inline);
+
+											var inline = document.createElement("DIV");
+											inline.setAttribute("class","inline");
+												var vremeDolaska = document.createElement("SELECT");
+												vremeDolaska.setAttribute("class","staroVremeDolaska");
+												for(var j=0;j<vremena.length;j++){
+													var option = document.createElement("OPTION");
+													option.setAttribute("value",vremena[j]);
+													option.innerHTML = vremena[j];
+													if(vremena[j]==dodele[i].vremeDolaska){
+														option.setAttribute("selected","selected");
+													}
+													vremeDolaska.appendChild(option);
+												}
+												inline.appendChild(vremeDolaska);  
+											dodela.appendChild(inline);	
+
+											var inline = document.createElement("DIV");
+											inline.setAttribute("class","inline");
+												var vremeRadova = document.createElement("SELECT");
+												vremeRadova.setAttribute("class","staroVremeRadova");
+												for(var j=0;j<vremenaRadova.length;j++){
+													var option = document.createElement("OPTION");
+													option.setAttribute("value",vremenaRadova[j]);
+													option.innerHTML = vremenaRadova[j];
+													if(vremenaRadova[j]==dodele[i].vremeRadova){
+														option.setAttribute("selected","selected");
+													}
+													vremeRadova.appendChild(option);
+												}
+												inline.appendChild(vremeRadova);  
+											dodela.appendChild(inline);	
+
+											var inline = document.createElement("DIV");
+											inline.setAttribute("class","inline");
+												var statusDodele = document.createElement("SELECT");
+												statusDodele.setAttribute("class","stariStatus");
+												for(var j=0;j<statusi.length;j++){
+													var option = document.createElement("OPTION");
+													option.setAttribute("value",statusi[j].value);
+													option.innerHTML = statusi[j].naziv;
+													if(statusi[j].value==dodele[i].status){
+														option.setAttribute("selected","selected");
+													}
+													statusDodele.appendChild(option);
+												}
+												inline.appendChild(statusDodele);  
+											dodela.appendChild(inline);	
+
+
+											if(istiDatum(new Date(Number(dodele[i].datum.datetime)),new Date())){
+												var inline = document.createElement("DIV");
+												inline.setAttribute("class","inline");
+													var komanda = document.createElement("DIV");
+													komanda.setAttribute("class","komanda");
+													komanda.setAttribute("onclick","editDodelu(this)")
+													komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png\">";
+													inline.appendChild(komanda);
+													var komanda = document.createElement("DIV");
+													komanda.setAttribute("class","komanda");
+													komanda.setAttribute("onclick","deleteDodelu(this)")
+													komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
+													inline.appendChild(komanda);
+												dodela.appendChild(inline)	
+											}
+											
+
+										document.getElementById("dodele").appendChild(dodela);
+									}
+									
+								}
+								function deleteDodelu(elem){
+									document.getElementById("deletion-id").value = elem.parentElement.parentElement.dataset.id;
+									loadGif();
+									document.getElementById("delete-form").submit();
+								}
+
+								function editDodelu(elem){
+									var parent = elem.parentElement.parentElement;
+									var json = {};
+									json.uniqueId = parent.dataset.id;
+									json.status = parent.getElementsByClassName("stariStatus")[0].value;
+									json.vremeDolaska = parent.getElementsByClassName("staroVremeDolaska")[0].value;
+									json.vremeRadova = parent.getElementsByClassName("staroVremeRadova")[0].value;
+									json.brojNaloga = nalog.broj;
+									document.getElementById("edit-json").value = JSON.stringify(json);
+									loadGif();
+									document.getElementById("edit-form").submit();
+								}
+							</script>
+							<form method="POST" action="/deleteMajstorNaNalogu" id="delete-form" style="display:none">
+								<input type="text" name="id" id="deletion-id">
+							</form>
+							<form method="POST" action="/editMajstorNaNalogu" id="edit-form" style="display:none">
+								<input type="text" name="json" id="edit-json">
+							</form>
+							<div class="text novaDodela">
+								<div class="inline">
+									<div class="note">&nbsp;</div>
+									<select id="novo-majstori-dodela"></select>
+									<script>
+										for(var i=0;i<majstori.length;i++){
+											if(podizvodjaci.indexOf(majstori[i].uniqueId)<0){
+												var option = document.createElement("OPTION");
+												option.setAttribute("value",majstori[i].uniqueId);
+												option.innerHTML = majstori[i].ime;
+												if(majstori[i].uniqueId==nalog.majstor){
+													option.setAttribute("selected","selected")
+												}
+												document.getElementById("novo-majstori-dodela").appendChild(option);
+											}
+										}
+									</script>
+								</div>
+								
+								<div class="inline">
+									<div class="note">Време доласка</div>
+									<select id="novo-vreme-dolaska"></select>
+									<script>
+										for(var i=0;i<vremena.length;i++){
+											var option = document.createElement("OPTION");
+											option.setAttribute("value",vremena[i]);
+											option.innerHTML = vremena[i];
+											document.getElementById("novo-vreme-dolaska").appendChild(option);
+										}
+										for(var i=0;i<document.getElementById("novo-vreme-dolaska").getElementsByTagName("OPTION").length;i++){
+											if(Number(document.getElementById("novo-vreme-dolaska").getElementsByTagName("OPTION")[i].value.split(":")[0])==new Date().getHours()){
+												document.getElementById("novo-vreme-dolaska").getElementsByTagName("OPTION")[i].selected = true;
+											}
+										}
+									</script>
+								</div>
+								<div class="inline">
+									<div class="note">Процена радова</div>
+									<select id="novo-vreme-radova"></select>
+									<script>
+										for(var i=0;i<vremenaRadova.length;i++){
+											var option = document.createElement("OPTION");
+											option.setAttribute("value",vremenaRadova[i]);
+											option.innerHTML = vremenaRadova[i];
+											document.getElementById("novo-vreme-radova").appendChild(option);
+										}
+									</script>
+								</div>
+								<div class="inline">
+									<div class="note">Статус</div>
+									<select id="novi-status-dodele"></select>
+									<script>
+										for(var i=0;i<statusi.length;i++){
+											var option = document.createElement("OPTION");
+											option.setAttribute("value",statusi[i].value);
+											option.innerHTML = statusi[i].naziv;
+											document.getElementById("novi-status-dodele").appendChild(option);
+										}
+									</script>
+								</div>
+							</div>
+							<div class="majstorNaNalogu" onclick="majstorNaNalogu()">
+								Пошаљи мајстора на налог
+							</div>
+							<form style="display:none" method="POST" action="/majstorNaNalogu" id="majstor-na-nalogu-form">
+								<input type="text" id="majstor-na-nalogu-input" name="json">
+							</form>
+							<script>
+								function majstorNaNalogu(){
+									var submitJson = {};
+									submitJson.user = user;
+									submitJson.nalog = nalog.broj;
+									submitJson.majstor = document.getElementById("novo-majstori-dodela").value;
+									submitJson.vremeDolaska = document.getElementById("novo-vreme-dolaska").value;
+									submitJson.vremeRadova = document.getElementById("novo-vreme-radova").value;
+									submitJson.status = document.getElementById("novi-status-dodele").value;
+									submitJson.adresa = nalog.adresa;
+									submitJson.radnaJedinica = nalog.radnaJedinica;
+									submitJson.punaAdresa = nalog.punaAdresa;
+									submitJson.coordinates = nalog.coordinates;
+									if(!submitJson.majstor || submitJson.majstor=="Nijedan"){
+										alert("Нисте одабрали мајстора.")
+									}else if(podizvodjaci.indexOf(submitJson.majstor)>=0){
+										alert("Ова функција се не користи за подизвођаче.")
+									}else{
+										document.getElementById("majstor-na-nalogu-input").value = JSON.stringify(submitJson);
+										loadGif();
+										document.getElementById("majstor-na-nalogu-form").submit();
+									}
+								}
+							</script>
+							<!--<div class="title">Категорије радова</div>
 							<div class="text">
 								<div class="inline50s">
 									<div class="inline50">
@@ -316,7 +522,7 @@
 										elem.parentElement.getElementsByTagName("INPUT")[0].checked = true;
 									}
 								}
-							</script>
+							</script>-->
 						</div>
 					</div>
 				</div>
