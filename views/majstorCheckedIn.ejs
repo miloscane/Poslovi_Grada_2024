@@ -17,7 +17,7 @@
 					var keyCode = e.code || e.key;
 					if (keyCode == 'Enter'){
 						loadGif();
-					  window.location.href = "/majstorCheckIn/"+serverToken + "/"+document.getElementById("tag-input").value;
+					  window.location.href = "/majstorCheckIn/"+serverToken + "/"+Number(document.getElementById("tag-input").value);
 					}
 				}
         
