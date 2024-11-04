@@ -158,9 +158,6 @@
 
 					for(var i=0;i<ekipe.prisustvo.ekipe.length;i++){
 						var majstorJson = getMajstorByCode(ekipe.prisustvo.ekipe[i].idMajstora);
-						if(!majstorJson.ime){
-							console.log(ekipe.prisustvo.ekipe[i])
-						}
 						var pomocnikJson = getPomocnikByCard(ekipe.prisustvo.ekipe[i].pomocnik);
 						var voziloJson = getVoziloById(ekipe.prisustvo.ekipe[i].vozilo);
 						var ekipaElem = document.createElement("DIV");
@@ -287,7 +284,16 @@
 							}
 							
 						}else{
-							document.getElementById("odsutni").appendChild(ekipaElem)
+							if(radnaJedinica!=""){
+								for(var j=0;j<majstoriWraps.length;j++){
+									if(majstoriWraps[j].parentElement.dataset.opstina==radnaJedinica){
+										majstoriWraps[j].appendChild(ekipaElem);
+										break;
+									}
+								}
+							}else{
+								document.getElementById("odsutni").appendChild(ekipaElem)
+							}
 						}
 						
 					}	
