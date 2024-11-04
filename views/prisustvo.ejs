@@ -86,21 +86,25 @@
 				for(var i=0;i<checkIns.length;i++){
 					for(var j=0;j<majstoriElems.length;j++){
 						if(checkIns[i].uniqueId==majstoriElems[j].dataset.id){
-							majstoriElems[j].classList.add("itemActive");
-							var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
-							var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
-							majstoriElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;
-							break;
+							if(!majstoriElems[j].classList.contains("itemActive")){
+								majstoriElems[j].classList.add("itemActive");
+								var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
+								var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
+								majstoriElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;
+								break;	
+							}
 						}
 						
 					}
 					for(var j=0;j<pomocniciElems.length;j++){
 						if(checkIns[i].uniqueId==pomocniciElems[j].dataset.id){
-							pomocniciElems[j].classList.add("itemActive");
-							var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
-							var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
-							pomocniciElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;
-							break;
+							if(!pomocniciElems[j].classList.contains("itemActive")){
+								pomocniciElems[j].classList.add("itemActive");
+								var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
+								var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
+								pomocniciElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;
+								break;	
+							}
 						}
 					}
 				}

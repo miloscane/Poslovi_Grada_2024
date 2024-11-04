@@ -9,6 +9,7 @@
 		var pomocnici = <%-JSON.stringify(pomocnici)%>;
 		var checkIns = <%-JSON.stringify(checkIns)%>;
 		var ekipe = <%-JSON.stringify(ekipe)%>;
+		console.log(ekipe)
 		var dodele = <%-JSON.stringify(dodele)%>;
 		var vozila = <%-JSON.stringify(vozila)%>;
 		var statusi = [{naziv:"Кренуо",value:"Odlazak"},{naziv:"Стигао",value:"Dolazak"},{naziv:"Завршио",value:"Zavrseno"}];
@@ -157,6 +158,9 @@
 
 					for(var i=0;i<ekipe.prisustvo.ekipe.length;i++){
 						var majstorJson = getMajstorByCode(ekipe.prisustvo.ekipe[i].idMajstora);
+						if(!majstorJson.ime){
+							console.log(ekipe.prisustvo.ekipe[i])
+						}
 						var pomocnikJson = getPomocnikByCard(ekipe.prisustvo.ekipe[i].pomocnik);
 						var voziloJson = getVoziloById(ekipe.prisustvo.ekipe[i].vozilo);
 						var ekipaElem = document.createElement("DIV");
