@@ -4902,8 +4902,10 @@ server.get('/nalog/:broj',async (req,res)=>{
 					.then((majstori)=>{
 						for(var i=0;i<majstori.length;i++){
 							if(!majstori[i].aktivan){
-								majstori.splice(i,1);
-								i--;
+								if(podizvodjaci.indexOf(majstori[i].uniqueId)<0){
+									majstori.splice(i,1);
+									i--;
+								}
 							}
 						}
 						istorijaNalogaDB.find({broj:req.params.broj.toString()}).toArray()
