@@ -4900,6 +4900,12 @@ server.get('/nalog/:broj',async (req,res)=>{
 				if(nalozi.length>0){
 					majstoriDB.find({}).toArray()
 					.then((majstori)=>{
+						for(var i=0;i<majstori.length;i++){
+							if(!majstori[i].aktivan){
+								majstori.splice(i,1);
+								i--;
+							}
+						}
 						istorijaNalogaDB.find({broj:req.params.broj.toString()}).toArray()
 						.then((istorijat)=>{
 							izvestajiDB.find({nalog:req.params.broj.toString()}).toArray()
@@ -8887,6 +8893,57 @@ server.get('/tv', async (req, res)=> {
 		.catch((error)=>{
 			logError(error);
 			res.send("Greska 2")
+		})
+	})
+	.catch((error)=>{
+		logError(error);
+		res.send("Greska")
+	})
+});
+
+server.get('/prisustvo', async (req, res)=> {
+	var date = new Date();
+	var year = new Date().getFullYear();
+	//date.setDate(date.getDate()-2)
+	var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
+	var dateStr = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
+	
+	majstoriDB.find({}).toArray()
+	.then((majstori)=>{
+		var majstorIdArray = [];
+		for(var i=0;i<majstori.length;i++){
+			majstorIdArray.push(majstori[i].uniqueId)
+			if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0 || !majstori[i].aktivan){
+				majstori.splice(i,1);
+				i--;
+			}
+		}
+		pomocniciDB.find({}).toArray()
+		.then((pomocnici)=>{
+			for(var i=0;i<pomocnici.length;i++){
+				if(!pomocnici[i].aktivan){
+					pomocnici.splice(i,1);
+					i--;
+				}
+			}
+			checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()
+			.then((checkIns)=>{
+
+				res.render("prisustvo",{
+			    pageTitle: "Прозор",
+			    pomocnici: pomocnici,
+			    majstori: majstori,
+			    checkIns: checkIns
+			  });
+		  })
+		  .catch((error)=>{
+				logError(error);
+				res.send("Greska 4")	
+			})			
+		})
+		.catch((error)=>{
+			logError(error);
+			res.send("Greska 3")	
 		})
 	})
 	.catch((error)=>{
