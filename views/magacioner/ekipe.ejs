@@ -317,6 +317,7 @@
 								majstoriElems[i].getElementsByClassName("pomocnikSelect")[0].dispatchEvent(new Event('input'));
 							}
 							majstoriElems[i].getElementsByClassName("trecaLicaBox")[0].checked = ekipe.prisustvo.ekipe[j].trecaLica;
+							majstoriElems[i].getElementsByClassName("dezurstvoBox")[0].checked = ekipe.prisustvo.ekipe[j].dezurstvo;
 							if(Number(ekipe.prisustvo.ekipe[j].vozilo)!=0){
 								majstoriElems[i].getElementsByClassName("voziloSelect")[0].value = ekipe.prisustvo.ekipe[j].vozilo;
 								majstoriElems[i].getElementsByClassName("voziloSelect")[0].dispatchEvent(new Event('input'));
