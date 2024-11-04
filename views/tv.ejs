@@ -270,6 +270,20 @@
 									special.innerHTML = "D";
 									specijalniStatusi.appendChild(special);
 								}
+
+								if(majstorJson.tipRada.indexOf("Bager")>=0){
+									var special = document.createElement("DIV");
+									special.setAttribute("class","special bager");
+									special.innerHTML = "B";
+									specijalniStatusi.appendChild(special);
+								}
+
+								if(majstorJson.tipRada.indexOf("Voma")>=0){
+									var special = document.createElement("DIV");
+									special.setAttribute("class","special voma");
+									special.innerHTML = "W";
+									specijalniStatusi.appendChild(special);
+								}
 							ekipaElem.appendChild(specijalniStatusi);
 						if(majstorCheckedIn){
 							if(radnaJedinica!=""){
