@@ -790,6 +790,25 @@ http.listen(process.env.PORT, function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			console.log(nalozi.length);
+			var brojNaloga = 0;
+			var iznosNaloga = 0
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].zahtevalac){
+					if(nalozi[i].zahtevalac.toLowerCase().includes("pav") &&nalozi[i].zahtevalac.toLowerCase().includes("alek")){
+						brojNaloga++;
+						if(!isNaN(nalozi[i].ukupanIznos)){
+							iznosNaloga = iznosNaloga + parseFloat(nalozi[i].ukupanIznos)
+						}
+					}
+				}
+				
+			}
+			console.log("Aleksandar Pavlovic: "+ brojNaloga + " / "+brojSaRazmacima(iznosNaloga))
+		})*/
 		/*var pomocnici = [
 				{
 					broj: 1,
@@ -5306,7 +5325,7 @@ server.get('/nalog/:broj',async (req,res)=>{
 
 server.post('/majstorNaNalogu',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==20){
+		if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
 			var json = JSON.parse(req.body.json);
 			json.datum  = {};
 			var currentDate = new Date(new Date().getTime()+2*3.6e+6);
@@ -5381,7 +5400,7 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 
 server.post('/deleteMajstorNaNalogu',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==20){
+		if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
 			dodeljivaniNaloziDB.find({uniqueId:req.body.id}).toArray()
 			.then((dodele)=>{
 				if(dodele[0].user.email == req.session.user.email){
@@ -5434,7 +5453,7 @@ server.post('/deleteMajstorNaNalogu',async (req,res)=>{
 
 server.post('/editMajstorNaNalogu',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==20){
+		if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
 			dodeljivaniNaloziDB.find({uniqueId:req.body.id}).toArray()
 			.then((dodele)=>{
 				var json = JSON.parse(req.body.json);
