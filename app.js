@@ -7486,7 +7486,7 @@ server.get('/majstorCheckIn/:servertoken/:tagId',async (req,res)=>{
 						pageTitle: "Успешно чекирање",
 						message: "САМО ГАС!",
 						majstor: majstori[0],
-						kartica: 0,
+						kartica: req.params.tagId,
 						vreme: vreme,
 						majstorType: 1
 					})
@@ -7519,7 +7519,7 @@ server.get('/majstorCheckIn/:servertoken/:tagId',async (req,res)=>{
 								pageTitle: "Успешно чекирањe",
 								message: "САМО ГАС!",
 								majstor: pomocnici[0],
-								kartica: 0,
+								kartica: req.params.tagId,
 								vreme: vreme,
 								majstorType: 0
 							});

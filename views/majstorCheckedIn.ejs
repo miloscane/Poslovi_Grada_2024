@@ -7,19 +7,30 @@
 					var majstorType = <%=majstorType%>;
 					var serverToken = window.location.href.split("/")[4];
 				</script>
-				<div style="width:1px;height:1px;overflow:hidden">
+				<div style="overflow:hidden">
 					<input type="text" id="tag-input">
 				</div>
 				<script>
-				document.getElementById('tag-input').focus();	
-				document.getElementById('tag-input').onkeypress = function(e){
+				//document.getElementById('tag-input').focus();	
+				/*document.getElementById('tag-input').onkeypress = function(e){
 					if (!e) e = window.event;
 					var keyCode = e.code || e.key;
 					if (keyCode == 'Enter'){
 						loadGif();
 					  window.location.href = "/majstorCheckIn/"+serverToken + "/"+Number(document.getElementById("tag-input").value);
 					}
-				}
+				}*/
+
+				document.addEventListener('keydown', (event) => {
+					if (event.key.length === 1) {
+						document.getElementById("tag-input").value += event.key; // Append the typed character to the input field
+					}
+					var keyCode = event.code || event.key;
+					if (keyCode == 'Enter'){
+						loadGif();
+						window.location.href = "/majstorCheckIn/"+serverToken + "/"+Number(document.getElementById("tag-input").value);
+					}
+				})
         
 				</script>
 				
