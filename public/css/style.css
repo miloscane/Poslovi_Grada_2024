@@ -5106,6 +5106,17 @@ input[type=number] {
     color:rgb(0,200,0);
 }
 
+.pregledPrisustva .itemActive .timestamp{
+    font-size:12px;
+    font-style:italic;
+}
+
+.pregledPrisustva .itemActive .totalHours{
+    font-size:12px;
+    font-style:italic;
+    font-weight:600;
+}
+
 @media screen and (max-width: 1100px) {
     .pageWidth{
         padding-left:10px;

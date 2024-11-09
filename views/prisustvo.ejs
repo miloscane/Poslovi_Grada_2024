@@ -1,4 +1,4 @@
-<%- include ("partials/header-nl") -%>
+<%- include ("partials/header") -%>
 	<script src="/js/socket.js"></script>
 	<script>
 		var socket  = io({});
@@ -41,7 +41,16 @@
 		  return vozilo
 		}
 	</script>
-	<div class="pageWidth pregledPrisustva">	
+	<div class="pageWidth pregledPrisustva">
+		<div class="drugiDatum">
+			<span>Погледај присуство на дан:</span> <input type="date" id="date-input" oninput="dateInput()">
+		</div>
+		<script>
+			function dateInput(){
+				loadGif()
+				window.location.href="/prisustvo/"+document.getElementById("date-input").value;
+			}
+		</script>
 		<div class="items">
 			<div class="title">Мајстори</div>
 			<div id="majstori"></div>
@@ -81,41 +90,81 @@
 				}
 
 				for(var i=0;i<checkIns.length;i++){
+					
 					for(var j=0;j<majstoriElems.length;j++){
 						if(checkIns[i].uniqueId==majstoriElems[j].dataset.id){
 							if(!majstoriElems[j].classList.contains("itemActive")){
 								majstoriElems[j].classList.add("itemActive");
-								var checkTime = new Date(checkIns[i].datetime);
-								if(Number(checkTime.getHours())<13){
-									majstoriElems[j].getElementsByClassName("arrival")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
-								}else{
-									majstoriElems[j].getElementsByClassName("departure")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
-								}
-								/*var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
-								var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
-								majstoriElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;*/
-								break;	
 							}
+							var checkTime = new Date(checkIns[i].datetime);
+							if(Number(checkTime.getHours())<13){
+								majstoriElems[j].getElementsByClassName("arrival")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
+							}else{
+								majstoriElems[j].getElementsByClassName("departure")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
+							}
+							/*var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
+							var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
+							majstoriElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;*/
+							//break;	
+							
 						}
-						
 					}
 					for(var j=0;j<pomocniciElems.length;j++){
 						if(checkIns[i].uniqueId==pomocniciElems[j].dataset.id){
 							if(!pomocniciElems[j].classList.contains("itemActive")){
 								pomocniciElems[j].classList.add("itemActive");
-								var checkTime = new Date(checkIns[i].datetime);
-								if(Number(checkTime.getHours())<13){
-									pomocniciElems[j].getElementsByClassName("arrival")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
-								}else{
-									pomocniciElems[j].getElementsByClassName("departure")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
-								}
-								/*var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
-								var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
-								pomocniciElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;*/
-								break;	
 							}
+								
+							var checkTime = new Date(checkIns[i].datetime);
+							if(Number(checkTime.getHours())<13){
+								pomocniciElems[j].getElementsByClassName("arrival")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
+							}else{
+								pomocniciElems[j].getElementsByClassName("departure")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
+							}
+							/*var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
+							var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
+							pomocniciElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;*/
+							break;	
 						}
 					}
+				}
+
+				for(var i=0;i<majstoriElems.length;i++){
+					if(majstoriElems[i].getElementsByClassName("arrival")[0].innerHTML!="" && majstoriElems[i].getElementsByClassName("departure")[0].innerHTML!=""){
+						var checkInTime = new Date();
+						checkInTime.setHours(majstoriElems[i].getElementsByClassName("arrival")[0].innerHTML.split(":")[0]);
+						checkInTime.setMinutes(majstoriElems[i].getElementsByClassName("arrival")[0].innerHTML.split(":")[1]);
+						var checkOutTime = new Date();
+						checkOutTime.setHours(majstoriElems[i].getElementsByClassName("departure")[0].innerHTML.split(":")[0]);
+						checkOutTime.setMinutes(majstoriElems[i].getElementsByClassName("departure")[0].innerHTML.split(":")[1]);
+
+
+						var totalMiliseconds = checkOutTime.getTime() - checkInTime.getTime();
+						var totalMinutes =  Math.floor(totalMiliseconds / 60000);
+						var hours = Math.floor(totalMinutes / 60);
+	   					var minutes = totalMinutes % 60;
+	   					majstoriElems[i].getElementsByClassName("totalHours")[0].innerHTML = "Сатница: "+String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0')
+					}
+					
+				}
+
+				for(var i=0;i<pomocniciElems.length;i++){
+					if(pomocniciElems[i].getElementsByClassName("arrival")[0].innerHTML!="" && pomocniciElems[i].getElementsByClassName("departure")[0].innerHTML!=""){
+						var checkInTime = new Date();
+						checkInTime.setHours(pomocniciElems[i].getElementsByClassName("arrival")[0].innerHTML.split(":")[0]);
+						checkInTime.setMinutes(pomocniciElems[i].getElementsByClassName("arrival")[0].innerHTML.split(":")[1]);
+						var checkOutTime = new Date();
+						checkOutTime.setHours(pomocniciElems[i].getElementsByClassName("departure")[0].innerHTML.split(":")[0]);
+						checkOutTime.setMinutes(pomocniciElems[i].getElementsByClassName("departure")[0].innerHTML.split(":")[1]);
+
+
+						var totalMiliseconds = checkOutTime.getTime() - checkInTime.getTime();
+						var totalMinutes =  Math.floor(totalMiliseconds / 60000);
+						var hours = Math.floor(totalMinutes / 60);
+	   					var minutes = totalMinutes % 60;
+	   					pomocniciElems[i].getElementsByClassName("totalHours")[0].innerHTML = "Сатница: "+String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0')
+					}
+					
 				}
 			}
 

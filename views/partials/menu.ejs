@@ -112,7 +112,14 @@
 							</div>
 							<div class="menuItem"><a href="/dispecer/pretragaNaloga" onclick="loadGif()">Претрага налога</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/dispecer/mojUcinak" onclick="loadGif()">Мој учинак</a><div class="rightBorder"></div></div>
-							<div class="menuItem"><a href="/ucinakMajstora" onclick="loadGif()">Учинак мајстора</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="#">Мајстори <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/administracijaMajstora" onclick="loadGif()">Администрација</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/ucinakMajstora" onclick="loadGif()">Учинак</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/prisustvo" onclick="loadGif()">Присуство</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/proveraLokacijeMajstora" onclick="loadGif()">Провера локације мајстора</a></div>
+								</div>
+							</div>
 							<div class="menuItem"><a href="/digitalizacijaNaloga" onclick="loadGif()">Дигитализација налога</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
 						<% }else if(Number(user.role)==25){ %>

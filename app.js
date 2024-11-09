@@ -752,6 +752,7 @@ var stariCenovnikJsons = [];
 http.listen(process.env.PORT, function(){
 	console.log("Poslovi Grada 2024");
 	console.log("Server Started v1.4");
+	console.log("Timezone offset: "+new Date().getTimezoneOffset())
 	console.log("Connecting to database....");
 	var dbConnectionStart	=	new Date().getTime();
 	client.connect()
@@ -6904,55 +6905,115 @@ server.get('/tv', async (req, res)=> {
 });
 
 server.get('/prisustvo', async (req, res)=> {
-	var date = new Date();
-	date.setDate(date.getDate()-2);
-	var year = new Date().getFullYear();
-	//date.setDate(date.getDate()-2)
-	var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
-	var dateStr = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
-	
-	majstoriDB.find({}).toArray()
-	.then((majstori)=>{
-		var majstorIdArray = [];
-		for(var i=0;i<majstori.length;i++){
-			majstorIdArray.push(majstori[i].uniqueId)
-			if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0 || !majstori[i].aktivan){
-				majstori.splice(i,1);
-				i--;
-			}
-		}
-		pomocniciDB.find({}).toArray()
-		.then((pomocnici)=>{
-			for(var i=0;i<pomocnici.length;i++){
-				if(!pomocnici[i].aktivan){
-					pomocnici.splice(i,1);
+	if(req.session.user){
+		var date = new Date();
+		//date.setDate(date.getDate()-2);
+		var year = new Date().getFullYear();
+		var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
+		var dateStr = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
+		
+		majstoriDB.find({}).toArray()
+		.then((majstori)=>{
+			var majstorIdArray = [];
+			for(var i=0;i<majstori.length;i++){
+				majstorIdArray.push(majstori[i].uniqueId)
+				if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0 || !majstori[i].aktivan){
+					majstori.splice(i,1);
 					i--;
 				}
 			}
-			checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()
-			.then((checkIns)=>{
+			pomocniciDB.find({}).toArray()
+			.then((pomocnici)=>{
+				for(var i=0;i<pomocnici.length;i++){
+					if(!pomocnici[i].aktivan){
+						pomocnici.splice(i,1);
+						i--;
+					}
+				}
+				checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()
+				.then((checkIns)=>{
 
-				res.render("prisustvo",{
-			    pageTitle: "Прозор",
-			    pomocnici: pomocnici,
-			    majstori: majstori,
-			    checkIns: checkIns
-			  });
-		  })
-		  .catch((error)=>{
+					res.render("prisustvo",{
+				    pageTitle: "Присуство мајстора на дан "+getDateAsStringForDisplay(date),
+				    pomocnici: pomocnici,
+				    majstori: majstori,
+				    user: req.session.user,
+				    checkIns: checkIns
+				  });
+			  })
+			  .catch((error)=>{
+					logError(error);
+					res.send("Greska 4")	
+				})			
+			})
+			.catch((error)=>{
 				logError(error);
-				res.send("Greska 4")	
-			})			
+				res.send("Greska 3")	
+			})
 		})
 		.catch((error)=>{
 			logError(error);
-			res.send("Greska 3")	
+			res.send("Greska")
+		})	
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/prisustvo/:datum', async (req, res)=> {
+	if(req.session.user){
+		var date = new Date(req.params.datum);
+		//date.setDate(date.getDate()-2);
+		var year = new Date().getFullYear();
+		var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
+		var dateStr = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
+		
+		majstoriDB.find({}).toArray()
+		.then((majstori)=>{
+			var majstorIdArray = [];
+			for(var i=0;i<majstori.length;i++){
+				majstorIdArray.push(majstori[i].uniqueId)
+				if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0 || !majstori[i].aktivan){
+					majstori.splice(i,1);
+					i--;
+				}
+			}
+			pomocniciDB.find({}).toArray()
+			.then((pomocnici)=>{
+				for(var i=0;i<pomocnici.length;i++){
+					if(!pomocnici[i].aktivan){
+						pomocnici.splice(i,1);
+						i--;
+					}
+				}
+				checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()
+				.then((checkIns)=>{
+
+					res.render("prisustvo",{
+				    pageTitle: "Присуство мајстора на дан "+getDateAsStringForDisplay(date),
+				    pomocnici: pomocnici,
+				    majstori: majstori,
+				    user: req.session.user,
+				    checkIns: checkIns
+				  });
+			  })
+			  .catch((error)=>{
+					logError(error);
+					res.send("Greska 4")	
+				})			
+			})
+			.catch((error)=>{
+				logError(error);
+				res.send("Greska 3")	
+			})
 		})
-	})
-	.catch((error)=>{
-		logError(error);
-		res.send("Greska")
-	})
+		.catch((error)=>{
+			logError(error);
+			res.send("Greska")
+		})	
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
 });
 
 server.get('/majstor/nalozi', async (req, res)=> {
