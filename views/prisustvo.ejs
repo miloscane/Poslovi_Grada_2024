@@ -5,7 +5,6 @@
 		var majstori = <%-JSON.stringify(majstori)%>;
 		var pomocnici = <%-JSON.stringify(pomocnici)%>;
 		var checkIns = <%-JSON.stringify(checkIns)%>;
-		console.log(checkIns);
 		function getPomocnikByCard(card){
 		  var pomocnik = {};
 		  if(pomocnici){
@@ -32,14 +31,12 @@
 		      if(Number(vozila[i].idNavigacije)==Number(id)){
 		        vozilo = vozila[i];
 		        break;
-		        //console.log("AAAAA")
 		      }
 		    }
 		    if(!vozilo.ime){
-		      //console.log("No majstor found")
 		    }
 		  }else{
-		    //console.log("No array majstori defined");
+		    //console.log("No array vozila defined");
 		  }
 		  return vozilo
 		}
@@ -53,7 +50,7 @@
 					var item = document.createElement("DIV");
 					item.setAttribute("class","item");
 					item.setAttribute("data-id",majstori[i].uniqueId);
-					item.innerHTML = "<div class=\"ime\">"+majstori[i].ime+"</div><div class=\"timestamp\">/</div>";
+					item.innerHTML = "<div class=\"ime\">"+majstori[i].ime+"</div><div class=\"timestamp\"><span class=\"arrival\"></span> - <span class=\"departure\"></span></div><div class=\"totalHours\"></div>";
 					document.getElementById("majstori").appendChild(item);
 				}
 			</script>
@@ -66,7 +63,7 @@
 					var item = document.createElement("DIV");
 					item.setAttribute("class","item");
 					item.setAttribute("data-id",pomocnici[i].uniqueId);
-					item.innerHTML = "<div class=\"ime\">"+pomocnici[i].ime+"</div><div class=\"timestamp\">/</div>";
+					item.innerHTML = "<div class=\"ime\">"+pomocnici[i].ime+"</div><div class=\"timestamp\"><span class=\"arrival\"></span> - <span class=\"departure\"></span></div><div class=\"totalHours\"></div>";;
 					document.getElementById("pomocnici").appendChild(item);
 				}
 			</script>
@@ -88,9 +85,15 @@
 						if(checkIns[i].uniqueId==majstoriElems[j].dataset.id){
 							if(!majstoriElems[j].classList.contains("itemActive")){
 								majstoriElems[j].classList.add("itemActive");
-								var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
+								var checkTime = new Date(checkIns[i].datetime);
+								if(Number(checkTime.getHours())<13){
+									majstoriElems[j].getElementsByClassName("arrival")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
+								}else{
+									majstoriElems[j].getElementsByClassName("departure")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
+								}
+								/*var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
 								var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
-								majstoriElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;
+								majstoriElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;*/
 								break;	
 							}
 						}
@@ -100,9 +103,15 @@
 						if(checkIns[i].uniqueId==pomocniciElems[j].dataset.id){
 							if(!pomocniciElems[j].classList.contains("itemActive")){
 								pomocniciElems[j].classList.add("itemActive");
-								var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
+								var checkTime = new Date(checkIns[i].datetime);
+								if(Number(checkTime.getHours())<13){
+									pomocniciElems[j].getElementsByClassName("arrival")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
+								}else{
+									pomocniciElems[j].getElementsByClassName("departure")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
+								}
+								/*var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
 								var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
-								pomocniciElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;
+								pomocniciElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;*/
 								break;	
 							}
 						}
