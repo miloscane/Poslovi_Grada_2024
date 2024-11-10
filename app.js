@@ -753,6 +753,7 @@ http.listen(process.env.PORT, function(){
 	console.log("Poslovi Grada 2024");
 	console.log("Server Started v1.4");
 	console.log("Timezone offset: "+new Date().getTimezoneOffset())
+	console.log("----------------------------------")
 	console.log("Connecting to database....");
 	var dbConnectionStart	=	new Date().getTime();
 	client.connect()
@@ -7011,6 +7012,124 @@ server.get('/prisustvo/:datum', async (req, res)=> {
 			logError(error);
 			res.send("Greska")
 		})	
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+
+server.get('/mesecnoPrisustvo', async (req, res)=> {
+	if(req.session.user){
+		majstoriDB.find({}).toArray()
+		.then((majstori)=>{
+			var majstorIdArray = [];
+			for(var i=0;i<majstori.length;i++){
+				majstorIdArray.push(majstori[i].uniqueId)
+				if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0 || !majstori[i].aktivan){
+					majstori.splice(i,1);
+					i--;
+				}
+			}
+			pomocniciDB.find({}).toArray()
+			.then((pomocnici)=>{
+				for(var i=0;i<pomocnici.length;i++){
+					if(!pomocnici[i].aktivan){
+						pomocnici.splice(i,1);
+						i--;
+					}
+				}
+				res.render("mesecnoPrisustvoOdabir",{
+			    pageTitle: "Одабери мајстора/помоћника и месец: ",
+			    pomocnici: pomocnici,
+			    majstori: majstori,
+			    user: req.session.user
+			  });	
+			
+			})
+			.catch((error)=>{
+				logError(error);
+				res.send("Greska 3")	
+			})
+		})
+		.catch((error)=>{
+			logError(error);
+			res.send("Greska")
+		})	
+		
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+
+server.get('/mesecnoPrisustvo/:mesec/:majstor', async (req, res)=> {
+	if(req.session.user){
+		//console.log(req.params.mesec.split(".")[0] +"-"+req.params.mesec.split(".")[1])
+		checkInMajstoraDB.find({uniqueId:req.params.majstor,month:req.params.mesec.split(".")[0].toString(),year:Number(req.params.mesec.split(".")[1])}).toArray()
+		.then((checkIns)=>{
+			dodeljivaniNaloziDB.find({majstor:req.params.majstor,"datum.datum":{$regex:req.params.mesec}}).toArray()
+			.then((dodele)=>{
+				stariUcinakMajstoraDB.find({majstor:req.params.majstor,datum:{$regex:req.params.mesec.split(".")[1]+"-"+req.params.mesec.split(".")[0]}}).toArray()
+				.then((ucinci)=>{
+					majstoriDB.find({uniqueId:req.params.majstor}).toArray()
+					.then((majstori)=>{
+						if(majstori.length>0){
+							var majstor = majstori[0];
+							res.render("mesecnoPrisustvo",{
+						    pageTitle: "Месечно присуство мајстора "+majstor.ime+" за месец "+req.params.mesec,
+						    majstor: majstor,
+						    checkIns: checkIns,
+						    ucinci: ucinci,
+						    dodele: dodele,
+						    month: req.params.mesec.split(".")[0],
+						    year: req.params.mesec.split(".")[1],
+						    user: req.session.user
+						  });
+						}else{
+							pomocniciDB.find({uniqueId:req.params.majstor}).toArray()
+							.then((pomocnici)=>{
+								if(pomocnici.length>0){
+									var majstor = pomocnici[0];
+									res.render("mesecnoPrisustvo",{
+								    pageTitle: "Месечно присуство мајстора "+majstor.ime+" за месец "+req.params.mesec,
+								    majstor: majstor,
+								    checkIns: checkIns,
+								    ucinci: ucinci,
+								    dodele: dodele,
+								    user: req.session.user
+								  });
+								}else{
+									res.send("Neposotjeci majstor");
+								}
+							})
+							.catch((error)=>{
+								logError(error);
+								res.send("Greska 3")	
+							})
+						}
+					})
+					.catch((error)=>{
+						logError(error);
+						res.send("Greska 2")
+					})
+				})
+				.catch((error)=>{
+					logError(error);
+					res.send("Greska 8");
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.send("Greska 7")
+			})
+				
+		})
+		.catch((error)=>{
+			logError(error);
+			res.send("Greska")
+		})
+			
+		
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}

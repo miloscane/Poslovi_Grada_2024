@@ -5117,6 +5117,82 @@ input[type=number] {
     font-weight:600;
 }
 
+.calendarTableWrap{
+    width:100%;
+    padding:0 10px;
+    margin-top:10px;
+}
+
+.calendarTableWrap #calendar-table{
+    width:100%;
+    border-collapse: collapse;
+}
+
+.calendarTableWrap #calendar-table td{
+    border:1px solid rgb(50,50,50);
+}
+
+.calendarTableWrap #calendar-table th{
+    font-size:12px;
+    font-weight:600;
+}
+
+.calendarTableWrap #calendar-table td .value{
+    /*height:calc((100% - 25px)/7);*/
+    height:140px;
+    width:100%;
+    padding:4px;
+}
+
+.calendarTableWrap #calendar-table td .calendarDateTitle{
+    text-align:left;
+    font-size:16px;
+    font-weight:600;
+}
+
+.calendarTableWrap #calendar-table td .calendarValue .inlines{
+    font-size:0;
+    margin-bottom:3px;
+}
+
+.calendarTableWrap #calendar-table td .calendarValue .inlines .inline{
+    font-size:12px;
+    font-weight:300;
+    display:inline-block;
+    vertical-align: middle;
+    width:50%;
+    width:66px;
+}
+
+
+.calendarTableWrap #calendar-table td .calendarValue .inlines .inline:first-child{
+    width:66px;
+    font-weight:500;
+}
+
+.ucinakPage .ucinakStats .inlines{
+    font-size:0;
+    margin-bottom:3px;
+}
+
+.ucinakPage .ucinakStats .inlines .inline{
+    font-size:16px;
+    font-weight:300;
+    display:inline-block;
+    vertical-align: middle;
+}
+
+
+.ucinakPage .ucinakStats .inlines .inline:first-child{
+    width:160px;
+    font-weight:600;
+}
+
+
+
+
+
+
 @media screen and (max-width: 1100px) {
     .pageWidth{
         padding-left:10px;

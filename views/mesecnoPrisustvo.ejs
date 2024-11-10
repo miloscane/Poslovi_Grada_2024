@@ -1,0 +1,232 @@
+<%- include ("partials/header") -%>
+		<script>
+			var majstor = <%- JSON.stringify(majstor)%>;
+			console.log(majstor);
+			var checkIns = <%- JSON.stringify(checkIns)%>;
+			console.log(checkIns)
+			var ucinci = <%- JSON.stringify(ucinci)%>;
+			console.log(ucinci)
+			var dodele = <%- JSON.stringify(dodele)%>;
+			console.log(dodele)
+		</script>
+		<div class="blueWrap">
+			<div class="pageWidth ucinakPage">
+				<div class="ucinakStats">
+					<div class="inlines">
+						<div class="inline">Укупно налога:</div>
+						<div class="inline" id="ukupno-naloga"></div>
+					</div>
+					<div class="inlines">
+						<div class="inline">Укупан учинак:</div>
+						<div class="inline" id="ukupan-ucinak"></div>
+					</div>
+					<div class="inlines">
+						<div class="inline">Радних дана:</div>
+						<div class="inline" id="ukupno-dana"></div>
+					</div>
+				</div>
+				<div class="calendarTableWrap">
+					<table id="calendar-table">
+						<tr>
+							<th>ПОН</th>
+							<th>УТО</th>
+							<th>СРЕ</th>
+							<th>ЧЕТ</th>
+							<th>ПЕТ</th>
+							<th>СУБ</th>
+							<th>НЕД</th>
+						</tr>
+						<tr></tr>
+						<tr></tr>
+						<tr></tr>
+						<tr></tr>
+						<tr></tr>
+						<tr></tr>
+					</table>
+				</div>
+				
+			</div>
+		</div>
+		<script>
+			//Initialize table with TD's
+			var tableRows	=	document.getElementById("calendar-table").querySelectorAll("TR");
+			for(var i=1;i<tableRows.length;i++){
+				for(var j=0;j<7;j++){
+					var td	=	document.createElement("TD");
+						var div = document.createElement("DIV");
+						div.setAttribute("class","value");
+						td.appendChild(div)
+					tableRows[i].appendChild(td);
+				}
+			}
+			var month = "<%=month%>";
+			var year = "<%=year%>";
+			var adaptedMonth = month.length>1 ? month : "0"+month;
+			var today = new Date(year+"-"+adaptedMonth+"-01");
+			var year 			=	today.getFullYear();
+			var month 			=	today.getMonth()+1;
+			var date			=	new Date(year,month-1,1);
+			var daysInMonth		=	new Date(year,month,0).getDate();
+			var weekDay			=	(date.getDay()==0) ? 7:date.getDay();//Return week day as 1-7
+			for(var i=1;i<=daysInMonth;i++){
+				var tempDate			=	new Date(year,month-1,i);
+				var calendarElement		=	document.createElement("DIV");
+				calendarElement.setAttribute("class","calendarElement");
+				calendarElement.setAttribute("data-datetime",tempDate.getTime());
+				calendarElement.setAttribute("data-date",tempDate.getDate());
+
+					var dateTitle		=	document.createElement("DIV");
+					dateTitle.innerHTML	=	i+".";
+					dateTitle.setAttribute("class","calendarDateTitle");
+					calendarElement.appendChild(dateTitle);
+
+					var calendarValue = document.createElement("DIV");
+					calendarValue.setAttribute("class","calendarValue");
+						var inlines = document.createElement("DIV");
+						inlines.setAttribute("class","inlines");
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+							inline.innerHTML = "Долазак:";
+							inlines.appendChild(inline);
+
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline dolazak");
+							inlines.appendChild(inline);
+						calendarValue.appendChild(inlines);
+						
+						var inlines = document.createElement("DIV");
+						inlines.setAttribute("class","inlines");
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+							inline.innerHTML = "Одлазак:";
+							inlines.appendChild(inline);
+
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline odlazak");
+							inlines.appendChild(inline);
+						calendarValue.appendChild(inlines);
+						
+						var inlines = document.createElement("DIV");
+						inlines.setAttribute("class","inlines");
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+							inline.innerHTML = "Сатница:";
+							inlines.appendChild(inline);
+
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline satnica");
+							inlines.appendChild(inline);
+						calendarValue.appendChild(inlines);
+						
+						var inlines = document.createElement("DIV");
+						inlines.setAttribute("class","inlines");
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+							inline.innerHTML = "Налози:";
+							inlines.appendChild(inline);
+
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline nalozi");
+							inlines.appendChild(inline);
+						calendarValue.appendChild(inlines);
+						
+						var inlines = document.createElement("DIV");
+						inlines.setAttribute("class","inlines");
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+							inline.innerHTML = "Учинак:";
+							inlines.appendChild(inline);
+
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline ucinak");
+							inlines.appendChild(inline);
+						calendarValue.appendChild(inlines);
+					calendarElement.appendChild(calendarValue);
+				if(i==1){
+					document.getElementById("calendar-table").querySelectorAll("TR")[1].querySelectorAll("TD")[weekDay-1].getElementsByClassName("value")[0].appendChild(calendarElement);
+				}else{
+					var elementPlaced	=	false;
+					for(var j=1;j<tableRows.length;j++){
+						if(elementPlaced){
+							break;
+						}
+						var rowTds	=	tableRows[j].querySelectorAll("TD");
+						var k		=	(j==1) ? weekDay-1:0;
+						for(k;k<rowTds.length;k++){
+							if(!rowTds[k].querySelectorAll(".calendarElement")[0]){
+								rowTds[k].getElementsByClassName("value")[0].appendChild(calendarElement);
+								elementPlaced	=	true;
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			var sviNalozi = [];
+			var brojRadnihDana = 0;
+			var calendarElements = document.getElementsByClassName("calendarElement");
+			for(var i=0;i<calendarElements.length;i++){
+				var calendarElement = calendarElements[i];
+				var elem = calendarElement.getElementsByClassName("calendarValue")[0];
+				var dolazak = false;
+				var odlazak = false;
+				for(var j=0;j<checkIns.length;j++){
+					var checkIn = checkIns[j]
+					if(checkIn.date==String(Number(calendarElement.dataset.date)).padStart(2,"0")){
+						var checkDate = new Date(Number(checkIn.datetime));
+						if(checkDate.getHours()<13){
+							elem.getElementsByClassName("dolazak")[0].innerHTML = checkIn.timestamp;
+							dolazak = checkDate;	
+						}else{
+							elem.getElementsByClassName("odlazak")[0].innerHTML = checkIn.timestamp;
+							odlazak = checkDate;
+						}
+					}
+				}
+				if(dolazak && odlazak){
+					var totalMiliseconds = odlazak.getTime() - dolazak.getTime();
+					var totalMinutes =  Math.floor(totalMiliseconds / 60000);
+					var hours = Math.floor(totalMinutes / 60);
+   					var minutes = totalMinutes % 60;
+   					elem.getElementsByClassName("satnica")[0].innerHTML = String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0');
+				}
+
+				if(dolazak || odlazak){
+   					brojRadnihDana++;
+				}
+				//odlazak = false;//Ne znam zasto ali mora
+				//dolazak = false;
+
+				var ukupnoDodela = [];
+				for(var j=0;j<dodele.length;j++){
+					if(dodele[j].datum.datum.startsWith(String(Number(calendarElement.dataset.date)).padStart(2,"0"))){
+						ukupnoDodela.push(dodele[j]);
+						if(sviNalozi.indexOf(dodele[j].nalog)){
+							sviNalozi.push(dodele[j].nalog);
+						}
+
+					}	
+				}
+				elem.getElementsByClassName("nalozi")[0].innerHTML = ukupnoDodela.length;
+				
+				var ucinak = 0;
+				for(var j=0;j<ucinci.length;j++){
+					if(ucinci[j].datum.includes(month+"-"+String(Number(calendarElement.dataset.date)).padStart(2,"0"))){
+						ucinak = ucinak + parseFloat(ucinci[j].ukupanIznos);
+					}	
+				}
+				elem.getElementsByClassName("ucinak")[0].innerHTML = brojSaRazmacima(ucinak);
+				elem.getElementsByClassName("ucinak")[0].dataset.ucinak = ucinak;
+			}
+
+			document.getElementById("ukupno-naloga").innerHTML = sviNalozi.length;
+			var mesecniUcinak = 0;
+			for(var i=0;i<ucinci.length;i++){
+				mesecniUcinak = mesecniUcinak + parseFloat(ucinci[i].ukupanIznos)
+			}
+			document.getElementById("ukupan-ucinak").innerHTML = brojSaRazmacima(mesecniUcinak);
+			document.getElementById("ukupno-dana").innerHTML = brojRadnihDana;
+		</script>
+	</div><!--page wrap-->
+<%- include ("partials/footer") -%>

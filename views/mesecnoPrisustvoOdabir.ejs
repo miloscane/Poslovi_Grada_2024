@@ -1,0 +1,49 @@
+<%- include ("partials/header") -%>
+		<div class="blueWrap">
+			<div class="pageWidth">
+				<script>
+					var majstori = <%- JSON.stringify(majstori)%>;
+					var pomocnici = <%- JSON.stringify(pomocnici)%>;
+				</script>
+				<h2>Мајстор/Помоћник:</h2>
+				<select id="majstor">
+					<optgroup label="Мајстори" id="majstori"></optgroup>
+					<optgroup label="Помоћници" id="pomocnici"></optgroup>
+				</select>
+				<script>
+					for(var i=0;i<majstori.length;i++){
+						var option = document.createElement("OPTION");
+						option.setAttribute("value",majstori[i].uniqueId);
+						option.innerHTML = majstori[i].ime;
+						document.getElementById("majstori").appendChild(option)
+					}
+
+					for(var i=0;i<pomocnici.length;i++){
+						var option = document.createElement("OPTION");
+						option.setAttribute("value",pomocnici[i].uniqueId);
+						option.innerHTML = pomocnici[i].ime;
+						document.getElementById("pomocnici").appendChild(option)
+					}
+				</script>
+
+				<h2>Месец:</h2>
+				<select id="mesec">
+					<option value="11.2024">Новембар 2024</option>
+					<option value="12.2024">Децембар 2024</option>
+					<option value="01.2025">Јануар 2025</option>
+					<option value="02.2025">Фебруар 2025</option>
+					<option value="03.2025">Март 2025</option>
+				</select>
+
+				<h2>&nbsp;</h2>
+				<button onclick="showMonth()">Претражи</button>
+			</div>
+		</div>
+		<script>
+			function showMonth(){
+				loadGif();
+				window.location.href = "/mesecnoPrisustvo/"+document.getElementById("mesec").value+"/"+document.getElementById("majstor").value;
+			}
+		</script>
+	</div><!--page wrap-->
+<%- include ("partials/footer") -%>
