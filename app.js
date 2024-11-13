@@ -7081,22 +7081,29 @@ server.get('/mesecnoPrisustvo/:mesec/:majstor', async (req, res)=> {
 		.then((checkIns)=>{
 			dodeljivaniNaloziDB.find({majstor:req.params.majstor,"datum.datum":{$regex:req.params.mesec}}).toArray()
 			.then((dodele)=>{
-				stariUcinakMajstoraDB.find({majstor:req.params.majstor,datum:{$regex:req.params.mesec.split(".")[1]+"-"+req.params.mesec.split(".")[0]}}).toArray()
-				.then((ucinci)=>{
+				
 					majstoriDB.find({uniqueId:req.params.majstor}).toArray()
 					.then((majstori)=>{
 						if(majstori.length>0){
 							var majstor = majstori[0];
-							res.render("mesecnoPrisustvo",{
-						    pageTitle: "Месечно присуство мајстора "+majstor.ime+" за месец "+req.params.mesec,
-						    majstor: majstor,
-						    checkIns: checkIns,
-						    ucinci: ucinci,
-						    dodele: dodele,
-						    month: req.params.mesec.split(".")[0],
-						    year: req.params.mesec.split(".")[1],
-						    user: req.session.user
-						  });
+							stariUcinakMajstoraDB.find({majstor:majstor.vezaSaStarimPortalom,datum:{$regex:req.params.mesec.split(".")[1]+"-"+req.params.mesec.split(".")[0]}}).toArray()
+							.then((ucinci)=>{
+								res.render("mesecnoPrisustvo",{
+							    pageTitle: "Месечно присуство мајстора "+majstor.ime+" за месец "+req.params.mesec,
+							    majstor: majstor,
+							    checkIns: checkIns,
+							    ucinci: ucinci,
+							    dodele: dodele,
+							    month: req.params.mesec.split(".")[0],
+							    year: req.params.mesec.split(".")[1],
+							    user: req.session.user
+							  });
+							})
+							.catch((error)=>{
+								logError(error);
+								res.send("Greska 8");
+							})
+							
 						}else{
 							pomocniciDB.find({uniqueId:req.params.majstor}).toArray()
 							.then((pomocnici)=>{
@@ -7124,11 +7131,6 @@ server.get('/mesecnoPrisustvo/:mesec/:majstor', async (req, res)=> {
 						logError(error);
 						res.send("Greska 2")
 					})
-				})
-				.catch((error)=>{
-					logError(error);
-					res.send("Greska 8");
-				})
 			})
 			.catch((error)=>{
 				logError(error);
