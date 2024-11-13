@@ -4738,6 +4738,7 @@ server.get('/wome',async (req,res)=>{
 				res.render("administracija/wome",{
 					pageTitle: "WOME",
 					nalozi: naloziZaMapu,
+					googlegeocoding: process.env.googlegeocoding,
 					user: req.session.user
 				});
 			})
