@@ -816,6 +816,7 @@
 				function saveNalog(){
 					var nalogJson = {};
 					nalogJson.broj = nalog.broj;
+					nalogJson.nalogId = nalog.uniqueId;
 					nalogJson.status = document.getElementById("status-naloga").value;
 					nalogJson.majstor = document.getElementById("majstor-naloga").value;
 					nalogJson.obracun = [];

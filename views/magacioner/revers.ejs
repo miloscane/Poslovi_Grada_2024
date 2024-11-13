@@ -271,13 +271,17 @@
 								<div class="inputWrap reversButtons">
 									<div class="button" onclick="saveRevers()">Сачувај измене</div>
 									<div class="button deleteButton" onclick="loadGif();document.getElementById('obrisi-revers-form').submit()">Обриши реверс</div>
-									<div class="button" onclick="printZaduzenje()">
+									<!--<div class="button" onclick="printZaduzenje()">
 										<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
 										<div class="label">Штампај задужење</div>
 									</div>
 									<div class="button" onclick="printRazduzenje()">
 										<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
 										<div class="label">Штампај раздужење</div>
+									</div>-->
+									<div class="button" onclick="printRevers()">
+										<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
+										<div class="label">Штампај реверс</div>
 									</div>
 									<form method="POST" action="/izmeni-revers" style="display:none" id="izmeni-revers-form">
 										<input type="text" name="json" id="izmeni-revers-json">
@@ -295,7 +299,8 @@
 											function make_base3(){
 											  base_image3 = new Image();
 											  base_image3.crossOrigin="anonymous"
-											  base_image3.src = 'https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturaLogo.png';
+											  //base_image3.src = 'https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturaLogo.png';
+											  base_image3.src = '/images/fakturaLogo.png';
 											  base_image3.onload = function(){
 											    logoCanvasContext.drawImage(base_image3, 0, 0);
 											    logoLogoBlob 	=	logoCanvas.toDataURL("image/png", 1.0);
@@ -303,6 +308,25 @@
 											  }
 											}
 											make_base3();
+										</script>
+									</div>
+									<div style="overflow:hidden;width:1px;height:1px">
+										<canvas id="logo-stambeno-canvas" height="87" width="238"></canvas>
+										<script>
+											var logoStambenoCanvas = document.getElementById('logo-stambeno-canvas');
+											var logoStambenoCanvasContext = logoStambenoCanvas.getContext('2d');
+											var logoStambenoLogoBlob;
+											function make_base4(){
+											  base_image4 = new Image();
+											  base_image4.crossOrigin="anonymous"
+											  base_image4.src = '/images/logo_stambeno.png';
+											  base_image4.onload = function(){
+											    logoStambenoCanvasContext.drawImage(base_image4, 0, 0);
+											    logoStambenoLogoBlob 	=	logoStambenoCanvas.toDataURL("image/png", 1.0);
+
+											  }
+											}
+											make_base4();
 										</script>
 									</div>
 									<script>
@@ -515,6 +539,162 @@
 											doc.setDrawColor(0);
 									        doc.setFillColor(0,0,0);
 											doc.rect(5, yPos, 50, 0.4, 'F');
+
+
+									        window.open(doc.output('bloburl'), '_blank');
+										}
+
+
+										function printRevers(){
+											doc = new jsPDF({
+												orientation: 'p',
+												unit: 'mm',
+												format: 'a4',
+												compress: true
+												//putOnlyUsedFonts:true
+											});
+											pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+											pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+											var yPos = 12;
+											var xPos = 12;
+											//doc.getFontList("Helvetica");
+											doc.addFileToVFS("PTSans.ttf", PTSans);
+											doc.addFileToVFS("PTSansBold.ttf", PTSansBold);
+											doc.addFont('PTSans.ttf', 'PTSans', 'normal');
+											doc.addFont('PTSansBold.ttf', 'PTSans', 'bold');
+
+											doc.setFont('PTSans'); // set font
+											doc.getFontList("PTSans");
+											if(logoLogoBlob){
+												doc.addImage(logoLogoBlob, 'PNG', 5, 5, 150/mm, 153/mm,'','FAST');
+											}
+									        doc.setFontType("bold");
+											doc.setFontSize(16);
+									        doc.text("Послови Града доо.",205,yPos,'right');
+									        doc.setFontType("normal");
+											doc.setFontSize(11);
+											yPos = yPos + 5;
+									        doc.text("Мије Ковачевића 9, 11000 Палилула",205,yPos,'right');
+											yPos = yPos + 5;
+									        doc.text("011/334-2325",205,yPos,'right');
+									        yPos = yPos + 5;
+									        doc.text("063/209-777",205,yPos,'right');
+											yPos = yPos + 5;
+									        doc.text("ПИБ: 114108334",205,yPos,'right');
+											yPos = yPos + 5;
+									        doc.text("МБ: 21972215",205,yPos,'right');
+											yPos = yPos + 5;
+									        doc.text("office@poslovigrada.rs",205,yPos,'right');
+									        yPos = yPos + 10;
+									        doc.setFontType("bold");
+											doc.setFontSize(20);
+									        doc.text("Реверс по налогу број "+revers.nalog,pageWidth/2,yPos,'center');
+									        doc.setFontType("normal");
+											doc.setFontSize(16);
+											yPos = yPos + 10;
+											var adresa = nalog.adresa ? nalog.adresa : " ";
+											doc.text(adresa,pageWidth/2,yPos,'center');
+											yPos = yPos + 10;
+									        doc.text(vremePrijema(revers.datetime),pageWidth/2,yPos,'center');
+											yPos = yPos + 10;
+									        doc.setFontType("bold");
+											doc.text("Требован материјал:",5,yPos);
+											doc.text("Уграђен материјал:",150,yPos);
+											doc.setFontType("normal");
+											doc.setFontSize(14);
+											yPos = yPos + 7;
+											for(var i=0;i<revers.zaduzenje.length;i++){
+									        	doc.setFontType("bold");
+												doc.text(eval(i+1).toString()+".",5,yPos);
+												doc.setFontType("normal");
+												doc.text(getProductById(revers.zaduzenje[i].uniqueId).name,15,yPos);
+												doc.text(revers.zaduzenje[i].quantity+" kom.",120,yPos);
+												//doc.text(revers.zaduzenje[i].quantity2+" kom.",150,yPos);
+												doc.text("_____ kom.",150,yPos);
+												yPos = yPos + 7;
+												if(yPos>285){
+													doc.addPage()
+													yPos = 5;
+												}
+											}
+											yPos = yPos + 7;
+											if(yPos>285){
+												doc.addPage()
+												yPos = 5;
+											}
+											doc.setFontType("bold");
+											doc.text(getMajstorByCode(revers.majstor).ime,5,yPos);
+											yPos = yPos + 15;
+											if(yPos>285){
+												doc.addPage()
+												yPos = 5;
+											}
+											doc.setDrawColor(0);
+									        doc.setFillColor(0,0,0);
+											doc.rect(5, yPos, 50, 0.4, 'F');
+
+											doc.addPage();
+											if(logoStambenoLogoBlob){
+												doc.addImage(logoStambenoLogoBlob, 'PNG', 5, 5, 238/mm, 87/mm,'','FAST');
+											}
+											yPos = 30;
+											yPos = yPos + 10;
+											doc.setFontSize(22);
+											doc.text("ИНТЕРНИ РАДНИ НАЛОГ",pageWidth/2,yPos,'center');
+											doc.setLineWidth(0.5);
+											doc.rect(60, 30, 90, 15);
+											
+											yPos = yPos + 10;
+											doc.setFontSize(14);
+											doc.text("Датум:",15,yPos,'left');
+											doc.text("Број налога:",195,yPos,'right');
+											yPos = yPos +7;
+											doc.setFontType("normal");
+											doc.text(getDateAsStringForInputObject(new Date()),15,yPos,'left');
+											doc.text(revers.nalog,195,yPos,'right');
+											yPos = yPos +7;
+											doc.setFontType("bold");
+											doc.text("Време доласка:",15,yPos,'left');
+											doc.text("Адреса:",195,yPos,'right');
+											yPos = yPos +7;
+											doc.setFontType("normal");
+											doc.text("____________________________",15,yPos,'left');
+											doc.text(adresa,195,yPos,'right');
+											yPos = yPos +7;
+											doc.setFontType("bold");
+											doc.text("Време завршетка радова:",15,yPos,'left');
+											doc.text("Радна јединица:",195,yPos,'right');
+											yPos = yPos +7;
+											doc.setFontType("normal");
+											doc.text("____________________________",15,yPos,'left');
+											doc.text(nalog.radnaJedinica,195,yPos,'right');
+											yPos = yPos + 7;
+											doc.setFontType("bold");
+											doc.text("Опис квара:",15,yPos,'left');
+											doc.text("Захтевалац радова:",195,yPos,'right');
+											yPos = yPos + 7;
+											doc.setFontType("normal");
+											doc.text(stringArray(nalog.opis,40),15,yPos,'left');
+											doc.text(nalog.zahtevalac,195,yPos,'right');
+											yPos = yPos + 7*stringArray(nalog.opis,40).length;
+											doc.setFontType("bold");
+											doc.text("Опис радова:",15,yPos,'left');
+											yPos = yPos + 7;
+											doc.setLineWidth(0.2);
+											doc.rect(15, yPos, 180, 270-yPos);
+											yPos = 280;
+											doc.setFontType("bold");
+											doc.text("Потпис мајстора:",15,yPos,'left');
+											doc.text("Потпис станара:",195,yPos,'right');
+											yPos = yPos +7;
+											doc.setFontType("normal");
+											doc.text("____________________________",15,yPos,'left');
+											doc.text("____________________________",195,yPos,'right');
+
+
+
+
+											
 
 
 									        window.open(doc.output('bloburl'), '_blank');

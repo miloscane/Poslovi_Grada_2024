@@ -858,6 +858,31 @@ http.listen(process.env.PORT, function(){
 		});
 		
 
+		/*proizvodiDB.find({}).toArray()
+		.then((proizvodi)=>{
+			proizvodi.sort((a, b) => {
+			  const aParts = a.code.split('.').map(Number);
+			  const bParts = b.code.split('.').map(Number);
+			  
+			  for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+			    const aPart = aParts[i] || 0;
+			    const bPart = bParts[i] || 0;
+			    if (aPart !== bPart) {
+			      return aPart - bPart;
+			    }
+			  }
+			  return 0;
+			});
+			var csvString = "Sifra,Naziv\r\n";
+			for(var i=0;i<proizvodi.length;i++){
+				csvString += proizvodi[i].code +","+proizvodi[i].name+"\r\n";
+			}
+			fs.writeFileSync("magacin.csv",csvString,{encoding:"utf8"});
+			console.log("Wrote file");
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 		
 
 
@@ -3623,6 +3648,7 @@ server.post('/edit-nalog', async (req, res)=> {
 				    var izvestajJson = {};
 				    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
 				    izvestajJson.nalog		=	nalogJson.broj;
+				    izvestajJson.nalogId	=	nalogJson.nalogId;
 				    izvestajJson.datetime 	=	new Date().getTime();
 				    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
 				    izvestajJson.izvestaj	=	nalogJson.izvestaj;
