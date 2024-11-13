@@ -98,10 +98,14 @@
 					</div>
 					<div class="table" id="table"></div>
 				</div>
-				<div class="inputWrap printButton" onclick="printTable()">
-					<div class="button">
+				<div class="inputWrap printButton">
+					<div class="button" onclick="printTable()">
 						<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
 						<div class="label">Штампај табелу</div>
+					</div>
+					<div class="button" style="margin-top:20px" onclick="printCSV()">
+						<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/excelIcon.png"></div>
+						<div class="label">Скини excel</div>
 					</div>
 				</div>
 			</div>
@@ -428,6 +432,28 @@
 				    }
 
 			        window.open(doc.output('bloburl'), '_blank');
+				}
+
+				function printCSV(){
+					var csvString = "Br.,Broj naloga,Datum naloga,Opstina,Adresa,Status+\r\n";
+					for(var i=0;i<naloziToShow.length;i++){
+						csvString += eval(i+1).toString() + "," + naloziToShow[i].broj + "," + naloziToShow[i].datum + "," + naloziToShow[i].radnaJedinica + "," + naloziToShow[i].adresa + "," +naloziToShow[i].statusNaloga + "\r\n"
+					}
+					const blob = new Blob([csvString], { type: "text/csv" });
+					const url = URL.createObjectURL(blob);
+
+					// Create a temporary link element
+					const a = document.createElement("a");
+					a.href = url;
+					a.download = "Nalozi";
+
+					// Append link to the body and trigger the download
+					document.body.appendChild(a);
+					a.click();
+
+					// Clean up by removing the link element and releasing the blob URL
+					document.body.removeChild(a);
+					URL.revokeObjectURL(url);
 				}
 			</script>
 		</div>

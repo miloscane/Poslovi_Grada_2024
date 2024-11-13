@@ -6729,23 +6729,6 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 					var primerJson = {"code":"200","message":"Primio sam podatke za fakturisan nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 					res.send(JSON.stringify(primerJson));
 				}
-				
-
-
-
-
-
-				/*stambeno2DB.insertOne(stambenoJson)
-				.then((dbResponse)=>{
-					res.status(200);
-					res.setHeader('Content-Type', 'application/json');
-					var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-					res.send(JSON.stringify(primerJson));
-				}).catch((err)=>{
-					logError(err)
-					res.status(500);
-					res.send("Database error");
-				})*/
 			}
 		})
 		.catch((error)=>{
