@@ -319,7 +319,7 @@
 											function make_base4(){
 											  base_image4 = new Image();
 											  base_image4.crossOrigin="anonymous"
-											  base_image4.src = '/images/logo_stambeno.png';
+											  base_image4.src = 'https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo_stambeno.png';
 											  base_image4.onload = function(){
 											    logoStambenoCanvasContext.drawImage(base_image4, 0, 0);
 											    logoStambenoLogoBlob 	=	logoStambenoCanvas.toDataURL("image/png", 1.0);
@@ -565,10 +565,13 @@
 
 											doc.setFont('PTSans'); // set font
 											doc.getFontList("PTSans");
-											if(logoLogoBlob){
+											/*if(logoLogoBlob){
 												doc.addImage(logoLogoBlob, 'PNG', 5, 5, 150/mm, 153/mm,'','FAST');
+											}*/
+											if(logoStambenoLogoBlob){
+												doc.addImage(logoStambenoLogoBlob, 'PNG', 5, 5, 238/mm, 87/mm,'','FAST');
 											}
-									        doc.setFontType("bold");
+									        /*doc.setFontType("bold");
 											doc.setFontSize(16);
 									        doc.text("Послови Града доо.",205,yPos,'right');
 									        doc.setFontType("normal");
@@ -585,7 +588,7 @@
 									        doc.text("МБ: 21972215",205,yPos,'right');
 											yPos = yPos + 5;
 									        doc.text("office@poslovigrada.rs",205,yPos,'right');
-									        yPos = yPos + 10;
+									        yPos = yPos + 10;*/
 									        doc.setFontType("bold");
 											doc.setFontSize(20);
 									        doc.text("Реверс по налогу број "+revers.nalog,pageWidth/2,yPos,'center');
