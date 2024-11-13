@@ -670,16 +670,28 @@
 											yPos = yPos +7;
 											doc.setFontType("normal");
 											doc.text("____________________________",15,yPos,'left');
-											doc.text(nalog.radnaJedinica,195,yPos,'right');
+											var radnaJedinica = nalog ? nalog.radnaJedinica : " ";
+											if(!radnaJedinica){
+												radnaJedinica = " ";
+											}
+											doc.text(radnaJedinica,195,yPos,'right');
 											yPos = yPos + 7;
 											doc.setFontType("bold");
 											doc.text("Опис квара:",15,yPos,'left');
 											doc.text("Захтевалац радова:",195,yPos,'right');
 											yPos = yPos + 7;
 											doc.setFontType("normal");
-											doc.text(stringArray(nalog.opis,40),15,yPos,'left');
-											doc.text(nalog.zahtevalac,195,yPos,'right');
-											yPos = yPos + 7*stringArray(nalog.opis,40).length;
+											var opis = nalog ? nalog.opis : " ";
+											if(!opis){
+												opis = " ";
+											}
+											doc.text(stringArray(opis,40),15,yPos,'left');
+											var zahtevalac = nalog ? nalog.zahtevalac : " ";
+											if(!zahtevalac){
+												zahtevalac = " ";
+											}
+											doc.text(zahtevalac,195,yPos,'right');
+											yPos = yPos + 7*stringArray(opis,40).length;
 											doc.setFontType("bold");
 											doc.text("Опис радова:",15,yPos,'left');
 											yPos = yPos + 7;
