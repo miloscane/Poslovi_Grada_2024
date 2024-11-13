@@ -2682,6 +2682,7 @@ server.get('/izvestajLokacijeMajstora/:majstorid/:date',async (req,res)=>{
 												pageTitle: "Извештај локације за "+majstori[0].ime+" / "+plate+" за датум "+reshuffleDate(date),
 												user: req.session.user,
 												nalozi: dodeljivaniNalozi,
+										googlegeocoding: process.env.googlegeocoding,
 												stops: stops
 											});
 										}
