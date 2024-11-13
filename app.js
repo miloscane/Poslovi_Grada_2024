@@ -2589,6 +2589,7 @@ server.post('/proveraLokacijeMajstora',async (req,res)=>{
 										pageTitle: "Извештај локације за "+json.imeMajstora+" за датум "+reshuffleDate(json.date),
 										user: req.session.user,
 										nalozi: dodeljivaniNalozi,
+										googlegeocoding: process.env.googlegeocoding,
 										stops: stops
 									});
 								}
