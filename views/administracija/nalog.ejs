@@ -11,12 +11,29 @@
 	<script src="/js/signature.js"></script>
 	<div class="pageWidth">
 		<div class="administracijaNalog nalog">
-			<div class="inputWrap printButton">
+			<div class="inputWrap printButton" style="display:inline-block">
 				<div class="button" onclick="window.open('<%=nalog.digitalizacija.lokacija%>','_blank')">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
 					<div class="label">Штампај налог</div>
 				</div>
-			</div>	
+			</div>
+			<div class="inputWrap printButton" style="margin-left:30px; display:inline-block;vertical-align: top;">
+				<div class="button" onclick="copyToViber(this)">
+					<div class="label">ВИБЕР</div>
+				</div>
+			</div>
+			<script>
+				function copyToViber(elem){
+					var text = nalog.broj+"\r\n*"+nalog.adresa+", "+nalog.radnaJedinica+"*\r\n\r\n"+nalog.opis+"\r\n\r\n"+nalog.zahtevalac+"\r\n\r\n"//+"Klikni ovde za navigaciju do naloga:\r\n"+"https://www.google.com/maps/search/?api=1&query="+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+');
+					navigator.clipboard.writeText(text)
+					.then(()=>{
+						elem.innerHTML = "КОПИРАНО"
+					})
+					.catch((error)=>{
+						console.log(error)
+					})
+				}
+			</script>	
 			<div class="boxesWrap">
 				<div class="box" style="cursor:pointer;" onclick="window.open('https://www.google.com/maps/search/?api=1&query='+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+'),'_blank')">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/locationIcon.png"></div>
