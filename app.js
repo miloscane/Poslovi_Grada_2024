@@ -6844,7 +6844,7 @@ server.get('/tv', async (req, res)=> {
 			}
 			checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()
 			.then((checkIns)=>{
-		    ekipeDB.find({"datum.datum":getDateAsStringForDisplay(date)}).toArray()
+		    ekipeDB.find({}).toArray()
 		    .then((ekipe)=>{
 		    	dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(date)}).toArray()
 		    	.then((dodele)=>{
@@ -6867,7 +6867,7 @@ server.get('/tv', async (req, res)=> {
 							    pomocnici: pomocnici,
 							    majstori: majstori,
 							    checkIns: checkIns,
-							    ekipe: ekipe.length==0 ? {} : ekipe[0],
+							    ekipe: ekipe.length==0 ? {} : ekipe[ekipe.length-1],
 							    vozila: vozila,
 							    mapKey: process.env.googlegeocoding,
 							    dodele: dodele
