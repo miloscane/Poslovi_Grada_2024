@@ -6,6 +6,9 @@
 		var istorijat = <%-JSON.stringify(istorijat)%>;
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
 		var ucinci = <%-JSON.stringify(ucinci)%>; 
+		var reversi = <%-JSON.stringify(reversi)%>; 
+		var proizvodi = <%-JSON.stringify(proizvodi)%>; 
+		console.log(reversi)
 		var stariCenovnik = <%-JSON.stringify(stariCenovnik)%>;//Milica koristi za ucinak
 	</script>
 	<script src="/js/signature.js"></script>
@@ -75,7 +78,6 @@
 								<input type="checkbox" id="obracunat-na-portalu" style="width:auto;width:20px;height:20px;" onclick="saveNalog()"> Обрачунат на порталу
 							</div>
 							<script>
-								console.log(nalog.obracunatNaPortalu)
 								if(nalog.obracunatNaPortalu){
 									document.getElementById("obracunat-na-portalu").checked = nalog.obracunatNaPortalu;
 								}

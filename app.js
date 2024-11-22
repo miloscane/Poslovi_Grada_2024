@@ -884,6 +884,37 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 		
+		/*var magacinCsv = fs.readFileSync("./magacin.csv",{encoding:"utf8"});
+		var magacinCsvArray = magacinCsv.split("\r\n");
+		magacinCsvArray.splice(0,1);
+		var itemsArray = [];
+		for(var i=0;i<magacinCsvArray.length;i++){
+			var itemArray = magacinCsvArray[i].split(";");
+			if(itemArray[2]!=""){
+				if(itemArray[2].startsWith("80")){
+					var codesArray = itemArray[2].split(/\s+/).filter(code => code.trim() !== "");
+					var json = {};
+					json.magacinCode = itemArray[0];
+					json.codes = codesArray;
+					itemsArray.push(json);
+				}
+				
+			}
+		}
+
+
+		async function updateItems(itemsArray, proizvodiDB) {
+		    for (const value of itemsArray) {
+		        const setObj = { $set: { codes: value.codes } };
+		        const result = await proizvodiDB.updateOne({ code: value.magacinCode }, setObj);
+		        console.log(result);
+		    }
+		}
+
+		updateItems(itemsArray, proizvodiDB)
+    .then(() => console.log("All updates complete"))
+    .catch(err => console.error("Error updating items:", err));*/
+
 
 
 
@@ -2952,20 +2983,46 @@ server.get('/nalog/:broj',async (req,res)=>{
 										
 										dodeljivaniNaloziDB.find({nalog:req.params.broj}).toArray()
 										.then((dodele)=>{
-											res.render("administracija/nalog",{
-												pageTitle:"Налог број " + req.params.broj,
-												nalog: nalozi[0],
-												majstori: majstori,
-												cenovnik: cenovnik,
-												stariCenovnik: stariCenovnik,
-												istorijat: istorijat,
-												izvestaji: izvestaji,
-												ucinci: ucinci,
-												phoneAccessCode: phoneAccessCode,
-												podizvodjac: podizvodjac,
-												dodele: dodele,
-												user: req.session.user
-											});
+											magacinReversiDB.find({nalog:req.params.broj}).toArray()
+											.then((reversi)=>{
+												proizvodiDB.find({}).toArray()
+												.then((proizvodi)=>{
+													res.render("administracija/nalog",{
+														pageTitle:"Налог број " + req.params.broj,
+														nalog: nalozi[0],
+														majstori: majstori,
+														cenovnik: cenovnik,
+														stariCenovnik: stariCenovnik,
+														istorijat: istorijat,
+														izvestaji: izvestaji,
+														ucinci: ucinci,
+														phoneAccessCode: phoneAccessCode,
+														podizvodjac: podizvodjac,
+														dodele: dodele,
+														reversi: reversi,
+														proizvodi: proizvodi,
+														user: req.session.user
+													});
+												})
+												.catch((error)=>{
+													logError(error);
+													res.render("message",{
+														pageTitle: "Грешка",
+														message: "<div class=\"text\">Дошло је до грешке у бази податка 3376.</div>",
+														user: req.session.user
+													});
+												})
+												
+											})
+											.catch((error)=>{
+												logError(error);
+												res.render("message",{
+													pageTitle: "Грешка",
+													message: "<div class=\"text\">Дошло је до грешке у бази податка 3376.</div>",
+													user: req.session.user
+												});
+											})
+											
 										})
 										.catch((error)=>{
 											logError(error);
@@ -6727,17 +6784,17 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						}	
 					}else{
 						portalStambenoTestDB.insertOne(stambenoJson)
-						.then((stambenoResponse)=>{
-							res.status(200);
-							res.setHeader('Content-Type', 'application/json');
-							var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-							res.send(JSON.stringify(primerJson));
-						})
-						.catch((error)=>{
-							logError(err);
-							res.status(500);
-							res.send("Database error");
-						})
+								.then((stambenoResponse)=>{
+									res.status(200);
+									res.setHeader('Content-Type', 'application/json');
+									var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+									res.send(JSON.stringify(primerJson));
+								})
+								.catch((error)=>{
+									logError(err);
+									res.status(500);
+									res.send("Database error");
+								})
 					}
 					
 					

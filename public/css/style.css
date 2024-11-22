@@ -1321,6 +1321,10 @@ input[type=number] {
     width:50px;
 }
 
+.nalog .elems .ugradjeno{
+    width:50px;
+}
+
 .nalog .elems .ukupno{
     width:160px;
 }
@@ -1402,6 +1406,16 @@ input[type=number] {
 
 .nalog #obracun-wrap .kolicina input:focus{
     background-color:rgb(255,255,255,1);
+}
+
+
+
+.nalog #obracun-wrap .ugradjeno input{
+    border:none;
+    background-color:rgb(255,255,255,0);
+    height:100%;
+    padding:9px 5px;
+    outline:none !important;
 }
 
 .nalog #obracun-wrap .kolicina .plus{

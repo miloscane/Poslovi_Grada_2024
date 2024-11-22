@@ -79,6 +79,19 @@ function addRow(json){
 			kolicina.appendChild(minus);
 		row.appendChild(kolicina);
 
+		var ugradjeno = document.createElement("DIV");
+		ugradjeno.setAttribute("class","elem ugradjeno");
+			var input = document.createElement("INPUT");
+			input.setAttribute("type","number");
+			input.setAttribute("class","ugradjeno");
+			input.setAttribute("min","0");
+			input.setAttribute("value","0");
+			input.setAttribute("disabled","disabled");
+			ugradjeno.appendChild(input);
+			
+			
+		row.appendChild(ugradjeno);
+
 		var ukupno = document.createElement("DIV");
 		ukupno.setAttribute("class","elem ukupno");
 		ukupno.innerHTML = json ? brojSaRazmacima(parseFloat(rowJson.kolicina)*parseFloat(rowJson.price)) : " ";
@@ -226,6 +239,37 @@ function calculateTable(){
 	document.getElementById("tabela-iznos").innerHTML = brojSaRazmacima(ukupanIznos)+" дин.";
 	document.getElementById("tabela-iznos").dataset.price = ukupanIznos;
 	document.getElementById("iznos-naloga").innerHTML = brojSaRazmacima(ukupanIznos)+" дин.";
+
+	//Provera materijala
+	if(typeof reversi !== "undefined"){
+		console.log(reversi)
+		for(var i=0;i<rows.length;i++){
+			for(var j=0;j<reversi.length;j++){
+				for(var k=0;k<reversi[j].zaduzenje.length;k++){
+					var proizvod = getProizvodById(reversi[j].zaduzenje[k].uniqueId);
+					if(proizvod.codes.includes(rows[i].getElementsByClassName("sifra")[0].getElementsByTagName("INPUT")[0].value)){
+						ugradjeno = parseFloat(rows[i].getElementsByClassName("ugradjeno")[0].getElementsByTagName("INPUT")[0].value) + parseFloat(reversi[j].zaduzenje[k].quantity) - parseFloat(reversi[j].zaduzenje[k].quantity2);
+						rows[i].getElementsByClassName("ugradjeno")[0].getElementsByTagName("INPUT")[0].value = ugradjeno
+					}
+				}
+			}
+			if(rows[i].getElementsByClassName("ugradjeno")[0].getElementsByTagName("INPUT")[0].value>rows[i].getElementsByClassName("kolicina")[0].getElementsByTagName("INPUT")[0].value){
+				rows[i].style.color = "rgb(255,255,255)"
+				rows[i].style.backgroundColor = "rgb(200,0,0)"
+			}
+		}
+	}
+}
+
+function getProizvodById(id){
+	var proizvod = {};
+	for(var i=0;i<proizvodi.length;i++){
+		if(proizvodi[i].uniqueId==id){
+			proizvod = JSON.parse(JSON.stringify(proizvodi[i]));
+			break;
+		}
+	}
+	return proizvod;
 }
 
 function quantityInput(elem){
