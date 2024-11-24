@@ -124,6 +124,60 @@
 				<div class="inputWrap" style="margin-top:15px;width:300px">
 					<div class="button" onclick="saveIzmene()">Сачувај измене</div>
 				</div>
+
+				<div class="beleskaWrap">
+					<div class="title">Белешка за датум <span><input type="date" id="datum-beleske"></span></div>
+					<div class="inputWrap">
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Nekasnjenje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Није каснио</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Kasnjenje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Каснио</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Bolovanje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Боловање</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Neopravdano" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Неоправдано</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Necekiranje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Није се чекирао</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Slava" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Слава</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Smrt" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Смртни случај</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Kazna" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Саобраћајна казна</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<form method="post" style="display:none" id="form" action="/izmenaMajstora">

@@ -4811,6 +4811,10 @@ input[type=number] {
     background-color:rgb(20,180,20);
 }
 
+.administracijaMajstoraEdit .infoWrap{
+    position:relative;
+}
+
 .administracijaMajstoraEdit .infoWrap .ime{
     font-weight:600;
     color:rgb(32,51,100);
@@ -4889,6 +4893,31 @@ input[type=number] {
 .administracijaMajstoraEdit .textareaInput textarea{
     width:500px;
     height:250px;
+}
+
+.administracijaMajstoraEdit .beleskaWrap{
+    position:absolute;
+    top:150px;
+    left:52%;
+}
+
+.administracijaMajstoraEdit .beleskaWrap .title{
+    font-size:20px;
+    color:rgb(31,52,100);
+    font-weight:500;
+}
+
+.administracijaMajstoraEdit .beleskaWrap .inputWrap .checkboxWrap .checkboxWrapper input{
+    width:15px;
+    height:15px;
+}
+
+.administracijaMajstoraEdit .beleskaWrap .inputWrap .checkboxWrap .checkboxWrapper{
+    font-size:12px;
+}
+
+.administracijaMajstoraEdit .beleskaWrap .inputWrap .checkboxWrap{
+    padding:5px 10px;
 }
 
 .majstorCheckIn .title{
