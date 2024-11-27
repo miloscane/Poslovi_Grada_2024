@@ -1,0 +1,202 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+		console.log(nalozi)
+		var cenovnik = <%-JSON.stringify(cenovnik)%>;
+		var majstori = <%-JSON.stringify(podizvodjaci)%>;//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		var date = "<%=date%>";
+	</script>
+	<div class="pageWidth">
+		<div class="zavrseniNalozi listaNaloga">
+			<input type="date" id="date" oninput="window.location.href='/jucerasnjiNaloziPodizvodjaca/'+this.value">
+			<script>
+				document.getElementById("date").value = date;
+
+			</script>
+			<div class="boxesWrap">
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/sumIcon.png"></div>
+					<div class="info">
+						<div class="title">Укупно налога</div>
+						<div class="text"><%=nalozi.length%></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
+					<div class="info">
+						<div class="title">Приказани налози</div>
+						<div class="text"><span id="ukupno-prikazanih-naloga"></span></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
+					<div class="info">
+						<div class="title">Укупан износ приказаних налога</div>
+						<div class="text"><span id="ukupan-iznos-prikazanih-naloga"></span></div>
+					</div>
+				</div>
+			</div>
+			<div class="lightBlueBox">
+				<div class="filters">
+					<div class="filter">
+						<div class="label">Приказани подизвоћачи:</div>
+						<div class="checkboxes" id="filter-opstine-checkboxes"></div>
+						<script>
+							for(var i=0;i<podizvodjaci.length;i++){
+								if(!getMajstorByCode(podizvodjaci[i]).inactive){
+									var checkboxWrapper = document.createElement("DIV");
+									checkboxWrapper.setAttribute("class","checkboxWrapper");
+										var checkboxWrap = document.createElement("DIV");
+										checkboxWrap.setAttribute("class","checkboxWrap");
+											var input = document.createElement("INPUT");
+											input.setAttribute("type","checkbox");
+											input.setAttribute("class","radnaJedinicaCheckbox");
+											input.setAttribute("value",podizvodjaci[i]);
+											input.setAttribute("oninput","generateTable()");
+											input.setAttribute("oncontextmenu","event.preventDefault();rightClickCheckbox(this)");
+											input.checked = true;
+											checkboxWrap.appendChild(input);
+										checkboxWrapper.appendChild(checkboxWrap);
+
+										var label = document.createElement("DIV");
+										label.setAttribute("class","label");
+										label.setAttribute("onclick","checkboxLabelClick(this)");
+										label.setAttribute("oncontextmenu","event.preventDefault();rightClickCheckbox(this)");
+										label.innerHTML	=	getMajstorByCode(podizvodjaci[i]).ime;
+										checkboxWrapper.appendChild(label);
+									document.getElementById("filter-opstine-checkboxes").appendChild(checkboxWrapper);
+								}
+								
+							}
+
+							function checkboxLabelClick(elem){
+								if(elem.parentElement.getElementsByTagName("INPUT")[0].checked){
+									elem.parentElement.getElementsByTagName("INPUT")[0].checked = false;
+								}else{
+									elem.parentElement.getElementsByTagName("INPUT")[0].checked = true;
+								}
+								generateTable();
+							}
+
+							function rightClickCheckbox(elem){
+								var checkboxElems = elem.parentElement.parentElement.getElementsByTagName("INPUT");
+								for(var i=0;i<checkboxElems.length;i++){
+									checkboxElems[i].checked = false;
+								}
+								elem.parentElement.getElementsByTagName("INPUT")[0].checked = true;
+								generateTable();
+							}
+						</script>
+					</div>
+				</div>
+				<div class="tableWrap" style="overflow-x:auto">
+					<div class="tableHeader">
+						<table>
+							<tr>
+								<td><div class="value redniBroj">Редни број</div></td>
+								<td><div class="value brojNaloga">Број налога</div></td>
+								<td><div class="value datumNaloga">Датум налога</div></td>
+								<td><div class="value opis">Опис</div></td>
+								<td><div class="value iznos">Износ</div></td>
+								<td><div class="value majstor">Подизвођач</div></td>
+							</tr>
+						</table>
+					</div>
+					<div class="table" id="table"></div>
+				</div>
+			</div>
+			<script>
+				var naloziToShow = [];
+				function generateTable(){
+					naloziToShow = [];
+					var opstineToShow = [];
+					var opstineFilter = document.getElementsByClassName("radnaJedinicaCheckbox");
+					for(var i=0;i<opstineFilter.length;i++){
+						if(opstineFilter[i].checked){
+							opstineToShow.push(opstineFilter[i].value);
+						}
+					}
+
+					for(var i=0;i<nalozi.length;i++){
+						//isfiltriraj ovde
+						if(opstineToShow.indexOf(nalozi[i].majstor)>=0){
+							var nalogToPush = {};
+							nalogToPush.broj = nalozi[i].broj;
+							nalogToPush.datum = nalozi[i].datum.datum;
+							nalogToPush.majstor = nalozi[i].majstor;
+							nalogToPush.opis = nalozi[i].opis;
+							var ukupanIznos = 0;
+							for(var j=0;j<nalozi[i].obracun.length;j++){
+								ukupanIznos = ukupanIznos + parseFloat(getPriceItemByCode(nalozi[i].obracun[j].code).price)*parseFloat(nalozi[i].obracun[j].quantity);
+							}
+							nalogToPush.ukupanIznos = ukupanIznos;
+							naloziToShow.push(nalogToPush);	
+						}
+						
+					}
+					var ukupanIznos = 0;
+					document.getElementById("ukupno-prikazanih-naloga").innerHTML = naloziToShow.length;
+					document.getElementById("table").innerHTML = "";
+					var table = document.createElement("TABLE");
+					naloziToShow.sort((a,b) => a.obracunatNaPortalu - b.obracunatNaPortalu);
+					
+					for(var i=0;i<naloziToShow.length;i++){
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1)+".";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojNaloga");
+								div.innerHTML = "<a href='/nalog/"+naloziToShow[i].broj+"' target='_blank'>"+naloziToShow[i].broj+"</a>";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value datumNaloga");
+								div.innerHTML = naloziToShow[i].datum;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value opis");
+								div.innerHTML = naloziToShow[i].opis;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value iznos");
+								div.innerHTML = brojSaRazmacima(naloziToShow[i].ukupanIznos);
+								var iznosNaloga = isNaN(naloziToShow[i].ukupanIznos) ? -1 : parseFloat(naloziToShow[i].ukupanIznos);
+								ukupanIznos = ukupanIznos + iznosNaloga;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value majstor");
+								div.innerHTML = getMajstorByCode(naloziToShow[i].majstor).ime;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+
+						table.appendChild(tr);
+					}
+					document.getElementById("ukupan-iznos-prikazanih-naloga").innerHTML = brojSaRazmacima(ukupanIznos);
+					document.getElementById("table").appendChild(table);
+				}
+
+				generateTable();
+
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

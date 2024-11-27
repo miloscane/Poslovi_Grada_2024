@@ -3457,6 +3457,11 @@ input[type=number] {
     overflow: hidden;
 }
 
+.listaNaloga .tableWrap table td .opis{
+    width:350px;
+    height:auto;
+}
+
 .listaNaloga .tableWrap table td .radnaJedinica{
     width:160px;
     text-overflow: ellipsis;
