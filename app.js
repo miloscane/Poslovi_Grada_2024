@@ -5976,7 +5976,8 @@ server.post('/izmeni-revers', async (req, res)=> {
 			var setObj	=	{ $set: {
 				majstor: json.majstor,
 				zaduzenje: json.zaduzenje,
-				nalog: json.nalog
+				nalog: json.nalog,
+				adresa: json.adresa
 			}};
 			magacinReversiDB.updateOne({uniqueId:json.uniqueId},setObj)
 			.then((dbResponse)=>{
@@ -7027,7 +7028,6 @@ server.get('/tv', async (req, res)=> {
 		    			.then((ucinci)=>{
 		    				for(var i=0;i<majstori.length;i++){
 		    					majstori[i].ucinak = 0;
-
 		    					for(var j=0;j<ucinci.length;j++){
 		    						if(majstori[i].uniqueId==ucinci[j].majstor){
 		    							majstori[i].ucinak = majstori[i].ucinak + parseFloat(ucinci[j].ukupanIznos);
