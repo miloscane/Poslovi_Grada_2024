@@ -254,7 +254,7 @@
 								</div>
 								<div class="inputWrap">
 									<div class="inputTitle">Адреса:</div>
-									<input type="text" id="adresa-naloga" disabled>
+									<input type="text" id="adresa-naloga">
 									<script>
 										document.getElementById("adresa-naloga").value = nalog.adresa ? nalog.adresa : "";
 									</script>
@@ -338,6 +338,7 @@
 													json.uniqueId = revers.uniqueId;
 													json.majstor = document.getElementById("majstor-reversa").value;
 													json.nalog = document.getElementById("broj-naloga").value;
+													json.adresa = document.getElementById("adresa-naloga").value;
 													json.zaduzenje = [];
 													for(var i=0;i<zaduzenjeElems.length;i++){
 														var zaduzenjeJson = {};
