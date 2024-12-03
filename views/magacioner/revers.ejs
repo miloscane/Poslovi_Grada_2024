@@ -481,7 +481,7 @@
 									        doc.setFontType("normal");
 											doc.setFontSize(16);
 											yPos = yPos + 10;
-											var adresa = nalog.adresa ? nalog.adresa : " ";
+											var adresa = nalog.adresa ? nalog.adresa : revers.adresa ? revers.adresa : " ";
 											doc.text(adresa,pageWidth/2,yPos,'center');
 											yPos = yPos + 10;
 									        doc.text(vremePrijema(revers.datetime),pageWidth/2,yPos,'center');
