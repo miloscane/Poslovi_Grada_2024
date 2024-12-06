@@ -340,88 +340,174 @@
 							<script>
 								var dodele = <%-JSON.stringify(dodele)%>;
 								for(var i=0;i<dodele.length;i++){
-									if(Number(dodele[i].deleted)!=1){
-										console.log(dodele[i])
-										var dodela = document.createElement("DIV");
-										dodela.setAttribute("data-id",dodele[i].uniqueId);
-										dodela.setAttribute("class","dodela");
+									if(dodele[i].nalog=="1111111"){
+										if(Number(dodele[i].deleted)!=1){
+											if(istiDatum(new Date(),new Date(Number(dodele[i].datum.datetime)))){
+												var dodela = document.createElement("DIV");
+												dodela.setAttribute("data-id",dodele[i].uniqueId);
+												dodela.setAttribute("class","dodela");
 
-											var inline = document.createElement("DIV");
-											inline.setAttribute("class","inline");
-												var majstor = document.createElement("DIV");
-												majstor.setAttribute("class","majstor");
-												majstor.innerHTML = "<span style=\"font-weight:500\">"+getMajstorByCode(dodele[i].majstor).ime+"</span><br><span style=\"font-weight:200;font-size:10px\">"+dodele[i].datum.datum +" "+dodele[i].datum.timestamp+" "+dodele[i].user.name+"</span>";
-												inline.appendChild(majstor);  
-											dodela.appendChild(inline);
+													var inline = document.createElement("DIV");
+													inline.setAttribute("class","inline");
+														var majstor = document.createElement("DIV");
+														majstor.setAttribute("class","majstor");
+														majstor.innerHTML = "<span style=\"font-weight:500\">"+getMajstorByCode(dodele[i].majstor).ime+"</span><br><span style=\"font-weight:200;font-size:10px\">"+dodele[i].datum.datum +" "+dodele[i].datum.timestamp+" "+dodele[i].user.name+"</span>";
+														inline.appendChild(majstor);  
+													dodela.appendChild(inline);
 
-											var inline = document.createElement("DIV");
-											inline.setAttribute("class","inline");
-												var vremeDolaska = document.createElement("SELECT");
-												vremeDolaska.setAttribute("class","staroVremeDolaska");
-												for(var j=0;j<vremena.length;j++){
-													var option = document.createElement("OPTION");
-													option.setAttribute("value",vremena[j]);
-													option.innerHTML = vremena[j];
-													if(vremena[j]==dodele[i].vremeDolaska){
-														option.setAttribute("selected","selected");
+													var inline = document.createElement("DIV");
+													inline.setAttribute("class","inline");
+														var vremeDolaska = document.createElement("SELECT");
+														vremeDolaska.setAttribute("class","staroVremeDolaska");
+														for(var j=0;j<vremena.length;j++){
+															var option = document.createElement("OPTION");
+															option.setAttribute("value",vremena[j]);
+															option.innerHTML = vremena[j];
+															if(vremena[j]==dodele[i].vremeDolaska){
+																option.setAttribute("selected","selected");
+															}
+															vremeDolaska.appendChild(option);
+														}
+														inline.appendChild(vremeDolaska);  
+													dodela.appendChild(inline);	
+
+													var inline = document.createElement("DIV");
+													inline.setAttribute("class","inline");
+														var vremeRadova = document.createElement("SELECT");
+														vremeRadova.setAttribute("class","staroVremeRadova");
+														for(var j=0;j<vremenaRadova.length;j++){
+															var option = document.createElement("OPTION");
+															option.setAttribute("value",vremenaRadova[j]);
+															option.innerHTML = vremenaRadova[j];
+															if(vremenaRadova[j]==dodele[i].vremeRadova){
+																option.setAttribute("selected","selected");
+															}
+															vremeRadova.appendChild(option);
+														}
+														inline.appendChild(vremeRadova);  
+													dodela.appendChild(inline);	
+
+													var inline = document.createElement("DIV");
+													inline.setAttribute("class","inline");
+														var statusDodele = document.createElement("SELECT");
+														statusDodele.setAttribute("class","stariStatus");
+														for(var j=0;j<statusi.length;j++){
+															var option = document.createElement("OPTION");
+															option.setAttribute("value",statusi[j].value);
+															option.innerHTML = statusi[j].naziv;
+															if(statusi[j].value==dodele[i].status){
+																option.setAttribute("selected","selected");
+															}
+															statusDodele.appendChild(option);
+														}
+														inline.appendChild(statusDodele);  
+													dodela.appendChild(inline);	
+
+
+													if(istiDatum(new Date(Number(dodele[i].datum.datetime)),new Date())){
+														var inline = document.createElement("DIV");
+														inline.setAttribute("class","inline");
+															var komanda = document.createElement("DIV");
+															komanda.setAttribute("class","komanda");
+															komanda.setAttribute("onclick","editDodelu(this)")
+															komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png\">";
+															inline.appendChild(komanda);
+															var komanda = document.createElement("DIV");
+															komanda.setAttribute("class","komanda");
+															komanda.setAttribute("onclick","deleteDodelu(this)")
+															komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
+															inline.appendChild(komanda);
+														dodela.appendChild(inline)	
 													}
-													vremeDolaska.appendChild(option);
-												}
-												inline.appendChild(vremeDolaska);  
-											dodela.appendChild(inline);	
-
-											var inline = document.createElement("DIV");
-											inline.setAttribute("class","inline");
-												var vremeRadova = document.createElement("SELECT");
-												vremeRadova.setAttribute("class","staroVremeRadova");
-												for(var j=0;j<vremenaRadova.length;j++){
-													var option = document.createElement("OPTION");
-													option.setAttribute("value",vremenaRadova[j]);
-													option.innerHTML = vremenaRadova[j];
-													if(vremenaRadova[j]==dodele[i].vremeRadova){
-														option.setAttribute("selected","selected");
-													}
-													vremeRadova.appendChild(option);
-												}
-												inline.appendChild(vremeRadova);  
-											dodela.appendChild(inline);	
-
-											var inline = document.createElement("DIV");
-											inline.setAttribute("class","inline");
-												var statusDodele = document.createElement("SELECT");
-												statusDodele.setAttribute("class","stariStatus");
-												for(var j=0;j<statusi.length;j++){
-													var option = document.createElement("OPTION");
-													option.setAttribute("value",statusi[j].value);
-													option.innerHTML = statusi[j].naziv;
-													if(statusi[j].value==dodele[i].status){
-														option.setAttribute("selected","selected");
-													}
-													statusDodele.appendChild(option);
-												}
-												inline.appendChild(statusDodele);  
-											dodela.appendChild(inline);	
-
-
-											if(istiDatum(new Date(Number(dodele[i].datum.datetime)),new Date())){
-												var inline = document.createElement("DIV");
-												inline.setAttribute("class","inline");
-													var komanda = document.createElement("DIV");
-													komanda.setAttribute("class","komanda");
-													komanda.setAttribute("onclick","editDodelu(this)")
-													komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png\">";
-													inline.appendChild(komanda);
-													var komanda = document.createElement("DIV");
-													komanda.setAttribute("class","komanda");
-													komanda.setAttribute("onclick","deleteDodelu(this)")
-													komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
-													inline.appendChild(komanda);
-												dodela.appendChild(inline)	
+													
+												document.getElementById("dodele").appendChild(dodela);	
 											}
 											
+										}
+									}else{
+										if(Number(dodele[i].deleted)!=1){
+											var dodela = document.createElement("DIV");
+											dodela.setAttribute("data-id",dodele[i].uniqueId);
+											dodela.setAttribute("class","dodela");
 
-										document.getElementById("dodele").appendChild(dodela);
+												var inline = document.createElement("DIV");
+												inline.setAttribute("class","inline");
+													var majstor = document.createElement("DIV");
+													majstor.setAttribute("class","majstor");
+													majstor.innerHTML = "<span style=\"font-weight:500\">"+getMajstorByCode(dodele[i].majstor).ime+"</span><br><span style=\"font-weight:200;font-size:10px\">"+dodele[i].datum.datum +" "+dodele[i].datum.timestamp+" "+dodele[i].user.name+"</span>";
+													inline.appendChild(majstor);  
+												dodela.appendChild(inline);
+
+												var inline = document.createElement("DIV");
+												inline.setAttribute("class","inline");
+													var vremeDolaska = document.createElement("SELECT");
+													vremeDolaska.setAttribute("class","staroVremeDolaska");
+													for(var j=0;j<vremena.length;j++){
+														var option = document.createElement("OPTION");
+														option.setAttribute("value",vremena[j]);
+														option.innerHTML = vremena[j];
+														if(vremena[j]==dodele[i].vremeDolaska){
+															option.setAttribute("selected","selected");
+														}
+														vremeDolaska.appendChild(option);
+													}
+													inline.appendChild(vremeDolaska);  
+												dodela.appendChild(inline);	
+
+												var inline = document.createElement("DIV");
+												inline.setAttribute("class","inline");
+													var vremeRadova = document.createElement("SELECT");
+													vremeRadova.setAttribute("class","staroVremeRadova");
+													for(var j=0;j<vremenaRadova.length;j++){
+														var option = document.createElement("OPTION");
+														option.setAttribute("value",vremenaRadova[j]);
+														option.innerHTML = vremenaRadova[j];
+														if(vremenaRadova[j]==dodele[i].vremeRadova){
+															option.setAttribute("selected","selected");
+														}
+														vremeRadova.appendChild(option);
+													}
+													inline.appendChild(vremeRadova);  
+												dodela.appendChild(inline);	
+
+												var inline = document.createElement("DIV");
+												inline.setAttribute("class","inline");
+													var statusDodele = document.createElement("SELECT");
+													statusDodele.setAttribute("class","stariStatus");
+													for(var j=0;j<statusi.length;j++){
+														var option = document.createElement("OPTION");
+														option.setAttribute("value",statusi[j].value);
+														option.innerHTML = statusi[j].naziv;
+														if(statusi[j].value==dodele[i].status){
+															option.setAttribute("selected","selected");
+														}
+														statusDodele.appendChild(option);
+													}
+													inline.appendChild(statusDodele);  
+												dodela.appendChild(inline);	
+
+
+												if(istiDatum(new Date(Number(dodele[i].datum.datetime)),new Date())){
+													var inline = document.createElement("DIV");
+													inline.setAttribute("class","inline");
+														var komanda = document.createElement("DIV");
+														komanda.setAttribute("class","komanda");
+														komanda.setAttribute("onclick","editDodelu(this)")
+														komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png\">";
+														inline.appendChild(komanda);
+														var komanda = document.createElement("DIV");
+														komanda.setAttribute("class","komanda");
+														komanda.setAttribute("onclick","deleteDodelu(this)")
+														komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
+														inline.appendChild(komanda);
+													dodela.appendChild(inline)	
+												}
+												
+
+											document.getElementById("dodele").appendChild(dodela);
+										}	
 									}
+									
 									
 								}
 								function deleteDodelu(elem){

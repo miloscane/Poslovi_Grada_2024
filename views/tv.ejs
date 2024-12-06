@@ -9,7 +9,6 @@
 		var pomocnici = <%-JSON.stringify(pomocnici)%>;
 		var checkIns = <%-JSON.stringify(checkIns)%>;
 		var ekipe = <%-JSON.stringify(ekipe)%>;
-		console.log(ekipe)
 		var dodele = <%-JSON.stringify(dodele)%>;
 		var vozila = <%-JSON.stringify(vozila)%>;
 		var statusi = [{naziv:"Кренуо",value:"Odlazak"},{naziv:"Стигао",value:"Dolazak"},{naziv:"Завршио",value:"Zavrseno"}];
@@ -257,12 +256,21 @@
 
 							var specijalniStatusi = document.createElement("DIV");
 							specijalniStatusi.setAttribute("class","specials");
-								if(ekipe.prisustvo.ekipe[i].trecaLica){
-									var special = document.createElement("DIV");
-									special.setAttribute("class","special trecaLica");
-									special.innerHTML = "III";
-									specijalniStatusi.appendChild(special);
+								var majstorskeDodele = [];
+								for(var j=0;j<dodele.length;j++){
+									if(dodele[j].majstor == majstorJson.uniqueId){
+										majstorskeDodele.push(dodele[j])
+									}
 								}
+								if(majstorskeDodele.length>0){
+									if(majstorskeDodele[majstorskeDodele.length-1].nalog=="1111111"){
+										var special = document.createElement("DIV");
+										special.setAttribute("class","special trecaLica");
+										special.innerHTML = "III";
+										specijalniStatusi.appendChild(special);
+									}
+								}
+								
 
 								if(ekipe.prisustvo.ekipe[i].dezurstvo){
 									var special = document.createElement("DIV");

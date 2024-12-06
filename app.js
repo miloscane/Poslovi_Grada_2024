@@ -1174,6 +1174,32 @@ http.listen(process.env.PORT, function(){
 		})*/
 
 
+		/*naloziDB.find({majstor:{$in:podizvodjaci},statusNaloga:{$in:["Spreman za fakturisanje","Fakturisan"]}}).toArray()
+		.then((nalozi)=>{
+			var naloziToShow = []
+			var ukupnaSuma = 0;
+			var ukupnoNaloga = 0;
+			var Oktobar28 = 1730073600000;
+			var Novembar30 = 1732924800000;
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].datum.datetime>Oktobar28 && nalozi[i].datum.datetime<Novembar30){
+					naloziToShow.push(nalozi[i])
+				}
+			}
+
+			for(var i=0;i<naloziToShow.length;i++){
+				//console.log(naloziToShow[i].ukupanIznos)
+				ukupnaSuma = ukupnaSuma + parseFloat(naloziToShow[i].ukupanIznos);
+				ukupnoNaloga++;
+			}
+
+			console.log("Iznos PG:" + brojSaRazmacima(ukupnaSuma));
+			console.log("Broj naloga:" + ukupnoNaloga);
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
+
 
 	})
 	.catch(error => {
