@@ -18,6 +18,7 @@ const multerS3						= require('multer-s3-transform');
 const sharp 							= require('sharp');
 const pdfParse						=	require('pdf-parse');
 const {Worker,SHARE_ENV}	=	require('worker_threads');
+const schedule = require('node-schedule');
 const request 			=	require('request');
 dotenv.config();
 
@@ -856,6 +857,7 @@ http.listen(process.env.PORT, function(){
 		.catch((error)=>{
 			logError(error);
 		});
+
 		
 
 		/*proizvodiDB.find({}).toArray()
@@ -923,7 +925,7 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var month = "10"
+			var month = "11"
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
@@ -1008,7 +1010,7 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var month = 10;
+			var month = 11;
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
@@ -1209,6 +1211,151 @@ http.listen(process.env.PORT, function(){
 	});
 });
 
+
+var daysInWeek = ["PONEDELJAK","UTORAK","SREDU","ČETVRTAK","PETAK","SUBOTU","NEDELJU"];
+
+
+const sendEmail = () => {
+		majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray()
+		.then((majstori)=>{
+			var idoviMajstora = [];
+			for(var i=0;i<majstori.length;i++){
+				idoviMajstora.push(majstori[i].uniqueId);
+			}
+			majstoriDB.find({uniqueId:{$in:podizvodjaci}}).toArray()
+			.then((podizvodjaciIzvestaj)=>{
+				naloziDB.find({"datum.datum":getDateAsStringForDisplay(new Date())}).toArray()
+				.then((danasnjiNalozi)=>{
+					var nalogaDanas = danasnjiNalozi.length;
+					var naloziPodizvodjaca = 0;
+					for(var i=0;i<danasnjiNalozi.length;i++){
+						if(podizvodjaci.indexOf(danasnjiNalozi[i].majstor)>=0){
+							naloziPodizvodjaca++;
+						}
+					}
+					checkInMajstoraDB.find({uniqueId:{$in:idoviMajstora},date:{$in:[new Date().getDate().toString().padStart("0",2),Number(new Date().getDate().toString().padStart("0",2))]},month:{$in:[eval(new Date().getMonth()+1).toString().padStart("0",2),Number(eval(new Date().getMonth()+1).toString().padStart("0",2))]},year:new Date().getFullYear()}).toArray()
+					.then((checkInMajstora)=>{
+						for(var i=0;i<majstori.length;i++){
+							majstori[i].checkIn = [];
+							for(var j=0;j<checkInMajstora.length;j++){
+								if(majstori[i].uniqueId==checkInMajstora[j].uniqueId){
+									majstori[i].checkIn.push(checkInMajstora[j]);
+								}
+							}
+						}
+
+						dodeljivaniNaloziDB.find({majstor:{$in:idoviMajstora},datum:getDateAsStringForDisplay(new Date())}).toArray()
+						.then((dodele)=>{
+							for(var i=0;i<majstori.length;i++){
+								majstori[i].dodeljivaniNalozi = [];
+								for(var j=0;j<dodele.length;j++){
+									if(dodele[j].majstor==majstori[i].uniqueId && majstori[i].dodeljivaniNalozi.indexOf(dodele[j].nalog)<0){
+										majstori[i].dodeljivaniNalozi.push(dodele[j].nalog)
+									}
+								}
+							}
+
+							naloziDB.find({}).toArray()
+							.then((nalozi)=>{
+								var fakturisanIznos = 0;
+								var realizovanIznos = 0;
+								for(var i=0;i<nalozi.length;i++){
+									if(nalozi[i].statusNaloga=="Fakturisan"){
+										fakturisanIznos = fakturisanIznos + parseFloat(nalozi[i].ukupanIznos);
+									}
+									realizovanIznos = realizovanIznos + parseFloat(nalozi[i].ukupanIznos);
+								}
+								var ukupnoDodeljenihMajstorima = [];
+								for(var i=0;i<majstori.length;i++){
+									for(var j=0;j<majstori[i].dodeljivaniNalozi.length;j++){
+										if(ukupnoDodeljenihMajstorima.indexOf(majstori[i].dodeljivaniNalozi[j])<0){
+											ukupnoDodeljenihMajstorima.push(majstori[i].dodeljivaniNalozi[j]);
+										}
+									}
+								}
+								var html = "<p style=\"font-size:20px;\"><b>DNEVNI IZVEŠTAJ ZA "+daysInWeek[(new Date().getDay() + 6) % 7]+" - "+getDateAsStringForDisplay(new Date())+"</b></p>";
+								html += "<p><b>Ukupno fakturisano:</b> "+brojSaRazmacima(fakturisanIznos)+"</p>";
+								html += "<p><b>Ukupno realizovano:</b> "+brojSaRazmacima(realizovanIznos)+"</p>";
+								html += "<p><b>Danasnji broj naloga:</b> "+nalogaDanas+"</p>";
+								html += "<p><b>Dodeljeno naloga:</b> "+ukupnoDodeljenihMajstorima.length+"</p>";
+								html += "<p><b>Dodeljeno podizvodjacima:</b> "+naloziPodizvodjaca+"</p>";
+								html += "-----------------------------------------------------------------------"
+								html += "<p style=\"font-size:20px;margin-bottom:10px\"><b>MAJSTORI:</b></p>"
+								for(var i=0;i<majstori.length;i++){
+									html += "<div style=\"margin-bottom:10px;font-size:16px\"><b>"+majstori[i].ime+"</b><br>";
+
+									var vremeDolaska = majstori[i].checkIn.length>0 ? majstori[i].checkIn[0].timestamp : "/";
+									var vremeOdlaska = majstori[i].checkIn.length>1 ? majstori[i].checkIn[majstori[i].checkIn.length-1].timestamp : "/";
+									html += "<p style=\"padding-left:10px;margin:0;font-size:12px\"><b>Vreme dolaska: </b>"+vremeDolaska+"</p>"
+									html += "<p style=\"padding-left:10px;margin:0;font-size:12px\"><b>Vreme odlaska: </b>"+vremeOdlaska+"</p>";
+									var radnoVreme = "/";
+									if(vremeDolaska!="/" && vremeOdlaska!="/"){
+										var totalMiliseconds = majstori[i].checkIn[majstori[i].checkIn.length-1].datetime - majstori[i].checkIn[0].datetime;
+										var totalMinutes =  Math.floor(totalMiliseconds / 60000);
+										var hours = Math.floor(totalMinutes / 60);
+										var minutes = totalMinutes % 60;
+										radnoVreme = String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0');
+									}
+									html += "<p style=\"padding-left:10px;margin:0;font-size:12px\"><b>Radno vreme: </b>"+radnoVreme+"</p>"
+									html += "<p style=\"padding-left:10px;margin:0;font-size:12px\"><b>Dodeljeno naloga: </b>"+majstori[i].dodeljivaniNalozi.length+"</p>"
+
+	
+								}
+								html += "<p style=\"margin-top:20px;font-size:20px\"><b>KRAJ IZVEŠTAJA</b></p>"
+								html += "</div>"
+								
+								const mailOptions = {
+						        from: 'admin@poslovigrada.rs', // Sender address
+						        to: 'miloscane@gmail.com,stefan.jankovic.ckp@gmail.com,marija.slijepcevic@poslovigrada.rs,doca051@gmail.com', // List of recipients
+						        subject: 'Poslovi Grada - Dnevni izvestaj za '+daysInWeek[(new Date().getDay() + 6) % 7]+" - "+getDateAsStringForDisplay(new Date()),
+						        html: html
+						    };
+
+						    transporter.sendMail(mailOptions, (error, info) => {
+						        if (error) {
+						            console.error('Error sending email:', error);
+						        } else {
+						            //console.log('Email sent:', info.response);
+						        }
+						    });
+							})
+							.catch((error)=>{
+								logError(error);
+							})
+
+							
+						})
+						.catch((error)=>{
+							logError(error)
+						})
+
+						
+
+
+					})
+					.catch((error)=>{
+						logError(error);
+					})
+
+					
+				})
+				.catch((error)=>{
+					logError(error)
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+			})
+		})
+		.catch((error)=>{
+			logError(error);
+		})
+    
+};
+
+
+// Schedule the email to be sent every day at 21:00
+schedule.scheduleJob('0 20 * * *', sendEmail);
 
 
 server.get('/',async (req,res)=>{
