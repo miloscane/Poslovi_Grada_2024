@@ -25,15 +25,16 @@
 					proizvodi[i].datumPopisa = reshuffleDateInverse2(proizvodi[i].datumPopisa);
 					proizvodi[i].realnoStanje = parseFloat(proizvodi[i].stanje);
 					proizvodi[i].obracunStanja = [];
-					proizvodi[i].obracunStanja.push("<p>Стање на попису " + reshuffleDate(proizvodi[i].datumPopisa) + " : " + proizvodi[i].stanje + "</p>");
+					
+					proizvodi[i].obracunStanja.push("<p>Стање на попису " + getDateAsStringForDisplay(new Date(Number(proizvodi[i].datetimePopisa))) + " : " + proizvodi[i].stanje + "</p>");
 					proizvodi[i].ukupnoDodato = 0;
 					proizvodi[i].ukupnoUzeto = 0;
 					for(var j=0;j<ulazi.length;j++){
-						//var datetimeUlaza = new Date(ulazi[j].datum).getTime();
 						var datetimeUlaza = Number(ulazi[j].datetime);
-						var datetimePopisa = new Date(proizvodi[i].datumPopisa).getTime();
+						var datetimePopisa = Number(proizvodi[i].datetimePopisa);
 						if(ulazi[j].productUniqueId==proizvodi[i].uniqueId){
 							if(datetimeUlaza>=datetimePopisa){
+
 								proizvodi[i].realnoStanje = proizvodi[i].realnoStanje + parseFloat(ulazi[j].quantity);
 								proizvodi[i].ukupnoDodato = proizvodi[i].ukupnoDodato + parseFloat(ulazi[j].quantity);
 								proizvodi[i].obracunStanja.push("<p>Улаз за производ дана "+ulazi[j].datum+" : "+ulazi[j].quantity+"</p>");
@@ -48,7 +49,7 @@
 								if(reversi[j].date){
 									//Stari revers
 									var datetimeReversa = new Date(reversi[j].date).getTime();
-									var datetimePopisa = new Date(proizvodi[i].datumPopisa).getTime()+1;//+1 dodato zbog toga jer se popis radi isti dan kad se izdaje materijal ujutru pa se izdati materijal racuna
+									var datetimePopisa = Number(proizvodi[i].datetimePopisa);//+1 dodato zbog toga jer se popis radi isti dan kad se izdaje materijal ujutru pa se izdati materijal racuna
 									if(datetimeReversa>=datetimePopisa){
 										var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
 										proizvodi[i].ukupnoUzeto = proizvodi[i].ukupnoUzeto + uzeto;
@@ -61,7 +62,7 @@
 								}else{
 									//novi revers
 									var datetimeReversa = Number(reversi[j].datetime);
-									var datetimePopisa = new Date(proizvodi[i].datumPopisa).getTime()+1;//+1 dodato zbog toga jer se popis radi isti dan kad se izdaje materijal ujutru pa se izdati materijal racuna
+									var datetimePopisa = Number(proizvodi[i].datetimePopisa);//+1 dodato zbog toga jer se popis radi isti dan kad se izdaje materijal ujutru pa se izdati materijal racuna
 									if(datetimeReversa>=datetimePopisa){
 										var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
 										proizvodi[i].ukupnoUzeto = proizvodi[i].ukupnoUzeto + uzeto;

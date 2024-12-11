@@ -1227,6 +1227,10 @@ const sendEmail = () => {
 				naloziDB.find({"datum.datum":getDateAsStringForDisplay(new Date())}).toArray()
 				.then((danasnjiNalozi)=>{
 					var nalogaDanas = danasnjiNalozi.length;
+					var idoviDanasnjihNaloga = [];
+					for(var i=0;i<danasnjiNalozi.length;i++){
+						idoviDanasnjihNaloga.push(danasnjiNalozi[i].broj)
+					}
 					var naloziPodizvodjaca = 0;
 					for(var i=0;i<danasnjiNalozi.length;i++){
 						if(podizvodjaci.indexOf(danasnjiNalozi[i].majstor)>=0){
@@ -1266,6 +1270,7 @@ const sendEmail = () => {
 									realizovanIznos = realizovanIznos + parseFloat(nalozi[i].ukupanIznos);
 								}
 								var ukupnoDodeljenihMajstorima = [];
+								var ukupnoDodeljenihMajstorimaDanas = [];
 								for(var i=0;i<majstori.length;i++){
 									for(var j=0;j<majstori[i].dodeljivaniNalozi.length;j++){
 										if(ukupnoDodeljenihMajstorima.indexOf(majstori[i].dodeljivaniNalozi[j])<0){
@@ -1273,11 +1278,16 @@ const sendEmail = () => {
 										}
 									}
 								}
+								for(var i=0;i<ukupnoDodeljenihMajstorima.length;i++){
+									if(idoviDanasnjihNaloga.indexOf(ukupnoDodeljenihMajstorima[i])){
+										ukupnoDodeljenihMajstorimaDanas.push(ukupnoDodeljenihMajstorima[i])
+									}
+								}
 								var html = "<p style=\"font-size:20px;\"><b>DNEVNI IZVEŠTAJ ZA "+daysInWeek[(new Date().getDay() + 6) % 7]+" - "+getDateAsStringForDisplay(new Date())+"</b></p>";
 								html += "<p><b>Ukupno fakturisano:</b> "+brojSaRazmacima(fakturisanIznos)+"</p>";
 								html += "<p><b>Ukupno realizovano:</b> "+brojSaRazmacima(realizovanIznos)+"</p>";
 								html += "<p><b>Danasnji broj naloga:</b> "+nalogaDanas+"</p>";
-								html += "<p><b>Dodeljeno naloga:</b> "+ukupnoDodeljenihMajstorima.length+"</p>";
+								html += "<p><b>Dodeljeno naloga:</b> "+ukupnoDodeljenihMajstorima.length+" / "+ukupnoDodeljenihMajstorimaDanas.length+"</p>";
 								html += "<p><b>Dodeljeno podizvodjacima:</b> "+naloziPodizvodjaca+"</p>";
 								html += "-----------------------------------------------------------------------"
 								html += "<p style=\"font-size:20px;margin-bottom:10px\"><b>MAJSTORI:</b></p>"
@@ -1354,8 +1364,7 @@ const sendEmail = () => {
 };
 
 
-// Schedule the email to be sent every day at 21:00
-schedule.scheduleJob('0 20 * * *', sendEmail);
+schedule.scheduleJob('59 23 * * *', sendEmail);
 
 
 server.get('/',async (req,res)=>{
