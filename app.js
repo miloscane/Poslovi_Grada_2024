@@ -1248,7 +1248,7 @@ const sendEmail = () => {
 							}
 						}
 
-						dodeljivaniNaloziDB.find({majstor:{$in:idoviMajstora},datum:getDateAsStringForDisplay(new Date())}).toArray()
+						dodeljivaniNaloziDB.find({majstor:{$in:idoviMajstora},"datum.datum":getDateAsStringForDisplay(new Date())}).toArray()
 						.then((dodele)=>{
 							for(var i=0;i<majstori.length;i++){
 								majstori[i].dodeljivaniNalozi = [];
@@ -1286,8 +1286,7 @@ const sendEmail = () => {
 								var html = "<p style=\"font-size:20px;\"><b>DNEVNI IZVEŠTAJ ZA "+daysInWeek[(new Date().getDay() + 6) % 7]+" - "+getDateAsStringForDisplay(new Date())+"</b></p>";
 								html += "<p><b>Ukupno fakturisano:</b> "+brojSaRazmacima(fakturisanIznos)+"</p>";
 								html += "<p><b>Ukupno realizovano:</b> "+brojSaRazmacima(realizovanIznos)+"</p>";
-								html += "<p><b>Danasnji broj naloga:</b> "+nalogaDanas+"</p>";
-								html += "<p><b>Dodeljeno naloga:</b> "+ukupnoDodeljenihMajstorima.length+" / "+ukupnoDodeljenihMajstorimaDanas.length+"</p>";
+								html += "<p><b>Danasnji broj naloga:</b> "+nalogaDanas+" / "+ukupnoDodeljenihMajstorimaDanas.length+"(dodeljenih)</p>";
 								html += "<p><b>Dodeljeno podizvodjacima:</b> "+naloziPodizvodjaca+"</p>";
 								html += "-----------------------------------------------------------------------"
 								html += "<p style=\"font-size:20px;margin-bottom:10px\"><b>MAJSTORI:</b></p>"
@@ -1325,7 +1324,7 @@ const sendEmail = () => {
 						        if (error) {
 						            console.error('Error sending email:', error);
 						        } else {
-						            //console.log('Email sent:', info.response);
+						            console.log('Email sent:', info.response);
 						        }
 						    });
 							})
@@ -6119,7 +6118,6 @@ server.get('/magacioner/noviRevers',async (req,res)=>{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
 });
-
 
 server.post('/novi-revers', async (req, res)=> {
 	if(req.session.user){
