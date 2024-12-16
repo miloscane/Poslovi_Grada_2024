@@ -5336,6 +5336,10 @@ input[type=number] {
         width:90%;
         margin:0 auto;
     }
+
+    .tv3 .boxesWrap .opstina{
+        width:calc(50% - 20px);
+    }
 }
 
 @media screen and (max-width: 850px) {
@@ -5445,6 +5449,10 @@ input[type=number] {
 
     .prikazUcinka .row .infoWrap .displayRow .displayWrap{
         width:45%;
+    }
+
+    .tv3 .boxesWrap .opstina{
+        width:90%;
     }
 
 }
