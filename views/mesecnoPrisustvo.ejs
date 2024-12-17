@@ -24,6 +24,10 @@
 						<div class="inline">Радних дана:</div>
 						<div class="inline" id="ukupno-dana"></div>
 					</div>
+					<div class="inlines">
+						<div class="inline">Укупно сати:</div>
+						<div class="inline" id="ukupno-sati"></div>
+					</div>
 				</div>
 				<div class="calendarTableWrap">
 					<table id="calendar-table">
@@ -165,6 +169,7 @@
 
 			var sviNalozi = [];
 			var brojRadnihDana = 0;
+			var brojSati = 0;
 			var calendarElements = document.getElementsByClassName("calendarElement");
 			for(var i=0;i<calendarElements.length;i++){
 				var calendarElement = calendarElements[i];
@@ -186,6 +191,7 @@
 				}
 				if(dolazak && odlazak){
 					var totalMiliseconds = odlazak.getTime() - dolazak.getTime();
+					brojSati = brojSati + totalMiliseconds;
 					var totalMinutes =  Math.floor(totalMiliseconds / 60000);
 					var hours = Math.floor(totalMinutes / 60);
    					var minutes = totalMinutes % 60;
@@ -225,6 +231,11 @@
 			}
 			document.getElementById("ukupan-ucinak").innerHTML = brojSaRazmacima(mesecniUcinak);
 			document.getElementById("ukupno-dana").innerHTML = brojRadnihDana;
+			var totalMinutes =  Math.floor(brojSati / 60000);
+			var hours = Math.floor(totalMinutes / 60);
+				var minutes = totalMinutes % 60;
+			document.getElementById("ukupno-sati").innerHTML = hours+":"+minutes;
+
 		</script>
 	</div><!--page wrap-->
 <%- include ("partials/footer") -%>
