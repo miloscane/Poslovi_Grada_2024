@@ -1511,6 +1511,9 @@ server.post('/login',async (req,res)=>{
 			if(korisnici.length>0){
 				if(korisnici[0].password==password){
 					var sessionObject	=	JSON.parse(JSON.stringify(korisnici[0]));
+					if(Number(sessionObject.role)==10){
+						sessionObject.opstine = radneJedinice;
+					}
 					delete sessionObject.password;
 					req.session.user	=	sessionObject;
 					if(loginJson.url){
@@ -5188,7 +5191,7 @@ server.get('/dispecer/sviNalozi',async (req,res)=>{
 
 server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 	if(req.session.user){
-			if(Number(req.session.user.role)==20){
+			if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
 				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"]}}).toArray()
 				.then((nalozi) => {
 					for(var i=0;i<nalozi.length;i++){
