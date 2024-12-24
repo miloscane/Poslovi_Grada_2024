@@ -4635,6 +4635,57 @@ server.get('/vraceniNaloziPodizvodjaca',async (req,res)=>{
 	}
 });
 
+server.get('/otvoreniNaloziPodizvodjaca',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			naloziDB.find({statusNaloga:{$nin:["Vraćen","Storniran","Fakturisan","Završeno","Spreman za fakturisanje",""]}}).toArray()
+			.then((nalozi)=>{
+				for(var i=0;i<nalozi.length;i++){
+					if(podizvodjaci.indexOf(nalozi[i].majstor)<0){
+						nalozi.splice(i,1);
+						i--;
+					}
+				}
+				majstoriDB.find({}).toArray()
+				.then((majstori)=>{
+					res.render("administracija/zavrseniNaloziPodizvodjaca",{
+						pageTitle:"Додељени налози подизвођача",
+						nalozi: nalozi,
+						cenovnik: cenovnik,
+						majstori: majstori,
+						user: req.session.user
+					})
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 2193.</div>"
+					});
+				})
+					
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2208.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
 
 server.get('/jucerasnjiNaloziPodizvodjaca',async (req,res)=>{
 	if(req.session.user){
