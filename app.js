@@ -5243,7 +5243,11 @@ server.get('/dispecer/sviNalozi',async (req,res)=>{
 server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 	if(req.session.user){
 			if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
-				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"]}}).toArray()
+				var skriveniStatusi = ["Završeno","Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
+				if(Number(req.session.user.role)==10){
+					skriveniStatusi = ["Završeno","Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
+				}
+				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:skriveniStatusi}}).toArray()
 				.then((nalozi) => {
 					for(var i=0;i<nalozi.length;i++){
 						delete nalozi[i]._id;
