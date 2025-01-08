@@ -5245,7 +5245,7 @@ server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 			if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
 				var skriveniStatusi = ["Završeno","Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
 				if(Number(req.session.user.role)==10){
-					skriveniStatusi = ["Završeno","Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
+					skriveniStatusi = ["Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
 				}
 				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:skriveniStatusi}}).toArray()
 				.then((nalozi) => {
