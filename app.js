@@ -7327,7 +7327,7 @@ server.get('/tv', async (req, res)=> {
 
 server.get('/juce', async (req, res)=> {
 	var juce = new Date();
-	juce.setDate(juce.getDate()-1);
+	//juce.setDate(juce.getDate()-1);
 	naloziDB.find({"datum.datum":getDateAsStringForDisplay(juce)}).toArray()
 	.then((jucerasnjiNalozi)=>{
 		var jucerasnjiBrojeviNaloga = [];
