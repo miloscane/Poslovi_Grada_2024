@@ -1,0 +1,179 @@
+<%- include ("partials/header-nl") -%>
+<script>
+	var majstori				=	<%-JSON.stringify(majstori)%>;
+	var jucerasnjiNalozi		=	<%-JSON.stringify(jucerasnjiNalozi)%>;
+	var dodeljeniNaloziOdRanije	=	<%-JSON.stringify(dodeljeniNaloziOdRanije)%>;
+</script>
+<div class="juce">
+	<div id="opstine"></div>
+	<script>
+		var ukupnoNovihDodeljenih = 0;
+		for(var i=0;i<jucerasnjiNalozi.length;i++){
+			if(jucerasnjiNalozi[i].dodele.length>0){
+				ukupnoNovihDodeljenih++;
+			}
+		}
+		document.getElementsByClassName("pageTitle")[0].getElementsByClassName("title")[0].innerHTML =document.getElementsByClassName("pageTitle")[0].getElementsByClassName("title")[0].innerHTML + " (Ukupno novih: "+jucerasnjiNalozi.length+", od toga dodeljeno "+ukupnoNovihDodeljenih+")" 
+
+		for(var i=0;i<radneJedinice.length;i++){
+			var radnaJedinica = radneJedinice[i];
+			var ukupnoNovihNaloga = 0;
+			var novihDodeljenih = 0;
+			var starihDodeljenih = 0;
+			for(var j=0;j<jucerasnjiNalozi.length;j++){
+				if(jucerasnjiNalozi[j].radnaJedinica==radnaJedinica){
+					ukupnoNovihNaloga++;
+					if(jucerasnjiNalozi[j].dodele.length>0){
+						novihDodeljenih++;
+					}
+				}
+			}
+			for(var j=0;j<dodeljeniNaloziOdRanije.length;j++){
+				if(dodeljeniNaloziOdRanije[j].radnaJedinica==radnaJedinica){
+					starihDodeljenih++;
+				}
+			}
+
+
+			var opstina = document.createElement("DIV");
+			opstina.setAttribute("class","opstina");
+				var title = document.createElement("DIV");
+				title.setAttribute("class","title");
+				title.innerHTML = radnaJedinica;
+				opstina.appendChild(title);
+
+				var titleSeparator = document.createElement("DIV");
+				titleSeparator.setAttribute("class","titleSeparator");
+				opstina.appendChild(titleSeparator);
+
+				var subTitle = document.createElement("DIV");
+				subTitle.setAttribute("class","subTitle");
+				subTitle.innerHTML = "<b>Нови налози</b><br>(Ukupno "+ukupnoNovihNaloga+" / Dodeljeno "+novihDodeljenih+" / Nedodeljeno "+eval(ukupnoNovihNaloga-novihDodeljenih)+")";
+				opstina.appendChild(subTitle);
+
+				var noviNalozi = document.createElement("DIV");
+				noviNalozi.setAttribute("class","listaNaloga");
+					for(var j=0;j<jucerasnjiNalozi.length;j++){
+						var row = document.createElement("DIV");
+						row.setAttribute("class","row");
+						if(jucerasnjiNalozi[j].statusNaloga=="Primljen"){
+							row.style.color = "rgb(200,0,0)"
+						}
+							var brojNaloga = document.createElement("DIV");
+							brojNaloga.setAttribute("class","brojNaloga");
+							brojNaloga.innerHTML = jucerasnjiNalozi[j].broj;
+							row.appendChild(brojNaloga);
+
+							var adresa = document.createElement("DIV");
+							adresa.setAttribute("class","adresa");
+							adresa.innerHTML = jucerasnjiNalozi[j].adresa;
+							row.appendChild(adresa);
+
+							var vremeNaloga = document.createElement("DIV");
+							vremeNaloga.setAttribute("class","statusNaloga");
+							vremeNaloga.innerHTML = "<b>Status:</b> "+jucerasnjiNalozi[j].statusNaloga;
+							row.appendChild(vremeNaloga);
+
+							var vremeNaloga = document.createElement("DIV");
+							vremeNaloga.setAttribute("class","vremeNaloga");
+							vremeNaloga.innerHTML = "<b>Prijem:</b> "+getTimestamp(new Date(Number(jucerasnjiNalozi[j].datum.datetime)));
+							row.appendChild(vremeNaloga);
+
+							var dodele = document.createElement("DIV");
+							dodele.setAttribute("class","dodele");
+								var miniTitle = document.createElement("DIV");
+								miniTitle.setAttribute("class","miniTitle")
+								miniTitle.innerHTML = "Dodele:";
+								dodele.appendChild(miniTitle);
+								for(var k=0;k<jucerasnjiNalozi[j].dodele.length;k++){
+									var row2 = document.createElement("DIV");
+									row2.setAttribute("class","dodela");
+										var vremeDodele = document.createElement("DIV");
+										vremeDodele.setAttribute("class","vremeDodele");
+										vremeDodele.innerHTML = jucerasnjiNalozi[j].dodele[k].datum.timestamp;
+										row2.appendChild(vremeDodele);
+
+										var imeMajstora = document.createElement("DIV");
+										imeMajstora.setAttribute("class","imeMajstora");
+										imeMajstora.innerHTML = getMajstorByCode(jucerasnjiNalozi[j].dodele[k].majstor).ime;
+										row2.appendChild(imeMajstora);
+
+										var statusElem = document.createElement("DIV");
+										statusElem.setAttribute("class","status");
+										statusElem.innerHTML = jucerasnjiNalozi[j].dodele[k].status;
+										row2.appendChild(statusElem);
+									dodele.appendChild(row2);
+									
+								}
+							row.appendChild(dodele);
+						noviNalozi.appendChild(row);
+					}
+				opstina.appendChild(noviNalozi);
+
+
+				var subTitle = document.createElement("DIV");
+				subTitle.setAttribute("class","subTitle");
+				subTitle.innerHTML = "<b>Стари додељени:</b><br>(Ukupno "+starihDodeljenih+")";
+				opstina.appendChild(subTitle);
+
+				var stariNalozi = document.createElement("DIV");
+				stariNalozi.setAttribute("class","listaNaloga");
+					for(var j=0;j<dodeljeniNaloziOdRanije.length;j++){
+						var row = document.createElement("DIV");
+						row.setAttribute("class","row");
+							var brojNaloga = document.createElement("DIV");
+							brojNaloga.setAttribute("class","brojNaloga");
+							brojNaloga.innerHTML = dodeljeniNaloziOdRanije[j].broj;
+							row.appendChild(brojNaloga);
+
+							var adresa = document.createElement("DIV");
+							adresa.setAttribute("class","adresa");
+							adresa.innerHTML = dodeljeniNaloziOdRanije[j].adresa;
+							row.appendChild(adresa);
+
+							var vremeNaloga = document.createElement("DIV");
+							vremeNaloga.setAttribute("class","statusNaloga");
+							vremeNaloga.innerHTML = "<b>Status:</b> "+dodeljeniNaloziOdRanije[j].statusNaloga;
+							row.appendChild(vremeNaloga);
+
+							var vremeNaloga = document.createElement("DIV");
+							vremeNaloga.setAttribute("class","vremeNaloga");
+							vremeNaloga.innerHTML = "<b>Datum:</b> "+dodeljeniNaloziOdRanije[j].datum.datum;
+							row.appendChild(vremeNaloga);
+
+							var dodele = document.createElement("DIV");
+							dodele.setAttribute("class","dodele");
+								var miniTitle = document.createElement("DIV");
+								miniTitle.setAttribute("class","miniTitle")
+								miniTitle.innerHTML = "Dodele:";
+								dodele.appendChild(miniTitle);
+								console.log(dodeljeniNaloziOdRanije[j].dodele)
+								for(var k=0;k<dodeljeniNaloziOdRanije[j].dodele.length;k++){
+									var row2 = document.createElement("DIV");
+									row2.setAttribute("class","dodela");
+										var vremeDodele = document.createElement("DIV");
+										vremeDodele.setAttribute("class","vremeDodele");
+										vremeDodele.innerHTML = dodeljeniNaloziOdRanije[j].dodele[k].datum.timestamp;
+										row2.appendChild(vremeDodele);
+
+										var imeMajstora = document.createElement("DIV");
+										imeMajstora.setAttribute("class","imeMajstora");
+										imeMajstora.innerHTML = getMajstorByCode(dodeljeniNaloziOdRanije[j].dodele[k].majstor).ime;
+										row2.appendChild(imeMajstora);
+
+										var statusElem = document.createElement("DIV");
+										statusElem.setAttribute("class","status");
+										statusElem.innerHTML = dodeljeniNaloziOdRanije[j].dodele[k].status;
+										row2.appendChild(statusElem);
+									dodele.appendChild(row2);
+									
+								}
+							row.appendChild(dodele);
+						stariNalozi.appendChild(row);
+					}
+				opstina.appendChild(stariNalozi);
+			document.getElementById("opstine").appendChild(opstina);
+		}
+	</script>
+</div>
+<%- include ("partials/footer") -%>

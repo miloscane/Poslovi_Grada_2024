@@ -7324,6 +7324,75 @@ server.get('/tv', async (req, res)=> {
 	})
 });
 
+
+server.get('/juce', async (req, res)=> {
+	var juce = new Date();
+	juce.setDate(juce.getDate()-1);
+	naloziDB.find({"datum.datum":getDateAsStringForDisplay(juce)}).toArray()
+	.then((jucerasnjiNalozi)=>{
+		var jucerasnjiBrojeviNaloga = [];
+		for(var i=0;i<jucerasnjiNalozi.length;i++){
+			jucerasnjiBrojeviNaloga.push(jucerasnjiNalozi[i].broj)
+		}
+		dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(juce)}).toArray()
+		.then((dodele)=>{
+			for(var i=0;i<jucerasnjiNalozi.length;i++){
+				jucerasnjiNalozi[i].dodele = [];
+				for(var j=0;j<dodele.length;j++){
+					dodele[j].dodeljen = false;
+					if(jucerasnjiNalozi[i].broj==dodele[j].nalog){
+						jucerasnjiNalozi[i].dodele.push(dodele[j]);
+						dodele[j].dodeljen = true;
+					}
+				}
+			}
+
+			var dodeljeniBrojeviOdRanije = [];
+			for(var i=0;i<dodele.length;i++){
+				if(dodele[i].dodeljen==false){
+					dodeljeniBrojeviOdRanije.push(dodele[i].nalog);
+				}
+			}
+			naloziDB.find({broj:{$in:dodeljeniBrojeviOdRanije}}).toArray()
+			.then((dodeljeniNaloziOdRanije)=>{
+				for(var i=0;i<dodeljeniNaloziOdRanije.length;i++){
+					dodeljeniNaloziOdRanije[i].dodele = [];
+					for(var j=0;j<dodele.length;j++){
+						if(dodele[j].nalog==dodeljeniNaloziOdRanije[i].broj){
+							dodeljeniNaloziOdRanije[i].dodele.push(dodele[j])
+						}
+					}
+				}
+				majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray()
+				.then((majstori)=>{
+					res.render("statusJuce",{
+						pageTitle: "Јучерашњи налози",
+						jucerasnjiNalozi: jucerasnjiNalozi,
+						dodeljeniNaloziOdRanije: dodeljeniNaloziOdRanije,
+						majstori: majstori
+					})
+				})
+				.catch((error)=>{
+					logError(error)
+					res.send("Greska 4")
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.send("Greska 3")
+			})
+		})
+		.catch((error)=>{
+			logError(error);
+			res.send("Greska 2")
+		})
+	})
+	.catch((error)=>{
+		logError(error)
+		res.send("Greska 1");
+	})
+});
+
 server.get('/prisustvo', async (req, res)=> {
 	if(req.session.user){
 		var date = new Date();
