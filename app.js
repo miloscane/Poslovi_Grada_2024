@@ -7589,8 +7589,10 @@ server.get('/mesecnoPrisustvo/:mesec/:majstor', async (req, res)=> {
 								    pageTitle: "Месечно присуство мајстора "+majstor.ime+" за месец "+req.params.mesec,
 								    majstor: majstor,
 								    checkIns: checkIns,
-								    ucinci: ucinci,
+								    ucinci: [],
 								    dodele: dodele,
+								    month: req.params.mesec.split(".")[0],
+								    year: req.params.mesec.split(".")[1],
 								    user: req.session.user
 								  });
 								}else{
