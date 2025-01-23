@@ -7069,7 +7069,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				nalogJson.coordinates = {};
 				io.emit("notification","noviNalog","<div class=\"title\">NOVI NALOG</div><div class=\"text\"><a href=\"/nalog/"+nalogJson.broj+"\" target=\"blank\">"+nalogJson.broj+"</a> - <span class=\"adresa\">"+nalogJson.adresa+"</span> - <span class=\"radnaJedinica\">"+nalogJson.radnaJedinica+"</span></span></div>",nalogJson.radnaJedinica)
 
-				
+				 
 
 
 				request(geoCodeOptions, (error,response,body)=>{
