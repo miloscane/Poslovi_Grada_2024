@@ -41,7 +41,7 @@ var websiteHeader = {
 };
 
 var websiteOptions = {
-    url: 'http://localhost:3001/nalog',
+    url: 'https://poslovigrada.rs/nalog',
     method: 'POST',
     headers: websiteHeader
     //body: JSON.stringify({nalog:"AAA",adresa:123})
