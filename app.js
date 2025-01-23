@@ -35,6 +35,30 @@ var ntsOptions = {
     auth: {username:process.env.ntsusername,password:process.env.ntspassword}
 };
 
+var websiteHeader = {
+    'accept': 'text/plain',
+    'Content-Type': 'application/json'
+};
+
+var websiteOptions = {
+    url: 'http://localhost:3001/nalog',
+    method: 'POST',
+    headers: websiteHeader
+    //body: JSON.stringify({nalog:"AAA",adresa:123})
+};
+
+/*request(websiteOptions, (error,response,body)=>{
+	if(error){
+		console.log(error)
+	}else{
+		//console.log(response.body);
+		console.log("-------------------------");
+		var json = response.body;
+		//console.log(json.results[0].geometry.location)
+	}
+})*/
+
+
 /*var geoCodeHeader = {
     'accept': 'text/plain',
     'Content-Type': 'application/json'
@@ -314,7 +338,7 @@ var mailPotpis = "<br>&nbsp;<br>Срдачан поздрав,<br>ВиК Пор�
 var resetPassLimit = 1.8e6; //30 minuta
 var podizvodjaci  = ["SeHQZ--1672650353244","IIwY4--1672650358507","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","ylSnq--1672041756318"];
 var radneJedinice = ["ČUKARICA","RAKOVICA","NOVI BEOGRAD","ZEMUN","ZVEZDARA","VRAČAR","VOŽDOVAC","STARI GRAD","PALILULA","SAVSKI VENAC"];
-var meseciJson    = [{name:"Februar 2024",string:"02.2024"},{name:"Mart 2024",string:"03.2024"},{name:"April 2024",string:"04.2024"},{name:"Maj 2024",string:"05.2024"},{name:"Jun 2024",string:"06.2024"},{name:"Jul 2024",string:"07.2024"},{name:"Avgust 2024",string:"08.2024"},{name:"Septembar 2024",string:"09.2024"},{name:"Oktobar 2024",string:"10.2024"},{name:"Novembar 2024",string:"11.2024"},{name:"Decembar 2024",string:"12.2024"}]
+var meseciJson    = [{name:"Februar 2024",string:"02.2024"},{name:"Mart 2024",string:"03.2024"},{name:"April 2024",string:"04.2024"},{name:"Maj 2024",string:"05.2024"},{name:"Jun 2024",string:"06.2024"},{name:"Jul 2024",string:"07.2024"},{name:"Avgust 2024",string:"08.2024"},{name:"Septembar 2024",string:"09.2024"},{name:"Oktobar 2024",string:"10.2024"},{name:"Novembar 2024",string:"11.2024"},{name:"Decembar 2024",string:"12.2024"},{name:"Januar 2025",string:"01.2025"},{name:"Februar 2025",string:"02.2025"},{name:"Mart 2025",string:"03.2025"},{name:"April 2024",string:"04.2025"}]
 var phoneAccessCode = generateId(25);
 setInterval(function(){
 	phoneAccessCode = generateId(25);
@@ -925,7 +949,7 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var month = "11"
+			var month = "12"
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
@@ -1010,7 +1034,7 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var month = 11;
+			var month = 12;
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
@@ -1203,6 +1227,73 @@ http.listen(process.env.PORT, function(){
 		})*/
 
 
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var naloziToExport = [];
+			var dateCutOff = new Date("2024-12-15");
+			var sifre = ["80.01.05.057","80.01.05.058","80.01.05.059","80.01.05.060","80.01.05.061","80.01.05.062","80.01.05.063","80.01.05.064","80.01.05.065"];
+			for(var i=0;i<nalozi.length;i++){
+				var odlazak = false;
+				if(Number(nalozi[i].datum.datetime)>dateCutOff.getTime()){
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(nalozi[i].obracun[j].code=="80.04.01.002"){
+							odlazak=true;
+							break;
+						}
+					}
+
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifre.indexOf(nalozi[i].obracun[j].code)>=0 && odlazak==true){
+							naloziToExport.push(nalozi[i]);
+							break;
+						}
+					}
+				}
+			}
+			var csvString = "Broj Naloga,Datum,Radna Jedinica,Adresa,Status,Iznos\r\n";
+			for(var i=0;i<naloziToExport.length;i++){
+				csvString += naloziToExport[i].broj+","+naloziToExport[i].datum.datum+","+naloziToExport[i].radnaJedinica+","+naloziToExport[i].adresa+","+naloziToExport[i].statusNaloga+","+naloziToExport[i].ukupanIznos+"\r\n"
+			}
+			fs.writeFileSync("./marija.csv",csvString,"utf8");	
+
+
+			console.log("Wrote file 1")
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var naloziToExport = [];
+			var dateCutOff = new Date("2024-12-15");
+			var sifre = ["80.02.09.001","80.02.09.002","80.02.09.005","80.02.09.007"];
+			for(var i=0;i<nalozi.length;i++){
+				if(Number(nalozi[i].datum.datetime)>dateCutOff.getTime()){
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifre.indexOf(nalozi[i].obracun[j].code)>=0){
+							naloziToExport.push(nalozi[i]);
+							break;
+						}
+					}
+				}
+			}
+			var csvString = "Broj Naloga,Datum,Radna Jedinica,Adresa,Status,Iznos\r\n";
+			for(var i=0;i<naloziToExport.length;i++){
+				csvString += naloziToExport[i].broj+","+naloziToExport[i].datum.datum+","+naloziToExport[i].radnaJedinica+","+naloziToExport[i].adresa+","+naloziToExport[i].statusNaloga+","+naloziToExport[i].ukupanIznos+"\r\n"
+			}
+			fs.writeFileSync("./001_007.csv",csvString,"utf8");	
+
+
+			console.log("Wrote file 2")
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+
+
 	})
 	.catch(error => {
 		console.log(error)
@@ -1210,7 +1301,6 @@ http.listen(process.env.PORT, function(){
 		logError(error);
 	});
 });
-
 
 var daysInWeek = ["PONEDELJAK","UTORAK","SREDU","ČETVRTAK","PETAK","SUBOTU","NEDELJU"];
 
@@ -1984,6 +2074,8 @@ server.get('/stefan/kategorije',async (req,res)=>{
 server.get('/kontrola/naslovna',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==25){
+			
+
 			var today = new Date();
 			naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom","Spreman za obračun","Završeno","Storniran"]}}).toArray()
 			.then((nalozi)=>{
@@ -6977,6 +7069,9 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				nalogJson.coordinates = {};
 				io.emit("notification","noviNalog","<div class=\"title\">NOVI NALOG</div><div class=\"text\"><a href=\"/nalog/"+nalogJson.broj+"\" target=\"blank\">"+nalogJson.broj+"</a> - <span class=\"adresa\">"+nalogJson.adresa+"</span> - <span class=\"radnaJedinica\">"+nalogJson.radnaJedinica+"</span></span></div>",nalogJson.radnaJedinica)
 
+				
+
+
 				request(geoCodeOptions, (error,response,body)=>{
 					if(error){
 						console.log(error)
@@ -6994,6 +7089,13 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 										res.setHeader('Content-Type', 'application/json');
 										var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 										res.send(JSON.stringify(primerJson));
+										websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: nalogJson.digitalizacija.stambeno.vreme,radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
+										request(websiteOptions, (error,response,body)=>{
+											if(error){
+												logError(error)
+											}
+										});
+
 									})
 									.catch((error)=>{
 										logError(error)
@@ -7010,6 +7112,12 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 										res.setHeader('Content-Type', 'application/json');
 										var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 										res.send(JSON.stringify(primerJson));
+										websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: nalogJson.digitalizacija.stambeno.vreme,radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
+										request(websiteOptions, (error,response,body)=>{
+											if(error){
+												logError(error)
+											}
+										});
 									})
 									.catch((error)=>{
 										logError(error)
@@ -7027,6 +7135,12 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 									res.setHeader('Content-Type', 'application/json');
 									var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 									res.send(JSON.stringify(primerJson));
+									websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: nalogJson.digitalizacija.stambeno.vreme,radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
+										request(websiteOptions, (error,response,body)=>{
+											if(error){
+												logError(error)
+											}
+										});
 								})
 								.catch((error)=>{
 									logError(error)
@@ -7044,6 +7158,12 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 								res.setHeader('Content-Type', 'application/json');
 								var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 								res.send(JSON.stringify(primerJson));
+								websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: nalogJson.digitalizacija.stambeno.vreme,radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
+								request(websiteOptions, (error,response,body)=>{
+									if(error){
+										logError(error)
+									}
+								});
 							})
 							.catch((error)=>{
 								logError(error)
