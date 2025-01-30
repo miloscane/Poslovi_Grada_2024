@@ -1,0 +1,78 @@
+<%- include ("partials/header-nl") -%>
+	<div>
+		<input type="checkbox" id="mesec1" class="mesec" name="mesec1" value="1"><label for="mesec1"> Januar</label>
+		<input type="checkbox" id="mesec2" class="mesec" name="mesec2" value="2"><label for="mesec2"> Januar</label>
+		<input type="checkbox" id="mesec3" class="mesec" name="mesec3" value="1"><label for="mesec1"> Januar</label>
+		<input type="checkbox" id="mesec1" class="mesec" name="mesec1" value="1"><label for="mesec1"> Januar</label>
+		<input type="checkbox" id="mesec1" class="mesec" name="mesec1" value="1"><label for="mesec1"> Januar</label>
+		<input type="checkbox" id="mesec1" class="mesec" name="mesec1" value="1"><label for="mesec1"> Januar</label>
+		<input type="checkbox" id="mesec1" class="mesec" name="mesec1" value="1"><label for="mesec1"> Januar</label>
+		<input type="checkbox" id="mesec1" class="mesec" name="mesec1" value="1"><label for="mesec1"> Januar</label>
+		<input type="checkbox" id="mesec1" class="mesec" name="mesec1" value="1"><label for="mesec1"> Januar</label>
+		<input type="checkbox" id="mesec1" class="mesec" name="mesec1" value="1"><label for="mesec1"> Januar</label>
+		<input type="checkbox" id="mesec1" class="mesec" name="mesec1" value="1"><label for="mesec1"> Januar</label>
+	</div>
+	<div id="map" style="width:100%;height:800px"></div>
+	<script>
+    var meseci = <%-JSON.stringify(meseci)%>;
+    console.log("Meseci data:", meseci);
+
+    var points = [];
+
+    // Populate points array
+    for (var i = 0; i < meseci.length; i++) {
+        for (var j = 0; j < meseci[i].nalozi.length; j++) {
+            const coords = meseci[i].nalozi[j].coordinates;
+            if (coords && coords.lat !== undefined && coords.lng !== undefined) {
+                points.push({ lat: coords.lat, lng: coords.lng });
+            }
+        }
+    }
+
+    //console.log("Points array:", points);
+
+    var map;
+    var heatmap;
+
+    function initMap() {
+        const myLatLng = { lat: 44.800003, lng: 20.45006 };
+
+        // Initialize map
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: myLatLng,
+            zoom: 14,
+            styles: [/* map styles */],
+        });
+
+        // Delay heatmap rendering to ensure points are populated
+        setTimeout(updateHeatmap, 500);
+    }
+
+    function updateHeatmap() {
+        console.log("Updating heatmap...");
+
+        // Convert points to LatLng objects
+        console.log("Heatmap Points:", points);
+        var heatmapData = [];
+        //const heatmapData = points.map(point => new google.maps.LatLng(point.lat, point.lng));
+        for(var i=0;i<points.length;i++){
+        	heatmapData.push(new google.maps.LatLng(points[i].lat,points[i].lng))
+        }
+        console.log("Heatmap Data:", heatmapData);
+
+        if (heatmap) {
+            heatmap.setData(heatmapData); // Update existing heatmap
+        } else {
+            heatmap = new google.maps.visualization.HeatmapLayer({
+                data: heatmapData,
+                map: map,
+            });
+        }
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3&key=<%-mapKey%>&libraries=visualization&callback=initMap" async defer></script>
+
+
+
+
+<%- include ("partials/footer") -%>

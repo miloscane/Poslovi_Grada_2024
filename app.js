@@ -810,6 +810,7 @@ http.listen(process.env.PORT, function(){
 
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
+		nalozi2022DB					=	client.db("Poslovi-Grada").collection('nalozi2022');
 		stariIzvestajiDB			=	client.db("Poslovi-Grada").collection('izvestaji-sa-terena');
 		stariCenovnikDB				=	client.db("Poslovi-Grada").collection('Cenovnik');
 		stariUcinakMajstoraDB	=	client.db("Poslovi-Grada").collection('UcinakMajstora');
@@ -1267,8 +1268,8 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var dateCutOff = new Date("2024-12-15");
-			var sifre = ["80.02.09.001","80.02.09.002","80.02.09.005","80.02.09.007"];
+			var dateCutOff = new Date("2025-01-15");
+			var sifre = ["80.02.10.007"];
 			for(var i=0;i<nalozi.length;i++){
 				if(Number(nalozi[i].datum.datetime)>dateCutOff.getTime()){
 					for(var j=0;j<nalozi[i].obracun.length;j++){
@@ -1283,7 +1284,7 @@ http.listen(process.env.PORT, function(){
 			for(var i=0;i<naloziToExport.length;i++){
 				csvString += naloziToExport[i].broj+","+naloziToExport[i].datum.datum+","+naloziToExport[i].radnaJedinica+","+naloziToExport[i].adresa+","+naloziToExport[i].statusNaloga+","+naloziToExport[i].ukupanIznos+"\r\n"
 			}
-			fs.writeFileSync("./001_007.csv",csvString,"utf8");	
+			fs.writeFileSync("./10_007.csv",csvString,"utf8");	
 
 
 			console.log("Wrote file 2")
@@ -1292,6 +1293,255 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 
+		var meseci = [];
+
+		/*for(var i=2022;i<=2025;i++){
+			for(var j=1;j<=12;j++){
+				if(j==2 && i==2025){
+					break;
+				}
+				var json = {};
+				json.mesec = j.toString().padStart(2,"0")+"."+i.toString();
+				json.mesecBroj = j;
+				json.godinaBroj = i;
+				json.nalozi = [];
+				meseci.push(json)
+			}
+		}
+
+		naloziDB.find({}).toArray()
+		.then((nalozi2024)=>{
+			nalozi2023DB.find({}).toArray()
+			.then((nalozi2023)=>{
+				nalozi2022DB.find({}).toArray()
+				.then((nalozi2022)=>{
+					for(var i=0;i<meseci.length;i++){
+						for(var j=0;j<nalozi2022.length;j++){
+							if(nalozi2022[j].datum.includes(meseci[i].mesec)){
+								meseci[i].nalozi.push(nalozi2022[j])
+							}
+						}
+
+						for(var j=0;j<nalozi2023.length;j++){
+							if(nalozi2023[j].datum.includes(meseci[i].mesec)){
+								meseci[i].nalozi.push(nalozi2023[j])
+							}
+						}
+
+						for(var j=0;j<nalozi2024.length;j++){
+							if(nalozi2024[j].datum.datum.includes(meseci[i].mesec)){
+								meseci[i].nalozi.push(nalozi2024[j])
+							}
+						}
+					}
+					console.log(meseci)
+					var csvString = "Broj;Datum;Mesec;Godina;Tip;Iznos\r\n";
+					for(var i=0;i<meseci.length;i++){
+						
+						for(var j=0;j<meseci[i].nalozi.length;j++){
+							if(!isNaN(parseFloat(meseci[i].nalozi[j].ukupanIznos))){
+								csvString += meseci[i].nalozi[j].broj+";";
+								if (typeof meseci[i].nalozi[j].datum === 'string' || meseci[i].nalozi[j].datum instanceof String){
+									csvString += meseci[i].nalozi[j].datum.split("god")[0];
+								}else{
+									csvString += meseci[i].nalozi[j].datum.datum;
+								}
+								csvString+=";"+meseci[i].mesecBroj+";"+meseci[i].godinaBroj+";TIP;"+meseci[i].nalozi[j].ukupanIznos+"\r\n";
+							}
+							
+						}
+					}
+					fs.writeFileSync("./Nalozi.csv",csvString,"utf8");
+					console.log("Wrote File")
+
+				})
+				.catch((error)=>{
+					console.log(error);
+				})
+			})
+			.catch((error)=>{
+				console.log(error)
+			})
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
+
+		for(var i=2024;i<=2024;i++){
+			for(var j=1;j<=12;j++){
+				var json = {};
+				json.mesec = j.toString().padStart(2,"0")+"."+i.toString();
+				json.mesecBroj = j;
+				json.godinaBroj = i;
+				json.nalozi = [];
+				meseci.push(json)
+			}
+		}
+
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			for(var i=0;i<meseci.length;i++){
+				for(var j=0;j<nalozi.length;j++){
+					if(nalozi[j].datum.datum.includes(meseci[i].mesec)){
+						meseci[i].nalozi.push(nalozi[j])
+					}
+				}
+			}
+
+		console.log(meseci)
+			
+			var woma = ["80.02.09.020","80.02.09.021","80.02.09.022"];
+			var rucno = ["80.02.09.001","80.02.09.002","80.02.09.003","80.02.09.004","80.02.09.005"];
+			var crp = ["80.02.09.009","80.02.09.010","80.02.09.012","80.02.09.025"];
+			var kop = ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
+			var mas = ["80.03.01.019","80.03.01.020","80.03.01.025"];
+			var kup = ["80.01.05.057","80.01.05.058","80.01.05.059","80.01.05.060","80.01.05.061","80.01.05.062","80.01.05.063","80.01.05.064"];
+
+			var csvString = "Broj;Datum;Mesec;Godina;Opstina;Tip;Iznos\r\n";
+			for(var i=0;i<meseci.length;i++){
+				
+				for(var j=0;j<meseci[i].nalozi.length;j++){
+					meseci[i].nalozi[j].tipNaloga = "ZAMENA";
+					var kategorisan = false;
+					for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+						if(mas.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							meseci[i].nalozi[j].tipNaloga = "BAGER";
+							kategorisan = true;
+							break;
+						}
+					}
+
+					if(!kategorisan){
+						for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+							if(kop.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+								meseci[i].nalozi[j].tipNaloga = "KOPANJE";
+								kategorisan = true;
+								break;
+							}
+						}	
+					}
+
+					if(!kategorisan){
+						for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+							if(woma.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+								meseci[i].nalozi[j].tipNaloga = "WOMA";
+								kategorisan = true;
+								break;
+							}
+						}
+					}
+
+					if(!kategorisan){
+						for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+							if(rucno.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+								if(parseFloat(meseci[i].nalozi[j].ukupanIznos)<20000){
+									meseci[i].nalozi[j].tipNaloga = "SAJLA";
+									kategorisan = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if(!kategorisan){
+						for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+							if(crp.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+								if(parseFloat(meseci[i].nalozi[j].ukupanIznos)<10000){
+									meseci[i].nalozi[j].tipNaloga = "CRPLJENJE";
+									kategorisan = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if(!kategorisan){
+						for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+							if(kup.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+								if(parseFloat(meseci[i].nalozi[j].ukupanIznos)<5500){
+									meseci[i].nalozi[j].tipNaloga = "SPOJKA";
+									kategorisan = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if(!kategorisan){
+						for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+							if(kup.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+								if(parseFloat(meseci[i].nalozi[j].ukupanIznos)<5500){
+									meseci[i].nalozi[j].tipNaloga = "SPOJKA";
+									kategorisan = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if(!kategorisan){
+						if(meseci[i].nalozi[j].obracun.length==2){
+							if(meseci[i].nalozi[j].obracun[0].code=="80.04.01.002" && meseci[i].nalozi[j].obracun[1].code=="80.04.01.005"){
+								meseci[i].nalozi[j].tipNaloga = "LOKALNO";
+								kategorisan = true;
+							}else if(meseci[i].nalozi[j].obracun[0].code=="80.04.01.005" && meseci[i].nalozi[j].obracun[1].code=="80.04.01.002"){
+								meseci[i].nalozi[j].tipNaloga = "LOKALNO";
+								kategorisan = true;
+							}
+						}else if(meseci[i].nalozi[j].obracun.length==1){
+							if(meseci[i].nalozi[j].obracun[0].code=="80.04.01.002" || meseci[i].nalozi[j].obracun[0].code=="80.04.01.005"){
+								meseci[i].nalozi[j].tipNaloga = "LOKALNO";
+								kategorisan = true;
+							}
+						}
+					}
+					
+
+					if(!isNaN(parseFloat(meseci[i].nalozi[j].ukupanIznos))){
+						csvString += meseci[i].nalozi[j].broj+";";
+						if (typeof meseci[i].nalozi[j].datum === 'string' || meseci[i].nalozi[j].datum instanceof String){
+							csvString += meseci[i].nalozi[j].datum.split("god")[0];
+						}else{
+							csvString += meseci[i].nalozi[j].datum.datum;
+						}
+						csvString+=";"+meseci[i].mesecBroj+";"+meseci[i].godinaBroj+";"+meseci[i].nalozi[j].radnaJedinica+";"+meseci[i].nalozi[j].tipNaloga+";"+meseci[i].nalozi[j].ukupanIznos+"\r\n";
+					}else{
+						console.log("BEZ IZNOSA!!!!")
+					}
+					
+				}
+			}
+			fs.writeFileSync("./Nalozi2024-4.csv",csvString,"utf8");
+			console.log("Wrote File 4")
+		})
+		.catch((error)=>{
+			console.log(error);
+		})*/
+
+
+		/*naloziDB.find({"datum.datum":{$regex:"01.2025"},majstor:{$in:podizvodjaci}}).toArray()
+		.then((nalozi)=>{
+			console.log(nalozi.length)
+			console.log(nalozi);
+			majstoriDB.find({uniqueId:{$in:podizvodjaci}}).toArray()
+			.then((majstori)=>{
+				for(var i=0;i<majstori.length;i++){
+					majstori[i].nalozi = 0;
+					majstori[i].brojevi = [];
+					for(var j=0;j<nalozi.length;j++){
+						if(majstori[i].uniqueId==nalozi[j].majstor){
+							majstori[i].nalozi++;
+							majstori[i].brojevi.push(nalozi[j].broj);
+						}
+					}
+				}
+				console.log(majstori)
+			})
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 
 
 	})
@@ -7347,6 +7597,205 @@ server.get('/tv2', async (req, res)=> {
       });
   });
 });
+
+server.get('/heatmap', async (req, res)=> {
+	var meseci = [];
+	for(var i=2024;i<=2024;i++){
+		for(var j=1;j<=12;j++){
+			var json = {};
+			json.mesec = j.toString().padStart(2,"0")+"."+i.toString();
+			json.mesecBroj = j;
+			json.godinaBroj = i;
+			json.nalozi = [];
+			meseci.push(json)
+		}
+	}
+
+
+	naloziDB.find({}).toArray()
+	.then((nalozi)=>{
+		for(var i=0;i<meseci.length;i++){
+			for(var j=0;j<nalozi.length;j++){
+				if(nalozi[j].datum.datum.includes(meseci[i].mesec)){
+					meseci[i].nalozi.push(nalozi[j])
+				}
+			}
+		}
+		
+		var woma = ["80.02.09.020","80.02.09.021","80.02.09.022"];
+		var rucno = ["80.02.09.001","80.02.09.002","80.02.09.003","80.02.09.004","80.02.09.005"];
+		var crp = ["80.02.09.009","80.02.09.010","80.02.09.012","80.02.09.025"];
+		var kop = ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
+		var mas = ["80.03.01.019","80.03.01.020"];
+		var kup = ["80.01.05.057","80.01.05.058","80.01.05.059","80.01.05.060","80.01.05.061","80.01.05.062","80.01.05.063","80.01.05.064"];
+
+		for(var i=0;i<meseci.length;i++){			
+			for(var j=0;j<meseci[i].nalozi.length;j++){
+				meseci[i].nalozi[j].tipNaloga = "ZAMENA";
+				var kategorisan = false;
+				for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+					if(mas.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+						meseci[i].nalozi[j].tipNaloga = "BAGER";
+						kategorisan = true;
+						break;
+					}
+				}
+
+				if(!kategorisan){
+					for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+						if(kop.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							meseci[i].nalozi[j].tipNaloga = "KOPANJE";
+							kategorisan = true;
+							break;
+						}
+					}	
+				}
+
+				if(!kategorisan){
+					for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+						if(woma.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							meseci[i].nalozi[j].tipNaloga = "WOMA";
+							kategorisan = true;
+							break;
+						}
+					}
+				}
+
+				if(!kategorisan){
+					for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+						if(rucno.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							if(parseFloat(meseci[i].nalozi[j].ukupanIznos)<20000){
+								meseci[i].nalozi[j].tipNaloga = "SAJLA";
+								kategorisan = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if(!kategorisan){
+					for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+						if(crp.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							if(parseFloat(meseci[i].nalozi[j].ukupanIznos)<10000){
+								meseci[i].nalozi[j].tipNaloga = "CRPLJENJE";
+								kategorisan = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if(!kategorisan){
+					for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+						if(kup.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							if(parseFloat(meseci[i].nalozi[j].ukupanIznos)<5500){
+								meseci[i].nalozi[j].tipNaloga = "SPOJKA";
+								kategorisan = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if(!kategorisan){
+					for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+						if(kup.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							if(parseFloat(meseci[i].nalozi[j].ukupanIznos)<5500){
+								meseci[i].nalozi[j].tipNaloga = "SPOJKA";
+								kategorisan = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if(!kategorisan){
+					if(meseci[i].nalozi[j].obracun.length<=2){
+						if(meseci[i].nalozi[j].obracun[0].code=="80.04.01.002" && meseci[i].nalozi[j].obracun[1].code=="80.04.01.005"){
+							meseci[i].nalozi[j].tipNaloga = "LOKALNO";
+							kategorisan = true;
+							break;
+						}else if(meseci[i].nalozi[j].obracun[0].code=="80.04.01.005" && meseci[i].nalozi[j].obracun[1].code=="80.04.01.002"){
+							meseci[i].nalozi[j].tipNaloga = "LOKALNO";
+							kategorisan = true;
+							break;
+						}else if(meseci[i].nalozi[j].obracun[0].code=="80.04.01.002" || meseci[i].nalozi[j].obracun[0].code=="80.04.01.005"){
+							meseci[i].nalozi[j].tipNaloga = "LOKALNO";
+							kategorisan = true;
+							break;
+						}
+					}
+				}
+
+
+
+
+
+
+				/*for(var k=0;k<meseci[i].nalozi[j].obracun.length;k++){
+					if(typeof meseci[i].nalozi[j].obracun[k]!== 'undefined'){
+						if(woma.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							meseci[i].nalozi[j].tipNaloga = "WOMA";
+							
+							for(var l=0;l<meseci[i].nalozi[j].obracun.length;l++){
+								if(kop.indexOf(meseci[i].nalozi[j].obracun[l].code)>=0){
+									meseci[i].nalozi[j].tipNaloga = "KOPANJE";
+									break;
+								}
+							}
+							break;
+						}
+						if(rucno.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							meseci[i].nalozi[j].tipNaloga = "ODGUSENJE";
+							if(parseFloat(meseci[i].nalozi[j].ukupanIznos)>20000){
+								meseci[i].nalozi[j].tipNaloga = "ZAMENA";
+							}
+							break;
+						}
+						if(crp.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							meseci[i].nalozi[j].tipNaloga = "CRPLJENJE";
+							if(parseFloat(meseci[i].nalozi[j].ukupanIznos)>10000){
+								meseci[i].nalozi[j].tipNaloga = "ZAMENA";
+							}
+							break;
+						}
+						if(kop.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							meseci[i].nalozi[j].tipNaloga = "KOPANJE";
+							break;
+						}
+						if(mas.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							meseci[i].nalozi[j].tipNaloga = "BAGER";
+							break;
+						}
+						if(kup.indexOf(meseci[i].nalozi[j].obracun[k].code)>=0){
+							meseci[i].nalozi[j].tipNaloga = "SPOJKA";
+							if(parseFloat(meseci[i].nalozi[j].ukupanIznos)>5500){
+								meseci[i].nalozi[j].tipNaloga = "ZAMENA";
+							}
+							break;
+						}
+					}
+					
+				}*/
+			}
+		}
+		res.render("heatmap",{
+			pageTitle: "Mapa",
+			mapKey: process.env.googlegeocoding,
+			meseci: meseci
+		})
+	})
+	.catch((error)=>{
+		console.log(error);
+	})
+})
+
+
+
+
+
+
+
 
 server.get('/tv', async (req, res)=> {
 	var date = new Date();
