@@ -1,6 +1,5 @@
 <%- include ("partials/header") -%>
 <script>
-	var majstor = <%-JSON.stringify(majstor)%>;
 	
 	function checkboxPicked(elem){
 		if(elem.checked){
@@ -14,10 +13,6 @@
 	<div class="pageWidth">
 		<div class="blueWrap">
 			<div class="infoWrap">
-				<div class="ime">
-					<%=majstor.ime%>	
-				</div>
-				<div class="glavniTip"><%=type%></div>
 				<div class="mainBorder"></div>
 				<div class="inputWrap">
 					<div class="checkboxWrap">
@@ -130,11 +125,8 @@
 					</div>
 				</div>
 				<div class="inputWrap" style="margin-top:15px;width:300px">
-					<div class="button" onclick="saveIzmene()">Сачувај измене</div>
+					<div class="button" onclick="saveMajstor()">Сачувај</div>
 				</div>
-				</div>
-				<div class="inputWrap" style="margin-top:15px;width:300px">
-					<div class="button" style="background-color:rgb(200,0,0)" onclick="deleteMajstor()">БРИСАЊЕ МАЈСТОРА</div>
 				</div>
 
 				<!--<div class="beleskaWrap">
@@ -192,69 +184,14 @@
 				</div>-->
 			</div>
 		</div>
-		<form method="post" style="display:none" id="form" action="/izmenaMajstora">
+		<form method="post" style="display:none" id="form" action="/dodavanjeMajstora">
 			<input type="text" name="json" id="json">
 		</form>
-		<form method="post" style="display:none" id="delete-form" action="/brisanjeMajstora">
-			<input type="text" name="json" id="delete-json">
-		</form>
 		<script>
-			if(majstor.ime){
-				document.getElementById("ime-majstora").value = majstor.ime;
-			}
-
-			if(majstor.brojKartice){
-				document.getElementById("broj-kartice").value = majstor.brojKartice;
-			}
-
-			if(majstor.ocekivaniUcinak){
-				document.getElementById("ocekivani-ucinak").value = majstor.ocekivaniUcinak;
-			}
-
-			if(majstor.vezaSaStarimPortalom){
-				document.getElementById("veza-sa-starim-portalom").value = majstor.vezaSaStarimPortalom;
-			}
-
-			if(majstor.sluzbeniBroj){
-				document.getElementById("sluzbeni-broj").value = majstor.sluzbeniBroj;
-			}
-
-			if(majstor.privatniBroj){
-				document.getElementById("privatni-broj").value = majstor.privatniBroj;
-			}
-
-			if(majstor.jmbg){
-				document.getElementById("jmbg").value = majstor.jmbg;
-			}
-
-			if(majstor.brojLicneKarte){
-				document.getElementById("broj-licne-karte").value = majstor.brojLicneKarte;
-			}
-
-			if(majstor.adresaStanovanja){
-				document.getElementById("adresa-stanovanja").value = majstor.adresaStanovanja;
-			}
-
-			if(majstor.beleske){
-				document.getElementById("beleske").value = majstor.beleske;
-			}
-
-			if(majstor.aktivan){
-				document.getElementById("aktivan").checked = true;
-			}
-
-			if(majstor.tipRada){
-				var tipovi = document.getElementsByClassName("tipRadnika");
-				for(var i=0;i<tipovi.length;i++){
-					if(majstor.tipRada.indexOf(tipovi[i].value)>=0){
-						tipovi[i].checked = true;
-					}
-				}
-			}
 			
-			function saveIzmene(){
+			
+			function saveMajstor(){
 				var izmenaJson = {};
-				izmenaJson.uniqueId = majstor.uniqueId;
 				izmenaJson.tip = "<%=type%>";
 				izmenaJson.brojKartice = Number(document.getElementById("broj-kartice").value);
 				izmenaJson.ime = document.getElementById("ime-majstora").value;
@@ -277,15 +214,6 @@
 				document.getElementById("json").value = JSON.stringify(izmenaJson);
 				loadGif();
 				document.getElementById("form").submit();
-			}
-			
-			function deleteMajstor(){
-				var deleteJson = {};
-				deleteJson.uniqueId = majstor.uniqueId;
-				deleteJson.tip = "<%=type%>";
-				document.getElementById("delete-json").value = JSON.stringify(deleteJson);
-				loadGif();
-				document.getElementById("delete-form").submit();
 			}
 		</script>
 	</div>

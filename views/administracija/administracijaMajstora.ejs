@@ -20,6 +20,16 @@
 						majstorBlok.appendChild(imeMajstora);
 					document.getElementById("lista-majstora").appendChild(majstorBlok);
 				}
+
+				var majstorBlok = document.createElement("DIV");
+				majstorBlok.setAttribute("class","majstorBlok");
+				majstorBlok.setAttribute("style","background-color:rgb(20,255,20)")
+					var imeMajstora = document.createElement("DIV");
+					imeMajstora.setAttribute("class","ime");
+					imeMajstora.setAttribute("onclick","window.location.href='/dodajMajstora'");
+					imeMajstora.innerHTML = "ДОДАЈ НОВОГ";
+					majstorBlok.appendChild(imeMajstora);
+				document.getElementById("lista-majstora").appendChild(majstorBlok);
 			</script>
 		</div>
 		<div class="pomocnici">
@@ -37,6 +47,16 @@
 						majstorBlok.appendChild(imeMajstora);
 					document.getElementById("lista-pomocnika").appendChild(majstorBlok);
 				}
+
+				var majstorBlok = document.createElement("DIV");
+				majstorBlok.setAttribute("class","majstorBlok");
+				majstorBlok.setAttribute("style","background-color:rgb(20,255,20)")
+					var imeMajstora = document.createElement("DIV");
+					imeMajstora.setAttribute("class","ime");
+					imeMajstora.setAttribute("onclick","window.location.href='/dodajPomocnika'");
+					imeMajstora.innerHTML = "ДОДАЈ НОВОГ";
+					majstorBlok.appendChild(imeMajstora);
+				document.getElementById("lista-pomocnika").appendChild(majstorBlok);
 			</script>
 		</div>
 	</div>

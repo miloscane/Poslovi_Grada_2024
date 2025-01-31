@@ -4822,6 +4822,7 @@ server.post('/izmenaMajstora',async (req,res)=>{
 			var json = JSON.parse(req.body.json);
 			var setObj	=	{ $set: {
 											brojKartice:json.brojKartice,
+											ime:json.ime,
 											ocekivaniUcinak:json.ocekivaniUcinak,
 											sluzbeniBroj:json.sluzbeniBroj,
 											privatniBroj:json.privatniBroj,
@@ -4852,6 +4853,150 @@ server.post('/izmenaMajstora',async (req,res)=>{
 				pomocniciDB.updateOne({uniqueId:json.uniqueId},setObj)
 				.then((dbResponse)=>{
 					res.redirect("/administracijaMajstora/"+json.uniqueId);
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 5884.</div>"
+					})
+				})
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да прави измене мајстора.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
+server.post('/brisanjeMajstora',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var json = JSON.parse(req.body.json);
+			if(json.tip=="Мајстор"){
+				majstoriDB.deleteOne({uniqueId:json.uniqueId})
+				.then((dbResponse)=>{
+					res.redirect("/administracijaMajstora");
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 4892.</div>"
+					})
+				})
+			}else{
+				pomocniciDB.deleteOne({uniqueId:json.uniqueId})
+				.then((dbResponse)=>{
+					res.redirect("/administracijaMajstora/");
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 5884.</div>"
+					})
+				})
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да прави измене мајстора.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
+server.get('/dodajMajstora',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			res.render("administracija/dodajMajstora",{
+				pageTitle: "Додавање Мајстора",
+				type: "Мајстор",
+				user: req.session.user
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
+server.get('/dodajPomocnika',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			res.render("administracija/dodajMajstora",{
+				pageTitle: "Додавање помоћника",
+				type: "Помоћник",
+				user: req.session.user
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
+server.post('/dodavanjeMajstora',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var json = JSON.parse(req.body.json);
+
+			var majstorJson = {};
+			majstorJson.brojKartice = json.brojKartice;
+			majstorJson.ime = json.ime;
+			majstorJson.tip = json.tip
+			majstorJson.ocekivaniUcinak = json.ocekivaniUcinak;
+			majstorJson.sluzbeniBroj = json.sluzbeniBroj;
+			majstorJson.privatniBroj = json.privatniBroj;
+			majstorJson.jmbg = json.jmbg;
+			majstorJson.brojLicneKarte = json.brojLicneKarte;
+			majstorJson.adresaStanovanja = json.adresaStanovanja;
+			majstorJson.beleske = json.beleske;
+			majstorJson.aktivan = json.aktivan;
+			majstorJson.vezaSaStarimPortalom = json.vezaSaStarimPortalom;
+			majstorJson.tipRada = json.tipRada;
+			majstorJson.uniqueId = generateId(7)+"--"+new Date().getTime();
+			if(json.tip=="Мајстор"){
+				majstoriDB.insertOne(majstorJson)
+				.then((dbResponse)=>{
+					res.redirect("/administracijaMajstora");
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 5884.</div>"
+					})
+				})
+			}else{
+				pomocniciDB.insertOne(majstorJson)
+				.then((dbResponse)=>{
+					res.redirect("/administracijaMajstora");
 				})
 				.catch((error)=>{
 					logError(error);
