@@ -2325,7 +2325,8 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==25){
 			var today = new Date();
-			naloziDB.find({"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray()
+			//"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()}
+			naloziDB.find({statusNaloga:{$nin:["Završeno","Storniran","Spreman za fakturisanje","Fakturisan"]},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray()
 			.then((nalozi)=>{
 				for(var i=0;i<nalozi.length;i++){
 					if(podizvodjaci.indexOf(nalozi[i].majstor)>=0){
@@ -2334,13 +2335,83 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 					}
 				}
 
-				res.render("kontrola/neizvrseniNalozi",{
-					pageTitle:"Неизвршени налози на дан "+getDateAsStringForDisplay(today),
-					nalozi: nalozi,
-					user: req.session.user
+				naloziDB.find({"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray()
+				.then((nalozi2)=>{
+					for(var i=0;i<nalozi2.length;i++){
+						if(podizvodjaci.indexOf(nalozi2[i].majstor)>=0){
+							nalozi2.splice(i,1);
+							i--;
+						}
+					}
+
+					for(var i=0;i<nalozi2.length;i++){
+						var nalogExists = false;
+						for(var j=0;j<nalozi.length;j++){
+							if(nalozi[j].broj==nalozi2[i].broj){
+								nalogExists = true;
+								break;
+							}
+						}
+						if(!nalogExists){
+							nalozi.push(nalozi2[i])
+						}
+					}
+
+					res.render("kontrola/neizvrseniNalozi",{
+						pageTitle:"Неизвршени налози на дан "+getDateAsStringForDisplay(today),
+						nalozi: nalozi,
+						user: req.session.user
+					});
+				})
+				.catch((error)=>{
+					console.log(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у бази података 2347.</div>"
+					});
+				})
+
+				
+			})
+			.catch((error)=>{
+				console.log(error)
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 2517.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/kontrola/lokacije',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==25){
+			ekipeDB.find({}).toArray()
+			.then((ekipeJuce)=>{
+				//console.log(ekipeJuce)
+				res.render("kontrola/lokacije",{
+					pageTitle: "Екипе",
+					user: req.session.user,
+					pomocnici: pomocnici,
+					vozila: vozila,
+					majstori: majstori,
+					checkIns: checkIns,
+					ekipe: ekipeJuce[ekipeJuce.length-1]
 				});
 			})
 			.catch((error)=>{
+				console.log(error)
 				res.render("message",{
 					pageTitle: "Грешка",
 					user: req.session.user,
