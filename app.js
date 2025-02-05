@@ -1293,9 +1293,9 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 
-		var meseci = [];
+		/*var meseci = [];
 
-		/*for(var i=2022;i<=2025;i++){
+		for(var i=2022;i<=2025;i++){
 			for(var j=1;j<=12;j++){
 				if(j==2 && i==2025){
 					break;
@@ -1367,7 +1367,7 @@ http.listen(process.env.PORT, function(){
 			console.log(error);
 		})*/
 
-		for(var i=2024;i<=2024;i++){
+		/*for(var i=2024;i<=2024;i++){
 			for(var j=1;j<=12;j++){
 				var json = {};
 				json.mesec = j.toString().padStart(2,"0")+"."+i.toString();
@@ -1379,7 +1379,7 @@ http.listen(process.env.PORT, function(){
 		}
 
 
-		/*naloziDB.find({}).toArray()
+		naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			for(var i=0;i<meseci.length;i++){
 				for(var j=0;j<nalozi.length;j++){
@@ -1512,7 +1512,7 @@ http.listen(process.env.PORT, function(){
 					
 				}
 			}
-			fs.writeFileSync("./Nalozi2024-4.csv",csvString,"utf8");
+			fs.writeFileSync("./Nalozi2024-5.csv",csvString,"utf8");
 			console.log("Wrote File 4")
 		})
 		.catch((error)=>{
@@ -2324,10 +2324,8 @@ server.get('/stefan/kategorije',async (req,res)=>{
 server.get('/kontrola/naslovna',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==25){
-			
-
 			var today = new Date();
-			naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom","Spreman za obračun","Završeno","Storniran"]}}).toArray()
+			naloziDB.find({"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray()
 			.then((nalozi)=>{
 				for(var i=0;i<nalozi.length;i++){
 					if(podizvodjaci.indexOf(nalozi[i].majstor)>=0){
@@ -2335,26 +2333,10 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 						i--;
 					}
 				}
-				var informacije = [];
-				for(var i=0;i<radneJedinice.length;i++){
-					var json = {};
-					json.radnaJedinica = radneJedinice[i];
-					json.brojNaloga = 0;
-					informacije.push(json);
-				}
-
-				for(var i=0;i<nalozi.length;i++){
-					for(var j=0;j<informacije.length;j++){
-						if(informacije[j].radnaJedinica == nalozi[i].radnaJedinica){
-							informacije[j].brojNaloga++;
-						}
-					}
-				}
-
 
 				res.render("kontrola/neizvrseniNalozi",{
 					pageTitle:"Неизвршени налози на дан "+getDateAsStringForDisplay(today),
-					informacije: informacije,
+					nalozi: nalozi,
 					user: req.session.user
 				});
 			})

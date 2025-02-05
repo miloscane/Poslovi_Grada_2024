@@ -1,41 +1,101 @@
 <%- include ("partials/header") -%>
 	<script>
-		var informacije = <%-JSON.stringify(informacije)%>;
+		var nalozi = <%-JSON.stringify(nalozi)%>;
 	</script>
 	<div class="pageWidth">
-		<div class="neizvrseniNalozi">
-			<div id="text"></div>
+		<div class="kontrolaNeizvrseniNalozi">
+			<div id="header" class="head">
+				<div class="mainTitle" id="opstine"></div>
+				<script>
+					var str = ""
+					for(var i=0;i<user.radneJedinice.length;i++){
+						str += user.radneJedinice[i] + ", ";
+					}
+					document.getElementById("opstine").innerHTML = str.slice(0, -2)
+				</script>
+				<div class="inlines">
+					<div class="title">Ostvaren Iznos</div>
+					<div class="info" id="ostvaren-iznos"></div>
+				</div>
+				<div class="inlines">
+					<div class="title">Završeno naloga</div>
+					<div class="info" id="zavrseno-naloga"></div>
+				</div>
+				<div class="inlines">
+					<div class="title">Neizvršeno naloga</div>
+					<div class="info" id="neizvrseno-naloga"></div>
+				</div>
+				<div class="inlines">
+					<div class="title">Danas naloga</div>
+					<div class="info" id="danas-naloga"></div>
+				</div>
+			</div>
+			<div class="nalozi" id="nalozi"></div>
 			<script>
-				var ukupnoNaloga = 0;
-				for(var i=0;i<informacije.length;i++){
-					ukupnoNaloga = ukupnoNaloga + informacije[i].brojNaloga;
-					var row = document.createElement("DIV");
-					row.setAttribute("class","row");
-						var inline = document.createElement("DIV");
-						inline.setAttribute("class","inline");
-						inline.innerHTML = informacije[i].radnaJedinica;
-						row.appendChild(inline);
+				var ostvarenIznos = 0;
+				var zavrsenoNaloga = 0;
+				var zavrseni = ["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan"];
+				var neizvrsenoNaloga = 0;
+				var danasNaloga = 0;
+				for(var i=0;i<nalozi.length;i++){
+					if(!isNaN(parseFloat(nalozi[i].ukupanIznos))){
+						ostvarenIznos = ostvarenIznos + parseFloat(nalozi[i].ukupanIznos);
+					}
 
-						var inline = document.createElement("DIV");
-						inline.setAttribute("class","inline");
-						inline.innerHTML = informacije[i].brojNaloga;
-						row.appendChild(inline);
-					document.getElementById("text").appendChild(row);
+					if(zavrseni.indexOf(nalozi[i].statusNaloga)>=0){
+						zavrsenoNaloga++;
+					}else{
+						neizvrsenoNaloga++;
+					}
+
+					if(getDateAsStringForDisplay(new Date())==nalozi[i].datum.datum){
+						danasNaloga++;
+					}
 				}
 
-				var row = document.createElement("DIV");
-				row.setAttribute("style","font-size:20px;border-top:1px solid rgb(100,100,100);padding-top:10px");
-				row.setAttribute("class","row");
-					var inline = document.createElement("DIV");
-					inline.setAttribute("class","inline");
-					inline.innerHTML = "УКУПНО";
-					row.appendChild(inline);
+				document.getElementById("ostvaren-iznos").innerHTML = brojSaRazmacima(ostvarenIznos);
+				document.getElementById("zavrseno-naloga").innerHTML = zavrsenoNaloga;
+				document.getElementById("neizvrseno-naloga").innerHTML = neizvrsenoNaloga;
+				document.getElementById("danas-naloga").innerHTML = danasNaloga;
 
-					var inline = document.createElement("DIV");
-					inline.setAttribute("class","inline");
-					inline.innerHTML = ukupnoNaloga;
-					row.appendChild(inline);
-				document.getElementById("text").appendChild(row);
+
+				nalozi.sort((a, b) => b.datum.datetime - a.datum.datetime);
+
+				for(var i=0;i<user.radneJedinice.length;i++){
+					var naloziWrap = document.createElement("DIV");
+					naloziWrap.setAttribute("class","naloziWrap");
+					naloziWrap.setAttribute("id",user.radneJedinice[i]);
+						var title = document.createElement("DIV");
+						title.setAttribute("class","title");
+						title.innerHTML = user.radneJedinice[i];
+						naloziWrap.appendChild(title);
+					document.getElementById("nalozi").appendChild(naloziWrap);
+				}
+
+				for(var i=0;i<nalozi.length;i++){
+					if(zavrseni.indexOf(nalozi[i].statusNaloga)<0){
+						var nalogWrap = document.createElement("DIV");
+						nalogWrap.setAttribute("class","nalogWrap");
+
+							var brojNaloga = document.createElement("DIV");
+							brojNaloga.setAttribute("class","brojNaloga");
+							brojNaloga.innerHTML = "<a href='/nalog/"+nalozi[i].broj+"'>"+nalozi[i].broj+"</a>";
+							nalogWrap.appendChild(brojNaloga);
+
+							var adresaNaloga = document.createElement("DIV");
+							adresaNaloga.setAttribute("class","adresaNaloga");
+							adresaNaloga.innerHTML = nalozi[i].adresa;
+							nalogWrap.appendChild(adresaNaloga);
+
+							var statusNaloga = document.createElement("DIV");
+							statusNaloga.setAttribute("class","statusNaloga");
+							statusNaloga.innerHTML = nalozi[i].statusNaloga;
+							nalogWrap.appendChild(statusNaloga);
+
+						document.getElementById(nalozi[i].radnaJedinica).appendChild(nalogWrap);
+					}
+					
+				}
 			</script>
 		</div>
 	</div>	
