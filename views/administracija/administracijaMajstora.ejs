@@ -2,6 +2,9 @@
 <script>
 	var majstori = <%-JSON.stringify(majstori)%>;
 	var pomocnici = <%-JSON.stringify(pomocnici)%>;
+	var users = <%-JSON.stringify(users)%>;
+	users.sort((a, b) => Number(a.role) - Number(b.role));
+	console.log(users)
 </script>
 <div class="administracijaMajstora">
 	<div class="pageWidth">
@@ -57,6 +60,24 @@
 					imeMajstora.innerHTML = "ДОДАЈ НОВОГ";
 					majstorBlok.appendChild(imeMajstora);
 				document.getElementById("lista-pomocnika").appendChild(majstorBlok);
+			</script>
+		</div>
+		<div class="administracija">
+			<div class="title">Администрација</div>
+			<div id="lista-administracije" class="majstorList"></div>
+			<script>
+				for(var i=0;i<users.length;i++){
+					if(!users[i].email.startsWith("miloscane") && Number(users[i].role)>=10 && Number(users[i].role)!=30 && Number(users[i].role)!=40){
+						var majstorBlok = document.createElement("DIV");
+						majstorBlok.setAttribute("class","majstorBlok");
+							var imeMajstora = document.createElement("DIV");
+							imeMajstora.setAttribute("class","ime");
+							imeMajstora.setAttribute("onclick","window.location.href='/administracijaAdministracije/"+encodeURIComponent(users[i].email)+"'");
+							imeMajstora.innerHTML = users[i].name;
+							majstorBlok.appendChild(imeMajstora);
+						document.getElementById("lista-administracije").appendChild(majstorBlok);
+					}	
+				}
 			</script>
 		</div>
 	</div>

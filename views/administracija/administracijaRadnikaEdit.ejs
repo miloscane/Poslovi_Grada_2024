@@ -1,0 +1,115 @@
+<%- include ("partials/header") -%>
+<script>
+	var radnik = <%-JSON.stringify(radnik)%>;
+	console.log(radnik)
+</script>
+<div class="administracijaMajstoraEdit">
+	<div class="pageWidth">
+		<div class="blueWrap">
+			<div class="infoWrap">
+				<div class="ime">
+					<%=radnik.name%>
+				</div>
+				<div class="glavniTip" id="tip"></div>
+				<script>
+					if(Number(radnik.role)==10){
+						document.getElementById("tip").innerHTML = "Администрација";
+					}else if(Number(radnik.role)==20){
+						document.getElementById("tip").innerHTML = "Диспечер";
+					}else if(Number(radnik.role)==25){
+						document.getElementById("tip").innerHTML = "Шеф ТЕ";
+					}else if(Number(radnik.role)==50){
+						document.getElementById("tip").innerHTML = "Магационер";
+					}
+				</script>
+				<div class="mainBorder"></div>
+				<div class="singleLineInput">
+					<div class="name">Број идентификационе картице</div>
+					<div class="inputWrapper">
+						<input type="number" id="broj-kartice">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Службени телефон</div>
+					<div class="inputWrapper">
+						<input type="text" id="sluzbeni-broj">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Приватни телефон</div>
+					<div class="inputWrapper">
+						<input type="text" id="privatni-broj">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">ЈМБГ</div>
+					<div class="inputWrapper">
+						<input type="text" id="jmbg">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Број личне карте</div>
+					<div class="inputWrapper">
+						<input type="text" id="broj-licne-karte">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Адреса становања</div>
+					<div class="inputWrapper">
+						<input type="text" id="adresa-stanovanja">
+					</div>
+				</div>
+				<div class="inputWrap" style="margin-top:15px;width:300px">
+					<div class="button" onclick="saveIzmene()">Сачувај измене</div>
+				</div>
+			</div>
+			</div>
+		</div>
+		<form method="post" style="display:none" id="form" action="/izmenaAdministracije">
+			<input type="text" name="json" id="json">
+		</form>
+		<script>
+
+			if(radnik.brojKartice){
+				document.getElementById("broj-kartice").value = radnik.brojKartice;
+			}
+
+			if(radnik.sluzbeniBroj){
+				document.getElementById("sluzbeni-broj").value = radnik.sluzbeniBroj;
+			}
+
+			if(radnik.privatniBroj){
+				document.getElementById("privatni-broj").value = radnik.privatniBroj;
+			}
+
+			if(radnik.jmbg){
+				document.getElementById("jmbg").value = radnik.jmbg;
+			}
+
+			if(radnik.brojLicneKarte){
+				document.getElementById("broj-licne-karte").value = radnik.brojLicneKarte;
+			}
+
+			if(radnik.adresaStanovanja){
+				document.getElementById("adresa-stanovanja").value = radnik.adresaStanovanja;
+			}
+			
+			function saveIzmene(){
+				var izmenaJson = {};
+				izmenaJson.email = radnik.email;
+				izmenaJson.brojKartice = Number(document.getElementById("broj-kartice").value);
+				izmenaJson.sluzbeniBroj = document.getElementById("sluzbeni-broj").value;
+				izmenaJson.privatniBroj = document.getElementById("privatni-broj").value;
+				izmenaJson.jmbg = document.getElementById("jmbg").value;
+				izmenaJson.brojLicneKarte = document.getElementById("broj-licne-karte").value;
+				izmenaJson.adresaStanovanja = document.getElementById("adresa-stanovanja").value;
+				document.getElementById("json").value = JSON.stringify(izmenaJson);
+				loadGif();
+				document.getElementById("form").submit();
+			}
+			
+
+		</script>
+	</div>
+</div>
+<%- include ("partials/footer") -%>

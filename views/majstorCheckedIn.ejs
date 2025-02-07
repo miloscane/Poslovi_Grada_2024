@@ -1,6 +1,6 @@
 <%- include ("partials/header-nl") -%>
 		<div class="blueWrap">
-			<div class="pageWidth">
+			<div class="pageWidth checkInPage">
 				<script>
 					var majstor = false;
 					majstor = <%- JSON.stringify(majstor)%>;
@@ -11,15 +11,6 @@
 					<input type="text" id="tag-input">
 				</div>
 				<script>
-				//document.getElementById('tag-input').focus();	
-				/*document.getElementById('tag-input').onkeypress = function(e){
-					if (!e) e = window.event;
-					var keyCode = e.code || e.key;
-					if (keyCode == 'Enter'){
-						loadGif();
-					  window.location.href = "/majstorCheckIn/"+serverToken + "/"+Number(document.getElementById("tag-input").value);
-					}
-				}*/
 
 				document.addEventListener('keydown', (event) => {
 					if (event.key.length === 1) {
@@ -34,12 +25,30 @@
         
 				</script>
 				
+					
+
+					<div class="videoWrap">
+						<video poster="https://poslovigrada.rs/videos/PGHome.jpg" autoplay muted loop playsinline>
+							<source src="https://poslovigrada.rs/videos/PGHome.mp4">
+						</video>
+					</div>
+
 					<div class="majstorCheckIn">
-						<div class="title"><%-majstor.ime%></div>
+						<div class="title">
+							<% if(majstorType==2) {%>
+								<%-majstor.name%>
+							<% }else{ %>
+								<%-majstor.ime%>
+							<% } %>
+						</div>
 						<div class="vreme"><%-vreme%></div>						
 						<div class="srecanRad"><%- message%></div>
 					</div>
-					<div class="message">Број картице: <%=kartica%></div>	
+					<div class="message">Број картице: <%=kartica%></div>
+					<div class="pageLogo"><img src="https://poslovigrada.rs/images/menuLogo.png"></div>
+					<script>
+						setTimeout(function(){document.getElementsByClassName("majstorCheckIn")[0].style.display="none";document.getElementsByClassName("message")[0].style.display="none";},30000)
+					</script>	
 				
 			</div>
 		</div>

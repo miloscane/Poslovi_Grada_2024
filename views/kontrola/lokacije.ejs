@@ -1,0 +1,43 @@
+<%- include ("partials/header") -%>
+	<script>
+		var ekipe = <%-JSON.stringify(ekipe)%>;
+		var vozila = <%-JSON.stringify(vozila)%>;
+		var majstori = <%-JSON.stringify(majstori)%>;
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+	</script>
+	<div class="pageWidth">
+		<div class="kontrolaLokacije">
+			<div id="majstori"></div>
+			<script>
+				for(var i=0;i<majstori.length;i++){
+					var majstorRow = document.createElement("DIV");
+					majstorRow.setAttribute("class","majstorRow");
+						var imeMajstora = document.createElement("DIV");
+						imeMajstora.setAttribute("class","imeMajstora");
+						imeMajstora.innerHTML = majstori[i].ime;
+						majstorRow.appendChild(imeMajstora);
+
+						var telefon = document.createElement("DIV");
+						telefon.setAttribute("class","telefon");
+						var brojTelefona = majstori[i].privatniBroj.replace(/[\s\\/\\-]/g, '');
+						telefon.innerHTML = "<a href=\"tel:"+brojTelefona+"\">Приватни</a>";
+						majstorRow.appendChild(telefon);
+
+						var telefon = document.createElement("DIV");
+						telefon.setAttribute("class","telefon");
+						var brojTelefona = majstori[i].sluzbeniBroj.replace(/[\s\\/\\-]/g, '');
+						telefon.innerHTML = "<a href=\"tel:"+brojTelefona+"\">Службени</a>";
+						majstorRow.appendChild(telefon);
+
+						var navigacija = document.createElement("DIV");
+						navigacija.setAttribute("class","nav");
+						navigacija.setAttribute("class","nav");
+						navigacija.innerHTML = "Мапа";
+						majstorRow.appendChild(navigacija);
+
+					document.getElementById("majstori").appendChild(majstorRow);
+				}
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

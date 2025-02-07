@@ -1918,8 +1918,7 @@ server.get('/logout',async (req,res)=>{
 	if(req.session){
 		req.session.destroy(function(){});
 	}
-		res.redirect('/login');
-
+	res.redirect('/login');
 });
 
 server.get('/zaboravljena-lozinka',async (req,res)=>{
@@ -2397,21 +2396,34 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 server.get('/kontrola/lokacije',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==25){
-			ekipeDB.find({}).toArray()
-			.then((ekipeJuce)=>{
+			ekipeDB.find({}).sort({ _id: -1 }).limit(1).toArray()
+			.then((ekipe)=>{
+				navigacijaInfoDB.find({}).toArray()
+		    .then((vozila)=>{
+		    	majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray()
+		    	.then((majstori)=>{
+		    		res.render("kontrola/lokacije",{
+							pageTitle: "Локације Мајстора",
+							user: req.session.user,
+							ekipe: ekipe[0],
+							vozila: vozila,
+							majstori: majstori
+						});
+		    	})
+		    })
+		    .catch((error)=>{
+					logError(error)
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у бази података 2422.</div>"
+					});
+		    })
 				//console.log(ekipeJuce)
-				res.render("kontrola/lokacije",{
-					pageTitle: "Екипе",
-					user: req.session.user,
-					pomocnici: pomocnici,
-					vozila: vozila,
-					majstori: majstori,
-					checkIns: checkIns,
-					ekipe: ekipeJuce[ekipeJuce.length-1]
-				});
+				
 			})
 			.catch((error)=>{
-				console.log(error)
+				logError(error)
 				res.render("message",{
 					pageTitle: "Грешка",
 					user: req.session.user,
@@ -4778,12 +4790,31 @@ server.get('/administracijaMajstora',async (req,res)=>{
 				}
 				pomocniciDB.find({}).toArray()
 				.then((pomocnici)=>{
-					res.render("administracija/administracijaMajstora",{
-						pageTitle:"Администрација мајстора",
-						majstori: majstori,
-						pomocnici: pomocnici,
-						user: req.session.user
-					});
+					usersDB.find({}).toArray()
+					.then((users)=>{
+						for(var i=0;i<users.length;i++){
+							delete users[i].password;
+							delete users[i].resetPassDate;
+							delete users[i].resetPassId;
+							delete users[i].resetPassTime;
+							delete users[i]._id;
+						}
+						res.render("administracija/administracijaMajstora",{
+							pageTitle:"Администрација мајстора",
+							majstori: majstori,
+							pomocnici: pomocnici,
+							users: users,
+							user: req.session.user
+						});
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 4802.</div>"
+						});
+					})
 				})
 				.catch((error)=>{
 					logError(error);
@@ -4848,6 +4879,46 @@ server.get('/administracijaMajstora/:id',async (req,res)=>{
 						});
 					})
 				}
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 5840.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
+server.get('/administracijaAdministracije/:mail',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			usersDB.find({email:decodeURIComponent(req.params.mail)}).toArray()
+			.then((users)=>{
+				if(users.length>0){
+					res.render("administracija/administracijaRadnikaEdit",{
+						pageTitle: "Администрација радника",
+						radnik: users[0],
+						user: req.session.user
+					});
+				}else{
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Непосотјећи радник.</div>"
+					});
+				}
+				
 			})
 			.catch((error)=>{
 				logError(error);
@@ -5072,6 +5143,49 @@ server.post('/dodavanjeMajstora',async (req,res)=>{
 		res.redirect("/login?url="+encodeURIComponent(req.url))
 	}
 });
+
+
+
+server.post('/izmenaAdministracije',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var json = JSON.parse(req.body.json);
+			var setObj	=	{ $set: {
+											brojKartice:json.brojKartice,
+											sluzbeniBroj:json.sluzbeniBroj,
+											privatniBroj:json.privatniBroj,
+											jmbg:json.jmbg,
+											brojLicneKarte:json.brojLicneKarte,
+											adresaStanovanja:json.adresaStanovanja
+										}
+								};
+
+				usersDB.updateOne({email:json.email},setObj)
+				.then((dbResponse)=>{
+					res.redirect("/administracijaAdministracije/"+encodeURIComponent(json.email));
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 5884.</div>"
+					})
+				})
+			
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да прави измене мајстора.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
 
 server.get('/zavrseniNaloziPodizvodjaca',async (req,res)=>{
 	if(req.session.user){
@@ -8942,7 +9056,6 @@ server.get('/majstorCheckIn/:servertoken/:tagId',async (req,res)=>{
 				pomocniciDB.find({brojKartice:Number(req.params.tagId)}).toArray()
 				.then((pomocnici)=>{
 					if(pomocnici.length>0){
-
 						var json = {};
 						json.uniqueId = pomocnici[0].uniqueId;
 						json.brojKartice = pomocnici[0].brojKartice;
@@ -8972,14 +9085,57 @@ server.get('/majstorCheckIn/:servertoken/:tagId',async (req,res)=>{
 						})
 						
 					}else{
-						res.render("majstorCheckedIn",{
-							pageTitle: "Непозната картица. Obavestite magacionera!",
-							majstor: {ime:"КО СТЕ ВИ!?!?"},
-							message: "САМО ГАС!",
-							majstorType: 0,
-							vreme: vreme,
-							kartica: req.params.tagId
+						usersDB.find({brojKartice:Number(req.params.tagId)}).toArray()
+						.then((users)=>{
+							if(users.length>0){
+								var json = {};
+								json.uniqueId = users[0].email;
+								json.brojKartice = users[0].brojKartice;
+								json.datetime = datetime;
+								json.month = month;
+								json.date = date;
+								json.year = year;
+								json.timestamp = hours+":"+minutes;
+								checkInMajstoraDB.insertOne(json)
+								.then((dbResponse)=>{
+									io.emit("majstorCheckedIn",json)
+									res.render("majstorCheckedIn",{
+										pageTitle: "Успешно чекирањe",
+										message: "САМО ГАС!",
+										majstor: users[0],
+										kartica: req.params.tagId,
+										vreme: vreme,
+										majstorType: 2
+									});
+								})
+								.catch((error)=>{
+									logError(error)
+									res.render("messageNotLoggedIn",{
+										pageTitle: "Грешка",
+										message: "<div class=\"text\">Greska u bazi podataka</div>"
+									});
+								})
+								
+							}else{
+								res.render("majstorCheckedIn",{
+									pageTitle: "Непозната картица. Obavestite magacionera!",
+									majstor: {ime:"КО СТЕ ВИ!?!?"},
+									message: "САМО ГАС!",
+									majstorType: 0,
+									vreme: vreme,
+									kartica: req.params.tagId
+								})
+							}
+							
 						})
+						.catch((error)=>{
+							logError(error);
+							res.render("messageNotLoggedIn",{
+								pageTitle: "Грешка",
+								message: "<div class=\"text\">Greska u bazi podataka</div>"
+							});
+						})
+						
 					}
 					
 				})
