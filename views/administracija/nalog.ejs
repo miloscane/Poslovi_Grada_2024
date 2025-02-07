@@ -219,7 +219,7 @@
 								historyWrap.setAttribute("onclick","pickHistory(this)");
 									var historyDate = document.createElement("DIV");
 									historyDate.setAttribute("class","date");
-									historyDate.innerHTML = getDateAsStringForDisplay(new Date(Number(istorijat[i].datetime)));
+									historyDate.innerHTML = getDateAsStringForDisplay(new Date(Number(istorijat[i].datetime))) + "&nbsp;&nbsp;" +getTimestamp(new Date(Number(istorijat[i].datetime)));
 									historyWrap.appendChild(historyDate);
 
 									var historyPerson = document.createElement("DIV");

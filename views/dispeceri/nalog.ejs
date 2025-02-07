@@ -67,7 +67,18 @@
 					<div class="label">Координате</div>
 				</div>
 			</div>
+			<div class="inputWrap printButton" style="margin-left:30px; display:inline-block;vertical-align: top;width:200px">
+				<div class="button" onclick="izvrsenNalog()">
+					<div class="label">Налог Извршен, потребна финализација или копање</div>
+				</div>
+			</div>
 			<script>
+				function izvrsenNalog(){
+					document.getElementById("status-naloga").value="Završeno";
+					document.getElementById("komentar").value = "POTREBNA FINALIZACIJA ILI KOPANJE";
+					saveNalog()
+				}
+
 				function copyCoordinates(elem){
 					if(nalog.coordinates){
 						if(nalog.coordinates.lat){
@@ -209,7 +220,7 @@
 								historyWrap.setAttribute("onclick","pickHistory(this)");
 									var historyDate = document.createElement("DIV");
 									historyDate.setAttribute("class","date");
-									historyDate.innerHTML = getDateAsStringForDisplay(new Date(Number(istorijat[i].datetime)));
+									historyDate.innerHTML = getDateAsStringForDisplay(new Date(Number(istorijat[i].datetime))) + "&nbsp;&nbsp;" +getTimestamp(new Date(Number(istorijat[i].datetime)));
 									historyWrap.appendChild(historyDate);
 
 									var historyPerson = document.createElement("DIV");
