@@ -157,166 +157,174 @@
 
 					for(var i=0;i<ekipe.prisustvo.ekipe.length;i++){
 						var majstorJson = getMajstorByCode(ekipe.prisustvo.ekipe[i].idMajstora);
-						var pomocnikJson = getPomocnikByCard(ekipe.prisustvo.ekipe[i].pomocnik);
-						var voziloJson = getVoziloById(ekipe.prisustvo.ekipe[i].vozilo);
-						var ekipaElem = document.createElement("DIV");
-						ekipaElem.setAttribute("class","ekipaElem");
-							var majstor = document.createElement("DIV");
-							majstor.setAttribute("class","majstor");
-							majstor.innerHTML = majstorJson.ime;
-							var majstorCheckedIn = false;
-							for(var j=0;j<checkIns.length;j++){
-								if(Number(checkIns[j].brojKartice)==Number(majstorJson.brojKartice)){
-									majstorCheckedIn = true;
+						if(majstorJson.ime){
+							var pomocnikJson = getPomocnikByCard(ekipe.prisustvo.ekipe[i].pomocnik);
+							var voziloJson = getVoziloById(ekipe.prisustvo.ekipe[i].vozilo);
+							var ekipaElem = document.createElement("DIV");
+							ekipaElem.setAttribute("class","ekipaElem");
+								var majstor = document.createElement("DIV");
+								majstor.setAttribute("class","majstor");
+								majstor.innerHTML = majstorJson.ime;
+								var majstorCheckedIn = false;
+								for(var j=0;j<checkIns.length;j++){
+									if(Number(checkIns[j].brojKartice)==Number(majstorJson.brojKartice)){
+										majstorCheckedIn = true;
+									}
 								}
-							}
-							ekipaElem.appendChild(majstor);
+								ekipaElem.appendChild(majstor);
 
 
-							var subTitle = document.createElement("DIV");
-							subTitle.setAttribute("class","subTitle");
-							subTitle.innerHTML = "Потребан учинак:";
-							ekipaElem.appendChild(subTitle);
+								var subTitle = document.createElement("DIV");
+								subTitle.setAttribute("class","subTitle");
+								subTitle.innerHTML = "Потребан учинак:";
+								ekipaElem.appendChild(subTitle);
 
-							var ucinak = document.createElement("DIV");
-							ucinak.setAttribute("class","ucinak");
-							ucinak.innerHTML = brojSaRazmacima(eval((parseFloat(majstorJson.ocekivaniUcinak)-parseFloat(majstorJson.ucinak))/workdaysCount));
-							ekipaElem.appendChild(ucinak);
+								var ucinak = document.createElement("DIV");
+								ucinak.setAttribute("class","ucinak");
+								ucinak.innerHTML = brojSaRazmacima(eval((parseFloat(majstorJson.ocekivaniUcinak)-parseFloat(majstorJson.ucinak))/workdaysCount));
+								ekipaElem.appendChild(ucinak);
 
-							var separator = document.createElement("DIV");
-							separator.setAttribute("class","separator");
-							ekipaElem.appendChild(separator);
+								var separator = document.createElement("DIV");
+								separator.setAttribute("class","separator");
+								ekipaElem.appendChild(separator);
 
-							var subTitle = document.createElement("DIV");
-							subTitle.setAttribute("class","subTitle");
-							subTitle.innerHTML = "Помоћник";
-							ekipaElem.appendChild(subTitle);
+								var subTitle = document.createElement("DIV");
+								subTitle.setAttribute("class","subTitle");
+								subTitle.innerHTML = "Помоћник";
+								ekipaElem.appendChild(subTitle);
 
-							var pomocnik = document.createElement("DIV");
-							pomocnik.setAttribute("class","pomocnik");
-							pomocnik.innerHTML = pomocnikJson.ime;
-							ekipaElem.appendChild(pomocnik);
+								var pomocnik = document.createElement("DIV");
+								pomocnik.setAttribute("class","pomocnik");
+								pomocnik.innerHTML = pomocnikJson.ime;
+								ekipaElem.appendChild(pomocnik);
 
 
-							var separator = document.createElement("DIV");
-							separator.setAttribute("class","separator");
-							ekipaElem.appendChild(separator);
+								var separator = document.createElement("DIV");
+								separator.setAttribute("class","separator");
+								ekipaElem.appendChild(separator);
 
-							var subTitle = document.createElement("DIV");
-							subTitle.setAttribute("class","subTitle");
-							subTitle.innerHTML = "Возило";
-							ekipaElem.appendChild(subTitle);
+								var subTitle = document.createElement("DIV");
+								subTitle.setAttribute("class","subTitle");
+								subTitle.innerHTML = "Возило";
+								ekipaElem.appendChild(subTitle);
 
-							var vozilo = document.createElement("DIV");
-							vozilo.setAttribute("class","vozilo");
-							vozilo.setAttribute("onclick","showOnMap(\""+majstorJson.uniqueId+"\")");
-							vozilo.innerHTML = voziloJson.brojTablice ? voziloJson.brojTablice : "-";
-							ekipaElem.appendChild(vozilo);
+								var vozilo = document.createElement("DIV");
+								vozilo.setAttribute("class","vozilo");
+								vozilo.setAttribute("onclick","showOnMap(\""+majstorJson.uniqueId+"\")");
+								vozilo.innerHTML = voziloJson.brojTablice ? voziloJson.brojTablice : "-";
+								ekipaElem.appendChild(vozilo);
 
-							var separator = document.createElement("DIV");
-							separator.setAttribute("class","separator");
-							ekipaElem.appendChild(separator);
+								var separator = document.createElement("DIV");
+								separator.setAttribute("class","separator");
+								ekipaElem.appendChild(separator);
 
-							var subTitle = document.createElement("DIV");
-							subTitle.setAttribute("class","subTitle");
-							subTitle.innerHTML = "Налози";
-							ekipaElem.appendChild(subTitle);
+								var subTitle = document.createElement("DIV");
+								subTitle.setAttribute("class","subTitle");
+								subTitle.innerHTML = "Налози";
+								ekipaElem.appendChild(subTitle);
 
-							var naloziWrap = document.createElement("DIV");
-							naloziWrap.setAttribute("class","naloziWrap");
-							var radnaJedinica = "";
-							for(var j=0;j<dodele.length;j++){
-								if(dodele[j].majstor == majstorJson.uniqueId){
-									radnaJedinica = dodele[j].radnaJedinica;
-									var row = document.createElement("DIV");
-									row.setAttribute("class","row");
-										var timestamp = document.createElement("DIV");
-										timestamp.setAttribute("class","timestamp");
-										timestamp.innerHTML=dodele[j].datum.timestamp;
-										row.appendChild(timestamp);
-
-										var brojNaloga = document.createElement("DIV");
-										brojNaloga.setAttribute("class","brojNaloga");
-										brojNaloga.innerHTML = dodele[j].nalog;
-										row.appendChild(brojNaloga);
-
-										var opstina = document.createElement("DIV");
-										opstina.setAttribute("class","radnaJedinica");
-										opstina.innerHTML = dodele[j].radnaJedinica;
-										row.appendChild(opstina);
-
-										var statusNaloga = document.createElement("DIV");
-										statusNaloga.setAttribute("class","status");
-										statusNaloga.innerHTML = dodele[j].status;
-										row.appendChild(statusNaloga);
-									naloziWrap.appendChild(row);
-								}
-							}
-							ekipaElem.appendChild(naloziWrap);
-
-							var specijalniStatusi = document.createElement("DIV");
-							specijalniStatusi.setAttribute("class","specials");
-								var majstorskeDodele = [];
+								var naloziWrap = document.createElement("DIV");
+								naloziWrap.setAttribute("class","naloziWrap");
+								var radnaJedinica = "";
 								for(var j=0;j<dodele.length;j++){
 									if(dodele[j].majstor == majstorJson.uniqueId){
-										majstorskeDodele.push(dodele[j])
+										radnaJedinica = dodele[j].radnaJedinica;
+										var row = document.createElement("DIV");
+										row.setAttribute("class","row");
+											var timestamp = document.createElement("DIV");
+											timestamp.setAttribute("class","timestamp");
+											timestamp.innerHTML=dodele[j].datum.timestamp;
+											row.appendChild(timestamp);
+
+											var brojNaloga = document.createElement("DIV");
+											brojNaloga.setAttribute("class","brojNaloga");
+											brojNaloga.innerHTML = dodele[j].nalog;
+											row.appendChild(brojNaloga);
+
+											var opstina = document.createElement("DIV");
+											opstina.setAttribute("class","radnaJedinica");
+											opstina.innerHTML = dodele[j].radnaJedinica;
+											row.appendChild(opstina);
+
+											var statusNaloga = document.createElement("DIV");
+											statusNaloga.setAttribute("class","status");
+											statusNaloga.innerHTML = dodele[j].status;
+											row.appendChild(statusNaloga);
+										naloziWrap.appendChild(row);
 									}
 								}
-								if(majstorskeDodele.length>0){
-									if(majstorskeDodele[majstorskeDodele.length-1].nalog=="1111111"){
+								ekipaElem.appendChild(naloziWrap);
+
+								var specijalniStatusi = document.createElement("DIV");
+								specijalniStatusi.setAttribute("class","specials");
+									var majstorskeDodele = [];
+									for(var j=0;j<dodele.length;j++){
+										if(dodele[j].majstor == majstorJson.uniqueId){
+											majstorskeDodele.push(dodele[j])
+										}
+									}
+									if(majstorskeDodele.length>0){
+										if(majstorskeDodele[majstorskeDodele.length-1].nalog=="1111111"){
+											var special = document.createElement("DIV");
+											special.setAttribute("class","special trecaLica");
+											special.innerHTML = "III";
+											specijalniStatusi.appendChild(special);
+										}
+									}
+									
+
+									if(ekipe.prisustvo.ekipe[i].dezurstvo){
 										var special = document.createElement("DIV");
-										special.setAttribute("class","special trecaLica");
-										special.innerHTML = "III";
+										special.setAttribute("class","special dezuran");
+										special.innerHTML = "D";
 										specijalniStatusi.appendChild(special);
 									}
+
+									if(majstorJson.tipRada){
+										if(majstorJson.tipRada.indexOf("Bager")>=0){
+											var special = document.createElement("DIV");
+											special.setAttribute("class","special bager");
+											special.innerHTML = "B";
+											specijalniStatusi.appendChild(special);
+										}
+
+										if(majstorJson.tipRada.indexOf("Voma")>=0){
+											var special = document.createElement("DIV");
+											special.setAttribute("class","special voma");
+											special.innerHTML = "W";
+											specijalniStatusi.appendChild(special);
+										}
+									}
+									
+								ekipaElem.appendChild(specijalniStatusi);
+							if(majstorCheckedIn){
+								if(radnaJedinica!=""){
+									for(var j=0;j<majstoriWraps.length;j++){
+										if(majstoriWraps[j].parentElement.dataset.opstina==radnaJedinica){
+											majstoriWraps[j].appendChild(ekipaElem);
+											break;
+										}
+									}
+								}else{
+									document.getElementById("slobodni").appendChild(ekipaElem)
 								}
 								
-
-								if(ekipe.prisustvo.ekipe[i].dezurstvo){
-									var special = document.createElement("DIV");
-									special.setAttribute("class","special dezuran");
-									special.innerHTML = "D";
-									specijalniStatusi.appendChild(special);
-								}
-
-								if(majstorJson.tipRada.indexOf("Bager")>=0){
-									var special = document.createElement("DIV");
-									special.setAttribute("class","special bager");
-									special.innerHTML = "B";
-									specijalniStatusi.appendChild(special);
-								}
-
-								if(majstorJson.tipRada.indexOf("Voma")>=0){
-									var special = document.createElement("DIV");
-									special.setAttribute("class","special voma");
-									special.innerHTML = "W";
-									specijalniStatusi.appendChild(special);
-								}
-							ekipaElem.appendChild(specijalniStatusi);
-						if(majstorCheckedIn){
-							if(radnaJedinica!=""){
-								for(var j=0;j<majstoriWraps.length;j++){
-									if(majstoriWraps[j].parentElement.dataset.opstina==radnaJedinica){
-										majstoriWraps[j].appendChild(ekipaElem);
-										break;
-									}
-								}
 							}else{
-								document.getElementById("slobodni").appendChild(ekipaElem)
+								if(radnaJedinica!=""){
+									for(var j=0;j<majstoriWraps.length;j++){
+										if(majstoriWraps[j].parentElement.dataset.opstina==radnaJedinica){
+											majstoriWraps[j].appendChild(ekipaElem);
+											break;
+										}
+									}
+								}else{
+									document.getElementById("odsutni").appendChild(ekipaElem)
+								}
 							}
-							
 						}else{
-							if(radnaJedinica!=""){
-								for(var j=0;j<majstoriWraps.length;j++){
-									if(majstoriWraps[j].parentElement.dataset.opstina==radnaJedinica){
-										majstoriWraps[j].appendChild(ekipaElem);
-										break;
-									}
-								}
-							}else{
-								document.getElementById("odsutni").appendChild(ekipaElem)
-							}
+							console.log("Nepostojeci majstor")
 						}
+						
 						
 					}	
 				}
