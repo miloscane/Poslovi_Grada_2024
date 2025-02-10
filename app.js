@@ -1820,6 +1820,52 @@ server.get('/administracija',async (req,res)=>{
 
 	}
 })
+ 
+server.get('/administracija/potrebnaFinalizacija',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			izvestajiDB.find({izvestaj:{$regex:"POTREBNA FINALIZACIJA ILI"}}).toArray()
+			.then((izvestaji)=>{
+				var brojeviNaloga = [];
+				for(var i=0;i<izvestaji.length;i++){
+					brojeviNaloga.push(izvestaji[i].nalog);
+				}
+				console.log(izvestaji.length);
+				console.log(brojeviNaloga)
+				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
+				.then((nalozi)=>{
+					console.log(nalozi)
+					res.render("administracija/potrebnaFinalizacija",{
+						pageTitle:"За Финализацију или копање",
+						nalozi: nalozi,
+						user: req.session.user
+					})
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 1841.</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 1849.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
 
 server.get('/login',async (req,res)=>{
 	if(req.session.user){
