@@ -1232,8 +1232,8 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var dateCutOff = new Date("2024-12-15");
-			var sifre = ["80.01.05.057","80.01.05.058","80.01.05.059","80.01.05.060","80.01.05.061","80.01.05.062","80.01.05.063","80.01.05.064","80.01.05.065"];
+			var dateCutOff = new Date("2025-01-22");
+			var sifre = ["80.02.09.001","80.02.09.002","80.02.09.005","80.02.10.007","80.02.09.022","80.02.09.020","80.02.09.021"];
 			for(var i=0;i<nalozi.length;i++){
 				var odlazak = false;
 				if(Number(nalozi[i].datum.datetime)>dateCutOff.getTime()){
@@ -1830,11 +1830,8 @@ server.get('/administracija/potrebnaFinalizacija',async (req,res)=>{
 				for(var i=0;i<izvestaji.length;i++){
 					brojeviNaloga.push(izvestaji[i].nalog);
 				}
-				console.log(izvestaji.length);
-				console.log(brojeviNaloga)
 				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
 				.then((nalozi)=>{
-					console.log(nalozi)
 					res.render("administracija/potrebnaFinalizacija",{
 						pageTitle:"За Финализацију или копање",
 						nalozi: nalozi,
