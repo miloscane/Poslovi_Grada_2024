@@ -2368,7 +2368,7 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 		if(Number(req.session.user.role)==25){
 			var today = new Date();
 			//"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()}
-			naloziDB.find({statusNaloga:{$nin:["Završeno","Storniran","Spreman za fakturisanje","Fakturisan"]},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray()
+			naloziDB.find({statusNaloga:{$nin:["Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray()
 			.then((nalozi)=>{
 				for(var i=0;i<nalozi.length;i++){
 					if(podizvodjaci.indexOf(nalozi[i].majstor)>=0){
@@ -2377,7 +2377,7 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 					}
 				}
 
-				naloziDB.find({"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray()
+				naloziDB.find({statusNaloga:{$nin:["Storniran","Vraćen"]},"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray()
 				.then((nalozi2)=>{
 					for(var i=0;i<nalozi2.length;i++){
 						if(podizvodjaci.indexOf(nalozi2[i].majstor)>=0){
