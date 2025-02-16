@@ -1035,11 +1035,11 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var month = 12;
+			var month = 1;
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
-						if(nalozi[i].prijemnica.datum.datum.includes("."+month+".2024")){
+						if(nalozi[i].prijemnica.datum.datum.includes("."+month.toString().padStart(2,'0')+".2025")){
 							naloziToExport.push(nalozi[i])
 						}
 					}
@@ -1091,7 +1091,7 @@ http.listen(process.env.PORT, function(){
 			for(var i=0;i<problemNalozi.length;i++){
 				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
 			}
-			fs.writeFileSync("./PG-Premijus-"+month+"-2024.csv",csvString,"utf8");
+			fs.writeFileSync("./PG-Premijus-"+month+"-2025.csv",csvString,"utf8");
 			console.log("Written ")
 		})
 		.catch((error)=>{
@@ -7694,7 +7694,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 										res.setHeader('Content-Type', 'application/json');
 										var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 										res.send(JSON.stringify(primerJson));
-										websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: nalogJson.digitalizacija.stambeno.vreme,radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
+										websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: new Date().getHours().toString().padStart(2,"0")+":"+new Date().getMinutes().toString().padStart(2,"0"),radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
 										request(websiteOptions, (error,response,body)=>{
 											if(error){
 												logError(error)
@@ -7717,7 +7717,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 										res.setHeader('Content-Type', 'application/json');
 										var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 										res.send(JSON.stringify(primerJson));
-										websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: nalogJson.digitalizacija.stambeno.vreme,radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
+										websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: new Date().getHours().toString().padStart(2,"0")+":"+new Date().getMinutes().toString().padStart(2,"0"),radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
 										request(websiteOptions, (error,response,body)=>{
 											if(error){
 												logError(error)
@@ -7740,7 +7740,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 									res.setHeader('Content-Type', 'application/json');
 									var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 									res.send(JSON.stringify(primerJson));
-									websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: nalogJson.digitalizacija.stambeno.vreme,radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
+									websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: new Date().getHours().toString().padStart(2,"0")+":"+new Date().getMinutes().toString().padStart(2,"0"),radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
 										request(websiteOptions, (error,response,body)=>{
 											if(error){
 												logError(error)
@@ -7763,7 +7763,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 								res.setHeader('Content-Type', 'application/json');
 								var primerJson = {"code":"200","message":"Primio sam podatke za nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
 								res.send(JSON.stringify(primerJson));
-								websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: nalogJson.digitalizacija.stambeno.vreme,radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
+								websiteOptions.body = JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: new Date().getHours().toString().padStart(2,"0")+":"+new Date().getMinutes().toString().padStart(2,"0"),radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa});
 								request(websiteOptions, (error,response,body)=>{
 									if(error){
 										logError(error)
