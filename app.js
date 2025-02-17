@@ -2611,7 +2611,7 @@ server.get('/kontrola/opomena/:id',async (req,res)=>{
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
-})
+});
 
 server.post('/opomenaRadnika', async (req, res)=> {
 	if(req.session.user){

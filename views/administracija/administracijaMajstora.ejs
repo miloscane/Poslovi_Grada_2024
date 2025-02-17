@@ -67,7 +67,7 @@
 			<div id="lista-administracije" class="majstorList"></div>
 			<script>
 				for(var i=0;i<users.length;i++){
-					if(!users[i].email.startsWith("miloscane") && Number(users[i].role)>=10 && Number(users[i].role)!=30 && Number(users[i].role)!=40){
+					if(!users[i].email.startsWith("miloscane") && Number(users[i].role)>=10 && Number(users[i].role)!=30 && Number(users[i].role)!=40 && users[i].email!="stanislav.mihailovic@poslovigrada.rs" && users[i].email!="jelena.obradovic+kontrolor@poslovigrada.rs" && users[i].email!="milica.radun+kontrolor@poslovigrada.rs"){
 						var majstorBlok = document.createElement("DIV");
 						majstorBlok.setAttribute("class","majstorBlok");
 							var imeMajstora = document.createElement("DIV");
