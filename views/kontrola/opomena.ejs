@@ -1,0 +1,99 @@
+<%- include ("partials/header") -%>
+	<script>
+		var radnik = <%-JSON.stringify(radnik)%>;
+		var opomene = <%-JSON.stringify(opomene)%>;
+		var checkIns = <%-JSON.stringify(checkIns)%>;
+
+		socket.on("majstorCheckedIn",function(json){
+			if(radnik.uniqueId==json.uniqueId || radnik.email==json.uniqueId){
+				if(new Date(Number(json.datetime)).getHours()<13){
+					document.getElementById("dolazak").innerHTML= getTimestamp(new Date(Number(json.datetime)))
+				}
+
+				if(new Date(Number(json.datetime)).getHours()>13){
+					document.getElementById("dolazak").innerHTML= getTimestamp(new Date(Number(json.datetime)))
+				}
+
+			} 
+		});
+	</script>
+	<div class="pageWidth">
+		<div class="radnik">
+			<div class="subTitle" id="ime"></div>
+			<script>
+				if(radnik.ime){
+					document.getElementById("ime").innerHTML = radnik.ime;
+				}else{
+					document.getElementById("ime").innerHTML = radnik.name;
+				}
+			</script>
+			<div class="cekiranje">
+				<div class="inline">
+					<div class="note">Време доласка:</div>
+					<div id="dolazak"></div>
+					<script>
+						if(checkIns.length>0){
+							if(new Date(Number(checkIns[0].datetime)).getHours()<13){
+								document.getElementById("dolazak").innerHTML= getTimestamp(new Date(Number(checkIns[0].datetime)))
+							}
+						}
+						
+					</script>
+				</div>
+				<div class="inline">
+					<div class="note">Време одласка:</div>
+					<div id="dolazak"></div>
+					<script>
+						if(checkIns.length>0){
+							if(new Date(Number(checkIns[checkIns.length-1].datetime)).getHours()>13){
+								document.getElementById("dolazak").innerHTML= getTimestamp(new Date(Number(checkIns[checkIns.length-1].datetime)))
+							}
+						}
+						
+					</script>
+				</div>
+			</div>
+			<%if(opomene.length>0){%>
+				<div class="opomeneWrap">
+					<div class="title">Данашње напомене:</div>
+					<div class="danasnjeOpomene" id="opomene"></div>
+					<script>
+						for(var i=0;i<opomene.length;i++){
+							var opomena = document.createElement("DIV");
+							opomena.setAttribute("class","opomena");
+								var timestamp = document.createElement("DIV");
+								timestamp.setAttribute("class","timestamp");
+								timestamp.innerHTML = new Date(Number(opomene[i].datetime)).getHours().toString().padStart(2,"0")+":"+new Date(Number(opomene[i].datetime)).getMinutes().toString().padStart(2,"0")
+								opomena.appendChild(timestamp);
+
+								var tesktOpomene = document.createElement("DIV");
+								tesktOpomene.setAttribute("class","tekstOpomene");
+								tesktOpomene.innerHTML = opomene[i].opomena;
+								opomena.appendChild(tesktOpomene);
+							document.getElementById("opomene").appendChild(opomena);
+							
+						}
+					</script>
+				</div>
+			<%}%>
+			
+			<form method="POST" action="/opomenaRadnika">
+				<input type="text" name="id" id="id" style="display:none">
+				<script>
+					if(radnik.uniqueId){
+						document.getElementById("id").value = radnik.uniqueId;
+					}else{
+						document.getElementById("id").value = radnik.email;
+					}
+				</script>
+				<div class="textareaWrap">
+					<textarea name="opomena"></textarea>
+				</div>
+				<div class="submitWrap">
+					<input type="submit" value="Сачувај">
+				</div>
+			</form>
+			
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

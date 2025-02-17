@@ -3,23 +3,13 @@
 			var majstor = <%- JSON.stringify(majstor)%>;
 			console.log(majstor);
 			var checkIns = <%- JSON.stringify(checkIns)%>;
-			console.log(checkIns)
-			var ucinci = <%- JSON.stringify(ucinci)%>;
-			console.log(ucinci)
-			var dodele = <%- JSON.stringify(dodele)%>;
-			console.log(dodele)
+			console.log(checkIns);
+			var opomene = <%- JSON.stringify(opomene)%>;
+			console.log(opomene);
 		</script>
 		<div class="blueWrap">
 			<div class="pageWidth ucinakPage">
 				<div class="ucinakStats">
-					<div class="inlines">
-						<div class="inline">Укупно налога:</div>
-						<div class="inline" id="ukupno-naloga"></div>
-					</div>
-					<div class="inlines">
-						<div class="inline">Укупан учинак:</div>
-						<div class="inline" id="ukupan-ucinak"></div>
-					</div>
 					<div class="inlines">
 						<div class="inline">Радних дана:</div>
 						<div class="inline" id="ukupno-dana"></div>
@@ -126,25 +116,14 @@
 						inlines.setAttribute("class","inlines");
 							var inline = document.createElement("DIV");
 							inline.setAttribute("class","inline");
-							inline.innerHTML = "Налози:";
+							inline.innerHTML = "Напомене:";
 							inlines.appendChild(inline);
 
 							var inline = document.createElement("DIV");
-							inline.setAttribute("class","inline nalozi");
+							inline.setAttribute("class","inline napomene");
 							inlines.appendChild(inline);
 						calendarValue.appendChild(inlines);
 						
-						var inlines = document.createElement("DIV");
-						inlines.setAttribute("class","inlines");
-							var inline = document.createElement("DIV");
-							inline.setAttribute("class","inline");
-							inline.innerHTML = "Учинак:";
-							inlines.appendChild(inline);
-
-							var inline = document.createElement("DIV");
-							inline.setAttribute("class","inline ucinak");
-							inlines.appendChild(inline);
-						calendarValue.appendChild(inlines);
 					calendarElement.appendChild(calendarValue);
 				if(i==1){
 					document.getElementById("calendar-table").querySelectorAll("TR")[1].querySelectorAll("TD")[weekDay-1].getElementsByClassName("value")[0].appendChild(calendarElement);
@@ -201,35 +180,8 @@
 				if(dolazak || odlazak){
    					brojRadnihDana++;
 				}
-
-				var ukupnoDodela = [];
-				for(var j=0;j<dodele.length;j++){
-					if(dodele[j].datum.datum.startsWith(String(Number(calendarElement.dataset.date)).padStart(2,"0"))){
-						ukupnoDodela.push(dodele[j]);
-						if(sviNalozi.indexOf(dodele[j].nalog)){
-							sviNalozi.push(dodele[j].nalog);
-						}
-
-					}	
-				}
-				elem.getElementsByClassName("nalozi")[0].innerHTML = ukupnoDodela.length;
-				
-				var ucinak = 0;
-				for(var j=0;j<ucinci.length;j++){
-					if(ucinci[j].datum.includes(month+"-"+String(Number(calendarElement.dataset.date)).padStart(2,"0"))){
-						ucinak = ucinak + parseFloat(ucinci[j].ukupanIznos);
-					}	
-				}
-				elem.getElementsByClassName("ucinak")[0].innerHTML = brojSaRazmacima(ucinak);
-				elem.getElementsByClassName("ucinak")[0].dataset.ucinak = ucinak;
 			}
 
-			document.getElementById("ukupno-naloga").innerHTML = sviNalozi.length;
-			var mesecniUcinak = 0;
-			for(var i=0;i<ucinci.length;i++){
-				mesecniUcinak = mesecniUcinak + parseFloat(ucinci[i].ukupanIznos)
-			}
-			document.getElementById("ukupan-ucinak").innerHTML = brojSaRazmacima(mesecniUcinak);
 			document.getElementById("ukupno-dana").innerHTML = brojRadnihDana;
 			var totalMinutes =  Math.floor(brojSati / 60000);
 			var hours = Math.floor(totalMinutes / 60);

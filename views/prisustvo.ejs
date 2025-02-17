@@ -1,10 +1,9 @@
 <%- include ("partials/header") -%>
-	<script src="/js/socket.js"></script>
 	<script>
-		var socket  = io({});
 		var majstori = <%-JSON.stringify(majstori)%>;
 		var pomocnici = <%-JSON.stringify(pomocnici)%>;
 		var checkIns = <%-JSON.stringify(checkIns)%>;
+		var users = <%-JSON.stringify(users)%>;
 		function getPomocnikByCard(card){
 		  var pomocnik = {};
 		  if(pomocnici){
@@ -12,7 +11,6 @@
 		      if(pomocnici[i].brojKartice.toString()==card.toString()){
 		        pomocnik = pomocnici[i];
 		        break;
-		        //console.log("AAAAA")
 		      }
 		    }
 		    if(!pomocnik.ime){
@@ -77,9 +75,26 @@
 				}
 			</script>
 		</div>
+		<div class="items">
+			<div class="title">Администрација</div>
+			<div id="administracija"></div>
+			<script>
+				for(var i=0;i<users.length;i++){
+					if(!users[i].email.startsWith("miloscane") && Number(users[i].role)>=10 && Number(users[i].role)!=30 && Number(users[i].role)!=40){
+						var item = document.createElement("DIV");
+						item.setAttribute("class","item");
+						item.setAttribute("data-id",users[i].uniqueId);
+						item.innerHTML = "<div class=\"ime\">"+users[i].ime+"</div><div class=\"timestamp\"><span class=\"arrival\"></span> - <span class=\"departure\"></span></div><div class=\"totalHours\"></div>";;
+						document.getElementById("administracija").appendChild(item);
+					}
+					
+				}
+			</script>
+		</div>
 		<script>
 			var majstoriElems = document.getElementById("majstori").getElementsByClassName("item");
 			var pomocniciElems = document.getElementById("pomocnici").getElementsByClassName("item");
+			var administracijaElems = document.getElementById("administracija").getElementsByClassName("item");
 			
 			function handleCheckIns(){
 				for(var j=0;j<majstoriElems.length;j++){
@@ -87,6 +102,9 @@
 				}
 				for(var j=0;j<pomocniciElems.length;j++){
 					pomocniciElems[j].classList.remove("itemActive");
+				}
+				for(var j=0;j<administracijaElems.length;j++){
+					administracijaElems[j].classList.remove("itemActive");
 				}
 
 				for(var i=0;i<checkIns.length;i++){
@@ -120,6 +138,24 @@
 								pomocniciElems[j].getElementsByClassName("arrival")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
 							}else{
 								pomocniciElems[j].getElementsByClassName("departure")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
+							}
+							/*var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
+							var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
+							pomocniciElems[j].getElementsByClassName("timestamp")[0].innerHTML = hours+":"+minutes;*/
+							break;	
+						}
+					}
+					for(var j=0;j<administracijaElems.length;j++){
+						if(checkIns[i].uniqueId==administracijaElems[j].dataset.id){
+							if(!administracijaElems[j].classList.contains("itemActive")){
+								administracijaElems[j].classList.add("itemActive");
+							}
+								
+							var checkTime = new Date(checkIns[i].datetime);
+							if(Number(checkTime.getHours())<13){
+								administracijaElems[j].getElementsByClassName("arrival")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
+							}else{
+								administracijaElems[j].getElementsByClassName("departure")[0].innerHTML = String(checkTime.getHours()).padStart(2,"0") + ":"+	String(checkTime.getMinutes()).padStart(2,"0");
 							}
 							/*var hours = new Date(checkIns[i].datetime).getHours().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getHours() : new Date(checkIns[i].datetime).getHours();
 							var minutes = new Date(checkIns[i].datetime).getMinutes().toString().length==1 ? "0"+new Date(checkIns[i].datetime).getMinutes() : new Date(checkIns[i].datetime).getMinutes();
@@ -163,6 +199,25 @@
 						var hours = Math.floor(totalMinutes / 60);
 	   					var minutes = totalMinutes % 60;
 	   					pomocniciElems[i].getElementsByClassName("totalHours")[0].innerHTML = "Сатница: "+String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0')
+					}
+					
+				}
+
+				for(var i=0;i<adminsitracijaElems.length;i++){
+					if(adminsitracijaElems[i].getElementsByClassName("arrival")[0].innerHTML!="" && adminsitracijaElems[i].getElementsByClassName("departure")[0].innerHTML!=""){
+						var checkInTime = new Date();
+						checkInTime.setHours(adminsitracijaElems[i].getElementsByClassName("arrival")[0].innerHTML.split(":")[0]);
+						checkInTime.setMinutes(adminsitracijaElems[i].getElementsByClassName("arrival")[0].innerHTML.split(":")[1]);
+						var checkOutTime = new Date();
+						checkOutTime.setHours(adminsitracijaElems[i].getElementsByClassName("departure")[0].innerHTML.split(":")[0]);
+						checkOutTime.setMinutes(adminsitracijaElems[i].getElementsByClassName("departure")[0].innerHTML.split(":")[1]);
+
+
+						var totalMiliseconds = checkOutTime.getTime() - checkInTime.getTime();
+						var totalMinutes =  Math.floor(totalMiliseconds / 60000);
+						var hours = Math.floor(totalMinutes / 60);
+	   					var minutes = totalMinutes % 60;
+	   					adminsitracijaElems[i].getElementsByClassName("totalHours")[0].innerHTML = "Сатница: "+String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0')
 					}
 					
 				}

@@ -3,12 +3,17 @@
 			<div class="pageWidth">
 				<script>
 					var majstori = <%- JSON.stringify(majstori)%>;
+					majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 					var pomocnici = <%- JSON.stringify(pomocnici)%>;
+					pomocnici.sort((a, b) => a.ime.localeCompare(b.ime));
+					var users = <%- JSON.stringify(users)%>;
+					users.sort((a, b) => a.ime.localeCompare(b.ime));
 				</script>
 				<h2>Мајстор/Помоћник:</h2>
 				<select id="majstor">
 					<optgroup label="Мајстори" id="majstori"></optgroup>
 					<optgroup label="Помоћници" id="pomocnici"></optgroup>
+					<optgroup label="Админстрација" id="kancelarija"></optgroup>
 				</select>
 				<script>
 					for(var i=0;i<majstori.length;i++){
@@ -23,6 +28,16 @@
 						option.setAttribute("value",pomocnici[i].uniqueId);
 						option.innerHTML = pomocnici[i].ime;
 						document.getElementById("pomocnici").appendChild(option)
+					}
+
+					for(var i=0;i<users.length;i++){
+						if(!users[i].email.startsWith("miloscane") && Number(users[i].role)>=10 && Number(users[i].role)!=30 && Number(users[i].role)!=40){
+							var option = document.createElement("OPTION");
+							option.setAttribute("value",users[i].uniqueId);
+							option.innerHTML = users[i].ime;
+							document.getElementById("kancelarija").appendChild(option)
+						}
+						
 					}
 				</script>
 

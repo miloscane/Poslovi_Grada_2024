@@ -1,0 +1,78 @@
+<%- include ("partials/header") -%>
+	<script>
+		var radnici = <%-JSON.stringify(radnici)%>;
+		var checkIns = <%-JSON.stringify(checkIns)%>;
+		for(var i=0;i<radnici.length;i++){
+			if(radnici[i].name){
+				radnici[i].ime = radnici[i].name;
+			}
+			if(!radnici[i].uniqueId){
+				radnici[i].uniqueId = radnici[i].email;
+			}
+		}
+		radnici.sort((a, b) => a.ime.localeCompare(b.ime));
+	</script>
+	<div class="pageWidth">
+		<div class="mojiRadnici">
+			<div id="radnici"></div>
+			<script>
+				for(var i=0;i<radnici.length;i++){
+					var row = document.createElement("DIV");
+					row.setAttribute("class","row");
+						var ime = document.createElement("DIV");
+						ime.setAttribute("class","ime");
+						if(radnici[i].email){
+							ime.setAttribute("data-id",radnici[i].email)
+						}else{
+							ime.setAttribute("data-id",radnici[i].uniqueId)	
+						}
+						
+						ime.innerHTML = radnici[i].ime;
+						for(var j=0;j<checkIns.length;j++){
+							if(checkIns[j].uniqueId==radnici[i].uniqueId){
+								ime.setAttribute("style","color:rgb(20,200,20)");
+							}
+							if(radnici[i].email){
+								if(checkIns[j].uniqueId==radnici[i].email){
+									ime.setAttribute("style","color:rgb(20,200,20)");
+								}
+							}
+						}
+						row.appendChild(ime);
+
+						var pozovi = document.createElement("DIV");
+						pozovi.setAttribute("class","call");
+						var brojTelefona = radnici[i].sluzbeniBroj.replace(/[\s\\/\\-]/g, '');
+						pozovi.innerHTML = "<a href=\"tel:"+brojTelefona+"\">Службени</a>";
+						if(brojTelefona!=""){
+							row.appendChild(pozovi);	
+						}
+						
+
+						var pozovi = document.createElement("DIV");
+						pozovi.setAttribute("class","call");
+						var brojTelefona = radnici[i].privatniBroj.replace(/[\s\\/\\-]/g, '');
+						pozovi.innerHTML = "<a href=\"tel:"+brojTelefona+"\">Приватни</a>";
+						if(brojTelefona!=""){
+							row.appendChild(pozovi);	
+						}
+
+						var opomena = document.createElement("DIV");
+						opomena.setAttribute("class","call");
+						opomena.innerHTML = "<a href=\"/kontrola/opomena/"+radnici[i].uniqueId+"\">Напомена</a>";
+						row.appendChild(opomena);
+					document.getElementById("radnici").appendChild(row);
+				}
+
+				socket.on("majstorCheckedIn",function(json){
+					var names = document.getElementsByClassName("ime")
+					for(var i=0;i<names.length;i++){
+						if(names[i].dataset.id==json.uniqueId){
+							names[i].style.color = "rgb(20,200,20)";
+						}
+					}
+				})
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

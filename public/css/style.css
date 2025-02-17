@@ -5486,6 +5486,95 @@ input[type=number] {
     width:50px;
 }
 
+.mojiRadnici .row{
+    padding:10px 0;
+}
+
+.mojiRadnici .row:nth-child(even){
+    background-color: rgb(240,240,240);
+}
+
+.mojiRadnici .row .ime{
+    margin-bottom:5px;
+    font-size:18px;
+    font-weight:600;
+    color:rgb(200,0,0);
+}
+
+.mojiRadnici .row .call{
+    display: inline-block;
+    vertical-align: top;
+    border-radius:3px;
+    overflow: hidden;
+    margin-top:5px;
+}
+
+.mojiRadnici .row .call a{
+    display:block;
+    background-color:rgb(31,52,100);
+    color:rgb(255,255,255);
+    font-weight:500;
+    padding:5px;
+    margin-right:10px;
+    text-decoration: none;
+}
+
+.cekiranje{
+    font-size:0;
+}
+
+.cekiranje .inline{
+    display:inline-block;
+    vertical-align: top;
+    width:50%;
+    font-size:14px;
+    font-weight:600;
+}
+
+.cekiranje .inline .note{
+    font-style:italic;
+    font-weight:200;
+}
+
+.radnik .textareaWrap{
+    margin-top:20px;
+}
+
+.radnik textarea{
+    width:100%;
+    height:200px;
+}
+
+.radnik input[type="submit"]{
+    width:100%;
+    padding:10px;
+    font-size:16px;
+    font-weight:400;
+    color:rgb(255,255,255);
+    background-color:rgb(31,52,100);
+}
+
+.radnik .opomeneWrap .title{
+    font-size:12px;
+    font-weight:600;
+    margin:10px 0;
+}
+
+.radnik .opomeneWrap .danasnjeOpomene{
+    padding-left:10px;
+}
+
+.radnik .opomeneWrap .danasnjeOpomene .opomena{
+    padding-bottom:5px;
+    margin-bottom:5px;
+    border-bottom:1px solid rgb(200,200,200);
+    font-size:12px;
+}
+
+.radnik .opomeneWrap .danasnjeOpomene .opomena .timestamp{
+    font-size:12px;
+    font-weight:200;
+}
 
 @media screen and (max-width: 1100px) {
     .pageWidth{

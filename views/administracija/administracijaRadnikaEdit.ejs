@@ -1,7 +1,7 @@
 <%- include ("partials/header") -%>
 <script>
 	var radnik = <%-JSON.stringify(radnik)%>;
-	console.log(radnik)
+	var nadzori = <%-JSON.stringify(nadzori)%>;
 </script>
 <div class="administracijaMajstoraEdit">
 	<div class="pageWidth">
@@ -59,6 +59,20 @@
 						<input type="text" id="adresa-stanovanja">
 					</div>
 				</div>
+				<div class="singleLineInput">
+					<div class="name">Одговорно лице</div>
+					<div class="inputWrapper">
+						<select id="odgovorno-lice"></select>
+						<script>
+							for(var i=0;i<nadzori.length;i++){
+								var option = document.createElement("OPTION");
+								option.setAttribute("value",nadzori[i].email);
+								option.innerHTML = nadzori[i].name;
+								document.getElementById("odgovorno-lice").appendChild(option)
+							}
+						</script>
+					</div>
+				</div>
 				<div class="inputWrap" style="margin-top:15px;width:300px">
 					<div class="button" onclick="saveIzmene()">Сачувај измене</div>
 				</div>
@@ -93,6 +107,11 @@
 			if(radnik.adresaStanovanja){
 				document.getElementById("adresa-stanovanja").value = radnik.adresaStanovanja;
 			}
+
+
+			if(radnik.odgovornoLice){
+				document.getElementById("odgovorno-lice").value = radnik.odgovornoLice;
+			}
 			
 			function saveIzmene(){
 				var izmenaJson = {};
@@ -103,6 +122,7 @@
 				izmenaJson.jmbg = document.getElementById("jmbg").value;
 				izmenaJson.brojLicneKarte = document.getElementById("broj-licne-karte").value;
 				izmenaJson.adresaStanovanja = document.getElementById("adresa-stanovanja").value;
+				izmenaJson.odgovornoLice = document.getElementById("odgovorno-lice").value;
 				document.getElementById("json").value = JSON.stringify(izmenaJson);
 				loadGif();
 				document.getElementById("form").submit();
