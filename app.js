@@ -4235,6 +4235,7 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 			json.datum.datetime = currentDate.getTime();
 			json.datum.datum = getDateAsStringForDisplay(currentDate);
 			json.datum.timestamp = timeStamp;
+			json.datumRadova = json.datumRadova;
 			json.uniqueId = generateId(5)+"--"+currentDate.getTime();
 			majstoriDB.find({uniqueId:json.majstor}).toArray()
 			.then((majstori)=>{
@@ -4246,17 +4247,9 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 							}};
 						naloziDB.updateOne({broj:json.nalog},setObj)
 						.then((dbResponse) => {
-							var statusString = ""
-							if(json.status=="Odlazak"){
-								statusString = "послали";
-							}else if(json.status=="Dolazak"){
-								statusString = "регистровали долазак";
-							}else if(json.status=="Zavrseno"){
-								statusString = "регистровали завршетак радова";
-							}
 							res.render("message",{
 								pageTitle: "Мајстор послат на налог",
-								message: "<div class=\"text\">Успешно сте "+statusString+" <b>"+majstori[0].ime+"</b> на налог број "+json.nalog+" - <b>"+json.adresa+"</b>, "+json.radnaJedinica+".<br>&nbsp;<br><b>Vreme:</b> "+json.datum.timestamp+"</div><br><a href=\"/nalog/"+json.nalog+"\">Повратак на налог</a></div>",
+								message: "<div class=\"text\">Успешно сте заказали <b>"+majstori[0].ime+"</b> на налог број "+json.nalog+" - <b>"+json.adresa+"</b>, "+json.radnaJedinica+".<br>&nbsp;<b>Датум</b>"+json.datumRadova+"<br><b>Време:</b> "+json.vremeRadova+"</div><br><a href=\"/nalog/"+json.nalog+"\">Повратак на налог</a></div>",
 								user: req.session.user
 							});
 						})
@@ -4359,19 +4352,11 @@ server.post('/editMajstorNaNalogu',async (req,res)=>{
 				var json = JSON.parse(req.body.json);
 				//if(dodele[0].user.email == req.session.user.email){
 					var zavrsetak = {};
-					if(json.status == "Zavrseno"){
-						var currentDate = new Date(new Date().getTime()+2*3.6e+6);
-						var currentHour = currentDate.getHours().toString().length==1 ? "0"+currentDate.getHours() : currentDate.getHours();
-						var currentMinute = currentDate.getMinutes().toString().length==1 ? "0"+currentDate.getMinutes() : currentDate.getMinutes();
-						var timeStamp =  currentHour +":"+currentMinute;
-						zavrsetak.datum = getDateAsStringForDisplay(currentDate);
-						zavrsetak.datetime = currentDate.getTime();
-						zavrsetak.timestamp = timeStamp;
-					}
+					
 					var setObj	=	{ $set: {
 								vremeDolaska: json.vremeDolaska,
 								vremeRadova: json.vremeRadova,
-								status: json.status,
+								datumRadova: json.datumRadova,
 								zavrsetak: zavrsetak
 							}};
 					dodeljivaniNaloziDB.updateOne({uniqueId:json.uniqueId},setObj)

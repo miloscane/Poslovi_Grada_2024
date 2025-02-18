@@ -11,7 +11,7 @@
 				}
 
 				if(new Date(Number(json.datetime)).getHours()>13){
-					document.getElementById("dolazak").innerHTML= getTimestamp(new Date(Number(json.datetime)))
+					document.getElementById("odlazak").innerHTML= getTimestamp(new Date(Number(json.datetime)))
 				}
 
 			} 
@@ -46,7 +46,7 @@
 					<script>
 						if(checkIns.length>0){
 							if(new Date(Number(checkIns[checkIns.length-1].datetime)).getHours()>13){
-								document.getElementById("dolazak").innerHTML= getTimestamp(new Date(Number(checkIns[checkIns.length-1].datetime)))
+								document.getElementById("odlazak").innerHTML= getTimestamp(new Date(Number(checkIns[checkIns.length-1].datetime)))
 							}
 						}
 						

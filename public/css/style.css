@@ -4476,7 +4476,7 @@ input[type=number] {
 .novaDodela .inline{
     display:inline-block;
     vertical-align: top;
-    font-size:16px;
+    font-size:14px;
 }
 
 .novaDodela .inline .note{
@@ -4484,11 +4484,16 @@ input[type=number] {
 }
 
 .novaDodela .inline:nth-child(2){
-    width:90px;
+    width:70px;
 }
 
 .novaDodela .inline:nth-child(3){
-    width:90px;
+    width:70px;
+}
+
+.novaDodela .inline input[type="date"]{
+    font-size:14px;
+    line-height: 14px;
 }
 
 .stareDodele .dodela{
@@ -4498,7 +4503,11 @@ input[type=number] {
 .stareDodele .inline{
     display:inline-block;
     vertical-align: top;
-    font-size:16px;
+    font-size:14px;
+}
+
+.stareDodele .inline:last-child{
+    vertical-align: middle;
 }
 
 .stareDodele .inline .note{
@@ -4506,11 +4515,16 @@ input[type=number] {
 }
 
 .stareDodele .inline:nth-child(2){
-    width:90px;
+    width:70px;
 }
 
 .stareDodele .inline:nth-child(3){
-    width:90px;
+    width:70px;
+}
+
+.stareDodele .inline input[type="date"]{
+    font-size:14px;
+    line-height: 14px;
 }
 
 .stareDodele .majstor{

@@ -371,6 +371,11 @@
 
 													var inline = document.createElement("DIV");
 													inline.setAttribute("class","inline");
+														var note = document.createElement("DIV");
+														note.setAttribute("class","note");
+														note.innerHTML = "Време доласка";
+														inline.appendChild(note);
+
 														var vremeDolaska = document.createElement("SELECT");
 														vremeDolaska.setAttribute("class","staroVremeDolaska");
 														for(var j=0;j<vremena.length;j++){
@@ -387,6 +392,11 @@
 
 													var inline = document.createElement("DIV");
 													inline.setAttribute("class","inline");
+														var note = document.createElement("DIV");
+														note.setAttribute("class","note");
+														note.innerHTML = "Време радова";
+														inline.appendChild(note);
+														
 														var vremeRadova = document.createElement("SELECT");
 														vremeRadova.setAttribute("class","staroVremeRadova");
 														for(var j=0;j<vremenaRadova.length;j++){
@@ -403,18 +413,16 @@
 
 													var inline = document.createElement("DIV");
 													inline.setAttribute("class","inline");
-														var statusDodele = document.createElement("SELECT");
-														statusDodele.setAttribute("class","stariStatus");
-														for(var j=0;j<statusi.length;j++){
-															var option = document.createElement("OPTION");
-															option.setAttribute("value",statusi[j].value);
-															option.innerHTML = statusi[j].naziv;
-															if(statusi[j].value==dodele[i].status){
-																option.setAttribute("selected","selected");
-															}
-															statusDodele.appendChild(option);
-														}
-														inline.appendChild(statusDodele);  
+														var note = document.createElement("DIV");
+														note.setAttribute("class","note");
+														note.innerHTML = "Датум радова";
+														inline.appendChild(note);
+														
+														var datumDodele = document.createElement("INPUT");
+														datumDodele.setAttribute("type","date");
+														datumDodele.setAttribute("class","stariDatum");
+														datumDodele.setAttribute("value",dodele[i].datumRadova);
+														inline.appendChild(datumDodele);  
 													dodela.appendChild(inline);	
 
 
@@ -456,6 +464,11 @@
 												inline.setAttribute("class","inline");
 													var vremeDolaska = document.createElement("SELECT");
 													vremeDolaska.setAttribute("class","staroVremeDolaska");
+													var note = document.createElement("DIV");
+													note.setAttribute("class","note");
+													note.innerHTML = "Време доласка";
+													inline.appendChild(note);
+													
 													for(var j=0;j<vremena.length;j++){
 														var option = document.createElement("OPTION");
 														option.setAttribute("value",vremena[j]);
@@ -470,6 +483,11 @@
 
 												var inline = document.createElement("DIV");
 												inline.setAttribute("class","inline");
+													var note = document.createElement("DIV");
+													note.setAttribute("class","note");
+													note.innerHTML = "Време радова";
+													inline.appendChild(note);
+														
 													var vremeRadova = document.createElement("SELECT");
 													vremeRadova.setAttribute("class","staroVremeRadova");
 													for(var j=0;j<vremenaRadova.length;j++){
@@ -486,18 +504,16 @@
 
 												var inline = document.createElement("DIV");
 												inline.setAttribute("class","inline");
-													var statusDodele = document.createElement("SELECT");
-													statusDodele.setAttribute("class","stariStatus");
-													for(var j=0;j<statusi.length;j++){
-														var option = document.createElement("OPTION");
-														option.setAttribute("value",statusi[j].value);
-														option.innerHTML = statusi[j].naziv;
-														if(statusi[j].value==dodele[i].status){
-															option.setAttribute("selected","selected");
-														}
-														statusDodele.appendChild(option);
-													}
-													inline.appendChild(statusDodele);  
+													var note = document.createElement("DIV");
+													note.setAttribute("class","note");
+													note.innerHTML = "Датум<br>радова";
+													inline.appendChild(note);
+														
+													var datumDodele = document.createElement("INPUT");
+													datumDodele.setAttribute("type","date");
+													datumDodele.setAttribute("class","stariDatum");
+													datumDodele.setAttribute("value",dodele[i].datumRadova);
+													inline.appendChild(datumDodele);  
 												dodela.appendChild(inline);	
 
 
@@ -534,7 +550,7 @@
 									var parent = elem.parentElement.parentElement;
 									var json = {};
 									json.uniqueId = parent.dataset.id;
-									json.status = parent.getElementsByClassName("stariStatus")[0].value;
+									json.datumRadova = parent.getElementsByClassName("stariDatum")[0].value;
 									json.vremeDolaska = parent.getElementsByClassName("staroVremeDolaska")[0].value;
 									json.vremeRadova = parent.getElementsByClassName("staroVremeRadova")[0].value;
 									json.brojNaloga = nalog.broj;
@@ -551,7 +567,7 @@
 							</form>
 							<div class="text novaDodela">
 								<div class="inline">
-									<div class="note">&nbsp;</div>
+									<div class="note">&nbsp;<br>&nbsp;</div>
 									<select id="novo-majstori-dodela"></select>
 									<script>
 										for(var i=0;i<majstori.length;i++){
@@ -598,20 +614,15 @@
 									</script>
 								</div>
 								<div class="inline">
-									<div class="note">Статус</div>
-									<select id="novi-status-dodele"></select>
+									<div class="note">Датум<br>радова</div>
+									<input type="date" value="" id="danasnji-datum-dodele">
 									<script>
-										for(var i=0;i<statusi.length;i++){
-											var option = document.createElement("OPTION");
-											option.setAttribute("value",statusi[i].value);
-											option.innerHTML = statusi[i].naziv;
-											document.getElementById("novi-status-dodele").appendChild(option);
-										}
+										document.getElementById("danasnji-datum-dodele").value = getDateAsStringForInputObject(new Date());
 									</script>
 								</div>
 							</div>
 							<div class="majstorNaNalogu" onclick="majstorNaNalogu()">
-								Пошаљи мајстора на налог
+								Закажи налог
 							</div>
 							<form style="display:none" method="POST" action="/majstorNaNalogu" id="majstor-na-nalogu-form">
 								<input type="text" id="majstor-na-nalogu-input" name="json">
@@ -624,7 +635,7 @@
 									submitJson.majstor = document.getElementById("novo-majstori-dodela").value;
 									submitJson.vremeDolaska = document.getElementById("novo-vreme-dolaska").value;
 									submitJson.vremeRadova = document.getElementById("novo-vreme-radova").value;
-									submitJson.status = document.getElementById("novi-status-dodele").value;
+									submitJson.datumRadova = document.getElementById("danasnji-datum-dodele").value;
 									submitJson.adresa = nalog.adresa;
 									submitJson.radnaJedinica = nalog.radnaJedinica;
 									submitJson.punaAdresa = nalog.punaAdresa;
@@ -640,53 +651,6 @@
 									}
 								}
 							</script>
-							<!--<div class="title">Категорије радова</div>
-							<div class="text">
-								<div class="inline50s">
-									<div class="inline50">
-										<div class="checkboxWrapper">
-											<div class="checkboxWrap"><input value="Zamena" type="checkbox" class="kategorijeRadova"></div>
-											<div class="label" onclick="checkboxLabelClick(this)">Замена</div>
-										</div>
-										<div class="checkboxWrapper">
-											<div class="checkboxWrap"><input value="Sajla" type="checkbox" class="kategorijeRadova"></div>
-											<div class="label" onclick="checkboxLabelClick(this)">Сајла</div>
-										</div>
-										<div class="checkboxWrapper">
-											<div class="checkboxWrap"><input value="Woma" type="checkbox" class="kategorijeRadova"></div>
-											<div class="label" onclick="checkboxLabelClick(this)">Вома</div>
-										</div>
-										<div class="checkboxWrapper">
-											<div class="checkboxWrap"><input value="Crpljenje" type="checkbox" class="kategorijeRadova"></div>
-											<div class="label" onclick="checkboxLabelClick(this)">Црпљење</div>
-										</div>
-									</div>
-									<div class="inline50">
-										<div class="checkboxWrapper">
-											<div class="checkboxWrap"><input value="Кopanje" type="checkbox" class="kategorijeRadova"></div>
-											<div class="label" onclick="checkboxLabelClick(this)">Копање</div>
-										</div>
-										<div class="checkboxWrapper">
-											<div class="checkboxWrap"><input value="Rov" type="checkbox" class="kategorijeRadova"></div>
-											<div class="label" onclick="checkboxLabelClick(this)">Ров</div>
-										</div>
-										<div class="checkboxWrapper">
-											<div class="checkboxWrap"><input value="Betoniranje" type="checkbox" class="kategorijeRadova"></div>
-											<div class="label" onclick="checkboxLabelClick(this)">Бетонирање</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="note">Обележити СВЕ категорије радова које су извршене на налогу.</div>
-							<script>
-								function checkboxLabelClick(elem){
-									if(elem.parentElement.getElementsByTagName("INPUT")[0].checked){
-										elem.parentElement.getElementsByTagName("INPUT")[0].checked = false;
-									}else{
-										elem.parentElement.getElementsByTagName("INPUT")[0].checked = true;
-									}
-								}
-							</script>-->
 						</div>
 					</div>
 				</div>
