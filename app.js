@@ -821,6 +821,32 @@ http.listen(process.env.PORT, function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
+		/*stariCenovnikDB.find({}).toArray()
+		.then((stariCenovnik)=>{
+			var csvString = "Stavka;Cena\r\n";
+			for(var i=0;i<stariCenovnik.length;i++){
+				csvString += stariCenovnik[i].name +";"+stariCenovnik[i].price+"\r\n"
+			}
+			fs.writeFileSync("./stariCenovnik.csv",csvString,{encoding:"utf8"});
+			console.log("Wrote file");
+		})
+		.catch((error)=>{
+			console.log(error)
+		})
+
+		pricesDB.find({}).toArray()
+		.then((stariCenovnik)=>{
+			var csvString = "Stavka;Cena\r\n";
+			for(var i=0;i<stariCenovnik.length;i++){
+				csvString += stariCenovnik[i].name +";"+stariCenovnik[i].price+"\r\n"
+			}
+			fs.writeFileSync("./cenovnik.csv",csvString,{encoding:"utf8"});
+			console.log("Wrote file");
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
 
 		navigacijaInfoDB.find({}).toArray()
 		.then((info)=>{
