@@ -1,11 +1,8 @@
 <%- include ("partials/header") -%>
 		<script>
 			var majstor = <%- JSON.stringify(majstor)%>;
-			console.log(majstor);
 			var checkIns = <%- JSON.stringify(checkIns)%>;
-			console.log(checkIns);
-			var opomene = <%- JSON.stringify(opomene)%>;
-			console.log(opomene);
+			var napomene = <%- JSON.stringify(opomene)%>;
 		</script>
 		<div class="blueWrap">
 			<div class="pageWidth ucinakPage">
@@ -180,13 +177,24 @@
 				if(dolazak || odlazak){
    					brojRadnihDana++;
 				}
+				for(var j=0;j<napomene.length;j++){
+					if(napomene[j].date==String(Number(calendarElement.dataset.date)).padStart(2,"0")){
+						var napomena = document.createElement("DIV");
+						napomena.setAttribute("class","napomenaElem");
+							var tooltip = document.createElement("DIV");
+							tooltip.setAttribute("class","tooltip");
+							tooltip.innerHTML = napomene[j].opomena;
+							napomena.appendChild(tooltip);
+						calendarElement.getElementsByClassName("napomene")[0].appendChild(napomena)
+					}
+				}
 			}
 
-			document.getElementById("ukupno-dana").innerHTML = brojRadnihDana;
+			document.getElementById("ukupno-dana").innerHTML = brojRadnihDana +" / "+countWorkdays(Number(year), Number(month), []);
 			var totalMinutes =  Math.floor(brojSati / 60000);
 			var hours = Math.floor(totalMinutes / 60);
 				var minutes = totalMinutes % 60;
-			document.getElementById("ukupno-sati").innerHTML = hours+":"+minutes;
+			document.getElementById("ukupno-sati").innerHTML = hours.toString().padStart(2,"0")+":"+minutes.toString().padStart(2,"0");
 
 		</script>
 	</div><!--page wrap-->

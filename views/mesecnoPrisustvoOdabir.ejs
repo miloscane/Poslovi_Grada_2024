@@ -31,7 +31,7 @@
 					}
 
 					for(var i=0;i<users.length;i++){
-						if(!users[i].email.startsWith("miloscane") && Number(users[i].role)>=10 && Number(users[i].role)!=30 && Number(users[i].role)!=40){
+						if(!users[i].email.startsWith("miloscane") && Number(users[i].role)>=10 && Number(users[i].role)!=30 && Number(users[i].role)!=40 && users[i].email!="stanislav.mihailovic@poslovigrada.rs" && users[i].email!="jelena.obradovic+kontrolor@poslovigrada.rs" && users[i].email!="milica.radun+kontrolor@poslovigrada.rs"){
 							var option = document.createElement("OPTION");
 							option.setAttribute("value",users[i].uniqueId);
 							option.innerHTML = users[i].ime;
@@ -43,11 +43,10 @@
 
 				<h2>Месец:</h2>
 				<select id="mesec">
-					<option value="11.2024">Новембар 2024</option>
-					<option value="12.2024">Децембар 2024</option>
-					<option value="01.2025">Јануар 2025</option>
 					<option value="02.2025">Фебруар 2025</option>
 					<option value="03.2025">Март 2025</option>
+					<option value="04.2025">Април 2025</option>
+					<option value="05.2025">Мај 2025</option>
 				</select>
 
 				<h2>&nbsp;</h2>

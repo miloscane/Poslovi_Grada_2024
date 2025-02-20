@@ -1848,12 +1848,41 @@ server.get('/administracija',async (req,res)=>{
 	}else{
 
 	}
+});
+
+
+server.post('/obrisiPotrebnaFinalizacija',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var setObj	=	{ $set: {
+				statusFin: "Gotovo"
+			}};
+			izvestajiDB.updateOne({nalog:req.body.brojnaloga.toString(),izvestaj:{$regex:"POTREBNA FINALIZACIJA ILI"},statusFin:{$ne:"Gotovo"}},setObj)
+			.then((dbResponse)=>{
+				res.redirect("/administracija/potrebnaFinalizacija")
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 1849.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Ваш налог није овлашћен да ради ово.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
 })
  
 server.get('/administracija/potrebnaFinalizacija',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
-			izvestajiDB.find({izvestaj:{$regex:"POTREBNA FINALIZACIJA ILI"}}).toArray()
+			izvestajiDB.find({izvestaj:{$regex:"POTREBNA FINALIZACIJA ILI"},statusFin:{$ne:"Gotovo"}}).toArray()
 			.then((izvestaji)=>{
 				var brojeviNaloga = [];
 				for(var i=0;i<izvestaji.length;i++){
@@ -8857,7 +8886,7 @@ server.get('/mesecnoPrisustvo', async (req, res)=> {
 
 server.get('/mesecnoPrisustvo/:mesec/:majstor', async (req, res)=> {
 	if(req.session.user){
-		console.log({uniqueId:req.params.majstor,month:req.params.mesec.split(".")[0],year:req.params.mesec.split(".")[1]})
+		//console.log({uniqueId:req.params.majstor,month:req.params.mesec.split(".")[0],year:req.params.mesec.split(".")[1]})
 		checkInMajstoraDB.find({uniqueId:req.params.majstor,month:req.params.mesec.split(".")[0],year:{$in:[req.params.mesec.split(".")[1],Number(req.params.mesec.split(".")[1])]}}).toArray()
 		.then((checkIns)=>{
 			opomeneDB.find({uniqueId:req.params.majstor,month:req.params.mesec.split(".")[0],year:{$in:[req.params.mesec.split(".")[1],Number(req.params.mesec.split(".")[1])]}}).toArray()

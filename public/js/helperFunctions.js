@@ -171,6 +171,22 @@ function istiDatum(d1, d2) {
     d1.getDate() === d2.getDate();
 }
 
+function countWorkdays(year, month, holidays = []) {//let holidays = ['2025-02-17'];
+    let workdays = 0;
+    let totalDays = new Date(year, month, 0).getDate(); // Get total days in the month
+
+    for (let day = 1; day <= totalDays; day++) {
+        let date = new Date(year, month - 1, day);
+        let dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
+
+        if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.includes(date.toISOString().split('T')[0])) {
+            workdays++;
+        }
+    }
+    
+    return workdays;
+}
+
 var definicijeProizvoda = [
                     {
                       "startCode":"01.01",

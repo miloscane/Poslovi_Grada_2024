@@ -3505,6 +3505,14 @@ input[type=number] {
     overflow: hidden;
 }
 
+.listaNaloga .tableWrap table td .obrisi{
+    width:30px;
+    text-align:center;
+    font-weight:900;
+    color:rgb(220,0,0);
+    cursor:pointer;
+}
+
 .listaNaloga .tableWrap .tableHeader{
     position:sticky;
     top:0;
@@ -5250,6 +5258,35 @@ input[type=number] {
     font-weight:600;
 }
 
+.ucinakPage .napomene{
+    padding-left:5px;
+}
+
+.ucinakPage .napomene .napomenaElem{
+    display:inline-block;
+    vertical-align: top;
+    width:15px;
+    height:15px;
+    border-radius:10px;
+    background-color:rgb(32,51,100);
+    border:1px solid rgb(100,100,100);
+}
+
+.ucinakPage .napomene .napomenaElem .tooltip{
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+}
+
+.ucinakPage .napomene .napomenaElem:hover .tooltip{
+  visibility: visible;
+}
 
 .juce .opstina{
     display: inline-block;

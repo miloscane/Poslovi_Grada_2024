@@ -14,6 +14,7 @@
 								<td><div class="value datumNaloga">Датум налога</div></td>
 								<td><div class="value radnaJedinica">Радна јединица</div></td>
 								<td><div class="value adresa">Адреса</div></td>
+								<td><div class="value obrisi">&nbsp;</div></td>
 							</tr>
 						</table>
 					</div>
@@ -67,6 +68,14 @@
 								div.innerHTML = naloziToShow[i].adresa;
 								td.appendChild(div);
 							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+							td.setAttribute("onclick","deleteKomentar(\""+naloziToShow[i].broj+"\")")
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value obrisi");
+								div.innerHTML = "X";
+								td.appendChild(div);
+							tr.appendChild(td);
 						table.appendChild(tr);
 					}
 					document.getElementById("table").appendChild(table);
@@ -74,7 +83,15 @@
 
 				generateTable();
 
+				function deleteKomentar(brojNaloga){
+					document.getElementById("broj-naloga").value = brojNaloga;
+					loadGif();
+					document.getElementById("form").submit();
+				}
 			</script>
+			<form style="display:none" method="POST" action="/obrisiPotrebnaFinalizacija" id="form">
+				<input type="text" name="brojnaloga" id="broj-naloga">
+			</form>
 		</div>
 	</div>
 <%- include ("partials/footer") -%>
