@@ -474,7 +474,9 @@
 							<script>
 								function majstorNaNalogu(){
 									var submitJson = {};
-									submitJson.user = user;
+									submitJson.user = {};
+									submitJson.user.email = user.email;
+									submitJson.user.name = user.name;
 									submitJson.nalog = nalog.broj;
 									submitJson.majstor = document.getElementById("novo-majstori-dodela").value;
 									submitJson.vremeDolaska = document.getElementById("novo-vreme-dolaska").value;

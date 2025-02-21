@@ -5627,6 +5627,95 @@ input[type=number] {
     font-weight:200;
 }
 
+.rasporedRadova .dan{
+    border-bottom:1px solid rgb(100,100,100);
+    margin-bottom:10px;
+    padding-bottom:30px;
+}
+
+.rasporedRadova .dan .title{
+    font-weight:600;
+    font-size:20px;
+}
+
+.rasporedRadova .dan .stickyLeft{
+    position:sticky;
+    left:0;
+    padding-top:30px;
+    width:100px;
+    z-index:200;
+}
+
+.rasporedRadova .dan .stickyLeft .hour{
+    height:60px;
+    line-height:60px;
+    background-color:rgb(255,255,255);
+    border:1px solid rgb(100,100,100);
+    padding-left:10px;
+}
+
+.rasporedRadova .dan .nalozi{
+    white-space: nowrap;
+    position:absolute;
+    top:0;
+    left:100px;
+    z-index:100;
+    height:100%;
+    overflow-x:scroll;
+    width:calc(100% - 100px);
+}
+
+.rasporedRadova .dan .relative{
+    position:relative;
+}
+
+.rasporedRadova .dan .nalozi .radnaJedinica{
+    display:inline-block;
+    vertical-align: top;
+    width:170px;
+    height:100%;
+    border:1px solid rgb(100,100,100);
+    overflow-y:hidden;
+}
+
+.rasporedRadova .dan .nalozi .radnaJedinica .line{
+    background-color:rgb(100,100,100);
+    position:absolute;
+    left:0;
+    right:0;
+    height:1px;
+    z-index:150;
+}
+
+.rasporedRadova .dan .nalozi .radnaJedinica .naloziWrap{
+    position:relative;
+    height:calc(100% - 25px);
+    margin-top:4px;
+}
+
+.rasporedRadova .dan .nalozi .dodele{
+    position:absolute;
+    color:rgb(255,255,255);
+    background-color: rgb(32,51,100);
+    font-size:12px;
+    z-index:300;
+    padding:5px;
+    border:1px solid rgba(255,255,255,0);
+    min-height:51px;
+}
+
+.rasporedRadova .dan .nalozi .dodele .relative{
+}
+
+.rasporedRadova .dan .nalozi .dodele a{
+    color:rgb(255,255,255);
+}
+
+
+.rasporedRadova .dan .title{
+    height:25px;
+}
+
 @media screen and (max-width: 1100px) {
     .pageWidth{
         padding-left:10px;

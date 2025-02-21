@@ -1,0 +1,175 @@
+<%- include ("partials/header-nl") -%>
+	<script>
+		var dodele	=	<%-JSON.stringify(dodele)%>;
+		console.log(dodele);
+		var dates	=	<%-JSON.stringify(dates)%>;
+		var majstori	=	<%-JSON.stringify(majstori)%>;
+	</script>
+	<div class="rasporedRadova">
+		<div id="raspored-radova"></div>
+		<script>
+
+			function resolveOverlaps() {
+			    const elements = Array.from(document.querySelectorAll('.dodele'));
+
+			    function isOverlapping(el1, el2) {
+			        const rect1 = el1.getBoundingClientRect();
+			        const rect2 = el2.getBoundingClientRect();
+
+			        return !(
+			            rect1.right <= rect2.left + 2 ||  // 2px offset for borders
+			            rect1.left >= rect2.right - 2 ||
+			            rect1.bottom <= rect2.top + 2 ||
+			            rect1.top >= rect2.bottom - 2
+			        );
+			    }
+
+			    elements.forEach((el, index) => {
+			        let hasOverlap;
+			        let currentLeft = parseFloat(getComputedStyle(el).left) || 0;
+
+			        do {
+			            hasOverlap = false;
+			            for (let i = 0; i < index; i++) {
+			                if (isOverlapping(el, elements[i])) {
+			                    let elRect = el.getBoundingClientRect();
+			                    let otherRect = elements[i].getBoundingClientRect();
+
+			                    let minMove = otherRect.right - elRect.left + 2; // Move enough to fully separate
+			                    currentLeft += minMove; // Adjust position
+			                    el.style.left = `${currentLeft}px`;
+
+			                    hasOverlap = true;
+			                }
+			            }
+			        } while (hasOverlap);
+			    });
+			}
+
+			function expandParents(){
+				var parents = document.getElementsByClassName("radnaJedinica");
+				for(var i=0;i<parents.length;i++){
+					var elements = parents[i].getElementsByClassName("dodele");
+					var maxLeft = 0;
+					var maxElem = null;
+					for(var j=0;j<elements.length;j++){
+						var elementLeft = Number(elements[j].style.left.split("p")[0])+1;
+						if(maxLeft<elementLeft){
+							maxLeft = elementLeft;
+							maxElem = elements[j];
+						}
+					}
+					if(maxElem){
+						parents[i].style.width = Math.max(170,eval(maxLeft+maxElem.getBoundingClientRect().width+20))+"px";	
+					}
+				}
+			}
+
+			for(var i=0;i<dates.length;i++){
+				var dan = document.createElement("DIV");
+				dan.setAttribute("class","dan");
+				dan.setAttribute("data-dan",dates[i])
+					var title = document.createElement("DIV");
+					title.setAttribute("class","title");
+					title.innerHTML = daniUNedelji[(new Date(dates[i]).getDay()+6)%7] + " - "+dates[i];
+					dan.appendChild(title);
+
+					var relative = document.createElement("DIV");
+					relative.setAttribute("class","relative");
+						var stickyLeft = document.createElement("DIV");
+						stickyLeft.setAttribute("class","stickyLeft");
+						relative.appendChild(stickyLeft);
+
+						var nalozi = document.createElement("DIV");
+						nalozi.setAttribute("class","nalozi");
+							for(var j=0;j<radneJedinice.length;j++){
+								var radnaJedinica = document.createElement("DIV");
+								radnaJedinica.setAttribute("class","radnaJedinica");
+								radnaJedinica.setAttribute("data-radnajedinica",radneJedinice[j]);
+								radnaJedinica.setAttribute("data-datum",dates[i]);
+									var title = document.createElement("DIV");
+									title.setAttribute("class","title");
+									title.innerHTML = radneJedinice[j];
+									radnaJedinica.appendChild(title)
+
+									var naloziWrap = document.createElement("DIV");
+									naloziWrap.setAttribute("class","naloziWrap");
+
+									radnaJedinica.appendChild(naloziWrap);
+								nalozi.appendChild(radnaJedinica);
+							}
+						relative.appendChild(nalozi);
+
+					dan.appendChild(relative);
+				document.getElementById("raspored-radova").appendChild(dan);
+			}
+
+			var dani = document.getElementsByClassName("dan");
+			for(var i=0;i<dani.length;i++){
+				var radneJedinice = dani[i].getElementsByClassName("radnaJedinica");
+				for(var j=0;j<radneJedinice.length;j++){
+					for(var k=7;k<22;k++){
+						for(var l=0;l<2;l++){//zbog pola sata							
+							var line = document.createElement("DIV");
+							line.setAttribute("class","line");
+							line.style.top = eval((k-7)*60 + l*30) + "px";
+							radneJedinice[j].getElementsByClassName("naloziWrap")[0].appendChild(line);
+						}						
+					}	
+				}
+			}
+
+			for(var i=0;i<dani.length;i++){
+				for(var j=7;j<22;j++){
+					var hourElem = document.createElement("DIV");
+					hourElem.setAttribute("class","hour");
+					hourElem.innerHTML = j.toString().padStart(2,"0") + ":00";
+					dani[i].getElementsByClassName("stickyLeft")[0].appendChild(hourElem);
+				}
+			}
+
+			for(var i=0;i<dodele.length;i++){
+				for(var j=0;j<dani.length;j++){
+					if(dodele[i].datumRadova == dani[j].dataset.dan){
+						var radneJedinice = dani[j].getElementsByClassName("radnaJedinica");
+						for(var k=0;k<radneJedinice.length;k++){
+							if(radneJedinice[k].dataset.radnajedinica==dodele[i].radnaJedinica){
+								var dodelaElem = document.createElement("DIV");
+								dodelaElem.setAttribute("class","dodele");
+								var topPosition = Number(dodele[i].vremeDolaska.split(":")[0]) - 7;
+								var half = Number(dodele[i].vremeDolaska.split(":")[1]) == 0 ? 0 : 0.5;
+								dodelaElem.style.top = (topPosition+half)*60+"px";
+
+								var height1 = Number(dodele[i].vremeRadova.split(":")[0])*60;
+								var height2 = Number(dodele[i].vremeRadova.split(":")[1]) == 0 ? 0 : 30;
+								dodelaElem.style.height = eval(height1+height2) + "px";
+								
+									var brojNaloga = document.createElement("DIV");
+									brojNaloga.setAttribute("class","brojNaloga");
+									brojNaloga.innerHTML = "<a href=\"/nalog/"+dodele[i].nalog+"\">"+dodele[i].nalog+"</a>";
+									dodelaElem.appendChild(brojNaloga);
+
+									var dodelio = document.createElement("DIV");
+									dodelio.setAttribute("class","dodelio");
+									dodelio.innerHTML = dodele[i].user.name;
+									dodelaElem.appendChild(dodelio);
+
+									var majstor = document.createElement("DIV");
+									majstor.setAttribute("class","dodelio");
+									majstor.innerHTML = getMajstorByCode(dodele[i].majstor).ime;
+									dodelaElem.appendChild(majstor);
+								radneJedinice[k].getElementsByClassName("naloziWrap")[0].appendChild(dodelaElem);
+							}
+						}
+					}
+				}
+			}
+
+			window.onload = function() {
+			    resolveOverlaps();
+			    expandParents(); // Add your additional function here
+			};
+		</script>
+	</div>
+
+<%- include ("partials/footer") -%>

@@ -751,6 +751,14 @@ function dhm(t){
   return [d, pad(h), pad(m)].join(':');
 }
 
+function getMonday(date) {
+  const day = date.getDay(); // Get the current day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+  const diff = day === 0 ? -6 : 1 - day; // Adjust so that Monday is the first day
+  const monday = new Date(date);
+  monday.setDate(date.getDate() + diff);
+  return monday;
+}
+
 var navigacijaInfo = [];
 var cenovnik;
 var cenovnikHigh;
@@ -1684,7 +1692,7 @@ const sendEmail = () => {
 								
 								const mailOptions = {
 						        from: 'admin@poslovigrada.rs', // Sender address
-						        to: 'miloscane@gmail.com,stefan.jankovic.ckp@gmail.com,marija.slijepcevic@poslovigrada.rs,doca051@gmail.com', // List of recipients
+						        to: 'miloscane@gmail.com',//,stefan.jankovic.ckp@gmail.com,marija.slijepcevic@poslovigrada.rs,doca051@gmail.com', // List of recipients
 						        subject: 'Poslovi Grada - Dnevni izvestaj za '+daysInWeek[(new Date().getDay() + 6) % 7]+" - "+getDateAsStringForDisplay(new Date()),
 						        html: html
 						    };
@@ -1706,10 +1714,6 @@ const sendEmail = () => {
 						.catch((error)=>{
 							logError(error)
 						})
-
-						
-
-
 					})
 					.catch((error)=>{
 						logError(error);
@@ -8428,6 +8432,36 @@ server.get('/heatmap', async (req, res)=> {
 
 
 
+
+server.get('/rasporedRadova', async(req,res)=>{
+	var monday = getMonday(new Date());
+	var dates = [];
+	for(var i=0;i<7;i++){
+		dates.push(monday.getFullYear()+"-"+eval(monday.getMonth()+1).toString().padStart(2,"0")+"-"+monday.getDate().toString().padStart(2,"0"));
+		monday.setDate(monday.getDate()+1);
+	}
+	majstoriDB.find({}).toArray()
+	.then((majstori)=>{
+		dodeljivaniNaloziDB.find({datumRadova:{$in:dates}}).toArray()
+		.then((dodele)=>{
+			res.render("rasporedRadova",{
+				pageTitle: "Недељни распоред радова",
+				dodele: dodele,
+				majstori: majstori,
+				dates: dates
+			});
+		})
+		.catch((error)=>{
+			logError(error);
+			res.send("Greska u bazi podataka");
+		})
+	})
+	.catch((error)=>{
+		logError(error);
+		res.send("Greska");
+	})
+	
+})
 
 
 
