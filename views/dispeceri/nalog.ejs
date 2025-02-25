@@ -553,7 +553,6 @@
 								}
 								function deleteDodelu(elem){
 									document.getElementById("deletion-id").value = elem.parentElement.parentElement.dataset.id;
-									loadGif();
 									document.getElementById("delete-form").submit();
 								}
 
@@ -566,6 +565,7 @@
 									json.vremeRadova = parent.getElementsByClassName("staroVremeRadova")[0].value;
 									json.brojNaloga = nalog.broj;
 									document.getElementById("edit-json").value = JSON.stringify(json);
+									//console.log(json)
 									loadGif();
 									document.getElementById("edit-form").submit();
 								}
