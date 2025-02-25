@@ -196,7 +196,7 @@
 							<script>
 								var dodele = <%-JSON.stringify(dodele)%>;
 								for(var i=0;i<dodele.length;i++){
-									document.getElementById("dodele").innerHTML += "<br>"+eval(i+1)+". "+dodele[i].datum.datum + " "+dodele[i].datum.timestamp +" - "+getMajstorByCode(dodele[i].majstor).ime;
+									document.getElementById("dodele").innerHTML += "<br>"+eval(i+1)+". "+reshuffleDate(dodele[i].datumRadova) + " "+dodele[i].vremeDolaska +" - "+getMajstorByCode(dodele[i].majstor).ime;
 								}
 							</script>
 						</div>
