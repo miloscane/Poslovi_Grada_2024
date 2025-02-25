@@ -4554,6 +4554,34 @@ input[type=number] {
     display:block;
 }
 
+.stareDodele .dodela .editor{
+    text-align:right;
+    padding-top:5px;
+    margin-bottom:20px;
+}
+
+.stareDodele .dodela .edit{
+    display:inline-block;
+    vertical-align: middle;
+    font-size:12px;
+    background-color:rgb(2,121,49);
+    color:rgb(255,255,255);
+    padding:4px;
+    margin-right:10px;
+    cursor:pointer;
+}
+
+.stareDodele .dodela .delete{
+    display:inline-block;
+    vertical-align: middle;
+    font-size:12px;
+    background-color:rgb(200,0,0);
+    color:rgb(255,255,255);
+    padding:4px;
+    cursor:pointer;
+    margin-right:30px;
+}
+
 .ekipe .majstor .nalozi{
     text-align:left;
     margin-top:7px;

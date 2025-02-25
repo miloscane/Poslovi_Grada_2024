@@ -139,7 +139,10 @@
 								var topPosition = Number(dodele[i].vremeDolaska.split(":")[0]) - 7;
 								var half = Number(dodele[i].vremeDolaska.split(":")[1]) == 0 ? 0 : 0.5;
 								dodelaElem.style.top = (topPosition+half)*60+"px";
-
+								if(Number(dodele[i].deleted==1)){
+									dodelaElem.style.backgroundColor = "rgb(200,0,0)"
+								}
+								
 								var height1 = Number(dodele[i].vremeRadova.split(":")[0])*60;
 								var height2 = Number(dodele[i].vremeRadova.split(":")[1]) == 0 ? 0 : 30;
 								dodelaElem.style.height = eval(height1+height2) + "px";

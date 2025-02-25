@@ -58,11 +58,6 @@
 				</div>
 			</div>
 			<div class="inputWrap printButton" style="margin-left:30px; display:inline-block;vertical-align: top;width:200px">
-				<div class="button" onclick="majstorNaNalogu()">
-					<div class="label">ПОШАЉИ МАЈСТОРА</div>
-				</div>
-			</div>
-			<div class="inputWrap printButton" style="margin-left:30px; display:inline-block;vertical-align: top;width:200px">
 				<div class="button" onclick="copyCoordinates(this)">
 					<div class="label">Координате</div>
 				</div>
@@ -517,8 +512,24 @@
 												dodela.appendChild(inline);	
 
 
-												if(istiDatum(new Date(Number(dodele[i].datum.datetime)),new Date())){
-													var inline = document.createElement("DIV");
+												if(new Date(dodele[i].datumRadova).setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)){
+													var editor = document.createElement("DIV");
+													editor.setAttribute("class","editor");
+														var edit = document.createElement("DIV");
+														edit.setAttribute("class","edit");
+														edit.setAttribute("onclick","editDodelu(this)");
+														edit.innerHTML = "Izmeni";
+														editor.appendChild(edit);
+
+														var edit = document.createElement("DIV");
+														edit.setAttribute("class","delete");
+														edit.setAttribute("onclick","deleteDodelu(this)");
+														edit.innerHTML = "Obrisi";
+														editor.appendChild(edit);
+
+													dodela.appendChild(editor);
+
+													/*var inline = document.createElement("DIV");
 													inline.setAttribute("class","inline");
 														var komanda = document.createElement("DIV");
 														komanda.setAttribute("class","komanda");
@@ -530,7 +541,7 @@
 														komanda.setAttribute("onclick","deleteDodelu(this)")
 														komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
 														inline.appendChild(komanda);
-													dodela.appendChild(inline)	
+													dodela.appendChild(inline)	*/
 												}
 												
 
