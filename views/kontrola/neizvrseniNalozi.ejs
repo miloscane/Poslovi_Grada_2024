@@ -34,7 +34,7 @@
 			<script>
 				var ostvarenIznos = 0;
 				var zavrsenoNaloga = 0;
-				var zavrseni = ["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan"];
+				var zavrseni = ["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Storniran","Vraćen"];
 				var neizvrsenoNaloga = 0;
 				var danasNaloga = 0;
 				for(var i=0;i<nalozi.length;i++){
@@ -95,6 +95,10 @@
 						document.getElementById(nalozi[i].radnaJedinica).appendChild(nalogWrap);
 					}
 					
+				}
+
+				for(var i=0;i<document.getElementsByClassName("naloziWrap").length;i++){
+					document.getElementsByClassName("naloziWrap")[i].getElementsByClassName("title")[0].innerHTML += " <span style=\"font-weight:200;\">(" + document.getElementsByClassName("naloziWrap")[i].getElementsByClassName("nalogWrap").length+ ")</span>";
 				}
 			</script>
 		</div>
