@@ -168,6 +168,12 @@
 			window.onload = function() {
 			    resolveOverlaps();
 			    expandParents(); // Add your additional function here
+			    var dani = document.getElementsByClassName("dan");
+			    for(var i=0;i<dani.length;i++){
+			    	if(getDateAsStringForInputObject(new Date())==dani[i].dataset.dan){
+			    		dani[i].scrollIntoView()
+			    	}
+			    }
 			};
 		</script>
 	</div>
