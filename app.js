@@ -6177,6 +6177,48 @@ server.get('/listaWoma',async (req,res)=>{
 	}
 });
 
+server.get('/dispecer/rasporedRadova', async(req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==20){
+			var monday = getMonday(new Date());
+			var dates = [];
+			for(var i=0;i<7;i++){
+				dates.push(monday.getFullYear()+"-"+eval(monday.getMonth()+1).toString().padStart(2,"0")+"-"+monday.getDate().toString().padStart(2,"0"));
+				monday.setDate(monday.getDate()+1);
+			}
+			majstoriDB.find({}).toArray()
+			.then((majstori)=>{
+				dodeljivaniNaloziDB.find({datumRadova:{$in:dates}}).toArray()
+				.then((dodele)=>{
+					res.render("dispeceri/rasporedRadova",{
+						user: req.session.user,
+						pageTitle: "Недељни распоред радова",
+						dodele: dodele,
+						majstori: majstori,
+						dates: dates
+					});
+				})
+				.catch((error)=>{
+					logError(error);
+					res.send("Greska u bazi podataka");
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.send("Greska");
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+})
+
 server.get('/dispecer/sviNalozi',async (req,res)=>{
 	if(req.session.user){
 			if(Number(req.session.user.role)==20){

@@ -1,9 +1,10 @@
-<%- include ("partials/header-nl") -%>
+<%- include ("partials/header") -%>
 	<script>
 		var dodele	=	<%-JSON.stringify(dodele)%>;
 		dodele.sort((a, b) => a.majstor.localeCompare(b.majstor));
 		var dates	=	<%-JSON.stringify(dates)%>;
-		var majstori	=	<%-JSON.stringify(majstori)%>;
+		var majstori	=	<%-JSON.stringify(majstori)%>; 
+		var radneJedinice = user.opstine;
 	</script>
 	<div class="rasporedRadova">
 		<div id="raspored-radova"></div>
@@ -146,12 +147,12 @@
 								
 									var brojNaloga = document.createElement("DIV");
 									brojNaloga.setAttribute("class","brojNaloga");
-									brojNaloga.innerHTML = "<a href=\"/nalog/"+dodele[i].nalog+"\">"+dodele[i].nalog+"</a>";
+									brojNaloga.innerHTML = "<a href=\"/nalog/"+dodele[i].nalog+"\" target=\"_blank\">"+dodele[i].nalog+"</a>";
 									dodelaElem.appendChild(brojNaloga);
 
 									var dodelio = document.createElement("DIV");
 									dodelio.setAttribute("class","dodelio");
-									dodelio.innerHTML = dodele[i].user.name;
+									dodelio.innerHTML = dodele[i].adresa;
 									dodelaElem.appendChild(dodelio);
 
 									var majstor = document.createElement("DIV");
