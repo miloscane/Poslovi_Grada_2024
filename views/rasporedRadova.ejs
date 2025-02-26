@@ -142,7 +142,7 @@
 								if(Number(dodele[i].deleted==1)){
 									dodelaElem.style.backgroundColor = "rgb(200,0,0)"
 								}
-								
+
 								var height1 = Number(dodele[i].vremeRadova.split(":")[0])*60;
 								var height2 = Number(dodele[i].vremeRadova.split(":")[1]) == 0 ? 0 : 30;
 								dodelaElem.style.height = eval(height1+height2) + "px";
@@ -178,6 +178,8 @@
 			    	}
 			    }
 			};
+
+			var socket = io({});
 
 			socket.on("majstorNaNalogu",function(){
 				location.reload()
