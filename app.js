@@ -6304,7 +6304,6 @@ server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 							var today = new Date();
 							today.setHours(0,0,0,0);
 							for(var j=0;j<nalozi[i].dodele.length;j++){
-								console.log(new Date(nalozi[i].dodele[j].datumRadova).getTime() +"vs"+today.getTime())
 								if(new Date(nalozi[i].dodele[j].datumRadova).getTime()>=today.getTime()){
 									nalozi[i].kasni = false;
 								}
