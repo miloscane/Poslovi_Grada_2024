@@ -6273,6 +6273,7 @@ server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 				}
 				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:skriveniStatusi}}).toArray()
 				.then((nalozi) => {
+					var brojeviNaloga = [];
 					for(var i=0;i<nalozi.length;i++){
 						delete nalozi[i]._id;
 						delete nalozi[i].uniqueId;
@@ -6285,11 +6286,43 @@ server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 						delete nalozi[i].ukupanIznos;
 						delete nalozi[i].faktura;
 						delete nalozi[i].prijemnica;
+						brojeviNaloga.push(nalozi[i].broj)
 					}
-					res.render("dispeceri/otvoreniNalozi",{
-						pageTitle:"Отворени налози",
-						user: req.session.user,
-						nalozi: nalozi
+					dodeljivaniNaloziDB.find({nalog:{$in:brojeviNaloga}}).toArray()
+					.then((dodele)=>{
+						for(var i=0;i<nalozi.length;i++){
+							nalozi[i].dodele = [];
+							for(var j=0;j<dodele.length;j++){
+								if(dodele[j].nalog==nalozi[i].broj){
+									nalozi[i].dodele.push(dodele[j])
+								}
+							}
+						}
+
+						for(var i=0;i<nalozi.length;i++){
+							nalozi[i].kasni = true;
+							var today = new Date();
+							today.setHours(0,0,0,0);
+							for(var j=0;j<nalozi[i].dodele.length;j++){
+								console.log(new Date(nalozi[i].dodele[j].datumRadova).getTime() +"vs"+today.getTime())
+								if(new Date(nalozi[i].dodele[j].datumRadova).getTime()>=today.getTime()){
+									nalozi[i].kasni = false;
+								}
+							}
+						}
+						res.render("dispeceri/otvoreniNalozi",{
+							pageTitle:"Отворени налози",
+							user: req.session.user,
+							nalozi: nalozi
+						})
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 281.</div>"
+						});
 					})
 				})
 				.catch((error)=>{
