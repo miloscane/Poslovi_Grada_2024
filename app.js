@@ -1069,10 +1069,10 @@ http.listen(process.env.PORT, function(){
 
 		//ZA PREMIJUS
 
-		/*naloziDB.find({}).toArray()
+		naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var month = 1;
+			var month = 2;
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
@@ -1129,11 +1129,11 @@ http.listen(process.env.PORT, function(){
 				csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
 			}
 			fs.writeFileSync("./PG-Premijus-"+month+"-2025.csv",csvString,"utf8");
-			console.log("Written ")
+			console.log("Written Premijus")
 		})
 		.catch((error)=>{
 			console.log(error)
-		})*/
+		})
 
 
 
@@ -8164,6 +8164,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						if(obracun.length>0){
 							var setObj	=	{ $set: {
 								obracun: obracun,
+								statusNaloga: "Nalog u Stambenom",
 								ukupanIznos: ukupanIznos
 							}};
 							naloziDB.updateOne({uniqueId:nalozi[0].uniqueId},setObj)
