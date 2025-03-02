@@ -5648,11 +5648,38 @@ input[type=number] {
     margin-bottom:5px;
     border-bottom:1px solid rgb(200,200,200);
     font-size:12px;
+    position:relative;
+}
+
+.radnik .opomeneWrap .danasnjeOpomene .opomena .delete{
+    position:absolute;
+    top:0;
+    right:0;
+    width:20px;
+}
+
+.radnik .opomeneWrap .danasnjeOpomene .opomena .delete img{
+    display:block;
 }
 
 .radnik .opomeneWrap .danasnjeOpomene .opomena .timestamp{
     font-size:12px;
     font-weight:200;
+}
+
+.radnik .quickButtons{
+    padding-top:20px;
+}
+
+.radnik .quickButtons .button{
+    display:inline-block;
+    vertical-align: top;
+    padding:5px;
+    border:2px outset ;
+    background:rgb(32,51,100);
+    color:rgb(255,255,255);
+    margin:5px;
+    font-size:14px;
 }
 
 .rasporedRadova .dan{

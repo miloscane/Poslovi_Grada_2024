@@ -1069,7 +1069,7 @@ http.listen(process.env.PORT, function(){
 
 		//ZA PREMIJUS
 
-		naloziDB.find({}).toArray()
+		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
 			var month = 2;
@@ -1133,7 +1133,8 @@ http.listen(process.env.PORT, function(){
 		})
 		.catch((error)=>{
 			console.log(error)
-		})
+		})*/
+
 
 
 
@@ -1574,6 +1575,188 @@ http.listen(process.env.PORT, function(){
 					}
 				}
 				console.log(majstori)
+			})
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+		/*naloziDB.find({$or: [{ "datum.datum": { $regex: "01\\.2025" } },{ "datum.datum": { $regex: "02\\.2025" } }],majstor:{$in:podizvodjaci}}).toArray()
+		.then((nalozi)=>{
+			majstoriDB.find({}).toArray()
+			.then((majstori)=>{
+				for(var i=0;i<nalozi.length;i++){
+					for(var j=0;j<majstori.length;j++){
+						if(nalozi[i].majstor==majstori[j].uniqueId){
+							nalozi[i].imeMajstora = majstori[j].ime;
+						}
+					}
+				}
+				console.log(nalozi)
+				var csvString = "Ime,Broj Naloga,Datum"+"\r\n";
+				for(var i=0;i<nalozi.length;i++){
+					csvString += nalozi[i].imeMajstora+","+nalozi[i].broj+","+nalozi[i].datum.datum+"\r\n"
+				}
+				fs.writeFileSync("marija.csv",csvString,{encoding:"utf8"});
+				console.log("Wrote file")
+			})
+			.catch((error)=>{
+				console.log(error);
+			})
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+		/*const isFirst7Numbers = str => /^\d{7}/.test(str);
+		var potvrdjeni = fs.readFileSync("Nalozi.csv",{encoding:"utf8"});
+		var potvrdjeniArray = potvrdjeni.split("\n");
+		var potvrdjeniBrojevi = [];
+		for(var i=0;i<potvrdjeniArray.length;i++){
+			if(isFirst7Numbers(potvrdjeniArray[i].split(",")[0])){
+				potvrdjeniBrojevi.push(potvrdjeniArray[i].split(",")[0].toString())
+			}
+		}
+
+		naloziDB.find({"prijemnica.datum.datum":{$regex:"02.2025"},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje"]}}).toArray()
+		.then((nalozi)=>{
+			naloziDB.find({broj:{$in:potvrdjeniBrojevi}}).toArray()
+			.then((nalozi2)=>{
+				for(var i=0;i<nalozi2.length;i++){
+					nalozi.push(nalozi2[i])
+				}
+				var ukupanIznos = 2754875.53;
+				var osnovicaZaPDV = 0;
+				var neoporezivo = 1820171.20;
+				for(var i=0;i<nalozi.length;i++){
+					ukupanIznos = ukupanIznos + parseFloat(nalozi[i].ukupanIznos);
+					if(parseFloat(nalozi[i].ukupanIznos)<500000){
+						osnovicaZaPDV = osnovicaZaPDV + parseFloat(nalozi[i].ukupanIznos)
+					}else{
+						neoporezivo = neoporezivo + parseFloat(nalozi[i].ukupanIznos);
+					}
+				}
+				console.log("Ukupno bez PDV: "+brojSaRazmacima(ukupanIznos))
+				console.log("Osnovica za PDV: "+brojSaRazmacima(osnovicaZaPDV))
+				console.log("Neoporezivo: "+brojSaRazmacima(neoporezivo))
+				console.log("PDV: "+brojSaRazmacima(osnovicaZaPDV*0.2))
+			})
+			
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+		/*naloziDB.find({"prijemnica.datum.datum":{$regex:"02.2025"}}).toArray()
+		.then((nalozi)=>{
+			console.log(nalozi.length)
+			naloziDB.find({statusNaloga:"Nalog u Stambenom"}).toArray()
+			.then((nalozi2)=>{
+				for(var i=0;i<nalozi2.length;i++){
+					nalozi.push(nalozi2[i])
+				}
+
+				var woma = ["80.02.09.020","80.02.09.021","80.02.09.022"];
+				var rucno = ["80.02.09.001","80.02.09.002","80.02.09.003","80.02.09.004","80.02.09.005"];
+				var crp = ["80.02.09.009","80.02.09.010","80.02.09.012","80.02.09.025"];
+				var kop = ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
+				var mas = ["80.03.01.019","80.03.01.020","80.03.01.025"];
+				var kup = ["80.01.05.057","80.01.05.058","80.01.05.059","80.01.05.060","80.01.05.061","80.01.05.062","80.01.05.063","80.01.05.064"];
+
+				for(var i=0;i<nalozi.length;i++){
+					nalozi[i].tipNaloga = "ZAMENA";
+				}
+
+
+				for(var i=0;i<nalozi.length;i++){
+					if(nalozi[i].tipNaloga=="ZAMENA"){
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							if(kop.indexOf(nalozi[i].obracun[k].code)>=0){
+								nalozi[i].tipNaloga = "KOPANJE";
+							}
+						}
+					}
+					
+
+					if(nalozi[i].tipNaloga=="ZAMENA"){
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							if(woma.indexOf(nalozi[i].obracun[k].code)>=0){
+								nalozi[i].tipNaloga = "WOMA";
+							}
+						}
+					}
+
+					
+
+					if(nalozi[i].tipNaloga=="ZAMENA"){
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							if(rucno.indexOf(nalozi[i].obracun[k].code)>=0){
+								if(parseFloat(nalozi[i].ukupanIznos)<20000){
+									nalozi[i].tipNaloga = "SAJLA";
+								}
+							}
+						}
+					}
+
+					
+
+					if(nalozi[i].tipNaloga=="ZAMENA"){
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							if(crp.indexOf(nalozi[i].obracun[k].code)>=0){
+								if(parseFloat(nalozi[i].ukupanIznos)<10000){
+									nalozi[i].tipNaloga = "CRPLJENJE";
+								}
+							}
+						}
+					}
+
+					
+
+					if(nalozi[i].tipNaloga=="ZAMENA"){
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							if(kup.indexOf(nalozi[i].obracun[k].code)>=0){
+								if(parseFloat(nalozi[i].ukupanIznos)<5500){
+									nalozi[i].tipNaloga = "SPOJKA";
+								}
+							}
+						}
+					}
+
+					
+
+					if(nalozi[i].tipNaloga=="ZAMENA"){
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							if(kup.indexOf(nalozi[i].obracun[k].code)>=0){
+								if(parseFloat(nalozi[i].ukupanIznos)<5500){
+									nalozi[i].tipNaloga = "SPOJKA";
+								}
+							}
+						}
+					}
+
+					
+					if(nalozi[i].tipNaloga=="ZAMENA"){
+						if(nalozi[i].obracun.length==2){
+							if(nalozi[i].obracun[0].code=="80.04.01.002" && nalozi[i].obracun[1].code=="80.04.01.005"){
+								nalozi[i].tipNaloga = "LOKALNO";
+							}else if(nalozi[i].obracun[0].code=="80.04.01.005" && nalozi[i].obracun[1].code=="80.04.01.002"){
+								nalozi[i].tipNaloga = "LOKALNO";
+							}
+						}else if(nalozi[i].obracun.length==1){
+							if(nalozi[i].obracun[0].code=="80.04.01.002" || nalozi[i].obracun[0].code=="80.04.01.005"){
+								nalozi[i].tipNaloga = "LOKALNO";
+							}
+						}
+					}
+				}
+
+				var csvString = "Broj naloga;Radna Jedinica;Datum Naloga; Datum Prijemnice;Tip Naloga; Iznos\r\n";
+				for(var i=0;i<nalozi.length;i++){
+					csvString += nalozi[i].broj + ";" +nalozi[i].radnaJedinica +";"+ nalozi[i].datum.datum + ";" + nalozi[i].prijemnica.datum.datum+ ";" + nalozi[i].tipNaloga + ";"+nalozi[i].ukupanIznos+"\r\n"; 
+				}					
+				fs.writeFileSync("februar.csv",csvString,{encoding:"Utf8"})
+				console.log("Wrote file")
+
 			})
 		})
 		.catch((error)=>{
@@ -2706,6 +2889,59 @@ server.post('/opomenaRadnika', async (req, res)=> {
 		res.redirect("/login");
 	}
 });
+
+server.post('/obrisiOpomenu', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==25){
+			opomeneDB.find({uniqueId:req.body.id}).toArray()
+			.then((opomene)=>{
+				if(opomene.length>0){
+					if(opomene[0].user.email==req.session.user.email){
+						opomeneDB.deleteOne({uniqueId:req.body.id})
+						.then((dbResponse)=>{
+							res.render("message",{
+								pageTitle: "Успешно обрисано",
+								user: req.session.user,
+								message: "<div class=\"text\">Само гас :)</div>"
+							});
+						})
+						.catch((error)=>{
+							res.render("message",{
+								pageTitle: "Програмска грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">Дошло је до грешке приликом уписивања у базу података 2912.</div>"
+							});
+						})
+					}else{
+						res.render("message",{
+							pageTitle: "Грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Не можете брисати туђе опомене.</div>"
+						});
+					}
+				}else{
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Опомена није пронађена.</div>"
+					});
+				}
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке приликом уписивања у базу података 2901.</div>"
+				});
+			})
+		}else{
+			res.send("Nije definisan nivo korisnika");
+		}
+	}else{
+		res.redirect("/login");
+	}
+})
 
 server.get('/kontrola/lokacije',async (req,res)=>{
 	if(req.session.user){

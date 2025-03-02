@@ -53,6 +53,15 @@
 					</script>
 				</div>
 			</div>
+			<div class="quickButtons">
+				<div class="button" onclick="quickButton('slobodan')">Слободан дан</div>
+				<div class="button" onclick="quickButton('neopravdan')">Неоправдано одсуство</div>
+				<div class="button" onclick="quickButton('opravdan')">Оправдано одсуство</div>
+				<div class="button" onclick="quickButton('bolovanje')">Боловање</div>
+				<div class="button" onclick="quickButton('neuredan')">Неуредан</div>
+				<div class="button" onclick="quickButton('necekiranje')">Није се чекирао</div>
+				<div class="button" onclick="quickButton('steta')">Штета фирми</div>
+			</div>
 			<%if(opomene.length>0){%>
 				<div class="opomeneWrap">
 					<div class="title">Данашње напомене:</div>
@@ -70,15 +79,60 @@
 								tesktOpomene.setAttribute("class","tekstOpomene");
 								tesktOpomene.innerHTML = opomene[i].opomena;
 								opomena.appendChild(tesktOpomene);
+
+								var deleteButton = document.createElement("DIV");
+								deleteButton.setAttribute("class","delete");
+								deleteButton.setAttribute("onclick","obrisiOpomenu(\""+opomene[i].uniqueId+"\")");
+								deleteButton.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/deleteRow.png\">";
+								opomena.appendChild(deleteButton);
 							document.getElementById("opomene").appendChild(opomena);
 							
 						}
+						
 					</script>
 				</div>
 			<%}%>
-			
-			<form method="POST" action="/opomenaRadnika">
+			<script>
+				function obrisiOpomenu(uniqueId){
+					document.getElementById("brisanje-id").value = uniqueId;
+					loadGif();
+					document.getElementById("brisanje-form").submit();
+				}
+
+				function quickButton(type){
+					if(type=="slobodan"){
+						document.getElementById("tekst-opomene").value = "Слободан дан";
+						document.getElementById("type").value = "10";
+					}else if(type=="neopravdan"){
+						document.getElementById("tekst-opomene").value = "Неоправдано одсуство";
+						document.getElementById("type").value = "20";
+					}else if(type=="opravdan"){
+						document.getElementById("tekst-opomene").value = "Оправдано одсуство";
+						document.getElementById("type").value = "30";
+					}else if(type=="bolovanje"){
+						document.getElementById("tekst-opomene").value = "Боловање";
+						document.getElementById("type").value = "40";
+					}else if(type=="neuredan"){
+						document.getElementById("tekst-opomene").value = "Неуредан";
+						document.getElementById("type").value = "50";
+					}else if(type=="necekiranje"){
+						document.getElementById("tekst-opomene").value = "Нечекирање";
+						document.getElementById("type").value = "60";
+					}else if(type=="steta"){
+						var iznos = prompt("Колики је новчани износ штете?");
+						document.getElementById("tekst-opomene").value = "Новчани износ штете: "+iznos;
+						document.getElementById("type").value = "70";
+					}
+					loadGif();
+					document.getElementById("opomena-form").submit();
+				}
+			</script>
+			<form method="POST" action="/obrisiOpomenu" id="brisanje-form" style="display: none;">
+				<input type="text" id="brisanje-id" name="id">
+			</form>
+			<form method="POST" action="/opomenaRadnika" id="opomena-form">
 				<input type="text" name="id" id="id" style="display:none">
+				<input type="text" name="type" id="type" value="0" style="display:none">
 				<script>
 					if(radnik.uniqueId){
 						document.getElementById("id").value = radnik.uniqueId;
@@ -87,7 +141,7 @@
 					}
 				</script>
 				<div class="textareaWrap">
-					<textarea name="opomena"></textarea>
+					<textarea name="opomena" id="tekst-opomene"></textarea>
 				</div>
 				<div class="submitWrap">
 					<input type="submit" value="Сачувај">
