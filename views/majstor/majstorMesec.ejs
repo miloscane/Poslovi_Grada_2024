@@ -10,6 +10,19 @@
 		var godina = datum.split(".")[1];
 	</script>
 	<div class="majstorMesec">
+		<div class="selectMesec">
+			<select id="odabir-meseca" oninput="pickMesec()">
+				<option value="02.2025">Februar 2025</option>
+				<option value="03.2025">Mart 2025</option>
+				<option value="04.2025">April 2025</option>
+			</select>
+			<script>
+				document.getElementById("odabir-meseca").value = datum;
+				function pickMesec(){
+					window.location.href = "/majstor/mesec/"+document.getElementById("odabir-meseca").value;
+				}
+			</script>
+		</div>
 		<div class="pageWidth">
 			<div class="box bodoviWrap">
 				<div class="title">Укупно бодова:</div>
@@ -132,7 +145,7 @@
 
 							for(var j=0;j<dodele.length;j++){
 								if(Number(dodele[j].deleted)!=1){
-									if(istiDatum(new Date(Number(dodele[j].datum.datetime)),date)){
+									if(istiDatum(new Date(dodele[j].datumRadova),date)){
 										var nalogElem = document.createElement("DIV");
 										nalogElem.setAttribute("class","nalog");
 											var title = document.createElement("DIV");

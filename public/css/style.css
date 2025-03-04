@@ -5771,6 +5771,20 @@ input[type=number] {
     height:25px;
 }
 
+.majstorMesec{
+    position:relative;
+}
+
+.majstorMesec .selectMesec{
+    position:absolute;
+    top:-3px;
+    right:10px;
+    font-size:14px;
+    transform: translateY(-100%);
+}
+
+
+
 .majstorMesec .box{
     color:rgb(255,255,255);
     font-size:16px;

@@ -82,6 +82,12 @@
 					</div>
 				</div>
 				<div class="singleLineInput">
+					<div class="name">Месечна плата</div>
+					<div class="inputWrapper">
+						<input type="number" id="mesecna-plata">
+					</div>
+				</div>
+				<div class="singleLineInput">
 					<div class="name">Службени телефон</div>
 					<div class="inputWrapper">
 						<input type="text" id="sluzbeni-broj">
@@ -225,6 +231,10 @@
 				document.getElementById("ocekivani-ucinak").value = majstor.ocekivaniUcinak;
 			}
 
+			if(majstor.mesecnaPlata){
+				document.getElementById("mesecna-plata").value = majstor.mesecnaPlata;
+			}
+
 			if(majstor.vezaSaStarimPortalom){
 				document.getElementById("veza-sa-starim-portalom").value = majstor.vezaSaStarimPortalom;
 			}
@@ -285,6 +295,7 @@
 				izmenaJson.beleske = document.getElementById("beleske").value;
 				izmenaJson.aktivan = document.getElementById("aktivan").checked;
 				izmenaJson.ocekivaniUcinak = document.getElementById("ocekivani-ucinak").value;
+				izmenaJson.mesecnaPlata = document.getElementById("mesecna-plata").value;
 				izmenaJson.vezaSaStarimPortalom = document.getElementById("veza-sa-starim-portalom").value;
 				izmenaJson.tipRada = [];
 				var tipovi = document.getElementsByClassName("tipRadnika");

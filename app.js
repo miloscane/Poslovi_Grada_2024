@@ -2031,7 +2031,7 @@ server.get('/',async (req,res)=>{
 		}else if(Number(req.session.user.role)==50){
 			res.redirect("/magacioner/stanje")
 		}else if(Number(req.session.user.role)==60){
-			res.redirect("/majstor/mesec/02.2025")
+			res.redirect("/majstor/mesec/"+eval(new Date().getMonth()+1).toString().padStart(2,"0")+"."+new Date().getFullYear())
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
