@@ -1,0 +1,213 @@
+<%- include ("partials/header") -%>
+	<script>
+		var dodele = <%-JSON.stringify(dodele)%>;
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+		var checkIns = <%-JSON.stringify(checkIns)%>;
+		var opomene = <%-JSON.stringify(opomene)%>;
+		console.log(dodele);
+		var datum = "<%=datum%>";
+		var mesec = datum.split(".")[0];
+		var godina = datum.split(".")[1];
+	</script>
+	<div class="majstorMesec">
+		<div class="pageWidth">
+			<div class="box bodoviWrap">
+				<div class="title">Укупно бодова:</div>
+				<div class="value bodovi" id="bodovi"></div>
+			</div>
+			<div class="box ocekivaniUcinakWrap">
+				<div class="title">Очекиван учинак</div>
+				<div class="value ocekivanUcinak" id="ocekivan-ucinak"></div>
+				<div class="title">Остварен учинак</div>
+				<div class="value ostvarenUcinak" id="ostvaren-ucinak"></div>
+				<div class="title">Очекивано налога</div>
+				<div class="value ocekivanoNaloga" id="ocekivano-naloga"></div>
+				<div class="title">Остварено налога</div>
+				<div class="value ostvarenoNaloga" id="ostvareno-naloga"></div>
+			</div>
+			<div class="swipeable">
+				<div class="arrow arrowLeft" onclick="moveDay(-1)"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/chevronLeft.svg"></div>
+				<div class="daily" id="daily"></div>
+				<div class="arrow arrowRight" onclick="moveDay(1)"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/chevronRight.svg"></div>
+			</div>
+			<script>
+				var daysInMonth = new Date(godina, mesec, 0).getDate();
+				for(var i=1;i<=daysInMonth;i++){
+					var date = new Date(godina, mesec - 1, i);
+					var day = document.createElement("DIV");
+					day.setAttribute("class","day");
+					day.setAttribute("data-date",date.getTime());
+					day.setAttribute("data-day",date.getDate());
+					if(i==1){
+						day.setAttribute("style","margin-left:0%");
+					}
+						var datum = document.createElement("DIV");
+						datum.setAttribute("class","datum");
+						datum.innerHTML = getDateAsStringForDisplay(date);
+						day.appendChild(datum);
+
+						var vremeDolaska = "<span style=\"color:rgb(200,0,0);font-weight:900;\">!!!</span>";
+						var vremeOdlaska = "<span style=\"color:rgb(200,0,0);font-weight:900;\">!!!</span>";
+						for(var j=0;j<checkIns.length;j++){
+							if(istiDatum(new Date(Number(checkIns[j].datetime)),date)){
+								if(vremeDolaska.split(":").length>2){
+									vremeDolaska = checkIns[j].timestamp;
+								}
+
+								if(new Date(Number(checkIns[j].datetime)).getHours()>=13){
+									vremeOdlaska = checkIns[j].timestamp;
+								}
+							}
+						}
+
+						var vremena = document.createElement("DIV");
+						vremena.setAttribute("class","vremena");
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Долазак:";
+								inline.appendChild(title);
+
+								var vreme = document.createElement("DIV");
+								vreme.setAttribute("class","vreme");
+								vreme.innerHTML = vremeDolaska;
+								inline.appendChild(vreme);
+							vremena.appendChild(inline);
+
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Одлазак:";
+								inline.appendChild(title);
+
+								var vreme = document.createElement("DIV");
+								vreme.setAttribute("class","vreme");
+								vreme.innerHTML = vremeOdlaska;
+								inline.appendChild(vreme);
+							vremena.appendChild(inline);
+						day.appendChild(vremena);
+
+						var title = document.createElement("DIV");
+						title.setAttribute("class","subTitle");
+						title.innerHTML = "Опомене и похвале";
+						day.appendChild(title);
+
+						var opomeneElem = document.createElement("DIV");
+						opomeneElem.setAttribute("class","opomene");
+						var imaOpomena = false;
+							for(var j=0;j<opomene.length;j++){
+								if(istiDatum(new Date(Number(opomene[j].datetime)),date)){
+									var opomenaElem = document.createElement("DIV");
+									opomenaElem.setAttribute("class","opomena");
+										var title = document.createElement("DIV");
+										title.setAttribute("class","title");
+										title.innerHTML = opomene[j].user.name;
+										opomenaElem.appendChild(title);
+
+										var tekst = document.createElement("DIV");
+										tekst.setAttribute("class","tekst");
+										tekst.innerHTML = opomene[j].opomena;
+										opomenaElem.appendChild(tekst);
+									opomeneElem.appendChild(opomenaElem);
+									imaOpomena = true;
+								}
+								
+							}
+							if(!imaOpomena){
+								opomeneElem.innerHTML = "<div style=\"padding-left:10px;font-size:12px;\">Немате опомена и похвала за овај датум.</span>";
+							}
+						day.appendChild(opomeneElem);
+
+						var title = document.createElement("DIV");
+						title.setAttribute("class","subTitle");
+						title.innerHTML = "Ваши налози:";
+						day.appendChild(title);
+
+						var naloziElem = document.createElement("DIV");
+						naloziElem.setAttribute("class","nalozi");
+							var imaNaloga = false;
+							var counter = 1;
+
+							for(var j=0;j<dodele.length;j++){
+								if(Number(dodele[j].deleted)!=1){
+									if(istiDatum(new Date(Number(dodele[j].datum.datetime)),date)){
+										var nalogElem = document.createElement("DIV");
+										nalogElem.setAttribute("class","nalog");
+											var title = document.createElement("DIV");
+											title.setAttribute("class","title");
+											title.innerHTML = counter+". доделио/ла "+dodele[j].user.name + " ("+dodele[j].nalog+") "+dodele[j].datum.datum+" "+getTimestamp(new Date(dodele[j].datum.datetime));
+											counter++;
+											nalogElem.appendChild(title);
+
+											var adresa = document.createElement("DIV");
+											adresa.setAttribute("class","adresa");
+											adresa.innerHTML = "<div class=\"radnaJedinica\">"+dodele[j].radnaJedinica+"</div><div class=\"adresaNaloga\">"+dodele[j].adresa+"</div>";
+											nalogElem.appendChild(adresa);
+
+										naloziElem.appendChild(nalogElem);
+										imaNaloga = true;
+									}
+								}
+							}
+							if(!imaNaloga){
+								naloziElem.innerHTML = "<div style=\"padding-left:10px;font-size:12px;\">Немате додељених налога за овај датум.</span>";
+							}
+						day.appendChild(naloziElem);
+
+					document.getElementById("daily").appendChild(day);
+				}
+
+				var dayElements = document.getElementById("daily").getElementsByClassName("day");
+
+				var swipeArea = document.getElementById("daily");
+				detectSwipe(swipeArea, (direction) => {
+				    if (direction === "left") {
+				        // Handle left swipe
+				        // na levo
+				    	moveDay(1);
+				    } else if (direction === "right") {
+				        // Handle right swipe
+				        // na desno (leva na desno)
+				    	moveDay(-1);
+				    }
+				});
+
+				function moveDay(direction){
+					//get current active day
+					var currentActive = document.getElementById("daily").getElementsByClassName("day")[0].style.marginLeft;
+					currentActive = Math.abs(Number(currentActive.split("%")[0]))/100;
+					var newActive = currentActive+direction;
+					if(newActive<0){
+						//first day
+						//console.log("FIRST DAY")
+					}else if(newActive>(dayElements.length-1)){
+						//last day
+						console.log("LAST DAY")
+					}else{
+						//-1 ide sa leva na desno, znaci skrola se unazad sa danima
+						//1 ide sa desna na levo, znaci skrola se unapred sa danima
+						//console.log(newActive)
+						document.getElementById("daily").getElementsByClassName("day")[0].style.marginLeft = "-"+eval(newActive*100)+"%";
+					}
+				}
+
+				function toDay(dayNumber){
+					//0 is first
+					document.getElementById("daily").getElementsByClassName("day")[0].style.marginLeft = "-"+eval(dayNumber*100)+"%";
+				}
+
+				if(mesec==Number(new Date().getMonth()+1)){
+					toDay(new Date().getDate()-1)
+				}else{
+					toDay(0)
+					console.log("Nije trenutni mesec");
+				}
+			</script>
+			<div class="box danas">
+				<div class="title">Дана</div>
+			</div>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

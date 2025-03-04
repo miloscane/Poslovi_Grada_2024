@@ -413,6 +413,12 @@ function reshuffleDate(date){//gets yyyy-mm-dd and returns dd.mm.yyyy
   return  array[2]+"."+array[1]+"."+array[0];
 }
 
+function istiDatum(d1, d2) {
+  return d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
+}
+
 function arraysEqual(a, b) {
 	if (a === b) return true;
 	if (a == null || b == null) return false;
@@ -1764,6 +1770,92 @@ http.listen(process.env.PORT, function(){
 		})*/
 
 
+		/*dodeljivaniNaloziDB.find({"datum.datum":{$regex:"02.2025"}}).toArray()
+		.then((dodele)=>{
+			var array = [];
+			for(var i=0;i<radneJedinice.length;i++){
+				var json = {};
+				json.radnaJedinica = radneJedinice[i];
+				json.dates = [];
+				var startDate = new Date("2025-02-15");
+				for(var j=0;j<13;j++){
+					var dateJson = {};
+					dateJson.datum = new Date(startDate);
+					dateJson.ekipe = [];
+					json.dates.push(dateJson);
+					startDate.setDate(startDate.getDate()+1);
+				}
+				//console.log(json)
+				array.push(json)
+			}
+			//console.log(array)
+
+			majstoriDB.find({}).toArray()
+			.then((majstori)=>{
+				for(var i=0;i<dodele.length;i++){
+					for(var j=0;j<majstori.length;j++){
+						if(majstori[j].uniqueId==dodele[i].majstor){
+							dodele[i].imeMajstora = majstori[j].ime;
+						}
+					}
+
+
+
+					for(var j=0;j<array.length;j++){
+						for(var k=0;k<array[j].dates.length;k++){
+							if(istiDatum(array[j].dates[k].datum,new Date(dodele[i].datum.datetime)) && dodele[i].radnaJedinica==array[j].radnaJedinica){
+
+								var vecUListi = false;
+								for(var l=0;l<array[j].dates[k].ekipe.length;l++){
+									if(array[j].dates[k].ekipe[l].uniqueId==dodele[i].majstor){
+										vecUListi = true;
+									}
+								}
+
+								if(!vecUListi){
+									var json2 = {};
+									json2.uniqueId = dodele[i].majstor;
+									json2.imeMajstora = dodele[i].imeMajstora;
+									var vecNaNekojOpstini = false;
+									for(var l=0;l<array.length;l++){
+										if(array[l].radnaJedinica!=array[j].radnaJedinica){
+											for(var m=0;m<array[l].dates.length;m++){
+												for(var n=0;n<array[l].dates[m].ekipe.length;n++){
+													if(array[l].dates[m].ekipe[n].uniqueId==dodele[i].majstor){
+														vecNaNekojOpstini = true;
+													}
+												}
+											}
+										}
+									}
+
+									if(!vecNaNekojOpstini){
+										array[j].dates[k].ekipe.push(json2)
+									}
+								}
+							}
+						}
+					}
+				}
+
+				for(var i=0;i<array.length;i++){
+					console.log(array[i].radnaJedinica);
+					for(var j=0;j<array[i].dates.length;j++){
+						console.log("  "+getDateAsStringForDisplay(array[i].dates[j].datum) +" -> "+array[i].dates[j].ekipe.length);
+						for(var k=0;k<array[i].dates[j].ekipe.length;k++){
+							console.log("        "+array[i].dates[j].ekipe[k].imeMajstora)
+						}
+					}
+				}
+			})
+			.catch((error)=>{
+				console.log(error)
+			})
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
 	})
 	.catch(error => {
 		console.log(error)
@@ -1939,7 +2031,7 @@ server.get('/',async (req,res)=>{
 		}else if(Number(req.session.user.role)==50){
 			res.redirect("/magacioner/stanje")
 		}else if(Number(req.session.user.role)==60){
-			res.redirect("/majstor/nalozi")
+			res.redirect("/majstor/mesec/02.2025")
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -9378,6 +9470,87 @@ server.get('/majstor/nalozi', async (req, res)=> {
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	} 
+});
+
+server.get('/majstor/mesec/:datum', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==60){
+			dodeljivaniNaloziDB.find({majstor:req.session.user.uniqueId,"datum.datum":{$regex:req.params.datum}}).toArray()
+			.then((dodele)=>{
+				var brojeviNaloga = [];
+				for(var i=0;i<dodele.length;i++){
+					if(brojeviNaloga.indexOf(dodele[i].nalog)<0){
+						brojeviNaloga.push(dodele[i].nalog);
+					}
+				}
+				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
+				.then((nalozi)=>{
+					var mesecString = "";
+					for(var i=0;i<meseciJson.length;i++){
+						if(meseciJson[i].string==req.params.datum){
+							mesecString = meseciJson[i].string;
+						}
+					}
+					checkInMajstoraDB.find({uniqueId:req.session.user.uniqueId,month:req.params.datum.split(".")[0],year:Number(req.params.datum.split(".")[1])}).toArray()
+					.then((checkIns)=>{
+						opomeneDB.find({uniqueId:req.session.user.uniqueId,month:req.params.datum.split(".")[0],year:Number(req.params.datum.split(".")[1])}).toArray()
+						.then((opomene)=>{
+							res.render("majstor/majstorMesec",{
+								user: req.session.user,
+								pageTitle: "Pregled za "+mesecString,
+								nalozi: nalozi,
+								datum: req.params.datum,
+								checkIns: checkIns,
+								opomene: opomene,
+								dodele: dodele
+							})
+						})
+						.catch((error)=>{
+							logError(error)
+							res.render("message",{
+			          pageTitle: "Грешка",
+			          user: req.session.user,
+			          message: "<div class=\"text\">Грешка у бази података 9413.</div>"
+			        });
+						})
+						
+					})
+					.catch((error)=>{
+						logError(error)
+						res.render("message",{
+		          pageTitle: "Грешка",
+		          user: req.session.user,
+		          message: "<div class=\"text\">Грешка у бази података 9399.</div>"
+		        });
+					})
+				})
+				.catch((error)=>{
+					logError(error)
+					res.render("message",{
+	          pageTitle: "Грешка",
+	          user: req.session.user,
+	          message: "<div class=\"text\">Грешка у бази података 9399.</div>"
+	        });
+				})
+			})
+			.catch((error)=>{
+				logError(error)
+				res.render("message",{
+            pageTitle: "Грешка",
+            user: req.session.user,
+            message: "<div class=\"text\">Грешка у бази података 9399.</div>"
+        });
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
 });
 
 server.post('/izvestaj-majstora', async (req, res)=> {

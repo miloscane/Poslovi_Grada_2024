@@ -187,6 +187,31 @@ function countWorkdays(year, month, holidays = []) {//let holidays = ['2025-02-1
     return workdays;
 }
 
+function detectSwipe(element, callback) {
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    element.addEventListener("touchstart", (event) => {
+        touchStartX = event.touches[0].clientX;
+    });
+
+    element.addEventListener("touchend", (event) => {
+        touchEndX = event.changedTouches[0].clientX;
+        handleSwipe();
+    });
+
+    function handleSwipe() {
+        let deltaX = touchEndX - touchStartX;
+        let threshold = 50; // Minimum distance required for a swipe
+
+        if (deltaX > threshold) {
+            callback("right"); // Swipe right detected
+        } else if (deltaX < -threshold) {
+            callback("left"); // Swipe left detected
+        }
+    }
+}
+
 var definicijeProizvoda = [
                     {
                       "startCode":"01.01",

@@ -58,9 +58,13 @@
 				<div class="button" onclick="quickButton('neopravdan')">Неоправдано одсуство</div>
 				<div class="button" onclick="quickButton('opravdan')">Оправдано одсуство</div>
 				<div class="button" onclick="quickButton('bolovanje')">Боловање</div>
+				<div class="button" onclick="quickButton('nebolovanje')">Неоправдано боловање</div>
+				<div class="button" onclick="quickButton('slava')">Слава</div>
+				<div class="button" onclick="quickButton('smrtnislucaj')">Смртни случај</div>
 				<div class="button" onclick="quickButton('neuredan')">Неуредан</div>
 				<div class="button" onclick="quickButton('necekiranje')">Није се чекирао</div>
 				<div class="button" onclick="quickButton('steta')">Штета фирми</div>
+				<div class="button" onclick="quickButton('stimulacija')">Стимулација</div>
 			</div>
 			<%if(opomene.length>0){%>
 				<div class="opomeneWrap">
@@ -72,7 +76,7 @@
 							opomena.setAttribute("class","opomena");
 								var timestamp = document.createElement("DIV");
 								timestamp.setAttribute("class","timestamp");
-								timestamp.innerHTML = new Date(Number(opomene[i].datetime)).getHours().toString().padStart(2,"0")+":"+new Date(Number(opomene[i].datetime)).getMinutes().toString().padStart(2,"0")
+								timestamp.innerHTML = new Date(Number(opomene[i].datetime)).getHours().toString().padStart(2,"0")+":"+new Date(Number(opomene[i].datetime)).getMinutes().toString().padStart(2,"0");
 								opomena.appendChild(timestamp);
 
 								var tesktOpomene = document.createElement("DIV");
@@ -122,6 +126,19 @@
 						var iznos = prompt("Колики је новчани износ штете?");
 						document.getElementById("tekst-opomene").value = "Новчани износ штете: "+iznos;
 						document.getElementById("type").value = "70";
+					}else if(type=="nebolovanje"){
+						document.getElementById("tekst-opomene").value = "Неоправдано боловање";
+						document.getElementById("type").value = "45";
+					}else if(type=="slava"){
+						document.getElementById("tekst-opomene").value = "Слава";
+						document.getElementById("type").value = "80";
+					}else if(type=="smrtnislucaj"){
+						document.getElementById("tekst-opomene").value = "Смртни случај";
+						document.getElementById("type").value = "90";
+					}else if(type=="stimulacija"){
+						var iznos = prompt("Колики је новчани износ стимулације?");
+						document.getElementById("tekst-opomene").value = "Новчани износ стимулације: "+iznos;
+						document.getElementById("type").value = "100";
 					}
 					loadGif();
 					document.getElementById("opomena-form").submit();
