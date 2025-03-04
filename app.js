@@ -5602,6 +5602,7 @@ server.post('/izmenaMajstora',async (req,res)=>{
 											brojKartice:json.brojKartice,
 											ime:json.ime,
 											ocekivaniUcinak:json.ocekivaniUcinak,
+											mesecnaPlata:json.mesecnaPlata,
 											sluzbeniBroj:json.sluzbeniBroj,
 											privatniBroj:json.privatniBroj,
 											jmbg:json.jmbg,
