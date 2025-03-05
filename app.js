@@ -6741,7 +6741,7 @@ server.get('/dispecer/dodeljeniNalozi',async (req,res)=>{
 server.get('/dispecer/zavrseniNalozi',async (req,res)=>{
 	if(req.session.user){
 			if(Number(req.session.user.role)==20){
-				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$in:["Završeno"]}}).toArray()
+				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$in:["Završeno","Spreman za obračun"]}}).toArray()
 				.then((nalozi) => {
 					for(var i=0;i<nalozi.length;i++){
 						delete nalozi[i]._id;
