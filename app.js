@@ -10124,6 +10124,118 @@ server.get('/majstorCheckIn/:servertoken/:tagId',async (req,res)=>{
 	}
 });
 
+server.get('/appLogIn/:servertoken/:deviceid',async (req,res)=>{
+	if(req.params.servertoken==process.env.servertoken){
+		if(!req.session.user){
+			var deviceId = hashString(req.params.deviceid);
+			majstoriDB.find({deviceId:deviceId}).toArray()
+			.then((majstori)=>{
+				if(majstori.length==0){
+					res.render("appLogin",{
+						pageTitle: "Пријавите се",
+						deviceId: deviceId,
+						serverToken: req.params.servertoken
+					});
+				}else{
+					//Uloguj ga
+					var sessionObject	=	JSON.parse(JSON.stringify(majstori[0]));
+					sessionObject.role = 60;
+					delete sessionObject.password;
+					delete sessionObject.deviceId;
+					req.session.user	=	sessionObject;
+					req.session.user.name = req.session.user.ime;
+					res.redirect("/");
+				}
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("messageNotLoggedIn",{
+					pageTitle: "Програмска грешка",
+					message: "<div class=\"text\">Greska u bazi podataka 10139</div>"
+				});
+			})
+		}else{
+			res.redirect("/");
+		}
+	}else{
+		res.send("Greska u tokenu");
+	}
+	
+})
+
+server.post('/appLogin',async (req,res)=>{
+	if(req.session.user){
+		res.redirect("/")
+	}else{
+		try{
+			const loginJson = JSON.parse(req.body.json);
+			if(loginJson.serverToken==process.env.servertoken){
+				const username = loginJson.username;
+				const password = hashString(loginJson.password);
+				const deviceId = loginJson.deviceId;
+				majstoriDB.find({username:username}).toArray()
+				.then((majstori)=>{
+					if(majstori.length>0){
+						if(majstori[0].password==password){
+							var sessionObject	=	JSON.parse(JSON.stringify(majstori[0]));
+							delete sessionObject.password;
+							req.session.user	=	sessionObject;
+							req.session.user.role = 60;
+							req.session.user.name = req.session.user.ime;
+							var setObj	=	{ $set: {
+								deviceId: deviceId
+							}};
+							majstoriDB.updateOne({username:username},setObj)
+							.then((dbResponse)=>{
+								res.redirect("/")
+							})
+							.catch((error)=>{
+								logError(error);
+								res.render("messageNotLoggedIn",{
+									pageTitle: "Програмска грешка",
+									message: "<div class=\"text\">Дошло је до грешке у бази податка 10196. Молимо затворите апликацију и покрените је поново.</div>"
+								});
+							})
+						}else{
+							res.render("messageNotLoggedIn",{
+								pageTitle: "Грешка",
+								message: "<div class=\"text\">Унели сте погрешну лозинку. Молимо затворите апликацију и покрените је поново.</div>"
+							});
+						}
+					}else{
+						res.render("messageNotLoggedIn",{
+							pageTitle: "Грешка",
+							message: "<div class=\"text\">Не постоји корисник са унетом електронском поштом. Молимо затворите апликацију и покрените је поново.</div>"
+						});
+					}
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("messageNotLoggedIn",{
+						pageTitle: "Програмска грешка",
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 2263. Молимо затворите апликацију и покрените је поново.</div>"
+					});
+				})
+			}else{
+				res.render("messageNotLoggedIn",{
+					pageTitle: "Програмска грешка",
+					message: "<div class=\"text\">Грешка у токену. Молимо затворите апликацију и покрените је поново.</div>"
+				});
+			}
+			
+		}catch(err){
+			logError(err);
+			res.render("messageNotLoggedIn",{
+				pageTitle: "Програмска грешка",
+				message: "<div class=\"text\">Greska u bazi podataka 10171. Молимо затворите апликацију и покрените је поново.</div>"
+			});
+		}
+	}
+	
+	
+});
+
+
 io.on('connection', function(socket){
 
 	socket.on('listaNalogaAdministracija', function(odDatuma,doDatuma,adresa,opstine){

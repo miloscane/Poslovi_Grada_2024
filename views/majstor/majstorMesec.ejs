@@ -4,7 +4,6 @@
 		var nalozi = <%-JSON.stringify(nalozi)%>;
 		var checkIns = <%-JSON.stringify(checkIns)%>;
 		var opomene = <%-JSON.stringify(opomene)%>;
-		console.log(dodele);
 		var datum = "<%=datum%>";
 		var mesec = datum.split(".")[0];
 		var godina = datum.split(".")[1];
@@ -27,8 +26,11 @@
 			<div class="box bodoviWrap">
 				<div class="title">Укупно бодова:</div>
 				<div class="value bodovi" id="bodovi"></div>
+				<script>
+					document.getElementById("bodovi").innerHTML = Math.ceil(user.mesecnaPlata/500);
+				</script>
 			</div>
-			<div class="box ocekivaniUcinakWrap">
+			<!--<div class="box ocekivaniUcinakWrap">
 				<div class="title">Очекиван учинак</div>
 				<div class="value ocekivanUcinak" id="ocekivan-ucinak"></div>
 				<div class="title">Остварен учинак</div>
@@ -37,7 +39,7 @@
 				<div class="value ocekivanoNaloga" id="ocekivano-naloga"></div>
 				<div class="title">Остварено налога</div>
 				<div class="value ostvarenoNaloga" id="ostvareno-naloga"></div>
-			</div>
+			</div>-->
 			<div class="swipeable">
 				<div class="arrow arrowLeft" onclick="moveDay(-1)"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/chevronLeft.svg"></div>
 				<div class="daily" id="daily"></div>
