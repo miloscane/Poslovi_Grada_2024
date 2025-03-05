@@ -7882,7 +7882,7 @@ server.get('/magacioner/danasnjiReversi', async (req, res)=> {
 			var today = new Date();
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
-			magacinReversiDB.find({datum:{$regex:dateString+"."+monthString}}).toArray()
+			magacinReversiDB.find({datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()}}).toArray()
 			.then((reversi)=>{
 				var naloziToFind = [];
 				for(var i=0;i<reversi.length;i++){
@@ -7947,7 +7947,7 @@ server.get('/magacioner/jucerasnjiReversi', async (req, res)=> {
 			today.setDate(today.getDate()-1);
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
-			magacinReversiDB.find({datum:{$regex:dateString+"."+monthString}}).toArray()
+			magacinReversiDB.find({datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()}}).toArray()
 			.then((reversi)=>{
 				var naloziToFind = [];
 				for(var i=0;i<reversi.length;i++){

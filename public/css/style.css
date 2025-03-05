@@ -5947,6 +5947,37 @@ input[type=number] {
 }
 
 
+#page-title .refreshButton{
+    position:absolute;
+    top:0%;
+    right:10px;
+    transform: translateY(-100%);
+}
+
+#page-title .refreshButton .appButton{
+    background-color:rgb(31,51,100);
+    color:rgb(255,255,255);
+    padding:3px 5px;
+    border:2px outset;
+}
+
+#page-title .refreshButton .appButton .icon{
+    width:15px;
+    display:inline-block;
+    vertical-align: middle;
+}
+
+#page-title .refreshButton .appButton .icon img{
+    display:block;
+}
+
+#page-title .refreshButton .appButton .text{
+    display:inline-block;
+    vertical-align: middle;
+    font-size:14px;
+    padding-left:5px;
+}
+
 
 @media screen and (max-width: 1100px) {
     .pageWidth{

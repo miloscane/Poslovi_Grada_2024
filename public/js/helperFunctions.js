@@ -187,29 +187,37 @@ function countWorkdays(year, month, holidays = []) {//let holidays = ['2025-02-1
     return workdays;
 }
 
-function detectSwipe(element, callback) {
-    let touchStartX = 0;
-    let touchEndX = 0;
+function detectSwipe(el, callback) {
+    let startX, startY, startTime;
 
-    element.addEventListener("touchstart", (event) => {
-        touchStartX = event.touches[0].clientX;
+    el.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startTime = new Date().getTime();
     });
 
-    element.addEventListener("touchend", (event) => {
-        touchEndX = event.changedTouches[0].clientX;
-        handleSwipe();
-    });
+    el.addEventListener("touchmove", (e) => {
+        //e.preventDefault(); // Prevent default scroll if needed
+    }, { passive: false });
 
-    function handleSwipe() {
-        let deltaX = touchEndX - touchStartX;
-        let threshold = 50; // Minimum distance required for a swipe
+    el.addEventListener("touchend", (e) => {
+        let endX = e.changedTouches[0].clientX;
+        let endY = e.changedTouches[0].clientY;
+        let deltaX = endX - startX;
+        let deltaY = endY - startY;
+        let elapsedTime = new Date().getTime() - startTime;
 
-        if (deltaX > threshold) {
-            callback("right"); // Swipe right detected
-        } else if (deltaX < -threshold) {
-            callback("left"); // Swipe left detected
+        // Minimum swipe distance and angle check
+        if (Math.abs(deltaX) > 100 && Math.abs(deltaX) > Math.abs(deltaY)) {
+            if (elapsedTime < 500) { // Ensures fast swipes are considered
+                if (deltaX < 0) {
+                    callback("left");
+                } else {
+                    callback("right");
+                }
+            }
         }
-    }
+    });
 }
 
 var definicijeProizvoda = [

@@ -18,6 +18,7 @@
 			<script>
 				document.getElementById("odabir-meseca").value = datum;
 				function pickMesec(){
+					loadGif();
 					window.location.href = "/majstor/mesec/"+document.getElementById("odabir-meseca").value;
 				}
 			</script>
@@ -225,4 +226,5 @@
 			</div>
 		</div>
 	</div>
+<%- include ("partials/appfooter") -%>
 <%- include ("partials/footer") -%>

@@ -1,0 +1,19 @@
+<script>
+	document.getElementById("page-title").style.position = "relative";
+	var refreshButton = document.createElement("DIV");
+	refreshButton.setAttribute("class","refreshButton");
+		var button = document.createElement("DIV");
+		button.setAttribute("class","appButton");
+		button.setAttribute("onclick","location.reload()")
+			var icon = document.createElement("DIV");
+			icon.setAttribute("class","icon");
+			icon.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/refresh.svg\">";
+			button.appendChild(icon);
+
+			var text = document.createElement("DIV");
+			text.setAttribute("class","text");
+			text.innerHTML = "Освежи";
+			button.appendChild(text);
+		refreshButton.appendChild(button);
+	document.getElementById("page-title").appendChild(refreshButton);
+</script>
