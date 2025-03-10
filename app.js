@@ -3992,6 +3992,42 @@ server.get('/izvestajLokacijeMajstora/:majstorid/:date',async (req,res)=>{
 	}
 });
 
+server.get('/administracija/strukturaJucerasnjihNaloga/:datum',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var date = req.params.datum;
+			var datum = new Date(date);
+			naloziDB.find({"datum.datum":getDateAsStringForDisplay(datum)}).toArray()
+			.then((nalozi)=>{
+				res.render("administracija/strukturaJucerasnjihNaloga",{
+					pageTitle: "Структура радних налога за " + getDateAsStringForDisplay(datum),
+					user: req.session.user,
+					date: date,
+					nalozi: nalozi 
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 4009</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+
+
 server.get('/administracija/specifikacijePodizvodjaca',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){

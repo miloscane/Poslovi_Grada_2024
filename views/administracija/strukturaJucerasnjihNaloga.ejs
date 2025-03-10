@@ -1,10 +1,74 @@
 <%- include ("partials/header") -%>
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
+		nalozi.sort((a, b) => a.radnaJedinica.localeCompare(b.radnaJedinica));
+		var date = "<%=date%>";
+		console.log(date)
 	</script>
 	<div class="pageWidth">
-		<div class="strukturaNaloga"></div>
-			
-		</div>
+		<div class="strukturaNaloga">
+			<div class="datePick"><input type="date" id="date-pick" oninput="datePicked()"></div>
+			<script>
+				document.getElementById("date-pick").value = date;
+				function datePicked(){
+					loadGif();
+					window.location.href="/administracija/strukturaJucerasnjihNaloga/"+document.getElementById("date-pick").value;
+				}
+			</script>
+			<div id="nalozi"></div>
+			<script>
+				for(var i=0;i<nalozi.length;i++){
+					var nalogWrap = document.createElement("DIV");
+					nalogWrap.setAttribute("class","nalogWrap");
+						var redniBroj = document.createElement("DIV");
+						redniBroj.setAttribute("class","redniBroj");
+						redniBroj.innerHTML = eval(i+1);
+						nalogWrap.appendChild(redniBroj);
+
+						var brojNaloga = document.createElement("DIV");
+						brojNaloga.setAttribute("class","brojNaloga");
+						brojNaloga.innerHTML = nalozi[i].broj;
+						nalogWrap.appendChild(brojNaloga);
+
+						var radnaJedinica = document.createElement("DIV");
+						radnaJedinica.setAttribute("class","radnaJedinica");
+						radnaJedinica.innerHTML = nalozi[i].radnaJedinica;
+						nalogWrap.appendChild(radnaJedinica);
+
+						var opis = document.createElement("DIV");
+						opis.setAttribute("class","opis");
+						opis.innerHTML = nalozi[i].opis;
+						nalogWrap.appendChild(opis);
+
+						var typeRadioBoxesWrap = document.createElement("DIV");
+						typeRadioBoxesWrap.setAttribute("class","typeRadioBoxesWrap");
+							var radioTypes = ["WOMA","Crpljenje","Zamena","Dezinfekcija","Curenje","Finalizacija","Zagušenje"];
+							for(var j=0;j<radioTypes.length;j++){
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","inline");
+									var radioBox = document.createElement("INPUT");
+									radioBox.setAttribute("class","radioBox");
+									radioBox.setAttribute("type","radio");
+									radioBox.setAttribute("name",nalozi[i].broj);
+									radioBox.setAttribute("id",nalozi[i].broj+"-"+j);
+									radioBox.setAttribute("value",radioTypes[j]);
+									inline.appendChild(radioBox);
+
+									var label = document.createElement("LABEL");
+									label.setAttribute("for",nalozi[i].broj+"-"+j);
+									label.setAttribute("class","radioLabel");
+									label.innerHTML = radioTypes[j];
+									inline.appendChild(label);
+								typeRadioBoxesWrap.appendChild(inline);
+								
+							}
+							
+						nalogWrap.appendChild(typeRadioBoxesWrap);
+
+
+					document.getElementById("nalozi").appendChild(nalogWrap);
+				}
+			</script>
+		</div>			
 	</div>
 <%- include ("partials/footer") -%>

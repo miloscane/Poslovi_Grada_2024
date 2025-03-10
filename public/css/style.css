@@ -662,7 +662,7 @@ input[type=number] {
 }
 
 #menu .menuWrap .menuItem:hover .subMenu{
-    max-height:400px;
+    max-height:500px;
     box-shadow: 0px 2px 2px rgba(0,0,0,0.2);
 }
 
@@ -5978,6 +5978,56 @@ input[type=number] {
     padding-left:5px;
 }
 
+.strukturaNaloga .nalogWrap{
+    padding:5px;
+}
+
+.strukturaNaloga .nalogWrap:nth-child(odd){
+    background-color:rgb(240,240,240);
+}
+
+.strukturaNaloga .nalogWrap .redniBroj{
+    display: inline-block;
+    vertical-align: middle;
+    width:30px;
+}
+
+.strukturaNaloga .nalogWrap .brojNaloga{
+    display: inline-block;
+    vertical-align: middle;
+    width:100px;
+}
+
+.strukturaNaloga .nalogWrap .radnaJedinica{
+    display: inline-block;
+    vertical-align: middle;
+    width:200px;
+}
+
+.strukturaNaloga .nalogWrap .opis{
+    display: inline-block;
+    vertical-align: middle;
+    width:300px;
+}
+
+.strukturaNaloga .nalogWrap .typeRadioBoxesWrap{
+    display: inline-block;
+    vertical-align: middle;
+    width:300px;
+    font-size:0;
+}
+
+.strukturaNaloga .nalogWrap .typeRadioBoxesWrap .inline{
+    display:inline-block;
+    vertical-align: top;
+    font-size:12px;
+    width:40%;
+    margin:5px 0;
+}
+
+.strukturaNaloga .nalogWrap .inline label{
+    padding-left:5px;
+}
 
 @media screen and (max-width: 1100px) {
     .pageWidth{
