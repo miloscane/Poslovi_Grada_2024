@@ -4026,6 +4026,49 @@ server.get('/administracija/strukturaJucerasnjihNaloga/:datum',async (req,res)=>
 	}
 });
 
+server.post('/strukturaNaloga',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var json = JSON.parse(req.body.json);
+			var mail = "<h1>Структура радних налога за дан: "+reshuffleDate(json[0].datum)+"</h1><br>";
+			for(var i=0;i<json.length;i++){
+				mail += "<h2 style=\"padding-left:10px\">"+json[i].radnaJedinica+" ("+json[i].nalozi+" налога)</h2>";
+				for(var j=0;j<json[i].types.length;j++){
+					mail += "<h3 style=\"padding-left:15px\">"+json[i].types[j].type+" ("+json[i].types[j].nalozi+")</h3>";
+				}
+			}
+
+			var mailOptions = {
+				from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+				to: "miloscane@gmail.com",
+				subject: "Структура радних налога за дан: "+reshuffleDate(json[0].datum),
+				html: mail
+			};
+
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+					logError(error);
+				}
+				res.render("message",{
+					pageTitle: "Браво!",
+					user: req.session.user,
+					message: "<div class=\"text\">Успешно послат емаил директору.</div>"
+				});
+			});
+
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login")
+	}
+});
+
 
 
 server.get('/administracija/specifikacijePodizvodjaca',async (req,res)=>{

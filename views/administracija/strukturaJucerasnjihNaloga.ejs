@@ -3,7 +3,7 @@
 		var nalozi = <%-JSON.stringify(nalozi)%>;
 		nalozi.sort((a, b) => a.radnaJedinica.localeCompare(b.radnaJedinica));
 		var date = "<%=date%>";
-		console.log(date)
+		var radioTypes = ["Crpljenje","Zamena","Dezinfekcija","Curenje","Finalizacija","Zagušenje","WOMA"];
 	</script>
 	<div class="pageWidth">
 		<div class="strukturaNaloga">
@@ -20,6 +20,7 @@
 				for(var i=0;i<nalozi.length;i++){
 					var nalogWrap = document.createElement("DIV");
 					nalogWrap.setAttribute("class","nalogWrap");
+					nalogWrap.setAttribute("data-radnajedinica",nalozi[i].radnaJedinica);
 						var redniBroj = document.createElement("DIV");
 						redniBroj.setAttribute("class","redniBroj");
 						redniBroj.innerHTML = eval(i+1);
@@ -42,7 +43,7 @@
 
 						var typeRadioBoxesWrap = document.createElement("DIV");
 						typeRadioBoxesWrap.setAttribute("class","typeRadioBoxesWrap");
-							var radioTypes = ["WOMA","Crpljenje","Zamena","Dezinfekcija","Curenje","Finalizacija","Zagušenje"];
+						var opisCheck = nalozi[i].opis.toLowerCase();
 							for(var j=0;j<radioTypes.length;j++){
 								var inline = document.createElement("DIV");
 								inline.setAttribute("class","inline");
@@ -52,6 +53,35 @@
 									radioBox.setAttribute("name",nalozi[i].broj);
 									radioBox.setAttribute("id",nalozi[i].broj+"-"+j);
 									radioBox.setAttribute("value",radioTypes[j]);
+									if(opisCheck.includes("voma") || opisCheck.includes("woma") || opisCheck.includes("womo") || opisCheck.includes("vomo") ){
+										if(radioTypes[j]=="WOMA"){
+											radioBox.checked = true;	
+										}
+									}else if(opisCheck.includes("crplj")){
+										if(radioTypes[j]=="Crpljenje"){
+											radioBox.checked = true;	
+										}
+									}else if(opisCheck.includes("zam")){
+										if(radioTypes[j]=="Zamena"){
+											radioBox.checked = true;	
+										}
+									}else if(opisCheck.includes("dezinf")){
+										if(radioTypes[j]=="Dezinfekcija"){
+											radioBox.checked = true;	
+										}
+									}else if(opisCheck.includes("cure") || opisCheck.includes("curi") || opisCheck.includes("cur")){
+										if(radioTypes[j]=="Curenje"){
+											radioBox.checked = true;	
+										}
+									}else if(opisCheck.includes("final")){
+										if(radioTypes[j]=="Finalizacija"){
+											radioBox.checked = true;	
+										}
+									}else if(opisCheck.includes("zagu") || opisCheck.includes("odgu") ){
+										if(radioTypes[j]=="Zagušenje"){
+											radioBox.checked = true;	
+										}
+									}
 									inline.appendChild(radioBox);
 
 									var label = document.createElement("LABEL");
@@ -60,13 +90,75 @@
 									label.innerHTML = radioTypes[j];
 									inline.appendChild(label);
 								typeRadioBoxesWrap.appendChild(inline);
+							}
+						nalogWrap.appendChild(typeRadioBoxesWrap);
+					document.getElementById("nalozi").appendChild(nalogWrap);
+				}
+			</script>
+			<form method="POST" action="/strukturaNaloga" style="display: none;" id="form">
+				<input type="text" id="json" name="json">
+			</form>
+			<div class="inputWrap">
+				<div class="button" onclick="sendMail()">ПОШАЉИ</div>
+			</div>
+			<script>
+				function sendMail(){
+					var json = [];
+					var radnaJedinicaJson = {};
+					radnaJedinicaJson.radnaJedinica = "UKUPNO";
+					radnaJedinicaJson.types = [];
+					radnaJedinicaJson.nalozi = 0;
+					radnaJedinicaJson.datum = date;
+					for(var j=0;j<radioTypes.length;j++){
+						var type = {};
+						type.type = radioTypes[j];
+						type.nalozi = 0;
+						radnaJedinicaJson.types.push(type)
+					}
+					json.push(radnaJedinicaJson)
+
+					for(var i=0;i<radneJedinice.length;i++){
+						var radnaJedinicaJson = {};
+						radnaJedinicaJson.radnaJedinica = radneJedinice[i];
+						radnaJedinicaJson.types = [];
+						radnaJedinicaJson.nalozi = 0;
+						radnaJedinicaJson.datum = date;
+						for(var j=0;j<radioTypes.length;j++){
+							var type = {};
+							type.type = radioTypes[j];
+							type.nalozi = 0;
+							radnaJedinicaJson.types.push(type)
+						}
+						json.push(radnaJedinicaJson)
+					}
+					
+					var nalozi = document.getElementsByClassName("nalogWrap");
+					for(var i=0;i<nalozi.length;i++){
+						json[0].nalozi++;
+						for(var j=0;j<json.length;j++){
+							if(json[j].radnaJedinica==nalozi[i].dataset.radnajedinica){
+								json[j].nalozi++;
+								for(var k=0;k<nalozi[i].getElementsByClassName("radioBox").length;k++){
+									if(nalozi[i].getElementsByClassName("radioBox")[k].checked){
+										for(var l=0;l<json[j].types.length;l++){
+											if(nalozi[i].getElementsByClassName("radioBox")[k].value==json[j].types[l].type){
+												json[j].types[l].nalozi++;
+											}
+										}
+										for(var l=0;l<json[0].types.length;l++){
+											if(nalozi[i].getElementsByClassName("radioBox")[k].value==json[0].types[l].type){
+												json[0].types[l].nalozi++;
+											}
+										}
+									}
+								}
 								
 							}
-							
-						nalogWrap.appendChild(typeRadioBoxesWrap);
-
-
-					document.getElementById("nalozi").appendChild(nalogWrap);
+						}
+					}
+					document.getElementById("json").value = JSON.stringify(json);
+					loadGif();
+					document.getElementById("form").submit();
 				}
 			</script>
 		</div>			
