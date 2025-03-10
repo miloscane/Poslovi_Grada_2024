@@ -6738,6 +6738,7 @@ server.get('/dispecer/dodeljeniNalozi',async (req,res)=>{
 	}
 });
 
+
 server.get('/dispecer/zavrseniNalozi',async (req,res)=>{
 	if(req.session.user){
 			if(Number(req.session.user.role)==20){
