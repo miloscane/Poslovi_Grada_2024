@@ -699,6 +699,57 @@
 											yPos = yPos + 7;
 											doc.setLineWidth(0.2);
 											doc.rect(15, yPos, 180, 270-yPos);
+
+											yPos = yPos + 5;
+											doc.setFontSize(12);
+											doc.setFontType("bold");
+											doc.text("Пуњење и пражњење мреже: ",17,yPos,'left');
+											doc.setFontType("normal");
+											doc.text("________________________ комада вертикала, ______________ спратова",73,yPos,'left');
+											yPos = yPos + 10;
+											doc.setFontType("bold");
+											doc.text("Штемање: ",17,yPos,'left');
+											doc.setFontType("normal");
+											doc.text("димензије _____________________",37,yPos,'left');
+											doc.text("_____________________",58,yPos+7,'left');
+
+											doc.setLineWidth(0.5);
+											var xPos = 100;
+											doc.rect(xPos, yPos-4, 5, 5);
+											xPos = xPos + 6;
+											doc.text("Опека",xPos,yPos,'left');
+											xPos = xPos + 15;
+											doc.rect(xPos, yPos-4, 5, 5);
+											xPos = xPos + 6;
+											doc.text("Бетон",xPos,yPos,'left');
+											xPos = xPos + 15;
+											doc.rect(xPos, yPos-4, 5, 5);
+											xPos = xPos + 6;
+											doc.text("Арм. Бетон",xPos,yPos,'left');
+											xPos = xPos + 23;
+											doc.rect(xPos, yPos-4, 5, 5);
+											xPos = xPos + 6;
+											doc.text("Гипс",xPos,yPos,'left');
+
+											yPos = yPos + 15;
+											doc.setFontType("bold");
+											doc.text("Демонтиран материјал: ",17,yPos,'left');
+											yPos = yPos + 20;
+											doc.text("Уграђен материјал: ",17,yPos,'left');
+											yPos = yPos + 80;
+											doc.text("Потребна финализација: ",17,yPos,'left');
+											doc.setFontType("normal");
+											doc.text("ДА / НЕ ",65,yPos,'left');
+											doc.setFontType("bold");
+											doc.text("Шут изнесен: ",85,yPos,'left');
+											doc.setFontType("normal");
+											doc.text("ДА / НЕ ",111,yPos,'left');
+											doc.setFontType("bold");
+											doc.text("Огушење сајлом: ",130,yPos,'left');
+											doc.setFontType("normal");
+											doc.text("ДА / НЕ ",163,yPos,'left');
+
+
 											yPos = 280;
 											doc.setFontType("bold");
 											doc.text("Потпис мајстора:",15,yPos,'left');
