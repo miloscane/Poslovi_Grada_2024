@@ -8704,6 +8704,31 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 							res.status(500);
 							res.send("Database error");
 						})
+					}else if(stambenoJson.vrsta_promene=="STATUS" && stambenoJson.status_code=="VRACEN"){
+						var setObj	=	{ $set: {
+							statusNaloga: "Vraćen"
+						}};
+						naloziDB.updateOne({uniqueId:nalozi[0].uniqueId},setObj)
+						.then((dbResponse)=>{
+							portalStambenoTestDB.insertOne(stambenoJson)
+							.then((stambenoResponse)=>{
+								res.status(200);
+								res.setHeader('Content-Type', 'application/json');
+								var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+								res.send(JSON.stringify(primerJson));
+							})
+							.catch((error)=>{
+								logError(err);
+								res.status(500);
+								res.send("Database error");
+							})
+							
+						})
+						.catch((error)=>{
+							logError(err);
+							res.status(500);
+							res.send("Database error");
+						})
 					}else{
 						portalStambenoTestDB.insertOne(stambenoJson)
 						.then((stambenoResponse)=>{
