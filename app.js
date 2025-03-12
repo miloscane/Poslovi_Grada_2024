@@ -1276,11 +1276,12 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var dateCutOff = new Date("2025-01-22");
+			var dateStart = new Date("2025-02-20");
+			var dateEnd = new Date("2025-03-03");
 			var sifre = ["80.02.09.001","80.02.09.002","80.02.09.005","80.02.10.007","80.02.09.022","80.02.09.020","80.02.09.021"];
 			for(var i=0;i<nalozi.length;i++){
 				var odlazak = false;
-				if(Number(nalozi[i].datum.datetime)>dateCutOff.getTime()){
+				if(Number(nalozi[i].datum.datetime)>dateStart.getTime() && Number(nalozi[i].datum.datetime)<dateEnd.getTime()){
 					for(var j=0;j<nalozi[i].obracun.length;j++){
 						if(nalozi[i].obracun[j].code=="80.04.01.002"){
 							odlazak=true;
@@ -4068,6 +4069,72 @@ server.post('/strukturaNaloga',async (req,res)=>{
 		res.redirect("/login")
 	}
 });
+
+
+
+
+server.get('/administracija/specifikacijeMajstora/:datum',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var date = req.params.datum;
+			var datum = new Date(date);
+			majstoriDB.find({uniqueId:{$nin:podizvodjaci},active:true}).toArray()
+			then((majstori)=>{
+				dodeljivaniNaloziDB.find({"datum.datum":reshuffleDate(req.params.date),deleted:{$exists:false}}).toArray()
+				.then((dodele)=>{
+					var brojeviNaloga = [];
+					for(var i=0;i<dodele.length;i++){
+						brojeviNaloga.push(dodele[i].nalog)
+					}
+					naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
+					.then((nalozi)=>{
+						res.render("administracija/strukturaJucerasnjihNaloga",{
+							pageTitle: "Структура радних налога мајстора " + getDateAsStringForDisplay(datum),
+							user: req.session.user,
+							date: date,
+							nalozi: nalozi,
+							dodele: dodele,
+							majstori: majstori 
+						})
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Грешка у бази података 4098</div>"
+						});
+					})
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у бази података 4092</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 4090</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 
 
 
@@ -8274,6 +8341,7 @@ server.get('/uspesnoFakturisano',async (req,res)=>{
 	}
 });*/
 
+
 server.post('/portalStambenoNalozi', async (req, res)=> {
 	var nalogJSON = {};
 	nalogJSON.datetime = new Date().getTime();
@@ -8611,19 +8679,44 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 								res.send("Database error");
 							})
 						}	
+					}else if(stambenoJson.vrsta_promene=="STATUS" && stambenoJson.status_code=="IZVRSEN"){
+						var setObj	=	{ $set: {
+							statusNaloga: "Završeno"
+						}};
+						naloziDB.updateOne({uniqueId:nalozi[0].uniqueId},setObj)
+						.then((dbResponse)=>{
+							portalStambenoTestDB.insertOne(stambenoJson)
+							.then((stambenoResponse)=>{
+								res.status(200);
+								res.setHeader('Content-Type', 'application/json');
+								var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+								res.send(JSON.stringify(primerJson));
+							})
+							.catch((error)=>{
+								logError(err);
+								res.status(500);
+								res.send("Database error");
+							})
+							
+						})
+						.catch((error)=>{
+							logError(err);
+							res.status(500);
+							res.send("Database error");
+						})
 					}else{
 						portalStambenoTestDB.insertOne(stambenoJson)
-								.then((stambenoResponse)=>{
-									res.status(200);
-									res.setHeader('Content-Type', 'application/json');
-									var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-									res.send(JSON.stringify(primerJson));
-								})
-								.catch((error)=>{
-									logError(err);
-									res.status(500);
-									res.send("Database error");
-								})
+						.then((stambenoResponse)=>{
+							res.status(200);
+							res.setHeader('Content-Type', 'application/json');
+							var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+							res.send(JSON.stringify(primerJson));
+						})
+						.catch((error)=>{
+							logError(err);
+							res.status(500);
+							res.send("Database error");
+						})
 					}
 					
 					
