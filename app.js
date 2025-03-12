@@ -2959,6 +2959,7 @@ server.post('/opomenaRadnika', async (req, res)=> {
 			opomenaJson.date = new Date().getDate().toString().padStart(2,"0");
 			opomenaJson.year = new Date().getFullYear();
 			opomenaJson.user = req.session.user;
+			opomenaJson.type = req.body.type;
 			opomeneDB.insertOne(opomenaJson)
 			.then((dbResponse)=>{
 				res.render("message",{
