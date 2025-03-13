@@ -1771,6 +1771,43 @@ http.listen(process.env.PORT, function(){
 		})*/
 
 
+
+
+		/*naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var ukupnoNaloga = 0;
+			var ukupanIznos = 0;
+				var woma = ["80.02.09.020","80.02.09.021","80.02.09.022"];
+				var kop = ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
+				for(var i=0;i<nalozi.length;i++){
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							if(kop.indexOf(nalozi[i].obracun[k].code)>=0){
+								nalozi[i].tipNaloga = "KOPANJE";
+							}
+						}
+					
+
+					if(nalozi[i].tipNaloga!="KOPANJE"){
+						for(var k=0;k<nalozi[i].obracun.length;k++){
+							if(woma.indexOf(nalozi[i].obracun[k].code)>=0){
+								nalozi[i].tipNaloga = "WOMA";
+								ukupnoNaloga++;
+								ukupanIznos = ukupanIznos + parseFloat(nalozi[i].ukupanIznos)
+								break;
+							}
+						}
+					}
+				}
+				console.log("Broj Naloga: "+ukupnoNaloga)
+				console.log("Iznos: "+brojSaRazmacima(ukupanIznos))
+
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+
+
 		/*dodeljivaniNaloziDB.find({"datum.datum":{$regex:"02.2025"}}).toArray()
 		.then((dodele)=>{
 			var array = [];

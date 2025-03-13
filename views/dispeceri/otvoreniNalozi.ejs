@@ -250,7 +250,7 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value ikonica");
-								if(naloziToShow[i].kasni && podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
+								if(naloziToShow[i].kasni && podizvodjaci.indexOf(naloziToShow[i].majstor)<0 && naloziToShow[i].statusNaloga!="Stambeno koči" && naloziToShow[i].statusNaloga!="Stanari koče" ){
 									tr.setAttribute("style","background-color:rgb(200,0,0);color:rgb(255,255,255)")
 								}
 								if(naloziToShow[i].statusNaloga=="Primljen" && podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
@@ -337,6 +337,9 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value ikonica");
+								if(naloziToShow[i].kasni && podizvodjaci.indexOf(naloziToShow[i].majstor)<0 && naloziToShow[i].statusNaloga!="Stambeno koči" && naloziToShow[i].statusNaloga!="Stanari koče" ){
+									tr.setAttribute("style","background-color:rgb(200,0,0);color:rgb(255,255,255)")
+								}
 								if(naloziToShowAdresa[i].statusNaloga=="Primljen" && podizvodjaci.indexOf(naloziToShowAdresa[i].majstor)<0){
 									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
 								}else if(podizvodjaci.indexOf(naloziToShowAdresa[i].majstor)<0){
@@ -417,6 +420,9 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value ikonica");
+								if(naloziToShow[i].kasni && podizvodjaci.indexOf(naloziToShow[i].majstor)<0 && naloziToShow[i].statusNaloga!="Stambeno koči" && naloziToShow[i].statusNaloga!="Stanari koče" ){
+									tr.setAttribute("style","background-color:rgb(200,0,0);color:rgb(255,255,255)")
+								}
 								if(naloziToShowBroj[i].statusNaloga=="Primljen" && podizvodjaci.indexOf(naloziToShowBroj[i].majstor)<0){
 									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
 								}else if(podizvodjaci.indexOf(naloziToShowBroj[i].majstor)<0){
