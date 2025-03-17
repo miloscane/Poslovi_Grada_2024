@@ -1654,15 +1654,31 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 
-		/*naloziDB.find({"prijemnica.datum.datum":{$regex:"02.2025"}}).toArray()
-		.then((nalozi)=>{
-			console.log(nalozi.length)
-			naloziDB.find({statusNaloga:"Nalog u Stambenom"}).toArray()
+		//09.03
+
+		/*naloziDB.find({"prijemnica.datum.datum":{$regex:"03.2025"}}).toArray()
+		.then((totalNalozi)=>{
+			var brojeviNaloga = [];
+			for(var i=0;i<totalNalozi.length;i++){
+				brojeviNaloga.push(totalNalozi[i].broj)
+			}
+			naloziDB.find({statusNaloga:{$nin:["Fakturisan","Storniran"]}}).toArray()
 			.then((nalozi2)=>{
 				for(var i=0;i<nalozi2.length;i++){
-					nalozi.push(nalozi2[i])
+					if(brojeviNaloga.indexOf(nalozi2[i].broj)<0){
+						totalNalozi.push(nalozi2[i])
+					}
 				}
 
+				var nalozi = [];
+				//var startDate = "2025-03-10";
+				//var endDate = "2025-03-14";
+				for(var i=0;i<totalNalozi.length;i++){
+					//if(totalNalozi[i].datum.datetime>new Date(startDate).getTime() &&totalNalozi[i].datum.datetime<new Date(endDate).getTime() ){
+						nalozi.push(totalNalozi[i])
+					//}
+				}
+				
 				var woma = ["80.02.09.020","80.02.09.021","80.02.09.022"];
 				var rucno = ["80.02.09.001","80.02.09.002","80.02.09.003","80.02.09.004","80.02.09.005"];
 				var crp = ["80.02.09.009","80.02.09.010","80.02.09.012","80.02.09.025"];
@@ -1761,7 +1777,7 @@ http.listen(process.env.PORT, function(){
 				for(var i=0;i<nalozi.length;i++){
 					csvString += nalozi[i].broj + ";" +nalozi[i].radnaJedinica +";"+ nalozi[i].datum.datum + ";" + nalozi[i].prijemnica.datum.datum+ ";" + nalozi[i].tipNaloga + ";"+nalozi[i].ukupanIznos+"\r\n"; 
 				}					
-				fs.writeFileSync("februar.csv",csvString,{encoding:"Utf8"})
+				fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
 				console.log("Wrote file")
 
 			})
@@ -1770,6 +1786,20 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 
+		/*majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray()
+		.then((majstori)=>{
+			for(var i=0;i<majstori.length;i++){
+				console.log(majstori[i].ime)
+				console.log(brojSaRazmacima(majstori[i].mesecnaPlata))
+				console.log("------------------------------------")
+			}
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+
+		//poruke za zakazivanje , telefonski automat, reklamacija (moze vise)
 
 
 
@@ -2166,6 +2196,49 @@ server.get('/administracija',async (req,res)=>{
 
 	}
 });
+
+
+/*server.get("/sastanak",async(req,res)=>{
+	naloziDB.find({majstor:{$nin:podizvodjaci},"datum.datum":{$regex:"03.2025"}}).sort({ "datum.datetime": 1 }).toArray()
+	.then((nalozi)=>{
+		var nalogIds = [];
+		for(var i=0;i<nalozi.length;i++){
+			nalogIds.push(nalozi[i].broj);
+		}
+		dodeljivaniNaloziDB.find({"datum.datum":{$regex:"03.2025"},deleted:{$exists:false}}).toArray()
+		.then((dodele)=>{
+			majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray()
+			.then((majstori)=>{
+				istorijaNalogaDB.find({broj:{$in:nalogIds}}).sort({ datetime: 1 }).toArray()
+				.then((istorijatNaloga)=>{
+					for(var i=0;i<nalozi.length;i++){
+						nalozi[i].istorija = [];
+						for(var j=0;j<istorijatNaloga.length;j++){
+							if(nalozi[i].broj==istorijatNaloga[j].broj){
+								nalozi[i].istorija.push(istorijatNaloga[j]);
+							}
+						}
+					}
+					res.render("sastanak",{
+						pageTitle: "Састанак",
+						nalozi: nalozi,
+						dodele: dodele,
+						majstori: majstori
+					})
+				})
+			})
+			.catch((error)=>{
+				console.log(error)
+			})
+		})
+		.catch((error)=>{
+			console.log(error)
+		})
+	})
+	.catch((error)=>{
+		console.log(error)
+	})
+})*/
 
 
 server.post('/obrisiPotrebnaFinalizacija',async (req,res)=>{
@@ -8750,10 +8823,23 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						.then((dbResponse)=>{
 							portalStambenoTestDB.insertOne(stambenoJson)
 							.then((stambenoResponse)=>{
-								res.status(200);
-								res.setHeader('Content-Type', 'application/json');
-								var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-								res.send(JSON.stringify(primerJson));
+								var mailOptions = {
+									from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+									to: 'marija.slijepcevic@poslovigrada.rs,miloscane@gmail.com',
+									subject: 'Налог број '+nalozi[0].broj+' је враћен',
+									html: 'Поштовани/а,<br>Налог <a href=\"https://vik2024.poslovigrada.rs/nalog/'+nalozi[0].broj+'\">'+nalozi[0].broj+'</a> је враћен.<br> Радна Јединица: '+nalozi[0].radnaJedinica+'<br>Adresa: '+nalozi[0].adresa+'.'
+								};
+
+								transporter.sendMail(mailOptions, (error, info) => {
+									if (error) {
+										logError(error);
+									}
+									res.status(200);
+									res.setHeader('Content-Type', 'application/json');
+									var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+									res.send(JSON.stringify(primerJson));
+								});
+								
 							})
 							.catch((error)=>{
 								logError(err);
@@ -8761,6 +8847,44 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 								res.send("Database error");
 							})
 							
+						})
+						.catch((error)=>{
+							logError(err);
+							res.status(500);
+							res.send("Database error");
+						})
+					}else if(stambenoJson.vrsta_promene=="STATUS" && stambenoJson.status_code=="OTKAZAN"){
+						var setObj	=	{ $set: {
+							statusNaloga: "Storniran"
+						}};
+						naloziDB.updateOne({uniqueId:nalozi[0].uniqueId},setObj)
+						.then((dbResponse)=>{
+							portalStambenoTestDB.insertOne(stambenoJson)
+							.then((stambenoResponse)=>{
+								var mailOptions = {
+									from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
+									to: 'marija.slijepcevic@poslovigrada.rs,miloscane@gmail.com',
+									subject: 'Налог број '+nalozi[0].broj+' је сторниран',
+									html: 'Поштовани/а,<br>Налог <a href=\"https://vik2024.poslovigrada.rs/nalog/'+nalozi[0].broj+'\">'+nalozi[0].broj+'</a> је сторниран.<br> Радна Јединица: '+nalozi[0].radnaJedinica+'<br>Adresa: '+nalozi[0].adresa+'.'
+								};
+
+								transporter.sendMail(mailOptions, (error, info) => {
+									if (error) {
+										logError(error);
+									}
+									res.status(200);
+								res.setHeader('Content-Type', 'application/json');
+								var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+								res.send(JSON.stringify(primerJson));
+								});
+
+								
+							})
+							.catch((error)=>{
+								logError(err);
+								res.status(500);
+								res.send("Database error");
+							})
 						})
 						.catch((error)=>{
 							logError(err);

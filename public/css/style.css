@@ -6029,6 +6029,114 @@ input[type=number] {
     padding-left:5px;
 }
 
+.sastanak .header{
+    position:sticky;
+    width:100%;
+    background-color: rgb(255,255,255);
+    top:0;
+    padding-bottom:10px;
+    border-bottom:1px solid rgb(31,52,100);
+}
+
+.sastanak .header .items .item{
+    font-size:20px;
+    font-weight:600;
+}
+
+.sastanak .items .item{
+    display:inline-block;
+    vertical-align: top;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding:3px;
+    overflow: hidden;
+}
+
+.sastanak .items .redniBroj{
+    width:35px;
+}
+
+.sastanak .items .adresa{
+    width:100px;
+}
+
+.sastanak .items .nalog{
+    width:80px;
+}
+
+.sastanak .items .opis{
+    width:200px;
+}
+
+.sastanak .items .iznos{
+    width:100px;
+}
+
+.sastanak .items .prijem, .sastanak .items .dodela, .sastanak .items .radovi, .sastanak .items .zavrsetak, .sastanak .items .obracun{
+    width:100px;
+}
+
+.sastanak .majstorElem{
+    position:relative;
+}
+
+.sastanak .majstorElem .title{
+    font-size:28px;
+    font-weight:bold;
+    color:rgb(31,52,100);
+}
+.sastanak .majstorElem .timelineWrap{
+    position:relative;
+}
+
+.sastanak .majstorElem .timelineWrap .date{
+    padding:5px;
+    color:rgb(31,52,100);
+    font-weight: 500;
+    font-size:16px;
+    width:120px;
+    height:100px;
+    border-right:2px solid rgb(31,52,100);
+}
+
+.sastanak .majstorElem .timelineWrap .timesWrap{
+    height:100%;
+    position:absolute;
+    top:0;
+    left:122px;
+    white-space: nowrap;
+    height:100px;
+}
+
+
+.sastanak .majstorElem .timelineWrap .timesWrap .timeSlot{
+    display:inline-block;
+    vertical-align: bottom;
+    width:100px;
+    white-space: normal;
+    border-left:1px solid rgb(100,100,100);
+    padding-left:5px;
+    height:100px;
+    border-bottom: 1px solid rgb(100,100,100);
+}
+
+.sastanak .majstorElem .timelineWrap .dodela{
+    position:absolute;
+    z-index:900;
+    background-color:rgb(31,52,100);
+    border:2px solid rgb(255,255,255);
+    padding:3px;
+    top:0;
+    min-width: 50px;
+}
+
+.sastanak .majstorElem .timelineWrap .dodela a{
+    font-size:10px;
+    text-decoration: none;
+    font-weight:200;
+    display:block;
+}
+
 @media screen and (max-width: 1100px) {
     .pageWidth{
         padding-left:10px;

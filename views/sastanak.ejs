@@ -1,0 +1,306 @@
+<%- include ("partials/header") -%>
+	<script>
+		var radneJedinice = ["ČUKARICA","RAKOVICA","NOVI BEOGRAD","ZEMUN","ZVEZDARA","VRAČAR","VOŽDOVAC","STARI GRAD","PALILULA","SAVSKI VENAC"];
+		var majstori = <%-JSON.stringify(majstori)%>;
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+		var dodele = <%-JSON.stringify(dodele)%>;
+		dodele.sort((a, b) => new Date(a.datum.datetime) - new Date(b.datum.datetime));
+
+	</script>
+	<div class="pageWidth">
+		<div class="sastanak">
+			<div id="radneJedinice"></div>
+			<script>
+				function datetimeDifference(datetime1,datetime2){
+					let hours = (datetime1 - datetime2) / (1000 * 60 * 60);
+					let roundedHours = (Math.round(hours * 2) / 2).toFixed(2);
+					return roundedHours;
+				}
+
+
+				for(var i=0;i<radneJedinice.length;i++){
+					var radnaJedinica = document.createElement("DIV");
+					radnaJedinica.setAttribute("class","radnaJedinica");
+						var header = document.createElement("DIV");
+						header.setAttribute("class","header");
+							var title = document.createElement("DIV");
+							title.setAttribute("class","title");
+							title.innerHTML = radneJedinice[i];
+							header.appendChild(title);
+
+							var items = document.createElement("DIV");
+							items.setAttribute("class","items");
+								var item = document.createElement("DIV");
+								item.setAttribute("class","item redniBroj");
+								item.innerHTML = "Rbr."
+								items.appendChild(item);
+
+								var item = document.createElement("DIV");
+								item.setAttribute("class","item nalog");
+								item.innerHTML = "Nalog"
+								items.appendChild(item);
+
+								var item = document.createElement("DIV");
+								item.setAttribute("class","item adresa");
+								item.innerHTML = "Adresa"
+								items.appendChild(item);
+
+								var item = document.createElement("DIV");
+								item.setAttribute("class","item opis");
+								item.innerHTML = "Opis";
+								items.appendChild(item);
+
+								var item = document.createElement("DIV");
+								item.setAttribute("class","item iznos");
+								item.innerHTML = "Iznos";
+								items.appendChild(item);
+
+								var item = document.createElement("DIV");
+								item.setAttribute("class","item prijem");
+								item.innerHTML = "Prijem";
+								items.appendChild(item);
+
+								var item = document.createElement("DIV");
+								item.setAttribute("class","item dodela");
+								item.innerHTML = "Dodela";
+								items.appendChild(item);
+
+								var item = document.createElement("DIV");
+								item.setAttribute("class","item radovi");
+								item.innerHTML = "Radovi";
+								items.appendChild(item);
+
+								/*var item = document.createElement("DIV");
+								item.setAttribute("class","item zavrsetak");
+								item.innerHTML = "Zavrsetak";
+								items.appendChild(item);*/
+
+								var item = document.createElement("DIV");
+								item.setAttribute("class","item obracun");
+								item.innerHTML = "Obracun";
+								items.appendChild(item);
+
+							header.appendChild(items);
+						radnaJedinica.appendChild(header);
+
+						var naloziElem = document.createElement("DIV");
+						naloziElem.setAttribute("class","nalozi");
+						var counter = 1;
+						for(var j=0;j<nalozi.length;j++){
+							if(nalozi[j].radnaJedinica==radneJedinice[i]){
+								var items = document.createElement("DIV");
+								items.setAttribute("class","items");
+									var item = document.createElement("DIV");
+									item.setAttribute("class","item redniBroj");
+									item.innerHTML = counter+"."
+									items.appendChild(item);
+									counter++;
+
+									var item = document.createElement("DIV");
+									item.setAttribute("class","item nalog");
+									item.innerHTML = "<a target=\"_blank\" href=\"/nalog/"+nalozi[j].broj+"\">"+nalozi[j].broj+"</a>";
+									items.appendChild(item);
+
+									var item = document.createElement("DIV");
+									item.setAttribute("class","item adresa");
+									item.innerHTML = nalozi[j].adresa;
+									items.appendChild(item);
+
+									var item = document.createElement("DIV");
+									item.setAttribute("class","item opis");
+									item.innerHTML = nalozi[j].opis;
+									items.appendChild(item);
+
+									var item = document.createElement("DIV");
+									item.setAttribute("class","item iznos");
+									item.innerHTML = brojSaRazmacima(nalozi[j].ukupanIznos);
+									items.appendChild(item);
+
+									var item = document.createElement("DIV");
+									item.setAttribute("class","item prijem");
+									item.innerHTML = getDateAsStringForDisplay(new Date(Number(nalozi[j].datum.datetime)))+"<br>"+getTimestamp(new Date(Number(nalozi[j].datum.datetime)));
+									items.appendChild(item);
+
+									var item = document.createElement("DIV");
+									item.setAttribute("class","item dodela");
+									var datetimeDodele = 0;
+									for(var k=0;k<dodele.length;k++){
+										if(dodele[k].nalog==nalozi[j].broj){
+											datetimeDodele = dodele[k].datum.datetime;
+											break;
+										}
+									}
+									if(datetimeDodele!=0){
+										item.innerHTML = datetimeDifference(datetimeDodele,nalozi[j].datum.datetime);
+									}else{
+										item.innerHTML = "<span style=\"color:rgb(200,0,0);font-weight:700;\">!!!</span>";
+									}
+									items.appendChild(item);
+
+									var item = document.createElement("DIV");
+									item.setAttribute("class","item radovi");
+									var datetimeRadova = 0;
+									for(var k=0;k<dodele.length;k++){
+										if(dodele[k].nalog==nalozi[j].broj){
+											var datumRadova = new Date(dodele[k].datumRadova);
+											datumRadova.setHours(Number(dodele[k].vremeDolaska.split(":")[0]));
+											datumRadova.setMinutes(Number(dodele[k].vremeDolaska.split(":")[1]));
+											datetimeRadova = datumRadova.getTime();
+											console.log(radneJedinice[i]+": "+datumRadova)
+											break;
+										}
+									}
+									if(datetimeRadova!=0){
+										item.innerHTML = datetimeDifference(datetimeRadova,nalozi[j].datum.datetime);
+									}else{
+										item.innerHTML = "<span style=\"color:rgb(200,0,0);font-weight:700;\">!!!</span>";
+									}
+									items.appendChild(item);
+
+									/*var item = document.createElement("DIV");
+									item.setAttribute("class","item zavrsetak");
+									var datetimeZavrsetka = 0;
+									if(nalozi[j].statusNaloga=="Završeno"){
+										if(nalozi[j].istorija.length>0){
+											datetimeZavrsetka = nalozi[j].istorija[nalozi[j].istorija.length-1].datetime;
+										}
+										
+									}else{
+										for(var k=0;k<nalozi[j].istorija.length;k++){
+											if(nalozi[j].istorija[k+1]){
+												if(nalozi[j].istorija[k+1].statusNaloga == "Završeno"){
+													datetimeZavrsetka = nalozi[j].istorija[k+1].datetime;
+													break;
+												}
+											}
+										}
+									}
+									if(datetimeZavrsetka!=0){
+										item.innerHTML = eval((datetimeZavrsetka-nalozi[j].datum.datetime)/ (1000 * 60 * 60)).toFixed(2);
+									}else{
+										item.innerHTML = "<span style=\"color:rgb(200,0,0);font-weight:700;\">!!!</span>";
+									}*/
+
+									items.appendChild(item);
+
+									var item = document.createElement("DIV");
+									item.setAttribute("class","item obracun");
+									if(nalozi[j].prijemnica.datum.datetime){
+										item.innerHTML = datetimeDifference(nalozi[j].prijemnica.datum.datetime,nalozi[j].datum.datetime);
+									}else{
+										item.innerHTML = "<span style=\"color:rgb(200,0,0);font-weight:700;\">!!!</span>";
+									}
+									
+									items.appendChild(item);
+									items.appendChild(item);
+								naloziElem.appendChild(items);
+		
+								
+							}
+							
+						}
+						radnaJedinica.appendChild(naloziElem);
+					var averageElems = radnaJedinica.getElementsByClassName("dodela");
+					var counter = 0;
+					var total = 0;
+					for(var j=1;j<averageElems.length;j++){
+						if(!isNaN(parseFloat(averageElems[j].innerHTML))){
+							total = total + parseFloat(averageElems[j].innerHTML);
+							counter++;
+						}
+					}	
+					averageElems[0].innerHTML = averageElems[0].innerHTML+"<br><span style=\"font-size:16px;font-weight:300\">"+eval(total/counter).toFixed(0)+"</span>";
+
+					
+					var averageElems = radnaJedinica.getElementsByClassName("radovi");
+					var counter = 0;
+					var total = 0;
+					for(var j=1;j<averageElems.length;j++){
+						if(!isNaN(parseFloat(averageElems[j].innerHTML))){
+							total = total + parseFloat(averageElems[j].innerHTML);
+							counter++;
+						}
+					}	
+					averageElems[0].innerHTML = averageElems[0].innerHTML+"<br><span style=\"font-size:16px;font-weight:300\">"+eval(total/counter).toFixed(0)+"</span>";
+
+					
+					var averageElems = radnaJedinica.getElementsByClassName("obracun");
+					var counter = 0;
+					var total = 0;
+					for(var j=1;j<averageElems.length;j++){
+						if(!isNaN(parseFloat(averageElems[j].innerHTML))){
+							total = total + parseFloat(averageElems[j].innerHTML);
+							counter++;
+						}
+					}	
+					averageElems[0].innerHTML = averageElems[0].innerHTML+"<br><span style=\"font-size:16px;font-weight:300\">"+eval(total/counter).toFixed(0)+"</span>";
+						
+
+					document.getElementById("radneJedinice").appendChild(radnaJedinica);
+					
+
+				}
+			</script>
+			<div style="font-size:35px;font-weight:600;color:rgb(31,52,100)">MAJSTORI</div>
+			<div id="majstori"></div>
+			<script>
+				for(var i=0;i<majstori.length;i++){
+					var majstorElem = document.createElement("DIV");
+					majstorElem.setAttribute("class","majstorElem");
+						var title = document.createElement("DIV");
+						title.setAttribute("class","title");
+						title.setAttribute("style","position:sticky;top:0;width:100%;background-color:rgb(255,255,255);z-index:1000");
+						title.innerHTML = majstori[i].ime;
+						majstorElem.appendChild(title);
+
+						var firstDay = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+						for(var j=1;j<=13;j++){
+							var timelineWrap = document.createElement("DIV");
+							timelineWrap.setAttribute("class","timelineWrap");
+								var date = document.createElement("DIV");
+								date.setAttribute("class","date")
+								date.innerHTML = getDateAsStringForDisplay(firstDay);
+								
+								timelineWrap.appendChild(date);
+
+								var timesWrap = document.createElement("DIV");
+								timesWrap.setAttribute("class","timesWrap");
+								timesWrap.setAttribute("data-datetime",firstDay.getTime());
+									for(var k=0;k<16;k++){
+										var timeSlot = document.createElement("DIV");
+										timeSlot.setAttribute("class","timeSlot");
+										timeSlot.innerHTML = eval(k+7) + ":00";
+										timesWrap.appendChild(timeSlot);
+									}
+									var minTop = 20;
+									var topIncrement = 0;
+									for(var k=0;k<dodele.length;k++){
+										if(majstori[i].uniqueId==dodele[k].majstor){
+											if(istiDatum(new Date(dodele[k].datumRadova),firstDay)){
+												var dodela = document.createElement("DIV");
+												dodela.setAttribute("class","dodela");
+												dodela.innerHTML = "<a target=\"_blank\" style=\"color:rgb(255,255,255)\" href=\"/nalog/"+dodele[k].nalog+"\">"+dodele[k].nalog+"</a>";
+												var half = dodele[k].vremeDolaska.split(":")[1]=="30" ? 50 : 0; 
+												dodela.style.left = eval(100*(dodele[k].vremeDolaska.split(":")[0]-7) + half)+"px"
+												var halfWidth = dodele[k].vremeRadova.split(":")[1] == "30" ? 50 : 0;
+												dodela.style.width = eval((Number(dodele[k].vremeRadova.split(":")[0])-7)*100 + halfWidth)+"px";
+												timesWrap.appendChild(dodela);
+												dodela.style.top = eval(minTop+topIncrement*22)+"px";
+												topIncrement++;
+
+											}
+										}
+									}
+								timelineWrap.appendChild(timesWrap);
+
+							majstorElem.appendChild(timelineWrap);
+							firstDay.setDate(firstDay.getDate()+1)
+						}
+						
+					document.getElementById("majstori").appendChild(majstorElem)
+				}
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>
