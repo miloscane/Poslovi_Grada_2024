@@ -8873,9 +8873,9 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 										logError(error);
 									}
 									res.status(200);
-								res.setHeader('Content-Type', 'application/json');
-								var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
-								res.send(JSON.stringify(primerJson));
+									res.setHeader('Content-Type', 'application/json');
+									var primerJson = {"code":"200","message":"Primio sam podatke za postojeci nalog.","warnings":{"vrsta_promene":"Missing type of change","broj_ugovora":"Contract number is missing"}}
+									res.send(JSON.stringify(primerJson));
 								});
 
 								

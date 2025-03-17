@@ -642,14 +642,13 @@
 											if(logoStambenoLogoBlob){
 												doc.addImage(logoStambenoLogoBlob, 'PNG', 5, 5, 238/mm, 87/mm,'','FAST');
 											}
-											yPos = 30;
-											yPos = yPos + 10;
+											yPos = 20;
 											doc.setFontSize(22);
 											doc.text("ИНТЕРНИ РАДНИ НАЛОГ",pageWidth/2,yPos,'center');
 											doc.setLineWidth(0.5);
-											doc.rect(60, 30, 90, 15);
+											doc.rect(60, yPos-10, 90, 15);
 											
-											yPos = yPos + 10;
+											yPos = yPos + 3;
 											doc.setFontSize(14);
 											doc.text("Датум:",15,yPos,'left');
 											doc.text("Број налога:",195,yPos,'right');
@@ -734,9 +733,20 @@
 											yPos = yPos + 15;
 											doc.setFontType("bold");
 											doc.text("Демонтиран материјал: ",17,yPos,'left');
-											yPos = yPos + 20;
+
+											doc.setLineWidth(0.1);
+											for(var j=0;j<5;j++){
+												yPos = yPos + 6;
+												doc.line(17, yPos, 193, yPos);
+											}
+											yPos = yPos + 5;
 											doc.text("Уграђен материјал: ",17,yPos,'left');
-											yPos = yPos + 80;
+											for(var j=0;j<16;j++){
+												yPos = yPos + 6;
+												doc.line(17, yPos, 193, yPos);
+											}
+											yPos = yPos + 5;
+											//yPos = yPos + 80;
 											doc.text("Потребна финализација: ",17,yPos,'left');
 											doc.setFontType("normal");
 											doc.text("ДА / НЕ ",65,yPos,'left');
@@ -747,7 +757,7 @@
 											doc.setFontType("bold");
 											doc.text("Одгушење сајлом: ",130,yPos,'left');
 											doc.setFontType("normal");
-											doc.text("ДА / НЕ ",163,yPos,'left');
+											doc.text("ДА / НЕ ",165,yPos,'left');
 
 
 											yPos = 280;
