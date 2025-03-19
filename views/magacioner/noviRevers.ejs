@@ -194,8 +194,11 @@
 									<div class="inputTitle">Тип реверса:</div>
 									<select id="tip-reversa">
 										<option value="Standardni">Стандардни</option>
-										<option value="Standard">Допуна</option>
-										<option value="Standard">Допуна</option>
+										<option value="Zamena">Замена</option>
+										<option value="PromenaTE">Промена ТЕ</option>
+										<option value="Dostava">Достава</option>
+										<option value="Dopuna">Допуна</option>
+										<option value="Reklamacija">Рекламација</option>
 									</select>
 								</div>
 								<div class="inputWrap">
@@ -212,6 +215,7 @@
 													json.majstor = document.getElementById("majstor-reversa").value;
 													json.nalog = document.getElementById("broj-naloga").value;
 													json.adresa = document.getElementById("adresa-naloga").value;
+													json.tip = document.getElementById("tip-reversa").value;
 													json.zaduzenje = [];
 													for(var i=0;i<zaduzenjeElems.length;i++){
 														var zaduzenjeJson = {};

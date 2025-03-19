@@ -2,7 +2,6 @@
 	<script>
 		var proizvodi	=	<%-JSON.stringify(proizvodi)%>;
 		var revers		=	<%-JSON.stringify(revers)%>;
-		console.log(revers)
 		var nalog	=	<%-JSON.stringify(nalog)%>;
 		proizvodi = proizvodi.sort((a, b) => {
 			if (a.code < b.code) {
