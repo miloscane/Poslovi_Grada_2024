@@ -658,6 +658,14 @@
 					</div>
 				</div>
 			</div>
+			<script>
+				if(nalog.vrstaRada=="TEKUCE"){
+					var boxesWraps = document.getElementsByClassName("boxesWrap");
+					for(var i=0;i<boxesWraps.length;i++){
+						boxesWraps[i].classList.add("tekuce")
+					}
+				}
+			</script>
 			<div class="izvestaji">
 				<div class="title">Извештаји</div>
 				<div class="qrWrap">
