@@ -173,6 +173,7 @@
 
 							<script>
 								var majstori = <%-JSON.stringify(majstori)%>;
+								majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 								for(var i=0;i<majstori.length;i++){
 									majstori[i].udaljenost = 1000;
 									for(var j=0;j<lokacijeMajstora.length;j++){
