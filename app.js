@@ -1984,7 +1984,7 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 
-		/*naloziDB.find({"datum.datum":{$regex:"03.2025"},"prijemnica.datum.datum":{$regex:"03.2025"}}).toArray()
+		/*naloziDB.find({"prijemnica.datum.datum":{$regex:"02.2025"}}).toArray()
 		.then((nalozi)=>{
 			var brojeviNaloga = [];
 			for(var i=0;i<nalozi.length;i++){
@@ -1992,7 +1992,6 @@ http.listen(process.env.PORT, function(){
 			}
 			portalStambenoTestDB.find({broj_naloga:{$in:brojeviNaloga}}).toArray()
 			.then((ispravke)=>{
-				console.log(ispravke.length)
 				for(var i=0;i<nalozi.length;i++){
 					nalozi[i].ispravke = [];
 					for(var j=0;j<ispravke.length;j++){
@@ -2120,6 +2119,23 @@ http.listen(process.env.PORT, function(){
 		.catch((error)=>{
 			console.log(error)
 		})*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	})
 	.catch(error => {
@@ -4083,7 +4099,7 @@ server.get('/naloziPoKategorijama',async (req,res)=>{
 
 server.get('/proveraLokacijeMajstora',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==25){
 			majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray()
 			.then((majstori)=>{
 				res.render("administracija/proveraLokacijeMajstora",{
@@ -4110,7 +4126,7 @@ server.get('/proveraLokacijeMajstora',async (req,res)=>{
 
 server.get('/izvestajLokacijeMajstora/:majstorid/:date',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==25){
 			var idMajstora = decodeURIComponent(req.params.majstorid);
 			var date = decodeURIComponent(req.params.date);
 			dodeljivaniNaloziDB.find({majstor:idMajstora,datumRadova:date}).toArray()
