@@ -4280,7 +4280,7 @@ server.post('/strukturaNaloga',async (req,res)=>{
 
 			var mailOptions = {
 				from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
-				to: "miloscane@gmail.com,stefan.jankovic.ckp@gmail.com,marija.slijepcevic@poslovigrada.rs",
+				to: "miloscane@gmail.com,stefan.jankovic.ckp@gmail.com,marija.slijepcevic@poslovigrada.rs,momir.lutovac@poslovigrada.rs,nenad.papes@poslovigrada.rs,vladimir.miljkovic@poslovigrada.rs",
 				subject: "Структура радних налога за дан: "+reshuffleDate(json[0].datum),
 				html: mail
 			};

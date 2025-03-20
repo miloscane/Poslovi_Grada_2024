@@ -6361,6 +6361,11 @@ input[type=number] {
         width:90%;
     }
 
+    .izvestajLokacije .navInfo{
+        font-size:11px;
+        padding:3px;
+    }
+
 }
 
 
