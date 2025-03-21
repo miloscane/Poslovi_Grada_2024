@@ -165,9 +165,11 @@
 						<div class="title">Мајстор</div>
 						<div class="text">
 							<select id="majstor-naloga">
-								<optgroup label="Poslovi Grada" id="majstori-pg">
+								<optgroup label="Мајстори" id="majstori-pg">
 									<option value="Nijedan" default="default">Nijedan</option>
 								</optgroup>
+								<optgroup label="Финализери" id="finalizeri"></optgroup>
+								<optgroup label="Воме" id="vome"></optgroup>
 								<optgroup label="Podizvodjaci" id="majstori-podizvodjaci"></optgroup>
 							</select>
 
@@ -187,7 +189,7 @@
 										}
 									}
 								}
-								majstori.sort((a, b) => a.udaljenost - b.udaljenost);
+								majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 								for(var i=0;i<majstori.length;i++){
 									if(!majstori[i].inactive){
 										var option = document.createElement("OPTION");
@@ -201,7 +203,14 @@
 										if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
 											document.getElementById("majstori-podizvodjaci").appendChild(option);
 										}else{
-											document.getElementById("majstori-pg").appendChild(option);
+											if(majstori[i].tipRada.indexOf("Finalizacija")>=0){
+												document.getElementById("finalizeri").appendChild(option);
+											}else if(majstori[i].tipRada.indexOf("Voma")>=0){
+												document.getElementById("vome").appendChild(option);
+											}else{
+												document.getElementById("majstori-pg").appendChild(option);
+											}
+											
 										}
 									}
 								}
@@ -601,7 +610,11 @@
 							<div class="text novaDodela">
 								<div class="inline">
 									<div class="note">&nbsp;<br>&nbsp;</div>
-									<select id="novo-majstori-dodela"></select>
+									<select id="novo-majstori-dodela">
+										<optgroup label="Мајстори" id="majstori-pg2"></optgroup>
+										<optgroup label="Финализери" id="finalizeri2"></optgroup>
+										<optgroup label="Воме" id="vome2"></optgroup>
+									</select>
 									<script>
 										for(var i=0;i<majstori.length;i++){
 											if(podizvodjaci.indexOf(majstori[i].uniqueId)<0){
@@ -611,7 +624,13 @@
 												if(majstori[i].uniqueId==nalog.majstor){
 													option.setAttribute("selected","selected")
 												}
-												document.getElementById("novo-majstori-dodela").appendChild(option);
+												if(majstori[i].tipRada.indexOf("Finalizacija")>=0){
+													document.getElementById("finalizeri2").appendChild(option);
+												}else if(majstori[i].tipRada.indexOf("Voma")>=0){
+													document.getElementById("vome2").appendChild(option);
+												}else{
+													document.getElementById("majstori-pg2").appendChild(option);
+												}
 											}
 										}
 									</script>

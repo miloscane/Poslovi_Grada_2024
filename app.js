@@ -10728,6 +10728,55 @@ server.post('/appLogin',async (req,res)=>{
 
 
 
+setInterval(function(){
+	request(ntsOptions, (error,response,body)=>{
+			if(error){
+				logError(error);
+			}else{
+				//console.log(response.headers['set-cookie']);
+				var cookie = response.headers['set-cookie'];
+				var headers = {
+					'accept': 'application/json',
+			    'Cookie': cookie,
+			    'Content-Type': 'application/json'
+				}
+				var options = {
+				    url: 'http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true',
+				    method: 'GET',
+				    headers: headers
+				};
+				request(options, (error,response2,body2)=>{
+					if(error){
+						logError(error);
+					}else{
+						var options = {
+						    url: 'https://app.nts-international.net/ntsapi/allvehicles',
+						    method: 'GET',
+						    headers: headers
+						};
+						request(options, (error,response3,body3)=>{
+							if(error){
+								logError(error)
+							}else{
+								try{
+									var vehiclesInfo = JSON.parse(response3.body);
+									try{
+										var vehicleStates = JSON.parse(response2.body);
+										io.emit('lokacijaMajstoraOdgovor',vehicleStates)
+									}catch(err){
+										logError(err)
+									}
+								}catch(err){
+									logError(err);
+								}
+							}
+						});
+					}
+				});
+			}
+		});
+},60000)
+
 
 io.on('connection', function(socket){
 

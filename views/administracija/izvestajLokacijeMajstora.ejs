@@ -218,27 +218,22 @@
 			}
 
 			markers = [];
-
-			if(istiDatum(new Date(),new Date(date))){
-				socket.emit("lokacijaMajstora",1)
-				setInterval(function(){
-					socket.emit("lokacijaMajstora",1)
-				},10*60000)	
-			}
 			
-
-			socket.on("lokacijaMajstoraOdgovor",function(response){
-				for(var i=0;i<response.length;i++){
-					if(response[i].vehicleId==vozilo){
-						for(var j=0;j<markers.length;j++){
-							if(markers[j].majstor){
-								markers[j].setPosition({lat:response[i].gpsLat,lng:response[i].gpsLon});
-								console.log("Position updated")
+			if(istiDatum(new Date(),new Date(date))){
+				socket.on("lokacijaMajstoraOdgovor",function(response){
+					for(var i=0;i<response.length;i++){
+						if(response[i].vehicleId==vozilo){
+							for(var j=0;j<markers.length;j++){
+								if(markers[j].majstor){
+									markers[j].setPosition({lat:response[i].gpsLat,lng:response[i].gpsLon});
+									console.log("Position updated")
+								}
 							}
 						}
 					}
-				}
-			})
+				})	
+			}
+			
 			
 		</script>
 		<script src="https://maps.googleapis.com/maps/api/js?v=3&key=<%=googlegeocoding%>&amp;callback=initMap" async="" defer=""></script>
