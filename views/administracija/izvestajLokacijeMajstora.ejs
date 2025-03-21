@@ -36,9 +36,12 @@
 			}
 			var magacin = {lat:44.813906,lng:20.443903};
 			var nalozi = <%-JSON.stringify(nalozi)%>;
-			console.log(nalozi);
+			//console.log(nalozi);
 			var stops = <%-JSON.stringify(stops)%>;
-			console.log(stops);
+			//console.log(stops);
+			var vozilo = <%=vozilo%>;
+			var date = "<%=date%>";
+			console.log(date)
 
 			var pauza = 5;//min
 			pauza = pauza * 60000;
@@ -115,7 +118,7 @@
 				         }
 				    });
 				    var infowindow = new google.maps.InfoWindow({
-						content: "Планирано: "+nalozi[i].vremeDolaska+"<br>"+"<a href=\"/nalog/"+nalozi[i].nalog+"\" onclick=\"this.style.backgroundColor=\'rgb(31,52,101)\';this.style.color=\'rgb(255,255,255)\'\" style=\"color:rgb(31,52,101)\" target=\"_blank\">" + nalozi[i].nalog + "</a>"
+						content: "Планирано: "+nalozi[i].vremeDolaska+"<br>"+"<a href=\"/nalog/"+nalozi[i].nalog+"\" onclick=\"this.style.backgroundColor=\'rgb(31,52,101)\';this.style.color=\'rgb(255,255,255)\'\" style=\"color:rgb(31,52,101)\" target=\"_blank\">" + nalozi[i].nalog + "</a><br>"+nalozi[i].adresa
 					});
 					infowindow.open(map,marker);
 
@@ -194,12 +197,48 @@
 					
 				}
 
+				if(istiDatum(new Date(),new Date(date))){
+					marker = new google.maps.Marker({
+				         position: myLatLng,
+				         map: map,
+				         majstor: 1,
+				         icon:{
+				         	url: "https://maps.google.com/mapfiles/ms/icons/truck.png"
+				         }
+				    });
+				    var infowindow = new google.maps.InfoWindow({
+						content: "Majstor"
+					});
+					infowindow.open(map,marker);
+				    markers.push(marker);
+				}
+				
+
+
 			}
 
 			markers = [];
 
-
+			if(istiDatum(new Date(),new Date(date))){
+				socket.emit("lokacijaMajstora",1)
+				setInterval(function(){
+					socket.emit("lokacijaMajstora",1)
+				},10*60000)	
+			}
 			
+
+			socket.on("lokacijaMajstoraOdgovor",function(response){
+				for(var i=0;i<response.length;i++){
+					if(response[i].vehicleId==vozilo){
+						for(var j=0;j<markers.length;j++){
+							if(markers[j].majstor){
+								markers[j].setPosition({lat:response[i].gpsLat,lng:response[i].gpsLon});
+								console.log("Position updated")
+							}
+						}
+					}
+				}
+			})
 			
 		</script>
 		<script src="https://maps.googleapis.com/maps/api/js?v=3&key=<%=googlegeocoding%>&amp;callback=initMap" async="" defer=""></script>

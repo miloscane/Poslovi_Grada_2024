@@ -4183,6 +4183,8 @@ server.get('/izvestajLokacijeMajstora/:majstorid/:date',async (req,res)=>{
 												pageTitle: "Извештај локације за "+majstori[0].ime+" / "+plate+" за датум "+reshuffleDate(date),
 												user: req.session.user,
 												nalozi: dodeljivaniNalozi,
+												vozilo: Number(navigacijaInfo[i].idNavigacije),
+												date: date,
 												googlegeocoding: process.env.googlegeocoding,
 												stops: stops
 											});
@@ -11027,7 +11029,7 @@ io.on('connection', function(socket){
 												}
 											}
 										}*/
-										for(var i=0;i<navigacijaInfo.length;i++){
+										/*for(var i=0;i<navigacijaInfo.length;i++){
 											for(var j=0;j<vehicleStates.length;j++){
 												if(navigacijaInfo[i].idNavigacije==vehicleStates[j].vehicleId){
 													vehicleStates[j].imeMajstora = navigacijaInfo[i].imeMajstora;
@@ -11045,7 +11047,7 @@ io.on('connection', function(socket){
 												vehicleStates.splice(i,1);
 												i--;
 											}
-										}
+										}*/
 
 										/*for(var i=0;i<vehicleStates.length;i++){
 											console.log(vehicleStates[i].statusMajstora)
@@ -11060,10 +11062,6 @@ io.on('connection', function(socket){
 								}
 							}
 						});
-
-
-
-						
 					}
 				});
 			}
