@@ -5220,6 +5220,7 @@ server.post('/majstorStigao',async (req,res)=>{
 							}};
 					dodeljivaniNaloziDB.updateOne({uniqueId:req.body.id},setObj)
 					.then((dbResponse) => {
+						io.emit("majstorStigao",req.body.id)
 						res.redirect("/nalog/"+dodele[0].nalog)
 					})
 					.catch((error)=>{
@@ -5270,6 +5271,7 @@ server.post('/majstorZavrsio',async (req,res)=>{
 							}};
 					dodeljivaniNaloziDB.updateOne({uniqueId:req.body.id},setObj)
 					.then((dbResponse) => {
+						io.emit("majstorZavrsio",req.body.id)
 						res.redirect("/nalog/"+dodele[0].nalog)
 					})
 					.catch((error)=>{

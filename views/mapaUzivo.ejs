@@ -104,6 +104,7 @@
 								vremeRadova: vremeRadova,
 								majstorZavrsio: 0,
 								majstorStigao: 0,
+								idDodele: idDodele,
 						      	strokeColor: circleColor,
 						      	strokeOpacity: 0.8,
 						      	strokeWeight: 2,
@@ -274,6 +275,22 @@
 					  strokeColor: "#6891fe", 
 					  fillColor: "#6891fe"    
 					});
+				}
+			}
+		})
+
+		socket.on("majstorStigao",function(dodela){
+			for(var i=0;i<circles.length;i++){
+				if(circles[i].idDodele==dodela){
+					circles[i].majstorStigao = 1
+				}
+			}
+		})
+
+		socket.on("majstorZavrsio",function(dodela){
+			for(var i=0;i<circles.length;i++){
+				if(circles[i].idDodele==dodela){
+					circles[i].majstorZavrsio = 1
 				}
 			}
 		})
