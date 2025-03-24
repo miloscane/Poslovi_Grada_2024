@@ -55,6 +55,7 @@
 						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/betonaza.png";
 					}else if(nalozi[i].statusNaloga=="Kopanje"){
 						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/bager.png";
+
 					}
 
 					
@@ -90,7 +91,7 @@
 						}
 					}
 
-					if(neplaniran && ["Finalizacija","Zakazana finalizacija"].indexOf(nalozi[i].statusNaloga)<0  && ["Betonaža", "Asfalt", "Bekaton"].indexOf(nalozi[i].statusNaloga)<0){
+					if(neplaniran && ["Finalizacija","Zakazana finalizacija"].indexOf(nalozi[i].statusNaloga)<0  && ["Betonaža", "Asfalt", "Bekaton"].indexOf(nalozi[i].statusNaloga)<0 && nalozi[i].statusNaloga!="Kopanje"){
 						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/mapaUzvik2.png";
 						//opacity =  0.5;
 					}else if(planiranDanas){

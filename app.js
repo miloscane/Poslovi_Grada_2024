@@ -6981,7 +6981,7 @@ server.get('/wome',async (req,res)=>{
 });
 
 server.get('/mapaUzivo',async (req,res)=>{
-	naloziDB.find({statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
+	naloziDB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
 	.then((nalozi)=>{
 		var brojeviNaloga = [];
 		for(var i=0;i<nalozi.length;i++){
@@ -7385,6 +7385,91 @@ server.get('/dispecer/pretragaNaloga',async (req,res)=>{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
 });
+
+server.get('/dispecer/mapaUzivo', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==20){
+			naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
+			.then((nalozi)=>{
+				var brojeviNaloga = [];
+				for(var i=0;i<nalozi.length;i++){
+					brojeviNaloga.push(nalozi[i].broj)
+				}
+				dodeljivaniNaloziDB.find({nalog:{$in:brojeviNaloga}}).toArray()
+				.then((dodele)=>{
+					for(var i=0;i<nalozi.length;i++){
+						nalozi[i].dodele = [];
+						for(var j=0;j<dodele.length;j++){
+							if(dodele[j].nalog==nalozi[i].broj){
+								nalozi[i].dodele.push(dodele[j]);
+							}
+						}
+					}
+					majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray()
+					.then((majstori)=>{
+						ekipeDB.find({}).sort({ _id: -1 }).limit(1).toArray()
+						.then((ekipe)=>{
+							for(var i=0;i<majstori.length;i++){
+								for(var j=0;j<ekipe[0].prisustvo.ekipe.length;j++){
+									if(majstori[i].uniqueId==ekipe[0].prisustvo.ekipe[j].idMajstora){
+										majstori[i].vozilo = ekipe[0].prisustvo.ekipe[j].vozilo;
+									}
+								}
+							}
+							res.render("dispeceri/mapaUzivoDispecer",{
+								pageTitle: "Мапа радова",
+								nalozi: nalozi,
+								user: req.session.user,
+								majstori: majstori,
+								googlegeocoding: process.env.googlegeocoding
+							})
+						})
+						.catch((error)=>{
+							console.log(error);
+							res.render("message",{
+								pageTitle: "Грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">Грешка у налогу.</div>"
+							});
+						})
+					})
+					.catch((error)=>{
+						console.log(error);
+						res.render("message",{
+							pageTitle: "Грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Грешка у налогу.</div>"
+						});
+					})
+				})
+				.catch((error)=>{
+					console.log(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у налогу.</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				console.log(error)
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у налогу.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
 
 server.get('/podizvodjac/pretragaNaloga',async (req,res)=>{
 	if(req.session.user){
@@ -9563,7 +9648,7 @@ server.get('/rasporedRadova', async(req,res)=>{
 
 
 server.get('/tv', async (req, res)=> {
-	naloziDB.find({statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
+	naloziDB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
 	.then((nalozi)=>{
 		var brojeviNaloga = [];
 		for(var i=0;i<nalozi.length;i++){
