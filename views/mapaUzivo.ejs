@@ -82,7 +82,7 @@
 
 						if(new Date(nalozi[i].dodele[j].datumRadova).getTime()>new Date().getTime()){
 							planiranBuducnost = true;
-							infoWindowContent = infoWindowContent + "<br>Планиран: "+reshuffleDate(nalozi[i].dodele[j].datumRadova)
+							infoWindowContent = infoWindowContent + "<br>Планиран: "+reshuffleDate(nalozi[i].dodele[j].datumRadova)+"<br>"+nalozi[i].opis;
 							neplaniran = false;
 							break;
 						}
@@ -146,13 +146,27 @@
 				        }
 				    });
 
-					marker.addListener("mouseover", () => {
-						infowindow.open(map, marker);
-					});
+					const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-					marker.addListener("mouseout", () => {
-						infowindow.close();
-					});
+					if (isTouchDevice) {
+					    // For touch devices: toggle info window on tap
+					    marker.addListener("click", () => {
+					        if (marker.infowindow.getMap()) {
+					            marker.infowindow.close();
+					        } else {
+					            marker.infowindow.open(map, marker);
+					        }
+					    });
+					} else {
+					    // For desktop: show on hover
+					    marker.addListener("mouseover", () => {
+					        marker.infowindow.open(map, marker);
+					    });
+
+					    marker.addListener("mouseout", () => {
+					        marker.infowindow.close();
+					    });
+					}
 
 					markers.push(marker);
 
@@ -186,13 +200,27 @@
 			        }
 			    });
 
-			    marker.addListener("mouseover", () => {
-			        marker.infowindow.open(map, marker);
-			    });
+			    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-			    marker.addListener("mouseout", () => {
-			        marker.infowindow.close();
-			    });
+				if (isTouchDevice) {
+				    // For touch devices: toggle info window on tap
+				    marker.addListener("click", () => {
+				        if (marker.infowindow.getMap()) {
+				            marker.infowindow.close();
+				        } else {
+				            marker.infowindow.open(map, marker);
+				        }
+				    });
+				} else {
+				    // For desktop: show on hover
+				    marker.addListener("mouseover", () => {
+				        marker.infowindow.open(map, marker);
+				    });
+
+				    marker.addListener("mouseout", () => {
+				        marker.infowindow.close();
+				    });
+				}
 
 			    markers.push(marker);
 		    }
@@ -209,10 +237,10 @@
 
 				const marker = markers.find(m => m.vozilo == state.vehicleId);
 				if (!marker) {
-					console.log("No marker found for " + state.vehicleId);
+					//console.log("No marker found for " + state.vehicleId);
 					for(var j=0;j<info.length;j++){
 						if(info[j].id==state.vehicleId){
-							console.log(info[j])
+							//console.log(info[j])
 						}
 					}
 					console.log("---------------")
@@ -276,6 +304,10 @@
 					  fillColor: "#6891fe"    
 					});
 				}
+
+				console.log(new Date().getTime())
+				console.log(vremePocetkaRadova.getTime())
+				console.log("------------------------------------------")
 			}
 		})
 

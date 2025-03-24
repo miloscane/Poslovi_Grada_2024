@@ -9558,12 +9558,8 @@ server.get('/rasporedRadova', async(req,res)=>{
 	.catch((error)=>{
 		logError(error);
 		res.send("Greska");
-	})
-	
-})
-
-
-
+	})	
+});
 
 
 server.get('/tv', async (req, res)=> {
