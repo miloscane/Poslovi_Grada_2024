@@ -1,0 +1,284 @@
+<%- include ("partials/header") -%>
+	<style>
+		.gm-style-iw{
+			padding:2px !important;
+			touch-action: none; /* Disables pinch-zoom and scrolling */
+  			overflow: auto;
+		}
+
+		.gm-style .gm-style-iw-d{
+			padding:0px !important;
+			margin-bottom:-10px;
+			margin-right:-12px;
+		}
+
+		.gm-ui-hover-effect{
+			display:none !important; 
+		}
+
+		.gm-style-iw-chr{
+			display:none !important;
+		}
+	</style>
+	<div class="mapaUzivo" id="map" style="height:100vh"></div>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+		console.log(nalozi)
+		var majstori = <%-JSON.stringify(majstori)%>;
+		console.log(majstori)
+		var map;
+		var myLatLng;
+		var marker;
+		var markers;
+		var circles;
+		var originalCenter;
+		var radius = 300;
+
+		function initMap() {
+			myLatLng = {lat: 44.800003, lng: 20.45006};//51.896468, 4.419172
+			map = new google.maps.Map(document.getElementById('map'), {
+				center: myLatLng,
+				zoom: 13,
+				gestureHandling: "cooperative",
+				styles: [{"elementType":"geometry","stylers":[{"color":"#f5f5f5"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#f5f5f5"}]},{"featureType":"administrative.land_parcel","elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#eeeeee"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#e5e5e5"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"road","elementType":"geometry","stylers":[{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#dadada"}]},{"featureType":"road.highway","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"road.local","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"transit.line","elementType":"geometry","stylers":[{"color":"#e5e5e5"}]},{"featureType":"transit.station","elementType":"geometry","stylers":[{"color":"#eeeeee"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#c9c9c9"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]}]
+			});
+
+
+		    for (let i = 0; i < nalozi.length; i++) {
+				if (nalozi[i].coordinates && nalozi[i].coordinates.lat) {
+
+					let iconUrl = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+					let opacity = 1;
+					if (nalozi[i].statusNaloga === "Finalizacija" || nalozi[i].statusNaloga === "Zakazana finalizacija") {
+						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/finalizacija.png";
+					} else if (["Betonaža", "Asfalt", "Bekaton"].includes(nalozi[i].statusNaloga)) {
+						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/betonaza.png";
+					}
+
+					
+					var infoWindowContent = `${nalozi[i].adresa}<br>${nalozi[i].datum.datum}<br>${nalozi[i].statusNaloga}`;
+					var planiranBuducnost = false;
+					var planiranDanas = false;
+					var neplaniran = true;
+					var vremeDolaska = 0;
+					var vremeRadova = 0;
+					var majstorStigao = 0;
+					var majstorZavrsio = 0;
+					var idDodele = "";
+					for(var j=0;j<nalozi[i].dodele.length;j++){
+						if(istiDatum(new Date(nalozi[i].dodele[j].datumRadova),new Date())){
+							planiranDanas = true;
+							infoWindowContent = infoWindowContent + "<br>Почетак радова: "+nalozi[i].dodele[j].vremeDolaska;
+							vremeDolaska = nalozi[i].dodele[j].vremeDolaska;
+							infoWindowContent = infoWindowContent + "<br>Трајање радова: "+nalozi[i].dodele[j].vremeRadova;
+							vremeRadova = nalozi[i].dodele[j].vremeRadova;
+							idDodele = nalozi[i].dodele[j].uniqueId;
+							majstorZavrsio = nalozi[i].dodele[j].majstorZavrsio ? nalozi[i].dodele[j].majstorZavrsio : 0;
+							console.log(majstorZavrsio)
+							majstorStigao = nalozi[i].dodele[j].majstorStigao ? nalozi[i].dodele[j].majstorStigao : 0;
+							neplaniran = false;
+							break;
+						}
+
+						if(new Date(nalozi[i].dodele[j].datumRadova).getTime()>new Date().getTime()){
+							planiranBuducnost = true;
+							infoWindowContent = infoWindowContent + "<br>Планиран: "+reshuffleDate(nalozi[i].dodele[j].datumRadova)
+							neplaniran = false;
+							break;
+						}
+					}
+
+					if(neplaniran && ["Finalizacija","Zakazana finalizacija"].indexOf(nalozi[i].statusNaloga)<0  && ["Betonaža", "Asfalt", "Bekaton"].indexOf(nalozi[i].statusNaloga)<0){
+						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/mapaUzvik2.png";
+						//opacity =  0.5;
+					}else if(planiranDanas){
+						if(majstorZavrsio==0){
+							var circleColor = "#6891fe";
+							if(majstorStigao==1){
+								circleColor = "#14ff14"
+							}
+							iconUrl = "https://maps.google.com/mapfiles/ms/icons/green-dot.png";
+							var nalogCircle = new google.maps.Circle({
+								nalog: nalozi[i].broj,
+								vremeDolaska: vremeDolaska,
+								vremeRadova: vremeRadova,
+								majstorZavrsio: 0,
+								majstorStigao: 0,
+						      	strokeColor: circleColor,
+						      	strokeOpacity: 0.8,
+						      	strokeWeight: 2,
+						      	fillColor: circleColor,
+						      	fillOpacity: 0.35,
+						      	map,
+						      	center: {lat: nalozi[i].coordinates.lat, lng: nalozi[i].coordinates.lng},
+						      	radius: radius
+						    });
+						    circles.push(nalogCircle);
+						}
+						
+					    
+					}else if(planiranBuducnost){
+
+					}
+
+					let marker = new google.maps.Marker({
+						position: {
+							lat: nalozi[i].coordinates.lat,
+							lng: nalozi[i].coordinates.lng
+						},
+						nalog: nalozi[i].broj,
+						map: map,
+						icon: { url: iconUrl },
+						opacity: opacity
+					});
+
+					let infowindow = new google.maps.InfoWindow({
+						content: infoWindowContent
+					});
+					google.maps.event.addListener(infowindow, "domready", function () {
+				        const infoWindowElement = document.querySelector(".gm-style");
+				        if (infoWindowElement) {
+				            infoWindowElement.addEventListener("wheel", function (event) {
+				                event.preventDefault();
+				                event.stopPropagation();
+				            }, { passive: false });
+				        }
+				    });
+
+					marker.addListener("mouseover", () => {
+						infowindow.open(map, marker);
+					});
+
+					marker.addListener("mouseout", () => {
+						infowindow.close();
+					});
+
+					markers.push(marker);
+
+					
+
+					
+					
+				}
+			}
+			for(var i=0;i<majstori.length;i++){
+		    	let marker = new google.maps.Marker({
+					position: {lat: 44.81389497793331, lng: 20.443950128835862}, //44.81389497793331, 20.443950128835862
+					map: map,
+					vozilo: majstori[i].vozilo,
+					icon:{
+						url: "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstor.png"
+					}
+			    });
+			    // Store the infowindow in the marker itself
+			    marker.infowindow = new google.maps.InfoWindow({
+			        content: majstori[i].ime
+			    });
+
+			    google.maps.event.addListener(marker.infowindow, "domready", function () {
+			        const infoWindowElement = document.querySelector(".gm-style");
+			        if (infoWindowElement) {
+			            infoWindowElement.addEventListener("wheel", function (event) {
+			                event.preventDefault();
+			                event.stopPropagation();
+			            }, { passive: false });
+			        }
+			    });
+
+			    marker.addListener("mouseover", () => {
+			        marker.infowindow.open(map, marker);
+			    });
+
+			    marker.addListener("mouseout", () => {
+			        marker.infowindow.close();
+			    });
+
+			    markers.push(marker);
+		    }
+
+		}
+
+		markers = [];
+		circles = [];
+		
+		socket.on("lokacijaMajstoraOdgovor",function(states,info){
+			//Update Pozicije majstora
+			for (var i = 0; i < states.length; i++) {
+				const state = states[i];
+
+				const marker = markers.find(m => m.vozilo == state.vehicleId);
+				if (!marker) {
+					console.log("No marker found for " + state.vehicleId);
+					for(var j=0;j<info.length;j++){
+						if(info[j].id==state.vehicleId){
+							console.log(info[j])
+						}
+					}
+					console.log("---------------")
+					continue;
+				}
+				if(state.ignitionStatus==false){
+					marker.setIcon("https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstor.png");
+				}else{
+					marker.setIcon("https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstorUpaljen.png");
+				}
+				marker.setPosition({ lat: state.gpsLat, lng: state.gpsLon });
+
+				const majstor = majstori.find(m => m.vozilo == state.vehicleId);
+				const vehicleInfo = info.find(inf => inf.id == state.vehicleId);
+
+				if (majstor && vehicleInfo) {
+					marker.infowindow.setContent(
+						`${majstor.ime}<br>${vehicleInfo.licenceplate}`
+					);
+				} else {
+					console.warn("Missing data for", state.vehicleId);
+				}
+			}
+
+			//updateCircles
+			//Crveni krug ako majstor nije dosao a pocelo vreme radova
+			for(var i=0;i<circles.length;i++){
+				var vremePocetkaRadova = new Date();
+				vremePocetkaRadova.setHours(Number(circles[i].vremeDolaska.split(":")[0]));
+				vremePocetkaRadova.setMinutes(Number(circles[i].vremeDolaska.split(":")[1]));
+
+				var vremeZavrsetkaRadova = vremePocetkaRadova;
+				vremeZavrsetkaRadova.setHours(vremeZavrsetkaRadova.getHours()+Number(circles[i].vremeRadova.split(":")[0]));
+				vremeZavrsetkaRadova.setMinutes(vremeZavrsetkaRadova.getMinutes()+Number(circles[i].vremeRadova.split(":")[1]));
+
+				if(new Date().getTime()>vremePocetkaRadova.getTime() && circles[i].majstorStigao==0){
+					circles[i].setOptions({
+					  strokeColor: "#FF0000", // red border
+					  fillColor: "#FF0000"    // red fill
+					});
+				}else if(new Date().getTime()>vremeZavrsetkaRadova.getTime() && circles[i].majstorStigao==1 && circles[i].majstorStigao==0){
+					circles[i].setOptions({
+					  strokeColor: "#FF0000", // red border
+					  fillColor: "#FF0000"    // red fill
+					});
+				}else if(new Date().getTime()>vremeZavrsetkaRadova.getTime() && circles[i].majstorStigao==1 && circles[i].majstorZavrsio==0){
+					circles[i].setOptions({
+					  strokeColor: "#FF0000", // red border
+					  fillColor: "#FF0000"    // red fill
+					});
+				}else if(new Date().getTime()>vremeZavrsetkaRadova.getTime() && circles[i].majstorStigao==1 && circles[i].majstorZavrsio==1){
+					circles[i].setMap(null)
+				}else if(new Date().getTime()>vremePocetkaRadova.getTime() && new Date().getTime()<vremeZavrsetkaRadova.getTime() && circles[i].majstorStigao==1 && circles[i].majstorZavrsio==0){
+					circles[i].setOptions({
+					  strokeColor: "#14ff14", 
+					  fillColor: "#14ff14"    
+					});
+				}else{
+					circles[i].setOptions({
+					  strokeColor: "#6891fe", 
+					  fillColor: "#6891fe"    
+					});
+				}
+			}
+		})
+		
+		
+	</script>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3&key=<%=googlegeocoding%>&amp;callback=initMap" async="" defer=""></script>
+<%- include ("partials/footer") -%>

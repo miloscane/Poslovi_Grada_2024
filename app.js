@@ -2124,6 +2124,37 @@ http.listen(process.env.PORT, function(){
 
 
 
+		/*naloziDB.find({"prijemnica.datum.datum":{$regex:"03.2025"}}).toArray()
+		.then((fakturisaniNalozi)=>{
+			naloziDB.find({statusNaloga:{$nin:["Fakturisan","Storniran"]}}).toArray()
+			.then((aktivniNalozi)=>{
+				var brojeviNaloga = [];
+				for(var i=0;i<fakturisaniNalozi.length;i++){
+					brojeviNaloga.push(fakturisaniNalozi[i].broj);
+				}
+				for(var i=0;i<aktivniNalozi.length;i++){
+					if(brojeviNaloga.indexOf(aktivniNalozi[i].broj)<0){
+						brojeviNaloga.push(aktivniNalozi[i].broj)
+					}
+				}
+				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
+				.then((nalozi)=>{
+					var csvString = "Broj naloga;Radna Jedinica;Iznos\r\n";
+					for(var i=0;i<nalozi.length;i++){
+						csvString += nalozi[i].broj + ";" +nalozi[i].radnaJedinica +";"+ nalozi[i].ukupanIznos+"\r\n"; 
+					}					
+					fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+					console.log("Wrote file");
+				})
+
+
+
+			})
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
 
 
 
@@ -5177,6 +5208,105 @@ server.post('/editMajstorNaNalogu',async (req,res)=>{
 	}
 });
 
+server.post('/majstorStigao',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==20){
+			dodeljivaniNaloziDB.find({uniqueId:req.body.id}).toArray()
+			.then((dodele)=>{
+				//if(dodele[0].user.email == req.session.user.email){
+					var setObj	=	{ $set: {
+								majstorStigao: 1,
+								vremeStizanja: new Date().getTime()
+							}};
+					dodeljivaniNaloziDB.updateOne({uniqueId:req.body.id},setObj)
+					.then((dbResponse) => {
+						res.redirect("/nalog/"+dodele[0].nalog)
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Грешка",
+							message: "<div class=\"text\">Грешка у бази података 4827.</div>",
+							user: req.session.user
+						});
+					})
+				//}else{
+					//res.render("message",{
+						//pageTitle: "Грешка",
+						//message: "<div class=\"text\">Не можете мењати туђу доделу.</div>",
+						//user: req.session.user
+					//});
+				//}
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Грешка у бази података 4821.</div>",
+					user: req.session.user
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Ваш налог није овлашћен да мења статус доделе.</div>",
+				user: req.session.user
+			});
+		}
+	}else{
+		res.redirect("/login")
+	}
+});
+
+server.post('/majstorZavrsio',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==20){
+			dodeljivaniNaloziDB.find({uniqueId:req.body.id}).toArray()
+			.then((dodele)=>{
+				//if(dodele[0].user.email == req.session.user.email){
+					var setObj	=	{ $set: {
+								majstorZavrsio: 1,
+								vremeZavrsetkaRadova: new Date().getTime()
+							}};
+					dodeljivaniNaloziDB.updateOne({uniqueId:req.body.id},setObj)
+					.then((dbResponse) => {
+						res.redirect("/nalog/"+dodele[0].nalog)
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Грешка",
+							message: "<div class=\"text\">Грешка у бази података 4827.</div>",
+							user: req.session.user
+						});
+					})
+				//}else{
+					//res.render("message",{
+						//pageTitle: "Грешка",
+						//message: "<div class=\"text\">Не можете мењати туђу доделу.</div>",
+						//user: req.session.user
+					//});
+				//}
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Грешка у бази података 4821.</div>",
+					user: req.session.user
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Ваш налог није овлашћен да мења статус доделе.</div>",
+				user: req.session.user
+			});
+		}
+	}else{
+		res.redirect("/login")
+	}
+});
 
 
 server.get('/pretragaNaloga',async (req,res)=>{
@@ -6846,6 +6976,78 @@ server.get('/wome',async (req,res)=>{
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url))
 	}
+});
+
+server.get('/mapaUzivo',async (req,res)=>{
+	naloziDB.find({statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
+	.then((nalozi)=>{
+		var brojeviNaloga = [];
+		for(var i=0;i<nalozi.length;i++){
+			brojeviNaloga.push(nalozi[i].broj)
+		}
+		dodeljivaniNaloziDB.find({nalog:{$in:brojeviNaloga}}).toArray()
+		.then((dodele)=>{
+			for(var i=0;i<nalozi.length;i++){
+				nalozi[i].dodele = [];
+				for(var j=0;j<dodele.length;j++){
+					if(dodele[j].nalog==nalozi[i].broj){
+						nalozi[i].dodele.push(dodele[j]);
+					}
+				}
+			}
+			majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray()
+			.then((majstori)=>{
+				ekipeDB.find({}).sort({ _id: -1 }).limit(1).toArray()
+				.then((ekipe)=>{
+					for(var i=0;i<majstori.length;i++){
+						for(var j=0;j<ekipe[0].prisustvo.ekipe.length;j++){
+							if(majstori[i].uniqueId==ekipe[0].prisustvo.ekipe[j].idMajstora){
+								majstori[i].vozilo = ekipe[0].prisustvo.ekipe[j].vozilo;
+							}
+						}
+					}
+					res.render("mapaUzivo",{
+						pageTitle: "Мапа радова",
+						nalozi: nalozi,
+						majstori: majstori,
+						googlegeocoding: process.env.googlegeocoding
+					})
+				})
+				.catch((error)=>{
+					console.log(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у налогу.</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				console.log(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у налогу.</div>"
+				});
+			})
+		})
+		.catch((error)=>{
+			console.log(error);
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Грешка у налогу.</div>"
+			});
+		})
+	})
+	.catch((error)=>{
+		console.log(error)
+		res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Грешка у налогу.</div>"
+		});
+	})
 });
 
 server.get('/listaWoma',async (req,res)=>{
@@ -10762,7 +10964,7 @@ setInterval(function(){
 									var vehiclesInfo = JSON.parse(response3.body);
 									try{
 										var vehicleStates = JSON.parse(response2.body);
-										io.emit('lokacijaMajstoraOdgovor',vehicleStates)
+										io.emit('lokacijaMajstoraOdgovor',vehicleStates,vehiclesInfo)
 									}catch(err){
 										logError(err)
 									}
@@ -10775,7 +10977,7 @@ setInterval(function(){
 				});
 			}
 		});
-},60000)
+},10000)
 
 
 io.on('connection', function(socket){

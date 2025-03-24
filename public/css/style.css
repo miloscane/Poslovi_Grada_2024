@@ -4587,6 +4587,17 @@ input[type=number] {
     margin-right:30px;
 }
 
+.stareDodele .dodela .majstorStigao{
+    display:inline-block;
+    vertical-align: middle;
+    font-size:12px;
+    background-color:rgb(2,121,49);
+    color:rgb(255,255,255);
+    padding:4px;
+    margin-right:10px;
+    cursor:pointer;
+}
+
 .ekipe .majstor .nalozi{
     text-align:left;
     margin-top:7px;

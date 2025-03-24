@@ -546,16 +546,35 @@
 												if(new Date(dodele[i].datumRadova).setHours(0,0,0,0) >= new Date().setHours(0,0,0,0)){
 													var editor = document.createElement("DIV");
 													editor.setAttribute("class","editor");
+
+														if(istiDatum(new Date(dodele[i].datumRadova),new Date())){
+															if(Number(dodele[i].majstorStigao)!=1){
+																var edit = document.createElement("DIV");
+																edit.setAttribute("class","edit");
+																edit.setAttribute("onclick","majstorStigao(this)");
+																edit.innerHTML = "Мајстор стигао";
+																editor.appendChild(edit);
+															}else{
+																if(Number(dodele[i].majstorZavrsio)!=1){
+																	var edit = document.createElement("DIV");
+																	edit.setAttribute("class","edit");
+																	edit.setAttribute("onclick","majstorZavrsio(this)");
+																	edit.innerHTML = "Завршени радови";
+																	editor.appendChild(edit);
+																}
+															}	
+														}
+
 														var edit = document.createElement("DIV");
 														edit.setAttribute("class","edit");
 														edit.setAttribute("onclick","editDodelu(this)");
-														edit.innerHTML = "Izmeni";
+														edit.innerHTML = "Измени";
 														editor.appendChild(edit);
 
 														var edit = document.createElement("DIV");
 														edit.setAttribute("class","delete");
 														edit.setAttribute("onclick","deleteDodelu(this)");
-														edit.innerHTML = "Obrisi";
+														edit.innerHTML = "Обриши";
 														editor.appendChild(edit);
 
 													dodela.appendChild(editor);
@@ -583,8 +602,13 @@
 									
 								}
 								function deleteDodelu(elem){
-									document.getElementById("deletion-id").value = elem.parentElement.parentElement.dataset.id;
-									document.getElementById("delete-form").submit();
+									var razlogBrisanja = prompt("Који је разлог брисања?");
+									if(razlogBrisanja.length>3){
+										document.getElementById("deletion-id").value = elem.parentElement.parentElement.dataset.id;
+										document.getElementById("delete-form").submit();
+									}else{
+										alert("Неоправдан разлог.")
+									}
 								}
 
 								function editDodelu(elem){
@@ -595,10 +619,31 @@
 									json.vremeDolaska = parent.getElementsByClassName("staroVremeDolaska")[0].value;
 									json.vremeRadova = parent.getElementsByClassName("staroVremeRadova")[0].value;
 									json.brojNaloga = nalog.broj;
-									document.getElementById("edit-json").value = JSON.stringify(json);
+									var razlogPromene = prompt("Који је разлог мењања?");
+									if(razlogPromene.length>3){
+										document.getElementById("edit-json").value = JSON.stringify(json);
+										//console.log(json)
+										loadGif();
+										document.getElementById("edit-form").submit();
+									}else{
+										alert("Неоправдан разлог.")
+									}
+								}
+
+								function majstorStigao(elem){
+									var parent = elem.parentElement.parentElement;
+									document.getElementById("stigao-json").value = parent.dataset.id;
 									//console.log(json)
 									loadGif();
-									document.getElementById("edit-form").submit();
+									document.getElementById("stigao-form").submit();
+								}
+
+								function majstorZavrsio(elem){
+									var parent = elem.parentElement.parentElement;
+									document.getElementById("zavrsio-json").value = parent.dataset.id;
+									//console.log(json)
+									loadGif();
+									document.getElementById("zavrsio-form").submit();
 								}
 							</script>
 							<form method="POST" action="/deleteMajstorNaNalogu" id="delete-form" style="display:none">
@@ -606,6 +651,12 @@
 							</form>
 							<form method="POST" action="/editMajstorNaNalogu" id="edit-form" style="display:none">
 								<input type="text" name="json" id="edit-json">
+							</form>
+							<form method="POST" action="/majstorStigao" id="stigao-form" style="display:none">
+								<input type="text" name="id" id="stigao-json">
+							</form>
+							<form method="POST" action="/majstorZavrsio" id="zavrsio-form" style="display:none">
+								<input type="text" name="id" id="zavrsio-json">
 							</form>
 							<div class="text novaDodela">
 								<div class="inline">
