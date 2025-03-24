@@ -82,7 +82,7 @@
 
 						if(new Date(nalozi[i].dodele[j].datumRadova).getTime()>new Date().getTime()){
 							planiranBuducnost = true;
-							infoWindowContent = infoWindowContent + "<br>Планиран: "+reshuffleDate(nalozi[i].dodele[j].datumRadova)+"<br>"+nalozi[i].opis;
+							infoWindowContent = infoWindowContent + "<br>Планиран: "+reshuffleDate(nalozi[i].dodele[j].datumRadova)
 							neplaniran = false;
 							break;
 						}
@@ -123,33 +123,35 @@
 					}
 
 					let marker = new google.maps.Marker({
-						position: {
-							lat: nalozi[i].coordinates.lat,
-							lng: nalozi[i].coordinates.lng
-						},
-						nalog: nalozi[i].broj,
-						map: map,
-						icon: { url: iconUrl },
-						opacity: opacity
+					    position: {
+					        lat: nalozi[i].coordinates.lat,
+					        lng: nalozi[i].coordinates.lng
+					    },
+					    nalog: nalozi[i].broj,
+					    map: map,
+					    icon: { url: iconUrl },
+					    opacity: opacity
 					});
 
-					let infowindow = new google.maps.InfoWindow({
-						content: infoWindowContent
+					marker.infowindow = new google.maps.InfoWindow({
+					    content: infoWindowContent
 					});
-					google.maps.event.addListener(infowindow, "domready", function () {
-				        const infoWindowElement = document.querySelector(".gm-style");
-				        if (infoWindowElement) {
-				            infoWindowElement.addEventListener("wheel", function (event) {
-				                event.preventDefault();
-				                event.stopPropagation();
-				            }, { passive: false });
-				        }
-				    });
+
+					// Prevent scroll inside InfoWindow from zooming map
+					google.maps.event.addListener(marker.infowindow, "domready", function () {
+					    const infoWindowElement = document.querySelector(".gm-style");
+					    if (infoWindowElement) {
+					        infoWindowElement.addEventListener("wheel", function (event) {
+					            event.preventDefault();
+					            event.stopPropagation();
+					        }, { passive: false });
+					    }
+					});
 
 					const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
 					if (isTouchDevice) {
-					    // For touch devices: toggle info window on tap
+					    // On mobile: tap toggles the InfoWindow
 					    marker.addListener("click", () => {
 					        if (marker.infowindow.getMap()) {
 					            marker.infowindow.close();
@@ -157,8 +159,15 @@
 					            marker.infowindow.open(map, marker);
 					        }
 					    });
+
+					    // Optional: close InfoWindow when tapping elsewhere
+					    map.addListener("click", (e) => {
+					        if (marker.infowindow.getMap()) {
+					            marker.infowindow.close();
+					        }
+					    });
 					} else {
-					    // For desktop: show on hover
+					    // On desktop: hover to open, mouseout to close
 					    marker.addListener("mouseover", () => {
 					        marker.infowindow.open(map, marker);
 					    });
@@ -170,6 +179,7 @@
 
 					markers.push(marker);
 
+
 					
 
 					
@@ -178,32 +188,34 @@
 			}
 			for(var i=0;i<majstori.length;i++){
 		    	let marker = new google.maps.Marker({
-					position: {lat: 44.81389497793331, lng: 20.443950128835862}, //44.81389497793331, 20.443950128835862
-					map: map,
-					vozilo: majstori[i].vozilo,
-					icon:{
-						url: "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstor.png"
-					}
-			    });
-			    // Store the infowindow in the marker itself
-			    marker.infowindow = new google.maps.InfoWindow({
-			        content: majstori[i].ime
-			    });
+				    position: { lat: 44.81389497793331, lng: 20.443950128835862 },
+				    map: map,
+				    vozilo: majstori[i].vozilo,
+				    icon: {
+				        url: "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstor.png"
+				    }
+				});
 
-			    google.maps.event.addListener(marker.infowindow, "domready", function () {
-			        const infoWindowElement = document.querySelector(".gm-style");
-			        if (infoWindowElement) {
-			            infoWindowElement.addEventListener("wheel", function (event) {
-			                event.preventDefault();
-			                event.stopPropagation();
-			            }, { passive: false });
-			        }
-			    });
+				// Store the infowindow in the marker itself
+				marker.infowindow = new google.maps.InfoWindow({
+				    content: majstori[i].ime
+				});
 
-			    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+				// Prevent scroll inside InfoWindow from zooming map
+				google.maps.event.addListener(marker.infowindow, "domready", function () {
+				    const infoWindowElement = document.querySelector(".gm-style");
+				    if (infoWindowElement) {
+				        infoWindowElement.addEventListener("wheel", function (event) {
+				            event.preventDefault();
+				            event.stopPropagation();
+				        }, { passive: false });
+				    }
+				});
+
+				const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
 				if (isTouchDevice) {
-				    // For touch devices: toggle info window on tap
+				    // On mobile: tap toggles the InfoWindow
 				    marker.addListener("click", () => {
 				        if (marker.infowindow.getMap()) {
 				            marker.infowindow.close();
@@ -211,8 +223,16 @@
 				            marker.infowindow.open(map, marker);
 				        }
 				    });
+
+				    // Optional: tap elsewhere on map closes it
+				    map.addListener("click", (e) => {
+				        // Close only if open
+				        if (marker.infowindow.getMap()) {
+				            marker.infowindow.close();
+				        }
+				    });
 				} else {
-				    // For desktop: show on hover
+				    // On desktop: hover to open, mouseout to close
 				    marker.addListener("mouseover", () => {
 				        marker.infowindow.open(map, marker);
 				    });
@@ -222,7 +242,8 @@
 				    });
 				}
 
-			    markers.push(marker);
+				markers.push(marker);
+
 		    }
 
 		}
