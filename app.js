@@ -9567,7 +9567,78 @@ server.get('/rasporedRadova', async(req,res)=>{
 
 
 server.get('/tv', async (req, res)=> {
-	var date = new Date();
+	naloziDB.find({statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
+	.then((nalozi)=>{
+		var brojeviNaloga = [];
+		for(var i=0;i<nalozi.length;i++){
+			brojeviNaloga.push(nalozi[i].broj)
+		}
+		dodeljivaniNaloziDB.find({nalog:{$in:brojeviNaloga}}).toArray()
+		.then((dodele)=>{
+			for(var i=0;i<nalozi.length;i++){
+				nalozi[i].dodele = [];
+				for(var j=0;j<dodele.length;j++){
+					if(dodele[j].nalog==nalozi[i].broj){
+						nalozi[i].dodele.push(dodele[j]);
+					}
+				}
+			}
+			majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray()
+			.then((majstori)=>{
+				ekipeDB.find({}).sort({ _id: -1 }).limit(1).toArray()
+				.then((ekipe)=>{
+					for(var i=0;i<majstori.length;i++){
+						for(var j=0;j<ekipe[0].prisustvo.ekipe.length;j++){
+							if(majstori[i].uniqueId==ekipe[0].prisustvo.ekipe[j].idMajstora){
+								majstori[i].vozilo = ekipe[0].prisustvo.ekipe[j].vozilo;
+							}
+						}
+					}
+					res.render("mapaUzivo",{
+						pageTitle: "Мапа радова",
+						nalozi: nalozi,
+						majstori: majstori,
+						googlegeocoding: process.env.googlegeocoding
+					})
+				})
+				.catch((error)=>{
+					console.log(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у налогу.</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				console.log(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у налогу.</div>"
+				});
+			})
+		})
+		.catch((error)=>{
+			console.log(error);
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Грешка у налогу.</div>"
+			});
+		})
+	})
+	.catch((error)=>{
+		console.log(error)
+		res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Грешка у налогу.</div>"
+		});
+	})
+
+
+	/*var date = new Date();
 	var year = new Date().getFullYear();
 	//date.setDate(date.getDate()-2)
 	var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
@@ -9659,7 +9730,7 @@ server.get('/tv', async (req, res)=> {
 	.catch((error)=>{
 		logError(error);
 		res.send("Greska")
-	})
+	})*/
 });
 
 
