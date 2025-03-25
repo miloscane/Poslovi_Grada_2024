@@ -20,12 +20,42 @@
 			display:none !important;
 		}
 	</style>
+	<div class="mapHeader">
+		<div class="inline" onclick="filterMapa(this)">
+			<div class="checkboxWrap"><input class="checkbox" type="checkbox" value="Finalizacija" checked></div>
+			<div class="iconWrap"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/finalizacija.png"></div>
+			<div class="noteWrap">Финализација</div>
+		</div>
+		<div class="inline" onclick="filterMapa(this)">
+			<div class="checkboxWrap"><input class="checkbox" type="checkbox" value="Beton" checked></div>
+			<div class="iconWrap"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/betonaza.png"></div>
+			<div class="noteWrap">Бет./Асф./Бек.</div>
+		</div>
+		<div class="inline" onclick="filterMapa(this)">
+			<div class="checkboxWrap"><input class="checkbox" type="checkbox" value="Bager" checked></div>
+			<div class="iconWrap"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/bager.png"></div>
+			<div class="noteWrap">Копање</div>
+		</div>
+		<div class="inline" onclick="filterMapa(this)">
+			<div class="checkboxWrap"><input class="checkbox" type="checkbox" value="Danasnji" checked></div>
+			<div class="iconWrap"><img src="https://maps.google.com/mapfiles/ms/icons/green-dot.png"></div>
+			<div class="noteWrap">Заказан данас</div>
+		</div>
+		<div class="inline" onclick="filterMapa(this)">
+			<div class="checkboxWrap"><input class="checkbox" type="checkbox" value="Planiran" checked></div>
+			<div class="iconWrap"><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png"></div>
+			<div class="noteWrap">Планиран</div>
+		</div>
+		<div class="inline" onclick="filterMapa(this)">
+			<div class="checkboxWrap"><input class="checkbox" type="checkbox" value="Neplaniran" checked></div>
+			<div class="iconWrap"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/mapaUzvik2.png"></div>
+			<div class="noteWrap">Непланиран</div>
+		</div>
+	</div>
 	<div class="mapaUzivo" id="map" style="height:100vh"></div>
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
-		console.log(nalozi)
 		var majstori = <%-JSON.stringify(majstori)%>;
-		console.log(majstori)
 		var map;
 		var myLatLng;
 		var marker;
@@ -33,6 +63,36 @@
 		var circles;
 		var originalCenter;
 		var radius = 300;
+
+		function filterMapa(elem){
+			if(elem.getElementsByClassName("checkbox")[0].checked){
+				elem.getElementsByClassName("checkbox")[0].checked = false;
+			}else{
+				elem.getElementsByClassName("checkbox")[0].checked = true;
+			}
+			var checkboxes = document.getElementsByClassName("checkbox");
+			var statusiZaPrikaz = [];
+			for(var i=0;i<checkboxes.length;i++){
+				if(checkboxes[i].checked){
+					statusiZaPrikaz.push(checkboxes[i].value)
+				}
+			}
+
+			
+			var naloziToHide = [];
+			for(var i=0;i<markers.length;i++){
+				if(markers[i].nalog){
+					markers[i].setMap(map)
+					if(statusiZaPrikaz.indexOf(markers[i].status)<0){
+						markers[i].setMap(null);
+						naloziToHide.push(markers[i].nalog);
+					}
+				}
+				
+			}
+
+
+		}
 
 		function initMap() {
 			myLatLng = {lat: 44.800003, lng: 20.45006};//51.896468, 4.419172
@@ -48,14 +108,17 @@
 				if (nalozi[i].coordinates && nalozi[i].coordinates.lat) {
 
 					let iconUrl = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+					let status = "Zakazani";
 					let opacity = 1;
 					if (nalozi[i].statusNaloga === "Finalizacija" || nalozi[i].statusNaloga === "Zakazana finalizacija") {
 						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/finalizacija.png";
+						status = "Finalizacija";
 					} else if (["Betonaža", "Asfalt", "Bekaton"].includes(nalozi[i].statusNaloga)) {
 						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/betonaza.png";
+						status = "Beton";
 					}else if(nalozi[i].statusNaloga=="Kopanje"){
 						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/bager.png";
-
+						status = "Bager";
 					}
 
 					
@@ -77,7 +140,7 @@
 							vremeRadova = nalozi[i].dodele[j].vremeRadova;
 							idDodele = nalozi[i].dodele[j].uniqueId;
 							majstorZavrsio = nalozi[i].dodele[j].majstorZavrsio ? nalozi[i].dodele[j].majstorZavrsio : 0;
-							console.log(majstorZavrsio)
+							status = "Danasnji";
 							majstorStigao = nalozi[i].dodele[j].majstorStigao ? nalozi[i].dodele[j].majstorStigao : 0;
 							neplaniran = false;
 							break;
@@ -86,6 +149,7 @@
 						if(new Date(nalozi[i].dodele[j].datumRadova).getTime()>new Date().getTime()){
 							planiranBuducnost = true;
 							infoWindowContent = infoWindowContent + "<br>Планиран: "+reshuffleDate(nalozi[i].dodele[j].datumRadova)
+							status = "Planiran";
 							neplaniran = false;
 							break;
 						}
@@ -93,6 +157,7 @@
 
 					if(neplaniran && ["Finalizacija","Zakazana finalizacija"].indexOf(nalozi[i].statusNaloga)<0  && ["Betonaža", "Asfalt", "Bekaton"].indexOf(nalozi[i].statusNaloga)<0 && nalozi[i].statusNaloga!="Kopanje"){
 						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/mapaUzvik2.png";
+						status="Neplaniran"
 						//opacity =  0.5;
 					}else if(planiranDanas){
 						if(majstorZavrsio==0){
@@ -113,6 +178,7 @@
 						      	strokeWeight: 2,
 						      	fillColor: circleColor,
 						      	fillOpacity: 0.35,
+						      	status: status,
 						      	map,
 						      	center: {lat: nalozi[i].coordinates.lat, lng: nalozi[i].coordinates.lng},
 						      	radius: radius
@@ -131,6 +197,7 @@
 					        lng: nalozi[i].coordinates.lng
 					    },
 					    nalog: nalozi[i].broj,
+					    status: status,
 					    map: map,
 					    icon: { url: iconUrl },
 					    opacity: opacity
