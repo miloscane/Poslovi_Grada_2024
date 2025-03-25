@@ -122,7 +122,7 @@
 					}
 
 					
-					var infoWindowContent = `${nalozi[i].adresa}<br>${nalozi[i].datum.datum}<br>${nalozi[i].statusNaloga}`;
+					var infoWindowContent = `${nalozi[i].adresa}<br>${nalozi[i].datum.datum}<br>${nalozi[i].statusNaloga}<br>Zahtevalac: ${nalozi[i].zahtevalac}`;
 					var planiranBuducnost = false;
 					var planiranDanas = false;
 					var neplaniran = true;
@@ -244,6 +244,13 @@
 
 					    marker.addListener("mouseout", () => {
 					        marker.infowindow.close();
+					    });
+
+					    marker.addListener("click", (e) => {
+					    	if(marker.nalog){
+					    		window.open('/nalog/'+marker.nalog, '_blank');
+					    	}
+					       
 					    });
 					}
 
