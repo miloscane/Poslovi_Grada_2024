@@ -56,6 +56,7 @@
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
 		var majstori = <%-JSON.stringify(majstori)%>;
+		var navigacija = <%-JSON.stringify(navigacija)%>;
 		var map;
 		var myLatLng;
 		var marker;
@@ -263,11 +264,11 @@
 					
 				}
 			}
-			for(var i=0;i<majstori.length;i++){
+			for(var i=0;i<navigacija.vozila.Data.length;i++){
 		    	let marker = new google.maps.Marker({
-				    position: { lat: 44.81389497793331, lng: 20.443950128835862 },
+				    position: { lat: parseFloat(navigacija.vozila.Data[i].Lat), lng: parseFloat(navigacija.vozila.Data[i].Lon) },
 				    map: map,
-				    vozilo: majstori[i].vozilo,
+				    vozilo: navigacija.vozila.Data[i].DeviceName,
 				    icon: {
 				        url: "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstor.png"
 				    }
@@ -275,7 +276,7 @@
 
 				// Store the infowindow in the marker itself
 				marker.infowindow = new google.maps.InfoWindow({
-				    content: majstori[i].ime
+				    content: navigacija.vozila.Data[i].DeviceName
 				});
 
 				// Prevent scroll inside InfoWindow from zooming map
@@ -328,39 +329,26 @@
 		markers = [];
 		circles = [];
 		
-		socket.on("lokacijaMajstoraOdgovor",function(states,info){
+		socket.on("lokacijaMajstoraOdgovor",function(states){
+			if(states=="Greska"){
+				console.log("Greska u update")
+			}
+			console.log("Update received")
 			//Update Pozicije majstora
-			for (var i = 0; i < states.length; i++) {
-				const state = states[i];
+			for (var i = 0; i < states.vozila.Data.length; i++) {
+				const state = states.vozila.Data[i];
 
-				const marker = markers.find(m => m.vozilo == state.vehicleId);
-				if (!marker) {
-					//console.log("No marker found for " + state.vehicleId);
-					for(var j=0;j<info.length;j++){
-						if(info[j].id==state.vehicleId){
-							//console.log(info[j])
-						}
-					}
-					console.log("---------------")
-					continue;
-				}
-				if(state.ignitionStatus==false){
+				const marker = markers.find(m => m.vozilo == state.DeviceName);
+				
+				if(state.IsIgnitionOn=="False"){
 					marker.setIcon("https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstor.png");
 				}else{
 					marker.setIcon("https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstorUpaljen.png");
 				}
-				marker.setPosition({ lat: state.gpsLat, lng: state.gpsLon });
+				console.log("position updated")
+				marker.setPosition({ lat: parseFloat(state.Lat), lng: parseFloat(state.Lon) });
 
-				const majstor = majstori.find(m => m.vozilo == state.vehicleId);
-				const vehicleInfo = info.find(inf => inf.id == state.vehicleId);
-
-				if (majstor && vehicleInfo) {
-					marker.infowindow.setContent(
-						`${majstor.ime}<br>${vehicleInfo.licenceplate}`
-					);
-				} else {
-					console.warn("Missing data for", state.vehicleId);
-				}
+				
 			}
 
 			//updateCircles

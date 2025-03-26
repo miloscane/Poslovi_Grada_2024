@@ -2177,20 +2177,43 @@ http.listen(process.env.PORT, function(){
 		})*/
 
 
-		naloziDB.find({majstor:{$in:podizvodjaci},"datum.datum":{$regex:".2025"}}).toArray()
+		/*naloziDB.find({majstor:{$in:podizvodjaci},"datum.datum":{$regex:".2025"}}).toArray()
 		.then((nalozi)=>{
-			console.log(nalozi.length);
 			var majstorJson = [];
 			for(var i=0;i<podizvodjaci.length;i++){
 				var json = {};
 				json.uniqueId = podizvodjaci[i];
 				json.nalozi = 0;
-				majstorJson.push(json)
+				majstorJson.push(json);
 			}
+
+			majstoriDB.find({uniqueId:{$in:podizvodjaci}}).toArray()
+			.then((majstori)=>{
+				for(var i=0;i<majstori.length;i++){
+					for(var j=0;j<majstorJson.length;j++){
+						if(majstorJson[j].uniqueId==majstori[i].uniqueId){
+							majstorJson[j].ime = majstori[i].ime;
+						}
+					}
+				}
+
+				for(var i=0;i<majstorJson.length;i++){
+					for(var j=0;j<nalozi.length;j++){
+						if(majstorJson[i].uniqueId==nalozi[j].majstor){
+							majstorJson[i].nalozi++;
+						}
+					}
+					console.log(majstorJson[i].ime + ": "+majstorJson[i].nalozi)
+				}
+			})
+			.catch((error)=>{
+				console.log(error)
+			})
+
 		})
 		.catch((error)=>{
 			console.log(error)
-		})
+		})*/
 
 
 
@@ -7501,13 +7524,74 @@ server.get('/dispecer/mapaUzivo', async (req, res)=> {
 									}
 								}
 							}
-							res.render("dispeceri/mapaUzivoDispecer",{
-								pageTitle: "Мапа радова",
-								nalozi: nalozi,
-								user: req.session.user,
-								majstori: majstori,
-								googlegeocoding: process.env.googlegeocoding
+
+
+							var config = {
+								method: 'post',
+								url: baseUrl+'/token', // Replace with your actual URL
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded'
+								},
+								data: data
+							};
+							axios(config)
+							.then(async response => {
+							  token = response.data.access_token;
+							  var json = {};
+
+								config = {
+							      url: baseUrl + '/api/Client/GetClient',
+							      method: 'POST', // If necessary
+							      headers: { 
+							          'Content-Type': 'application/json',
+							          'Authorization': `Bearer ${token}`
+							      },
+							      data: { 'ClientId': telematicsId }
+							  };
+
+							  //Client data
+							  var response = await axios(config);
+							  //console.log(response.data)
+							  json.clientInfo = response.data.client[0];
+
+							  
+							  config = {
+							      url: baseUrl + '/api/Asset/GetDevicesCurrentData',
+							      method: 'POST', // If necessary
+							      headers: { 
+							          'Content-Type': 'application/json',
+							          'Authorization': `Bearer ${token}`
+							      },
+							      data: { 'ClientId': telematicsId }
+							  };
+							  var response = await axios(config);
+							  json.vozila = response.data;
+							  /*res.render("mapaUzivo",{
+									pageTitle: "Мапа радова",
+									nalozi: nalozi,
+									majstori: majstori,
+									navigacija: json,
+									googlegeocoding: process.env.googlegeocoding
+								})*/
+
+								res.render("dispeceri/mapaUzivoDispecer",{
+									pageTitle: "Мапа радова",
+									nalozi: nalozi,
+									user: req.session.user,
+									majstori: majstori,
+									navigacija: json,
+									googlegeocoding: process.env.googlegeocoding
+								})
 							})
+							.catch((error)=>{
+								console.log(error)
+								res.send("Greska")
+							})
+
+
+
+
+							
 						})
 						.catch((error)=>{
 							console.log(error);
