@@ -2177,6 +2177,20 @@ http.listen(process.env.PORT, function(){
 		})*/
 
 
+		naloziDB.find({majstor:{$in:podizvodjaci},"datum.datum":{$regex:".2025"}}).toArray()
+		.then((nalozi)=>{
+			console.log(nalozi.length);
+			var majstorJson = [];
+			for(var i=0;i<podizvodjaci.length;i++){
+				var json = {};
+				json.uniqueId = podizvodjaci[i];
+				json.nalozi = 0;
+				majstorJson.push(json)
+			}
+		})
+		.catch((error)=>{
+			console.log(error)
+		})
 
 
 
@@ -9719,7 +9733,8 @@ server.get('/rasporedRadova', async(req,res)=>{
 
 
 server.get('/tv', async (req, res)=> {
-	naloziDB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
+	res.redirect('/mapaUzivo')
+	/*naloziDB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
 	.then((nalozi)=>{
 		var brojeviNaloga = [];
 		for(var i=0;i<nalozi.length;i++){
@@ -9787,7 +9802,7 @@ server.get('/tv', async (req, res)=> {
 			user: req.session.user,
 			message: "<div class=\"text\">Грешка у налогу.</div>"
 		});
-	})
+	})*/
 
 
 	/*var date = new Date();
