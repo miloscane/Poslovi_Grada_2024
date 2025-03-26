@@ -18,8 +18,10 @@ const multerS3						= require('multer-s3-transform');
 const sharp 							= require('sharp');
 const pdfParse						=	require('pdf-parse');
 const {Worker,SHARE_ENV}	=	require('worker_threads');
-const schedule = require('node-schedule');
-const request 			=	require('request');
+const schedule 						= require('node-schedule');
+const request 						=	require('request');
+const axios								=	require('axios');
+const qs									=	require('qs');
 dotenv.config();
 
 var ntsHeader = {
@@ -44,8 +46,27 @@ var websiteOptions = {
     url: 'https://poslovigrada.rs/nalog',
     method: 'POST',
     headers: websiteHeader
-    //body: JSON.stringify({nalog:"AAA",adresa:123})
 };
+
+const data = qs.stringify({
+  username: process.env.telematicskey,  // Replace with your actual key
+  password: process.env.telematicspass, // Replace with your actual secret key
+  grant_type: 'password'
+});
+
+var baseUrl = "https://api.gpsiot.net";
+var config = {
+	method: 'post',
+	url: baseUrl+'/token', // Replace with your actual URL
+	headers: {
+		'Content-Type': 'application/x-www-form-urlencoded'
+	},
+	data: data
+};
+
+
+var token;
+var telematicsId = process.env.telematicsid;
 
 /*request(websiteOptions, (error,response,body)=>{
 	if(error){
@@ -1138,7 +1159,7 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var month = 2;
+			var month = 3;
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
@@ -7008,12 +7029,62 @@ server.get('/mapaUzivo',async (req,res)=>{
 							}
 						}
 					}
-					res.render("mapaUzivo",{
-						pageTitle: "Мапа радова",
-						nalozi: nalozi,
-						majstori: majstori,
-						googlegeocoding: process.env.googlegeocoding
+
+					var config = {
+						method: 'post',
+						url: baseUrl+'/token', // Replace with your actual URL
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						data: data
+					};
+					axios(config)
+					.then(async response => {
+					  token = response.data.access_token;
+					  var json = {};
+
+						config = {
+					      url: baseUrl + '/api/Client/GetClient',
+					      method: 'POST', // If necessary
+					      headers: { 
+					          'Content-Type': 'application/json',
+					          'Authorization': `Bearer ${token}`
+					      },
+					      data: { 'ClientId': telematicsId }
+					  };
+
+					  //Client data
+					  var response = await axios(config);
+					  //console.log(response.data)
+					  json.clientInfo = response.data.client[0];
+
+					  
+					  config = {
+					      url: baseUrl + '/api/Asset/GetDevicesCurrentData',
+					      method: 'POST', // If necessary
+					      headers: { 
+					          'Content-Type': 'application/json',
+					          'Authorization': `Bearer ${token}`
+					      },
+					      data: { 'ClientId': telematicsId }
+					  };
+					  var response = await axios(config);
+					  json.vozila = response.data;
+					  res.render("mapaUzivo",{
+							pageTitle: "Мапа радова",
+							nalozi: nalozi,
+							majstori: majstori,
+							navigacija: json,
+							googlegeocoding: process.env.googlegeocoding
+						})
 					})
+					.catch((error)=>{
+						console.log(error)
+						res.send("Greska")
+					})
+
+
+					
 				})
 				.catch((error)=>{
 					console.log(error);
@@ -11082,10 +11153,48 @@ server.post('/appLogin',async (req,res)=>{
 	
 });
 
-
-
 setInterval(function(){
-	request(ntsOptions, (error,response,body)=>{
+	axios(config)
+	.then(async response => {
+	  token = response.data.access_token;
+	  var json = {};
+
+		var config2 = {
+	      url: baseUrl + '/api/Client/GetClient',
+	      method: 'POST', // If necessary
+	      headers: { 
+	          'Content-Type': 'application/json',
+	          'Authorization': `Bearer ${token}`
+	      },
+	      data: { 'ClientId': telematicsId }
+	  };
+
+	  //Client data
+	  var response = await axios(config2);
+	  //console.log(response.data)
+	  json.clientInfo = response.data.client[0];
+
+	  
+	  var config3 = {
+	      url: baseUrl + '/api/Asset/GetDevicesCurrentData',
+	      method: 'POST', // If necessary
+	      headers: { 
+	          'Content-Type': 'application/json',
+	          'Authorization': `Bearer ${token}`
+	      },
+	      data: { 'ClientId': telematicsId }
+	  };
+	  var response = await axios(config3);
+	  json.vozila = response.data;
+	  io.emit('lokacijaMajstoraOdgovor',json)
+	})
+	.catch((error)=>{
+		console.log(error)
+		io.emit('lokacijaMajstoraOdgovor',"Greska")
+	})
+
+
+	/*request(ntsOptions, (error,response,body)=>{
 			if(error){
 				logError(error);
 			}else{
@@ -11130,7 +11239,7 @@ setInterval(function(){
 					}
 				});
 			}
-		});
+		});*/
 },10000)
 
 
