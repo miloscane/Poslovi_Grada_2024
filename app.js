@@ -7566,13 +7566,6 @@ server.get('/dispecer/mapaUzivo', async (req, res)=> {
 							  };
 							  var response = await axios(config);
 							  json.vozila = response.data;
-							  /*res.render("mapaUzivo",{
-									pageTitle: "Мапа радова",
-									nalozi: nalozi,
-									majstori: majstori,
-									navigacija: json,
-									googlegeocoding: process.env.googlegeocoding
-								})*/
 
 								res.render("dispeceri/mapaUzivoDispecer",{
 									pageTitle: "Мапа радова",
@@ -11445,6 +11438,7 @@ io.on('connection', function(socket){
 						warnings.push("Nije moguce odrediti broj fakture za nalog "+nalogToPush.broj+", broj fakture"+nalogToPush.brojFakture);
 					}else{
 						if(Number(nalogToPush.faktura.samoBroj)>=Number(odBroja) && Number(nalogToPush.faktura.samoBroj)<=Number(doBroja)){
+							if(nalogToPush.faktura.broj.includes("2025"))
 							naloziToSend.push(nalogToPush)
 						}
 					}
