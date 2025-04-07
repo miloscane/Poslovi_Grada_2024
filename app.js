@@ -2160,9 +2160,107 @@ http.listen(process.env.PORT, function(){
 				}
 				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
 				.then((nalozi)=>{
-					var csvString = "Broj naloga;Radna Jedinica;Iznos\r\n";
+
+					var woma = ["80.02.09.020","80.02.09.021","80.02.09.022"];
+					var rucno = ["80.02.09.001","80.02.09.002","80.02.09.003","80.02.09.004","80.02.09.005"];
+					var crp = ["80.02.09.009","80.02.09.010","80.02.09.012","80.02.09.025"];
+					var kop = ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
+					var mas = ["80.03.01.019","80.03.01.020","80.03.01.025"];
+					var kup = ["80.01.05.057","80.01.05.058","80.01.05.059","80.01.05.060","80.01.05.061","80.01.05.062","80.01.05.063","80.01.05.064"];
+
 					for(var i=0;i<nalozi.length;i++){
-						csvString += nalozi[i].broj + ";" +nalozi[i].radnaJedinica +";"+ nalozi[i].ukupanIznos+"\r\n"; 
+						nalozi[i].tipNaloga = "ZAMENA";
+						if(parseFloat(nalozi[i].ukupanIznos)==0){
+							nalozi.splice(i,1);
+							i--;
+						}
+					}
+
+
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							for(var k=0;k<nalozi[i].obracun.length;k++){
+								if(kop.indexOf(nalozi[i].obracun[k].code)>=0){
+									nalozi[i].tipNaloga = "KOPANJE";
+								}
+							}
+						}
+						
+
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							for(var k=0;k<nalozi[i].obracun.length;k++){
+								if(woma.indexOf(nalozi[i].obracun[k].code)>=0){
+									nalozi[i].tipNaloga = "WOMA";
+								}
+							}
+						}
+
+						
+
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							for(var k=0;k<nalozi[i].obracun.length;k++){
+								if(rucno.indexOf(nalozi[i].obracun[k].code)>=0){
+									if(parseFloat(nalozi[i].ukupanIznos)<20000){
+										nalozi[i].tipNaloga = "SAJLA";
+									}
+								}
+							}
+						}
+
+						
+
+						/*if(nalozi[i].tipNaloga=="ZAMENA"){
+							for(var k=0;k<nalozi[i].obracun.length;k++){
+								if(crp.indexOf(nalozi[i].obracun[k].code)>=0){
+									if(parseFloat(nalozi[i].ukupanIznos)<10000){
+										nalozi[i].tipNaloga = "CRPLJENJE";
+									}
+								}
+							}
+						}
+
+						
+
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							for(var k=0;k<nalozi[i].obracun.length;k++){
+								if(kup.indexOf(nalozi[i].obracun[k].code)>=0){
+									if(parseFloat(nalozi[i].ukupanIznos)<5500){
+										nalozi[i].tipNaloga = "SPOJKA";
+									}
+								}
+							}
+						}
+
+						
+
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							for(var k=0;k<nalozi[i].obracun.length;k++){
+								if(kup.indexOf(nalozi[i].obracun[k].code)>=0){
+									if(parseFloat(nalozi[i].ukupanIznos)<5500){
+										//nalozi[i].tipNaloga = "SPOJKA";
+									}
+								}
+							}
+						}
+
+						
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							if(nalozi[i].obracun.length==2){
+								if(nalozi[i].obracun[0].code=="80.04.01.002" && nalozi[i].obracun[1].code=="80.04.01.005"){
+									nalozi[i].tipNaloga = "LOKALNO";
+								}else if(nalozi[i].obracun[0].code=="80.04.01.005" && nalozi[i].obracun[1].code=="80.04.01.002"){
+									nalozi[i].tipNaloga = "LOKALNO";
+								}
+							}else if(nalozi[i].obracun.length==1){
+								if(nalozi[i].obracun[0].code=="80.04.01.002" || nalozi[i].obracun[0].code=="80.04.01.005"){
+									nalozi[i].tipNaloga = "LOKALNO";
+								}
+							}
+						}
+					}
+					var csvString = "Broj naloga;Radna Jedinica;Tip;Iznos\r\n";
+					for(var i=0;i<nalozi.length;i++){
+						csvString += nalozi[i].broj + ";" +nalozi[i].radnaJedinica +";"+nalozi[i].tipNaloga+";"+ nalozi[i].ukupanIznos+"\r\n"; 
 					}					
 					fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
 					console.log("Wrote file");
@@ -2215,9 +2313,91 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 
+				/*naloziDB.find({"datum.datum":{$regex:"02.2025"}}).toArray()
+				.then((nalozi)=>{
+					var woma = ["80.02.09.020","80.02.09.021","80.02.09.022"];
+					var rucno = ["80.02.09.001","80.02.09.002","80.02.09.003","80.02.09.004","80.02.09.005"];
+					var crp = ["80.02.09.009","80.02.09.010","80.02.09.012","80.02.09.025"];
+					var kop = ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
+					var mas = ["80.03.01.019","80.03.01.020","80.03.01.025"];
+					var kup = ["80.01.05.057","80.01.05.058","80.01.05.059","80.01.05.060","80.01.05.061","80.01.05.062","80.01.05.063","80.01.05.064"];
+
+					for(var i=0;i<nalozi.length;i++){
+						nalozi[i].tipNaloga = "ZAMENA";
+						if(parseFloat(nalozi[i].ukupanIznos)==0){
+							nalozi.splice(i,1);
+							i--;
+						}
+					}
 
 
+					for(var i=0;i<nalozi.length;i++){
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							for(var k=0;k<nalozi[i].obracun.length;k++){
+								if(kop.indexOf(nalozi[i].obracun[k].code)>=0){
+									nalozi[i].tipNaloga = "KOPANJE";
+								}
+							}
+						}
+						
 
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							for(var k=0;k<nalozi[i].obracun.length;k++){
+								if(woma.indexOf(nalozi[i].obracun[k].code)>=0){
+									nalozi[i].tipNaloga = "WOMA";
+								}
+							}
+						}
+
+						
+
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							for(var k=0;k<nalozi[i].obracun.length;k++){
+								if(rucno.indexOf(nalozi[i].obracun[k].code)>=0){
+									if(parseFloat(nalozi[i].ukupanIznos)<20000){
+										nalozi[i].tipNaloga = "SAJLA";
+									}
+								}
+							}
+						}
+
+						
+
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							for(var k=0;k<nalozi[i].obracun.length;k++){
+								if(kup.indexOf(nalozi[i].obracun[k].code)>=0){
+									if(parseFloat(nalozi[i].ukupanIznos)<5500){
+										//nalozi[i].tipNaloga = "SPOJKA";
+									}
+								}
+							}
+						}
+
+						
+						if(nalozi[i].tipNaloga=="ZAMENA"){
+							if(nalozi[i].obracun.length==2){
+								if(nalozi[i].obracun[0].code=="80.04.01.002" && nalozi[i].obracun[1].code=="80.04.01.005"){
+									nalozi[i].tipNaloga = "LOKALNO";
+								}else if(nalozi[i].obracun[0].code=="80.04.01.005" && nalozi[i].obracun[1].code=="80.04.01.002"){
+									nalozi[i].tipNaloga = "LOKALNO";
+								}
+							}else if(nalozi[i].obracun.length==1){
+								if(nalozi[i].obracun[0].code=="80.04.01.002" || nalozi[i].obracun[0].code=="80.04.01.005"){
+									nalozi[i].tipNaloga = "LOKALNO";
+								}
+							}
+						}
+					}
+					var csvString = "Broj naloga;Radna Jedinica;Tip;Iznos\r\n";
+					for(var i=0;i<nalozi.length;i++){
+						csvString += nalozi[i].broj + ";" +nalozi[i].radnaJedinica +";"+nalozi[i].tipNaloga+";"+ nalozi[i].ukupanIznos+"\r\n"; 
+					}					
+					fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+					console.log("Wrote file");
+				})
+				.catch((error)=>{
+					console.log(error)
+				})*/
 
 
 
@@ -11429,7 +11609,7 @@ io.on('connection', function(socket){
 				nalogToPush.ukupanIznos = nalozi[i].ukupanIznos;
 				nalogToPush.prijemnica = nalozi[i].prijemnica;
 				if(startTime!="" && endTime!=""){
-					var datetime = Number(nalogToPush.faktura.datum.datetime);
+					var datetime = nalogToPush.prijemnica.datum.datetime;
 					if(datetime>=startTime && datetime<=endTime){
 						naloziToSend.push(nalogToPush)
 					}
