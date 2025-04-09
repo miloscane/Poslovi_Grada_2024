@@ -4398,7 +4398,7 @@ server.get('/izvestajLokacijeMajstora/:majstorid/:date',async (req,res)=>{
 		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==25){
 			var idMajstora = decodeURIComponent(req.params.majstorid);
 			var date = decodeURIComponent(req.params.date);
-			dodeljivaniNaloziDB.find({majstor:idMajstora,datumRadova:date}).toArray()
+			dodeljivaniNaloziDB.find({datumRadova:date}).toArray()
 			.then((dodeljivaniNalozi)=>{
 				majstoriDB.find({uniqueId:idMajstora}).toArray()
 				.then((majstori)=>{
@@ -4412,6 +4412,7 @@ server.get('/izvestajLokacijeMajstora/:majstorid/:date',async (req,res)=>{
 								break;
 							}
 						}
+						vozilo = 50719;
 						if(vozilo!="" && vozilo!=0 && vozilo!="0"){
 							request(ntsOptions, (error,response,body)=>{
 								if(error){
@@ -4452,7 +4453,7 @@ server.get('/izvestajLokacijeMajstora/:majstorid/:date',async (req,res)=>{
 												pageTitle: "Извештај локације за "+majstori[0].ime+" / "+plate+" за датум "+reshuffleDate(date),
 												user: req.session.user,
 												nalozi: dodeljivaniNalozi,
-												vozilo: Number(navigacijaInfo[i].idNavigacije),
+												vozilo: 50719,
 												date: date,
 												googlegeocoding: process.env.googlegeocoding,
 												stops: stops
@@ -11424,6 +11425,60 @@ server.post('/appLogin',async (req,res)=>{
 	
 	
 });
+
+
+/*request(ntsOptions, (error,response,body)=>{
+	if(error){
+		logError(error);
+	}else{
+		var cookie = response.headers['set-cookie'];
+		var headers = {
+			'accept': 'application/json',
+		  'Cookie': cookie,
+		  'Content-Type': 'application/json'
+		}
+		var options = {
+		    url: 'http://app.nts-international.net/ntsapi/allvehiclestate?timezone=UTC&sensors=true&ioin=true',
+		    method: 'GET',
+		    headers: headers
+		};
+		request(options, (error,response2,body2)=>{
+			if(error){
+				logError(error);
+			}else{
+				var options = {
+				    url: 'https://app.nts-international.net/ntsapi/allvehicles',
+				    method: 'GET',
+				    headers: headers
+				};
+				request(options, (error,response3,body3)=>{
+					if(error){
+						logError(error)
+					}else{
+						try{
+							var vehiclesInfo = JSON.parse(response3.body);
+							console.log(vehiclesInfo);
+							console.log("---------------------------------------------------")
+							try{
+								var vehicleStates = JSON.parse(response2.body);
+								console.log(vehicleStates)
+								console.log("---------------------------------------------------")
+								
+								//socket.emit('lokacijaMajstoraOdgovor',vehicleStates)
+							}catch(err){
+								logError(err)
+								//socket.emit('lokacijaMajstoraOdgovor',[])
+							}
+						}catch(err){
+							logError(err);
+						}
+					}
+				});
+			}
+		});
+	}
+})*/
+
 
 setInterval(function(){
 	axios(config)
