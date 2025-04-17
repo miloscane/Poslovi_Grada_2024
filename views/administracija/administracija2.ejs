@@ -1,0 +1,487 @@
+<%- include ("partials/header") -%>
+	<div class="pageWidth">
+		<div class="administracija2">
+			<div class="wrapper">
+				<div class="title">Београд (цео уговор)</div>
+				<div class="boxes">
+					<div class="box">
+						<div class="subTitle">Налози</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="beograd-ugovor-nalozi-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Додељени:</div>
+								<div class="value" id="beograd-ugovor-nalozi-dodeljeni"></div>
+							</div>
+							<div class="row">
+								<div class="name">Враћено:</div>
+								<div class="value" id="beograd-ugovor-nalozi-vraceni"></div>
+							</div>
+							<div class="row">
+								<div class="name">Извршено:</div>
+								<div class="value" id="beograd-ugovor-nalozi-izvrseno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Валидирано:</div>
+								<div class="value" id="beograd-ugovor-nalozi-validirano"></div>
+							</div>
+							<div class="row">
+								<div class="name">На одобрењу:</div>
+								<div class="value" id="beograd-ugovor-nalozi-na-odobrenju"></div>
+							</div>
+							<div class="row">
+								<div class="name">Сторнирано:</div>
+								<div class="value" id="beograd-ugovor-nalozi-stornirano"></div>
+							</div>
+						</div>
+					</div>
+					<div class="box">
+						<div class="subTitle">Финансије</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="beograd-ugovor-finansije-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Фактурисано:</div>
+								<div class="value" id="beograd-ugovor-finansije-fakturisano"></div>
+							</div>
+							<div class="row">
+								<div class="name">Валидирано:</div>
+								<div class="value" id="beograd-ugovor-finansije-validirano"></div>
+							</div>
+							<div class="row">
+								<div class="name">На одобрењу:</div>
+								<div class="value" id="beograd-ugovor-finansije-na-odobrenju"></div>
+							</div>
+							<div class="row">
+								<div class="name">Враћено:</div>
+								<div class="value" id="beograd-ugovor-finansije-vraceno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Одбијено:</div>
+								<div class="value" id="beograd-ugovor-finansije-odbijeno"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="wrapper">
+				<div class="title">Београд (овај месец)</div>
+				<div class="boxes">
+					<div class="box">
+						<div class="subTitle">Налози</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="beograd-ovaj-mesec-nalozi-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Додељени:</div>
+								<div class="value" id="beograd-ovaj-mesec-nalozi-dodeljeni"></div>
+							</div>
+							<div class="row">
+								<div class="name">Враћено:</div>
+								<div class="value" id="beograd-ovaj-mesec-nalozi-vraceni"></div>
+							</div>
+							<div class="row">
+								<div class="name">Извршено:</div>
+								<div class="value" id="beograd-ovaj-mesec-nalozi-izvrseno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Валидирано:</div>
+								<div class="value" id="beograd-ovaj-mesec-nalozi-validirano"></div>
+							</div>
+							<div class="row">
+								<div class="name">На одобрењу:</div>
+								<div class="value" id="beograd-ovaj-mesec-nalozi-na-odobrenju"></div>
+							</div>
+							<div class="row">
+								<div class="name">Сторнирано:</div>
+								<div class="value" id="beograd-ovaj-mesec-nalozi-stornirano"></div>
+							</div>
+						</div>
+					</div>
+					<div class="box">
+						<div class="subTitle">Финансије</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="beograd-ovaj-mesec-finansije-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Фактурисано:</div>
+								<div class="value" id="beograd-ovaj-mesec-finansije-fakturisano"></div>
+							</div>
+							<div class="row">
+								<div class="name">Валидирано:</div>
+								<div class="value" id="beograd-ovaj-mesec-finansije-validirano"></div>
+							</div>
+							<div class="row">
+								<div class="name">На одобрењу:</div>
+								<div class="value" id="beograd-ovaj-mesec-finansije-na-odobrenju"></div>
+							</div>
+							<div class="row">
+								<div class="name">Враћено:</div>
+								<div class="value" id="beograd-ovaj-mesec-finansije-vraceno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Одбијено:</div>
+								<div class="value" id="beograd-ovaj-mesec-finansije-odbijeno"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="wrapper">
+				<div class="title">Београд (претходни месец)</div>
+				<div class="boxes">
+					<div class="box">
+						<div class="subTitle">Налози</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="beograd-prethodni-mesec-nalozi-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Сторнирано:</div>
+								<div class="value" id="beograd-prethodni-mesec-nalozi-stornirano"></div>
+							</div>
+						</div>
+					</div>
+					<div class="box">
+						<div class="subTitle">Финансије</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="beograd-prethodni-mesec-finansije-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Фактурисано:</div>
+								<div class="value" id="beograd-prethodni-mesec-finansije-fakturisano"></div>
+							</div>
+							<div class="row">
+								<div class="name">Одбијено:</div>
+								<div class="value" id="beograd-prethodni-mesec-finansije-odbijeno"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+
+			<div class="wrapper">
+				<div class="title">Исток (овај месец)</div>
+				<div class="boxes">
+					<div class="box">
+						<div class="subTitle">Налози</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="istok-ovaj-mesec-nalozi-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Додељени:</div>
+								<div class="value" id="istok-ovaj-mesec-nalozi-dodeljeni"></div>
+							</div>
+							<div class="row">
+								<div class="name">Враћено:</div>
+								<div class="value" id="istok-ovaj-mesec-nalozi-vraceni"></div>
+							</div>
+							<div class="row">
+								<div class="name">Извршено:</div>
+								<div class="value" id="istok-ovaj-mesec-nalozi-izvrseno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Валидирано:</div>
+								<div class="value" id="istok-ovaj-mesec-nalozi-validirano"></div>
+							</div>
+							<div class="row">
+								<div class="name">На одобрењу:</div>
+								<div class="value" id="istok-ovaj-mesec-nalozi-na-odobrenju"></div>
+							</div>
+							<div class="row">
+								<div class="name">Сторнирано:</div>
+								<div class="value" id="istok-ovaj-mesec-nalozi-stornirano"></div>
+							</div>
+						</div>
+					</div>
+					<div class="box">
+						<div class="subTitle">Финансије</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="istok-ovaj-mesec-finansije-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Фактурисано:</div>
+								<div class="value" id="istok-ovaj-mesec-finansije-fakturisano"></div>
+							</div>
+							<div class="row">
+								<div class="name">Валидирано:</div>
+								<div class="value" id="istok-ovaj-mesec-finansije-validirano"></div>
+							</div>
+							<div class="row">
+								<div class="name">На одобрењу:</div>
+								<div class="value" id="istok-ovaj-mesec-finansije-na-odobrenju"></div>
+							</div>
+							<div class="row">
+								<div class="name">Враћено:</div>
+								<div class="value" id="istok-ovaj-mesec-finansije-vraceno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Одбијено:</div>
+								<div class="value" id="istok-ovaj-mesec-finansije-odbijeno"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="wrapper">
+				<div class="title">Исток (претходни месец)</div>
+				<div class="boxes">
+					<div class="box">
+						<div class="subTitle">Налози</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="istok-prethodni-mesec-nalozi-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Сторнирано:</div>
+								<div class="value" id="istok-prethodni-mesec-nalozi-stornirano"></div>
+							</div>
+						</div>
+					</div>
+					<div class="box">
+						<div class="subTitle">Финансије</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="istok-prethodni-mesec-finansije-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Фактурисано:</div>
+								<div class="value" id="istok-prethodni-mesec-finansije-fakturisano"></div>
+							</div>
+							<div class="row">
+								<div class="name">Одбијено:</div>
+								<div class="value" id="istok-prethodni-mesec-finansije-odbijeno"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="wrapper">
+				<div class="title">Запад (овај месец)</div>
+				<div class="boxes">
+					<div class="box">
+						<div class="subTitle">Налози</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="zapad-ovaj-mesec-nalozi-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Додељени:</div>
+								<div class="value" id="zapad-ovaj-mesec-nalozi-dodeljeni"></div>
+							</div>
+							<div class="row">
+								<div class="name">Враћено:</div>
+								<div class="value" id="zapad-ovaj-mesec-nalozi-vraceni"></div>
+							</div>
+							<div class="row">
+								<div class="name">Извршено:</div>
+								<div class="value" id="zapad-ovaj-mesec-nalozi-izvrseno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Валидирано:</div>
+								<div class="value" id="zapad-ovaj-mesec-nalozi-validirano"></div>
+							</div>
+							<div class="row">
+								<div class="name">На одобрењу:</div>
+								<div class="value" id="zapad-ovaj-mesec-nalozi-na-odobrenju"></div>
+							</div>
+							<div class="row">
+								<div class="name">Сторнирано:</div>
+								<div class="value" id="zapad-ovaj-mesec-nalozi-stornirano"></div>
+							</div>
+						</div>
+					</div>
+					<div class="box">
+						<div class="subTitle">Финансије</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="zapad-ovaj-mesec-finansije-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Фактурисано:</div>
+								<div class="value" id="zapad-ovaj-mesec-finansije-fakturisano"></div>
+							</div>
+							<div class="row">
+								<div class="name">Валидирано:</div>
+								<div class="value" id="zapad-ovaj-mesec-finansije-validirano"></div>
+							</div>
+							<div class="row">
+								<div class="name">На одобрењу:</div>
+								<div class="value" id="zapad-ovaj-mesec-finansije-na-odobrenju"></div>
+							</div>
+							<div class="row">
+								<div class="name">Враћено:</div>
+								<div class="value" id="zapad-ovaj-mesec-finansije-vraceno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Одбијено:</div>
+								<div class="value" id="zapad-ovaj-mesec-finansije-odbijeno"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="wrapper">
+				<div class="title">Запад (претходни месец)</div>
+				<div class="boxes">
+					<div class="box">
+						<div class="subTitle">Налози</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="zapad-prethodni-mesec-nalozi-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Сторнирано:</div>
+								<div class="value" id="zapad-prethodni-mesec-nalozi-stornirano"></div>
+							</div>
+						</div>
+					</div>
+					<div class="box">
+						<div class="subTitle">Финансије</div>
+						<div class="stats">
+							<div class="row">
+								<div class="name">Укупно:</div>
+								<div class="value" id="zapad-prethodni-mesec-finansije-ukupno"></div>
+							</div>
+							<div class="row">
+								<div class="name">Фактурисано:</div>
+								<div class="value" id="zapad-prethodni-mesec-finansije-fakturisano"></div>
+							</div>
+							<div class="row">
+								<div class="name">Одбијено:</div>
+								<div class="value" id="zapad-prethodni-mesec-finansije-odbijeno"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		loadGif();
+		document.getElementById("load-lightbox").style.top = "220px"
+		socket.emit("administracija2",1);
+		socket.on("administracija2Odgovor",function(data){
+			if(data=="error"){
+				alert("doslo je do greske");
+			}else{
+				console.log(data)
+				document.getElementById("beograd-ugovor-nalozi-ukupno").innerHTML 			=	data.beogradUgovorNaloziUkupno;
+				document.getElementById("beograd-ugovor-nalozi-dodeljeni").innerHTML 		=	data.beogradUgovorNaloziDodeljeni;
+				document.getElementById("beograd-ugovor-nalozi-vraceni").innerHTML			=	data.beogradUgovorNaloziVraceni;
+				document.getElementById("beograd-ugovor-nalozi-izvrseno").innerHTML			=	data.beogradUgovorNaloziIzvrseno;
+				document.getElementById("beograd-ugovor-nalozi-validirano").innerHTML		=	data.beogradUgovorNaloziValidirano;
+				document.getElementById("beograd-ugovor-nalozi-na-odobrenju").innerHTML		=	data.beogradUgovorNaloziNaOdobrenju;
+				document.getElementById("beograd-ugovor-nalozi-stornirano").innerHTML		=	data.beogradUgovorNaloziStornirano;
+
+				document.getElementById("beograd-ugovor-finansije-ukupno").innerHTML 		=	brojSaRazmacima(data.beogradUgovorFinansijeUkupno);
+				document.getElementById("beograd-ugovor-finansije-fakturisano").innerHTML 	=	brojSaRazmacima(data.beogradUgovorFinansijeFakturisano);
+				document.getElementById("beograd-ugovor-finansije-validirano").innerHTML 	=	brojSaRazmacima(data.beogradUgovorFinansijeValidirano);
+				document.getElementById("beograd-ugovor-finansije-na-odobrenju").innerHTML	=	brojSaRazmacima(data.beogradUgovorFinansijeNaOdobrenju);
+				document.getElementById("beograd-ugovor-finansije-vraceno").innerHTML 		=	brojSaRazmacima(data.beogradUgovorFinansijeVraceno);
+				document.getElementById("beograd-ugovor-finansije-odbijeno").innerHTML 		=	brojSaRazmacima(data.beogradUgovorFinansijeOdbijeno);
+
+
+
+				document.getElementById("beograd-ovaj-mesec-nalozi-ukupno").innerHTML 			=	data.beogradOvajMesecNaloziUkupno;
+				document.getElementById("beograd-ovaj-mesec-nalozi-dodeljeni").innerHTML 		=	data.beogradOvajMesecNaloziDodeljeni;
+				document.getElementById("beograd-ovaj-mesec-nalozi-vraceni").innerHTML			=	data.beogradOvajMesecNaloziVraceni;
+				document.getElementById("beograd-ovaj-mesec-nalozi-izvrseno").innerHTML			=	data.beogradOvajMesecNaloziIzvrseno;
+				document.getElementById("beograd-ovaj-mesec-nalozi-validirano").innerHTML		=	data.beogradOvajMesecNaloziValidirano;
+				document.getElementById("beograd-ovaj-mesec-nalozi-na-odobrenju").innerHTML		=	data.beogradOvajMesecNaloziNaOdobrenju;
+				document.getElementById("beograd-ovaj-mesec-nalozi-stornirano").innerHTML		=	data.beogradOvajMesecNaloziStornirano;
+
+				document.getElementById("beograd-ovaj-mesec-finansije-ukupno").innerHTML 		=	brojSaRazmacima(data.beogradOvajMesecFinansijeUkupno);
+				document.getElementById("beograd-ovaj-mesec-finansije-fakturisano").innerHTML 	=	brojSaRazmacima(data.beogradOvajMesecFinansijeFakturisano);
+				document.getElementById("beograd-ovaj-mesec-finansije-validirano").innerHTML 	=	brojSaRazmacima(data.beogradOvajMesecFinansijeValidirano);
+				document.getElementById("beograd-ovaj-mesec-finansije-na-odobrenju").innerHTML	=	brojSaRazmacima(data.beogradOvajMesecFinansijeNaOdobrenju);
+				document.getElementById("beograd-ovaj-mesec-finansije-vraceno").innerHTML 		=	brojSaRazmacima(data.beogradOvajMesecFinansijeVraceno);
+				document.getElementById("beograd-ovaj-mesec-finansije-odbijeno").innerHTML 		=	brojSaRazmacima(data.beogradOvajMesecFinansijeOdbijeno);
+
+
+				document.getElementById("beograd-prethodni-mesec-nalozi-ukupno").innerHTML 		=	data.beogradPrethodniMesecNaloziUkupno;
+				document.getElementById("beograd-prethodni-mesec-nalozi-stornirano").innerHTML	=	data.beogradPrethodniMesecNaloziStornirano;
+
+				document.getElementById("beograd-prethodni-mesec-finansije-ukupno").innerHTML 		=	brojSaRazmacima(data.beogradPrethodniMesecFinansijeUkupno);
+				document.getElementById("beograd-prethodni-mesec-finansije-fakturisano").innerHTML 	=	brojSaRazmacima(data.beogradPrethodniMesecFinansijeFakturisano);
+				document.getElementById("beograd-prethodni-mesec-finansije-odbijeno").innerHTML 	=	brojSaRazmacima(data.beogradPrethodniMesecFinansijeOdbijeno);
+
+
+
+				document.getElementById("istok-ovaj-mesec-nalozi-ukupno").innerHTML 			=	data.istokOvajMesecNaloziUkupno;
+				document.getElementById("istok-ovaj-mesec-nalozi-dodeljeni").innerHTML 			=	data.istokOvajMesecNaloziDodeljeni;
+				document.getElementById("istok-ovaj-mesec-nalozi-vraceni").innerHTML			=	data.istokOvajMesecNaloziVraceni;
+				document.getElementById("istok-ovaj-mesec-nalozi-izvrseno").innerHTML			=	data.istokOvajMesecNaloziIzvrseno;
+				document.getElementById("istok-ovaj-mesec-nalozi-validirano").innerHTML			=	data.istokOvajMesecNaloziValidirano;
+				document.getElementById("istok-ovaj-mesec-nalozi-na-odobrenju").innerHTML		=	data.istokOvajMesecNaloziNaOdobrenju;
+				document.getElementById("istok-ovaj-mesec-nalozi-stornirano").innerHTML			=	data.istokOvajMesecNaloziStornirano;
+
+				document.getElementById("istok-ovaj-mesec-finansije-ukupno").innerHTML 			=	brojSaRazmacima(data.istokOvajMesecFinansijeUkupno);
+				document.getElementById("istok-ovaj-mesec-finansije-fakturisano").innerHTML 	=	brojSaRazmacima(data.istokOvajMesecFinansijeFakturisano);
+				document.getElementById("istok-ovaj-mesec-finansije-validirano").innerHTML 		=	brojSaRazmacima(data.istokOvajMesecFinansijeValidirano);
+				document.getElementById("istok-ovaj-mesec-finansije-na-odobrenju").innerHTML	=	brojSaRazmacima(data.istokOvajMesecFinansijeNaOdobrenju);
+				document.getElementById("istok-ovaj-mesec-finansije-vraceno").innerHTML 		=	brojSaRazmacima(data.istokOvajMesecFinansijeVraceno);
+				document.getElementById("istok-ovaj-mesec-finansije-odbijeno").innerHTML 		=	brojSaRazmacima(data.istokOvajMesecFinansijeOdbijeno);
+
+
+
+
+				document.getElementById("zapad-ovaj-mesec-nalozi-ukupno").innerHTML 			=	data.zapadOvajMesecNaloziUkupno;
+				document.getElementById("zapad-ovaj-mesec-nalozi-dodeljeni").innerHTML 			=	data.zapadOvajMesecNaloziDodeljeni;
+				document.getElementById("zapad-ovaj-mesec-nalozi-vraceni").innerHTML			=	data.zapadOvajMesecNaloziVraceni;
+				document.getElementById("zapad-ovaj-mesec-nalozi-izvrseno").innerHTML			=	data.zapadOvajMesecNaloziIzvrseno;
+				document.getElementById("zapad-ovaj-mesec-nalozi-validirano").innerHTML			=	data.zapadOvajMesecNaloziValidirano;
+				document.getElementById("zapad-ovaj-mesec-nalozi-na-odobrenju").innerHTML		=	data.zapadOvajMesecNaloziNaOdobrenju;
+				document.getElementById("zapad-ovaj-mesec-nalozi-stornirano").innerHTML			=	data.zapadOvajMesecNaloziStornirano;
+
+				document.getElementById("zapad-ovaj-mesec-finansije-ukupno").innerHTML 			=	brojSaRazmacima(data.zapadOvajMesecFinansijeUkupno);
+				document.getElementById("zapad-ovaj-mesec-finansije-fakturisano").innerHTML 	=	brojSaRazmacima(data.zapadOvajMesecFinansijeFakturisano);
+				document.getElementById("zapad-ovaj-mesec-finansije-validirano").innerHTML 		=	brojSaRazmacima(data.zapadOvajMesecFinansijeValidirano);
+				document.getElementById("zapad-ovaj-mesec-finansije-na-odobrenju").innerHTML	=	brojSaRazmacima(data.zapadOvajMesecFinansijeNaOdobrenju);
+				document.getElementById("zapad-ovaj-mesec-finansije-vraceno").innerHTML 		=	brojSaRazmacima(data.zapadOvajMesecFinansijeVraceno);
+				document.getElementById("zapad-ovaj-mesec-finansije-odbijeno").innerHTML 		=	brojSaRazmacima(data.zapadOvajMesecFinansijeOdbijeno);
+
+
+				document.getElementById("zapad-prethodni-mesec-nalozi-ukupno").innerHTML 		=	data.zapadOvajMesecNaloziUkupno;
+				document.getElementById("zapad-prethodni-mesec-nalozi-stornirano").innerHTML	=	data.zapadOvajMesecNaloziStornirano;
+
+				document.getElementById("zapad-prethodni-mesec-finansije-ukupno").innerHTML 	=	brojSaRazmacima(data.zapadOvajMesecFinansijeUkupno);
+				document.getElementById("zapad-prethodni-mesec-finansije-fakturisano").innerHTML=	brojSaRazmacima(data.zapadOvajMesecFinansijeFakturisano);
+				document.getElementById("zapad-prethodni-mesec-finansije-odbijeno").innerHTML 	=	brojSaRazmacima(data.zapadOvajMesecFinansijeOdbijeno);
+
+
+				document.getElementById("istok-prethodni-mesec-nalozi-ukupno").innerHTML 		=	data.istokOvajMesecNaloziUkupno;
+				document.getElementById("istok-prethodni-mesec-nalozi-stornirano").innerHTML	=	data.istokOvajMesecNaloziStornirano;
+
+				document.getElementById("istok-prethodni-mesec-finansije-ukupno").innerHTML 	=	brojSaRazmacima(data.istokOvajMesecFinansijeUkupno);
+				document.getElementById("istok-prethodni-mesec-finansije-fakturisano").innerHTML=	brojSaRazmacima(data.istokOvajMesecFinansijeFakturisano);
+				document.getElementById("istok-prethodni-mesec-finansije-odbijeno").innerHTML 	=	brojSaRazmacima(data.istokOvajMesecFinansijeOdbijeno);
+			}
+
+			stopLoadGif();
+		});
+	</script>
+<%- include ("partials/footer") -%>

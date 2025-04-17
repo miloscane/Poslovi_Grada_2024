@@ -11,7 +11,10 @@ const dotenv 							=	require('dotenv');
 const cookieParser				=	require('cookie-parser');
 const crypto							=	require('node:crypto');
 const {MongoClient}				=	require('mongodb');
-const io									=	require('socket.io')(http);
+const io = require('socket.io')(http, {
+  pingTimeout: 3600000,   // 30 seconds instead of default ~5s
+  pingInterval: 10000   // keep-alive pings every 10s
+});
 const aws									= require('aws-sdk');
 const multer							= require('multer');
 const multerS3						= require('multer-s3-transform');
@@ -360,7 +363,10 @@ var resetPassLimit = 1.8e6; //30 minuta
 var podizvodjaci  = ["SeHQZ--1672650353244","IIwY4--1672650358507","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","ylSnq--1672041756318"];
 var radneJedinice = ["NOVI BEOGRAD","ZEMUN","ČUKARICA","SAVSKI VENAC","VRAČAR","RAKOVICA","ZVEZDARA","VOŽDOVAC","STARI GRAD","PALILULA"];
 var meseciJson    = [{name:"Februar 2024",string:"02.2024"},{name:"Mart 2024",string:"03.2024"},{name:"April 2024",string:"04.2024"},{name:"Maj 2024",string:"05.2024"},{name:"Jun 2024",string:"06.2024"},{name:"Jul 2024",string:"07.2024"},{name:"Avgust 2024",string:"08.2024"},{name:"Septembar 2024",string:"09.2024"},{name:"Oktobar 2024",string:"10.2024"},{name:"Novembar 2024",string:"11.2024"},{name:"Decembar 2024",string:"12.2024"},{name:"Januar 2025",string:"01.2025"},{name:"Februar 2025",string:"02.2025"},{name:"Mart 2025",string:"03.2025"},{name:"April 2024",string:"04.2025"}]
-var daniUNedelji 	=	["Недеља","Понедељак","Уторак","Среда","Четвртак","Петак","Субота"]
+var daniUNedelji 	=	["Недеља","Понедељак","Уторак","Среда","Четвртак","Петак","Субота"];
+var istok         = ["ZVEZDARA","RAKOVICA","VOŽDOVAC","STARI GRAD","PALILULA"];
+var zapad         = ["NOVI BEOGRAD","ZEMUN","ČUKARICA","VRAČAR","SAVSKI VENAC"];
+
 var phoneAccessCode = generateId(25);
 setInterval(function(){
 	phoneAccessCode = generateId(25);
@@ -1357,8 +1363,8 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var dateStart = new Date("2025-02-20");
-			var dateEnd = new Date("2025-03-03");
+			var dateStart = new Date("2025-03-01");
+			var dateEnd = new Date("2025-04-16");
 			var sifre = ["80.02.09.001","80.02.09.002","80.02.09.005","80.02.10.007","80.02.09.022","80.02.09.020","80.02.09.021"];
 			for(var i=0;i<nalozi.length;i++){
 				var odlazak = false;
@@ -2676,6 +2682,25 @@ server.get('/administracija',async (req,res)=>{
 		}
 	}else{
 
+	}
+});
+
+server.get('/administracija2',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			res.render("administracija/administracija2",{
+				pageTitle: "Статистика фирме",
+				user:req.session.user
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Greska",
+				user:req.session.user,
+				message: "<div class=\"text\">Vas nalog nije ovlascen da vidi ovu stranicu.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
 });
 
@@ -12116,6 +12141,311 @@ io.on('connection', function(socket){
 				});
 			}
 		});
+	})
+
+	socket.on('administracija2', function(dummy){
+		var json = {};
+		json.beogradUgovorNaloziUkupno 					=	0;
+		json.beogradUgovorNaloziDodeljeni 			=	0;
+		json.beogradUgovorNaloziVraceni 				=	0;
+		json.beogradUgovorNaloziIzvrseno 				=	0;
+		json.beogradUgovorNaloziValidirano 			=	0;
+		json.beogradUgovorNaloziNaOdobrenju 		=	0;
+		json.beogradUgovorNaloziStornirano 			=	0;
+		
+
+		json.beogradUgovorFinansijeUkupno 			=	0;
+		json.beogradUgovorFinansijeFakturisano 	=	0;
+		json.beogradUgovorFinansijeValidirano 	=	0;
+		json.beogradUgovorFinansijeNaOdobrenju 	=	0;
+		json.beogradUgovorFinansijeVraceno		 	=	0;
+		json.beogradUgovorFinansijeOdbijeno		 	=	0;
+
+
+		json.beogradOvajMesecNaloziUkupno 				=	0;
+		json.beogradOvajMesecNaloziDodeljeni 			=	0;
+		json.beogradOvajMesecNaloziVraceni 				=	0;
+		json.beogradOvajMesecNaloziIzvrseno 			=	0;
+		json.beogradOvajMesecNaloziValidirano 		=	0;
+		json.beogradOvajMesecNaloziNaOdobrenju 		=	0;
+		json.beogradOvajMesecNaloziStornirano 		=	0;
+
+		json.beogradOvajMesecFinansijeUkupno 			=	0;
+		json.beogradOvajMesecFinansijeFakturisano =	0;
+		json.beogradOvajMesecFinansijeValidirano 	=	0;
+		json.beogradOvajMesecFinansijeNaOdobrenju =	0;
+		json.beogradOvajMesecFinansijeVraceno		 	=	0;
+		json.beogradOvajMesecFinansijeOdbijeno		=	0;
+
+
+		json.beogradPrethodniMesecNaloziUkupno 			=	0;
+		json.beogradPrethodniMesecNaloziStornirano 	=	0;
+
+		json.beogradOvajMesecFinansijeUkupno 			=	0;
+		json.beogradOvajMesecFinansijeFakturisano =	0;
+		json.beogradOvajMesecFinansijeOdbijeno		=	0;
+
+
+		json.istokOvajMesecNaloziUkupno 				=	0;
+		json.istokOvajMesecNaloziDodeljeni 			=	0;
+		json.istokOvajMesecNaloziVraceni 				=	0;
+		json.istokOvajMesecNaloziIzvrseno 			=	0;
+		json.istokOvajMesecNaloziValidirano 		=	0;
+		json.istokOvajMesecNaloziNaOdobrenju 		=	0;
+		json.istokOvajMesecNaloziStornirano 		=	0;
+
+		json.istokOvajMesecFinansijeUkupno 			=	0;
+		json.istokOvajMesecFinansijeFakturisano =	0;
+		json.istokOvajMesecFinansijeValidirano 	=	0;
+		json.istokOvajMesecFinansijeNaOdobrenju =	0;
+		json.istokOvajMesecFinansijeVraceno		 	=	0;
+		json.istokOvajMesecFinansijeOdbijeno		=	0;
+
+
+		json.istokPrethodniMesecNaloziUkupno 			=	0;
+		json.istokPrethodniMesecNaloziStornirano 	=	0;
+
+		json.istokOvajMesecFinansijeUkupno 			=	0;
+		json.istokOvajMesecFinansijeFakturisano =	0;
+		json.istokOvajMesecFinansijeOdbijeno		=	0;
+
+
+
+
+
+
+		json.zapadOvajMesecNaloziUkupno 				=	0;
+		json.zapadOvajMesecNaloziDodeljeni 			=	0;
+		json.zapadOvajMesecNaloziVraceni 				=	0;
+		json.zapadOvajMesecNaloziIzvrseno 			=	0;
+		json.zapadOvajMesecNaloziValidirano 		=	0;
+		json.zapadOvajMesecNaloziNaOdobrenju 		=	0;
+		json.zapadOvajMesecNaloziStornirano 		=	0;
+
+		json.zapadOvajMesecFinansijeUkupno 			=	0;
+		json.zapadOvajMesecFinansijeFakturisano =	0;
+		json.zapadOvajMesecFinansijeValidirano 	=	0;
+		json.zapadOvajMesecFinansijeNaOdobrenju =	0;
+		json.zapadOvajMesecFinansijeVraceno		 	=	0;
+		json.zapadOvajMesecFinansijeOdbijeno		=	0;
+
+
+		json.zapadPrethodniMesecNaloziUkupno 			=	0;
+		json.zapadPrethodniMesecNaloziStornirano 	=	0;
+
+		json.zapadOvajMesecFinansijeUkupno 			=	0;
+		json.zapadOvajMesecFinansijeFakturisano =	0;
+		json.zapadOvajMesecFinansijeOdbijeno		=	0;
+		var mesec = eval(new Date().getMonth()+1).toString().padStart("0",2);
+		var prethodniMesec = eval(new Date().getMonth()).toString().padStart("0",2);
+		var godina = new Date().getFullYear();
+
+		naloziDB.find({}).toArray()
+		.then((nalozi)=>{
+			var brojeviNaloga = [];
+			for(var i=0;i<nalozi.length;i++){
+				if(brojeviNaloga.indexOf(Number(nalozi[i].broj))<0){
+					brojeviNaloga.push(Number(nalozi[i].broj))
+				}
+			}
+			console.log("Ukupno naloga: "+brojeviNaloga.length)
+			portalStambenoTestDB.find({broj_naloga:{$in:brojeviNaloga}}).toArray()
+			.then((ispravke)=>{
+				console.log("Ukupno ispravki: "+ispravke.length)
+				for(var i=0;i<nalozi.length;i++){
+					nalozi[i].ispravke = [];
+					for(var j=0;j<ispravke.length;j++){
+						if(Number(nalozi[i].broj)==ispravke[j].broj_naloga){
+							nalozi[i].ispravke.push(ispravke[j])
+						}
+					}
+
+					nalozi[i].maxIznos = nalozi[i].ukupanIznos ? parseFloat(nalozi[i].ukupanIznos) : 0;
+					for(var j=0;j<nalozi[i].ispravke.length;j++){
+						var iznos = 0;
+						for(var k=0;k<nalozi[i].ispravke[j].order_lines.length;k++){
+							iznos = iznos + parseFloat(nalozi[i].ispravke[j].order_lines[k].ukupna_cena_dobavljaca)
+						}
+						if(nalozi[i].maxIznos<iznos){
+							nalozi[i].maxIznos = parseFloat(iznos)
+						}
+					}
+
+					json.beogradUgovorNaloziUkupno++;
+					json.beogradUgovorFinansijeUkupno = json.beogradUgovorFinansijeUkupno + parseFloat(nalozi[i].ukupanIznos);
+					if(["Završeno","Spreman za fakturisanje","Nalog u Stambenom","Fakturisan","Storniran"].indexOf(nalozi[i].statusNaloga)<0){
+						json.beogradUgovorNaloziDodeljeni++;
+					}
+
+					if(nalozi[i].statusNaloga=="Vraćen"){
+						json.beogradUgovorNaloziVraceni++;
+					}
+
+					if(["Završeno","Spreman za fakturisanje","Nalog u Stambenom"].indexOf(nalozi[i].statusNaloga)>=0){
+						json.beogradUgovorNaloziIzvrseno++;
+					}
+
+					if(nalozi[i].statusNaloga=="Spreman za fakturisanje"){
+						json.beogradUgovorNaloziValidirano++;
+						json.beogradUgovorFinansijeValidirano = json.beogradUgovorFinansijeValidirano + parseFloat(nalozi[i].ukupanIznos);
+					}
+
+					if(nalozi[i].statusNaloga=="Nalog u Stambenom"){
+						json.beogradUgovorNaloziNaOdobrenju++;
+						json.beogradUgovorFinansijeNaOdobrenju = json.beogradUgovorFinansijeNaOdobrenju + parseFloat(nalozi[i].ukupanIznos);
+					}
+
+					if(nalozi[i].statusNaloga=="Storniran"){
+						json.beogradUgovorNaloziStornirano++;
+					}
+
+					if(nalozi[i].statusNaloga=="Fakturisan"){
+						json.beogradUgovorFinansijeFakturisano = json.beogradUgovorFinansijeFakturisano + parseFloat(nalozi[i].ukupanIznos);
+						json.beogradUgovorFinansijeOdbijeno = json.beogradUgovorFinansijeOdbijeno + parseFloat(nalozi[i].maxIznos) - parseFloat(nalozi[i].ukupanIznos);
+					}
+
+					if(nalozi[i].statusNaloga=="Vraćen"){
+						json.beogradUgovorFinansijeVraceno = json.beogradUgovorFinansijeVraceno + parseFloat(nalozi[i].ukupanIznos);
+						json.beogradOvajMesecFinansijeVraceno = json.beogradOvajMesecFinansijeVraceno + parseFloat(nalozi[i].ukupanIznos);
+						if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.istokOvajMesecNaloziVraceno++;
+						}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.zapadOvajMesecNaloziVraceno++;
+						}
+
+						json.beogradOvajMesecNaloziVraceni++;
+						if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.istokOvajMesecNaloziVraceni++;
+						}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.zapadOvajMesecNaloziVraceni++;
+						}
+
+						if(["Završeno","Spreman za fakturisanje","Nalog u Stambenom","Fakturisan","Storniran"].indexOf(nalozi[i].statusNaloga)<0){
+							json.beogradOvajMesecNaloziDodeljeni++;
+							if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+								json.istokOvajMesecNaloziDodeljeni++;
+							}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+								json.zapadOvajMesecNaloziDodeljeni++;
+							}
+						}
+
+						if(["Završeno","Spreman za fakturisanje","Nalog u Stambenom"].indexOf(nalozi[i].statusNaloga)>=0){
+							json.beogradOvajMesecNaloziIzvrseno++;
+							if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+								json.istokOvajMesecNaloziIzvrseno++;
+							}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+								json.zapadOvajMesecNaloziIzvrseno++;
+							}
+						}
+
+						json.beogradOvajMesecNaloziUkupno++;
+						json.beogradOvajMesecFinansijeUkupno = json.beogradOvajMesecFinansijeUkupno + parseFloat(nalozi[i].ukupanIznos);
+						if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.istokOvajMesecNaloziUkupno++;
+							json.istokOvajMesecFinansijeUkupno = json.istokOvajMesecFinansijeUkupno + parseFloat(nalozi[i].ukupanIznos);
+						}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.zapadOvajMesecNaloziUkupno++;
+							json.zapadOvajMesecFinansijeUkupno = json.zapadOvajMesecFinansijeUkupno + parseFloat(nalozi[i].ukupanIznos);
+						}
+
+						if(nalozi[i].statusNaloga=="Spreman za fakturisanje"){
+							json.beogradOvajMesecNaloziValidirano++;
+							json.beogradOvajMesecFinansijeValidirano = json.beogradOvajMesecFinansijeValidirano + parseFloat(nalozi[i].ukupanIznos);
+							if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+								json.istokOvajMesecNaloziValidirano++;
+								json.istokOvajMesecFinansijeValidirano = json.istokOvajMesecFinansijeValidirano + parseFloat(nalozi[i].ukupanIznos);
+							}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+								json.zapadOvajMesecNaloziValidirano++;
+								json.zapadOvajMesecFinansijeValidirano = json.zapadOvajMesecFinansijeValidirano + parseFloat(nalozi[i].ukupanIznos);
+							}
+						}
+
+						if(nalozi[i].statusNaloga=="Nalog u Stambenom"){
+							json.beogradOvajMesecNaloziNaOdobrenju++;
+							json.beogradOvajMesecFinansijeNaOdobrenju = json.beogradOvajMesecFinansijeNaOdobrenju + parseFloat(nalozi[i].ukupanIznos);
+							if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+								json.istokOvajMesecNaloziNaOdobrenju++;
+								json.istokOvajMesecFinansijeNaOdobrenju = json.istokOvajMesecFinansijeNaOdobrenju + parseFloat(nalozi[i].ukupanIznos);
+							}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+								json.zapadOvajMesecNaloziNaOdobrenju++;
+								json.zapadOvajMesecFinansijeNaOdobrenju = json.zapadOvajMesecFinansijeNaOdobrenju + parseFloat(nalozi[i].ukupanIznos);
+							}
+						}
+
+						if(nalozi[i].statusNaloga=="Fakturisan"){
+							
+						}
+					}
+
+
+
+
+					if(nalozi[i].prijemnica.datum.datum.includes(mesec+"."+godina)){
+						
+
+						
+
+						
+					}
+
+					if(nalozi[i].datum.datum.includes(mesec+"."+godina)){
+						json.beogradOvajMesecNaloziStornirano++;
+						if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.istokOvajMesecNaloziStornirano++;
+						}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.zapadOvajMesecNaloziStornirano++;
+						}
+
+					}
+
+
+					if(nalozi[i].prijemnica.datum.datum.includes(prethodniMesec+"."+godina)){
+						json.beogradPrethodniMesecNaloziUkupno++;
+						json.beogradPrethodniMesecFinansijeUkupno = json.beogradPrethodniMesecFinansijeUkupno + parseFloat(nalozi[i].ukupanIznos);
+						if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.istokPrethodniMesecNaloziUkupno++;
+							json.istokPrethodniMesecFinansijeUkupno = json.istokPrethodniMesecFinansijeUkupno + parseFloat(nalozi[i].ukupanIznos);
+						}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.zapadPrethodniMesecNaloziUkupno++;
+							json.zapadPrethodniMesecFinansijeUkupno = json.zapadPrethodniMesecFinansijeUkupno + parseFloat(nalozi[i].ukupanIznos);
+						}
+						if(nalozi[i].statusNaloga=="Fakturisan"){
+							json.beogradPrethodniMesecFinansijeFakturisano = json.beogradPrethodniMesecFinansijeFakturisano + parseFloat(nalozi[i].ukupanIznos);
+							json.beogradPrethodniMesecFinansijeOdbijeno = json.beogradPrethodniMesecFinansijeOdbijeno + parseFloat(nalozi[i].maxIznos) - parseFloat(nalozi[i].ukupanIznos);
+							if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+								json.istokPrethodniMesecFinansijeFakturisano = json.istokPrethodniMesecFinansijeFakturisano + parseFloat(nalozi[i].ukupanIznos);
+								json.istokPrethodniMesecFinansijeOdbijeno = json.istokPrethodniMesecFinansijeOdbijeno + parseFloat(nalozi[i].maxIznos) - parseFloat(nalozi[i].ukupanIznos);
+							}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+								json.zapadPrethodniMesecFinansijeFakturisano = json.zapadPrethodniMesecFinansijeFakturisano + parseFloat(nalozi[i].ukupanIznos);
+								json.zapadPrethodniMesecFinansijeOdbijeno = json.zapadPrethodniMesecFinansijeOdbijeno + parseFloat(nalozi[i].maxIznos) - parseFloat(nalozi[i].ukupanIznos);
+							}
+						}
+					}
+
+					if(nalozi[i].datum.datum.includes(prethodniMesec+"."+godina)){
+						json.beogradPrethodniMesecNaloziStornirano++;
+						if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.istokPrethodniMesecNaloziStornirano++;
+						}else if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
+							json.zapadPrethodniMesecNaloziStornirano++;
+						}
+					}
+				}
+				console.log("FINISHED!!!")
+				io.emit("administracija2Odgovor",json)
+
+			})
+			.catch((error)=>{
+				console.log(error);
+				io.emit("administracija2Odgovor","error")
+			})
+
+
+		})
+		.catch((error)=>{
+			console.log(error);
+			io.emit("administracija2Odgovor","error")
+		})
 	})
 
 });
