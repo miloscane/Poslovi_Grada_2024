@@ -6185,6 +6185,34 @@ input[type=number] {
     vertical-align: middle;
 }
 
+.stanjeNalogaPoOpstinama .stats{
+    padding-left:20px;
+}
+
+.stanjeNalogaPoOpstinama .stats .inlines{
+    padding-bottom:4px;
+    padding-top:4px;
+    border-bottom:1px solid rgb(150,150,150);
+}
+
+.stanjeNalogaPoOpstinama .stats .inlines:nth-child(even){
+    background-color:rgb(240,240,240);
+}
+
+.stanjeNalogaPoOpstinama .stats .inlines .inline{
+    display:inline-block;
+    vertical-align: middle;
+}
+
+.stanjeNalogaPoOpstinama .stats .inlines .inline:first-child{
+    font-weight:500;
+    width:200px;
+    padding-left:10px;
+}
+
+
+
+
 .administracija2 .title{
     font-weight:500;
     background-color:rgb(42,47,50);

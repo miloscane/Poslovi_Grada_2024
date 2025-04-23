@@ -4563,6 +4563,37 @@ server.get('/administracija/strukturaJucerasnjihNaloga/:datum',async (req,res)=>
 	}
 });
 
+server.get('/administracija/stanjePoOpstinama',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom","Storniran"]}}).toArray()
+			.then((nalozi)=>{
+				res.render("administracija/stanjePoOpstinama",{
+					pageTitle: "Стање налога по општинама",
+					user: req.session.user,
+					nalozi: nalozi 
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.post('/strukturaNaloga',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
@@ -4670,9 +4701,6 @@ server.get('/administracija/specifikacijeMajstora/:datum',async (req,res)=>{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
 });
-
-
-
 
 server.get('/administracija/specifikacijePodizvodjaca',async (req,res)=>{
 	if(req.session.user){
@@ -9613,7 +9641,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 								var podizvodjac = podizvodjaci.indexOf(nalozi[0].majstor)>=0 ? "ПОДИЗВОЂАЧА" : "";
 								var mailOptions = {
 									from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
-									to: 'marija.slijepcevic@poslovigrada.rs,miloscane@gmail.com',
+									to: 'marija.slijepcevic@poslovigrada.rs',
 									subject: 'Налог број '+podizvodjac+' '+nalozi[0].broj+' је враћен',
 									html: 'Поштовани/а,<br>Налог '+podizvodjac+' <a href=\"https://vik2024.poslovigrada.rs/nalog/'+nalozi[0].broj+'\">'+nalozi[0].broj+'</a> је враћен.<br> Радна Јединица: '+nalozi[0].radnaJedinica+'<br>Adresa: '+nalozi[0].adresa+'.'
 								};
@@ -9651,7 +9679,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 							.then((stambenoResponse)=>{
 								var mailOptions = {
 									from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
-									to: 'marija.slijepcevic@poslovigrada.rs,miloscane@gmail.com',
+									to: 'marija.slijepcevic@poslovigrada.rs',
 									subject: 'Налог број '+nalozi[0].broj+' је сторниран',
 									html: 'Поштовани/а,<br>Налог <a href=\"https://vik2024.poslovigrada.rs/nalog/'+nalozi[0].broj+'\">'+nalozi[0].broj+'</a> је сторниран.<br> Радна Јединица: '+nalozi[0].radnaJedinica+'<br>Adresa: '+nalozi[0].adresa+'.'
 								};
