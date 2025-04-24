@@ -6210,6 +6210,34 @@ input[type=number] {
     padding-left:10px;
 }
 
+.jucerasnjiUcinak table{
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.jucerasnjiUcinak table td{
+    text-align:left;
+    vertical-align: top;
+    border:1px solid rgb(150,150,150);
+    padding:5px;
+}
+
+.jucerasnjiUcinak table .redniBroj .value{
+    width:30px;
+}
+
+.jucerasnjiUcinak table .brojNaloga .value{
+    width:100px;
+}
+
+.jucerasnjiUcinak table .adresa .value{
+    width:200px;
+}
+
+.jucerasnjiUcinak table .opis .value{
+    width:500px;
+}
+
 
 
 

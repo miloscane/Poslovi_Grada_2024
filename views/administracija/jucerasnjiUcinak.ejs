@@ -1,0 +1,48 @@
+<%- include ("partials/header") -%>
+	<script>
+		var majstori = <%-JSON.stringify(majstori)%>;
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+		console.log(majstori)
+	</script>
+	<div class="pageWidth jucerasnjiUcinak">
+
+	</div>
+	<script>
+		for(var i=0;i<majstori.length;i++){
+			var wrap = document.createElement("DIV");
+			wrap.setAttribute("class","wrap");
+				var h1 = document.createElement("H1");
+				h1.innerHTML = majstori[i].ime;
+				wrap.appendChild(h1);
+
+				var table = document.createElement("table");
+				for(var j=0;j<majstori[i].dodele.length;j++){
+					var tr = document.createElement("TR");
+						var td = document.createElement("TD");
+						td.setAttribute("class","redniBroj");
+						td.innerHTML = "<div class=\"value\">"+eval(j+1)+".</div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","brojNaloga");
+						td.innerHTML = "<div class=\"value\"><a target=\"_blank\" href=\"/nalog/"+majstori[i].dodele[j].nalog+"\">"+majstori[i].dodele[j].nalog+"</a></div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","adresa");
+						td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].adresa+"</div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","opis");
+						td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].opis+"</div>";
+						tr.appendChild(td);
+
+					table.appendChild(tr);
+				}
+				wrap.appendChild(table);
+			document.getElementsByClassName("jucerasnjiUcinak")[0].appendChild(wrap);
+			
+		}
+	</script>
+<%- include ("partials/footer") -%>
