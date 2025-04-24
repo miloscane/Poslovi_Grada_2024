@@ -6230,6 +6230,10 @@ input[type=number] {
     width:100px;
 }
 
+.jucerasnjiUcinak table .radnaJedinica .value{
+    width:150px;
+}
+
 .jucerasnjiUcinak table .adresa .value{
     width:200px;
 }

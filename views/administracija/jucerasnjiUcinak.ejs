@@ -29,6 +29,11 @@
 						tr.appendChild(td);
 
 						var td = document.createElement("TD");
+						td.setAttribute("class","radnaJedinica");
+						td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].radnaJedinica+"</div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
 						td.setAttribute("class","adresa");
 						td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].adresa+"</div>";
 						tr.appendChild(td);
