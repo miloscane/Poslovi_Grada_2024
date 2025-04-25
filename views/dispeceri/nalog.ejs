@@ -579,19 +579,6 @@
 
 													dodela.appendChild(editor);
 
-													/*var inline = document.createElement("DIV");
-													inline.setAttribute("class","inline");
-														var komanda = document.createElement("DIV");
-														komanda.setAttribute("class","komanda");
-														komanda.setAttribute("onclick","editDodelu(this)")
-														komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/validiranIcon.png\">";
-														inline.appendChild(komanda);
-														var komanda = document.createElement("DIV");
-														komanda.setAttribute("class","komanda");
-														komanda.setAttribute("onclick","deleteDodelu(this)")
-														komanda.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
-														inline.appendChild(komanda);
-													dodela.appendChild(inline)	*/
 												}
 												
 
@@ -770,7 +757,6 @@
 			</script>
 			<div class="izvestaji">
 				<div class="title">Извештаји</div>
-				<%if(user.opstine.indexOf(nalog.radnaJedinica)>=0){%>
 					<div class="qrWrap">
 						<div id="qr"></div>
 						<div class="sticker"><div class="relative"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png"></div></div>
@@ -795,13 +781,10 @@
 							generateQr(code);
 						})
 					</script>
-				<%}%>
 				<div id="komentari"></div>
-				<%if(user.opstine.indexOf(nalog.radnaJedinica)<0){%>
-					<script>
-						document.getElementById("komentari").style.marginTop = "0px";
-					</script>
-				<%}%>
+				<script>
+					document.getElementById("komentari").style.marginTop = "0px";
+				</script>
 				<script>
 					for(var i=0;i<izvestaji.length;i++){
 						var izvestajBox = document.createElement("DIV");
@@ -857,92 +840,87 @@
 				</script>
 				<div class="inputWrapper">
 					<div class="inputWrap buttonWrap izvestajInputWrap">
-						<%if(user.opstine.indexOf(nalog.radnaJedinica)>=0){%>
-							<textarea id="komentar" placeholder="Текст извештаја"></textarea>
-							<div class="previewImages" id="preview-images"></div>
-							<form method="POST" action="/edit-nalog" id="form" style="display:none;" enctype="multipart/form-data">
-								<input type="text" name="json" id="json">
-								<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
-							</form>
-							<div class="buttonWrap" onclick="document.getElementById('slike-input').click()">
-								<div class="button">
-									<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/addImageIcon.png"></div>
-									<div class="label">Додај слике</div>
-									
-									<script>
-										document.getElementById("slike-input").onchange = evt => {
-											document.getElementById("preview-images").innerHTML = "";
-											for(var i=0;i<document.getElementById("slike-input").files.length;i++){
-												var imagePreview =	document.createElement("DIV");
-												imagePreview.setAttribute("class","imagePreview");
-												imagePreview.setAttribute("onclick","previewImage(this)");
-													var image = document.createElement("IMG");
-													image.setAttribute("class","image");
-													image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
-													imagePreview.appendChild(image)
-												document.getElementById("preview-images").appendChild(imagePreview);
-											}
-											if(document.getElementById("slike-input").files.length>10){
-												alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 10 слика по извештају. Уколико желите да окачите више од 10 слика направите два извештаја.");
-												document.getElementById("preview-images").innerHTML = "";
-												document.getElementById("slike-input").value = "";
-											}
-										}
-									</script>
-								</div>
+						<textarea id="komentar" placeholder="Текст извештаја"></textarea>
+						<div class="previewImages" id="preview-images"></div>
+						<form method="POST" action="/edit-nalog" id="form" style="display:none;" enctype="multipart/form-data">
+							<input type="text" name="json" id="json">
+							<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
+						</form>
+						<div class="buttonWrap" onclick="document.getElementById('slike-input').click()">
+							<div class="button">
+								<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/addImageIcon.png"></div>
+								<div class="label">Додај слике</div>
 								
-							</div>
-							<div class="dropSlike" id="drop-zone" style="">Или превуци слике овде</div>
-							<script>
-								var dropContainer = document.getElementById("drop-zone");
-								dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
-								  evt.preventDefault();
-								};
-
-								dropContainer.ondrop = function(evt) {
-								  // pretty simple -- but not for IE :(
-								  	document.getElementById("slike-input").files = evt.dataTransfer.files;
-								  	document.getElementById("drop-zone").classList.remove("dropHot");
-								  	document.getElementById("preview-images").innerHTML = "";
-									for(var i=0;i<document.getElementById("slike-input").files.length;i++){
-										var imagePreview =	document.createElement("DIV");
-										imagePreview.setAttribute("class","imagePreview");
-										imagePreview.setAttribute("onclick","previewImage(this)");
-											var image = document.createElement("IMG");
-											image.setAttribute("class","image");
-											image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
-											imagePreview.appendChild(image)
-										document.getElementById("preview-images").appendChild(imagePreview);
-									}
-									if(document.getElementById("slike-input").files.length>10){
-										alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 10 слика по извештају. Уколико желите да окачите више од 10 слика направите два извештаја.");
+								<script>
+									document.getElementById("slike-input").onchange = evt => {
 										document.getElementById("preview-images").innerHTML = "";
-										document.getElementById("slike-input").value = "";
+										for(var i=0;i<document.getElementById("slike-input").files.length;i++){
+											var imagePreview =	document.createElement("DIV");
+											imagePreview.setAttribute("class","imagePreview");
+											imagePreview.setAttribute("onclick","previewImage(this)");
+												var image = document.createElement("IMG");
+												image.setAttribute("class","image");
+												image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
+												imagePreview.appendChild(image)
+											document.getElementById("preview-images").appendChild(imagePreview);
+										}
+										if(document.getElementById("slike-input").files.length>10){
+											alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 10 слика по извештају. Уколико желите да окачите више од 10 слика направите два извештаја.");
+											document.getElementById("preview-images").innerHTML = "";
+											document.getElementById("slike-input").value = "";
+										}
 									}
-								  evt.preventDefault();
-								};
+								</script>
+							</div>
+							
+						</div>
+						<div class="dropSlike" id="drop-zone" style="">Или превуци слике овде</div>
+						<script>
+							var dropContainer = document.getElementById("drop-zone");
+							dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
+							  evt.preventDefault();
+							};
 
-								dropContainer.ondragover = function(evt) {
-								  evt.preventDefault();
-								  document.getElementById("drop-zone").classList.add("dropHot");
-								};
+							dropContainer.ondrop = function(evt) {
+							  // pretty simple -- but not for IE :(
+							  	document.getElementById("slike-input").files = evt.dataTransfer.files;
+							  	document.getElementById("drop-zone").classList.remove("dropHot");
+							  	document.getElementById("preview-images").innerHTML = "";
+								for(var i=0;i<document.getElementById("slike-input").files.length;i++){
+									var imagePreview =	document.createElement("DIV");
+									imagePreview.setAttribute("class","imagePreview");
+									imagePreview.setAttribute("onclick","previewImage(this)");
+										var image = document.createElement("IMG");
+										image.setAttribute("class","image");
+										image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
+										imagePreview.appendChild(image)
+									document.getElementById("preview-images").appendChild(imagePreview);
+								}
+								if(document.getElementById("slike-input").files.length>10){
+									alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 10 слика по извештају. Уколико желите да окачите више од 10 слика направите два извештаја.");
+									document.getElementById("preview-images").innerHTML = "";
+									document.getElementById("slike-input").value = "";
+								}
+							  evt.preventDefault();
+							};
 
-								dropContainer.ondragleave = function(evt) {
-								  evt.preventDefault();
-								  document.getElementById("drop-zone").classList.remove("dropHot");
-								};
-							</script>
-						<%}%>
+							dropContainer.ondragover = function(evt) {
+							  evt.preventDefault();
+							  document.getElementById("drop-zone").classList.add("dropHot");
+							};
+
+							dropContainer.ondragleave = function(evt) {
+							  evt.preventDefault();
+							  document.getElementById("drop-zone").classList.remove("dropHot");
+							};
+						</script>
 					</div>
 				</div>
 				<div class="saveNalog">
 					<div class="inputWrapper">
 						<div class="inputWrap">
-							<%if(user.opstine.indexOf(nalog.radnaJedinica)>=0){%>
 								<div class="button" onclick="saveNalog()">САЧУВАЈ ИЗМЕНЕ НА НАЛОГУ</div>
-							<%}else{%>
-								<div class="buttonDisabled">НЕ МОЖЕТЕ МЕЊАТИ НАЛОГ КОЈИ НА ВАШИМ ОПШТИНАМА</div>
-							<%}%>
+								<!--<div class="buttonDisabled">НЕ МОЖЕТЕ МЕЊАТИ НАЛОГ КОЈИ НА ВАШИМ ОПШТИНАМА</div>-->
 						</div>
 					</div>
 				</div>
@@ -953,7 +931,6 @@
 					document.getElementsByClassName("obracunWrap")[0].style.display="none";
 				</script>
 			<%}%>
-			<%- include ("partials/obracunUcinka") -%>
 			<script>
 				document.getElementsByClassName("noviUcinak")[0].style.display="none";
 			</script>

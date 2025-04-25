@@ -7483,7 +7483,7 @@ server.get('/mapaUzivo',async (req,res)=>{
 
 server.get('/listaWoma',async (req,res)=>{
 	if(req.session.user){
-			if(Number(req.session.user.role)==10){
+			if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 				naloziDB.find({statusNaloga:"Potrebna WOMA"}).toArray()
 				.then((nalozi) => {
 					for(var i=0;i<nalozi.length;i++){
