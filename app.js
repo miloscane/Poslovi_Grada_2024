@@ -4758,7 +4758,9 @@ server.get('/administracija/danasnjiUcinak',async (req,res)=>{
 
 					majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray()
 					.then((majstori)=>{
+						var majstorIds = [];
 						for(var i=0;i<majstori.length;i++){
+							majstorIds.push(majstori[i].uniqueId);
 							majstori[i].dodele = [];
 							var proveraBrojaNalogaDuplikata = [];
 							for(var j=0;j<dodele.length;j++){
@@ -4771,11 +4773,46 @@ server.get('/administracija/danasnjiUcinak',async (req,res)=>{
 								}
 							}
 						}
-						res.render("administracija/jucerasnjiUcinak",{
-								pageTitle: "Данашњи учинак мајстора",
+						var monthString = eval(yesterday.getMonth()+1).toString().padStart(2,"0");
+						var dateString = eval(yesterday.getDate()).toString().padStart(2,"0");
+						checkInMajstoraDB.find({month:{$in:[monthString,Number(monthString)]},date:{$in:[dateString,Number(dateString)]},year:yesterday.getFullYear()}).toArray()
+						.then((checkIns)=>{
+							for(var i=0;i<majstori.length;i++){
+								majstori[i].checkIns = [];
+								for(var j=0;j<checkIns.length;j++){
+									if(majstori[i].uniqueId == checkIns[j].uniqueId){
+										majstori[i].checkIns.push(checkIns[j])
+									}
+								}
+							}
+							for(var i=0;i<majstori.length;i++){
+								majstori[i].vremeDolaska = "Није се чекирао";
+								majstori[i].vremeOdlaska = "Није се чекирао";
+								if(majstori[i].checkIns.length>0){
+									majstori[i].vremeDolaska = majstori[i].checkIns[0].timestamp;
+									majstori[i].vremeOdlaska = majstori[i].checkIns[majstori[i].checkIns.length-1].timestamp;
+								}
+							}
+							for(var i=0;i<majstori.length;i++){
+								if(majstori[i].vremeDolaska==majstori[i].vremeOdlaska){
+									majstori[i].vremeOdlaska = "Није се чекирао";
+								}
+							}
+							
+							res.render("administracija/jucerasnjiUcinak",{
+								pageTitle: "Јучерашњи учинак мајстора",
 								user: req.session.user,
 								majstori: majstori 
 							})
+						})
+						.catch((error)=>{
+							logError(error);
+							res.render("message",{
+								pageTitle: "Грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+							});
+						})
 					})
 					.catch((error)=>{
 						logError(error);
