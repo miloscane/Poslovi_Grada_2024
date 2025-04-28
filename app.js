@@ -4688,6 +4688,100 @@ server.get('/administracija/jucerasnjiUcinak',async (req,res)=>{
 	}
 });
 
+server.get('/administracija/danasnjiUcinak',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var yesterday = new Date();
+			//yesterday.setDate(yesterday.getDate()-1)
+			dodeljivaniNaloziDB.find({datumRadova:getDateAsStringForInputObject(yesterday),deleted: {$ne:1}}).toArray()
+			.then((dodele)=>{
+				for(var i=0;i<dodele.length;i++){
+					var datumDodele = new Date(dodele[i].datumRadova);
+					datumDodele.setHours(Number(dodele[i].vremeDolaska.split(":")[0]))
+					datumDodele.setMinutes(Number(dodele[i].vremeDolaska.split(":")[1]))
+					dodele[i].datetimeRadova = datumDodele.getTime();
+				}
+				dodele.sort((a, b) => a.datetimeRadova - b.datetimeRadova);
+				var brojeviNaloga = [];
+				for(var i=0;i<dodele.length;i++){
+					if(brojeviNaloga.indexOf(dodele[i].nalog)){
+						brojeviNaloga.push(dodele[i].nalog)
+					}
+				}
+				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
+				.then((nalozi)=>{
+					for(var i=0;i<dodele.length;i++){
+						for(var j=0;j<nalozi.length;j++){
+							if(dodele[i].nalog==nalozi[j].broj){
+								dodele[i].opis = nalozi[j].opis;
+								break;
+							}
+						}
+					}
+
+					majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray()
+					.then((majstori)=>{
+						for(var i=0;i<majstori.length;i++){
+							majstori[i].dodele = [];
+							var proveraBrojaNalogaDuplikata = [];
+							for(var j=0;j<dodele.length;j++){
+								if(dodele[j].majstor==majstori[i].uniqueId){
+									if(proveraBrojaNalogaDuplikata.indexOf(dodele[j].nalog)<0){
+										majstori[i].dodele.push(dodele[j])
+										proveraBrojaNalogaDuplikata.push(dodele[j].nalog)
+									}
+									
+								}
+							}
+						}
+						res.render("administracija/jucerasnjiUcinak",{
+								pageTitle: "Данашњи учинак мајстора",
+								user: req.session.user,
+								majstori: majstori 
+							})
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+						});
+					})
+
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+					});
+				})
+				
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+				});
+			})
+
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.post('/strukturaNaloga',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
