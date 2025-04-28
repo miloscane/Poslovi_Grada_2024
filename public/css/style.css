@@ -6211,8 +6211,22 @@ input[type=number] {
 }
 
 .jucerasnjiUcinak table{
-    table-layout: fixed;
+    /*table-layout: fixed;*/
+    width:100%;
     border-collapse: collapse;
+}
+
+.jucerasnjiUcinak .radnoVreme{
+    width:100%;
+}
+
+.jucerasnjiUcinak .radnoVreme td, .jucerasnjiUcinak .radnoVreme th{
+    width:33.33%;
+}
+
+.jucerasnjiUcinak .radnoVreme td{
+    font-size:26px;
+    text-align:center;
 }
 
 .jucerasnjiUcinak table th{
@@ -6261,7 +6275,7 @@ input[type=number] {
 }
 
 .jucerasnjiUcinak table .opis .value{
-    width:500px;
+    width:100%;
 }
 
 

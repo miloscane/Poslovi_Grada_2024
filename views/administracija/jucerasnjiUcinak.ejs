@@ -15,86 +15,139 @@
 				h1.innerHTML = majstori[i].ime;
 				wrap.appendChild(h1);
 
-				var table = document.createElement("table");
-				var tr = document.createElement("TR");
-					var th = document.createElement("TH");
-					th.setAttribute("class","redniBroj");
-					th.innerHTML = "<div class=\"value\">R.Br.</div>";
-					tr.appendChild(th);
+				var table = document.createElement("TABLE");
+				table.setAttribute("class","radnoVreme");
+					var tr = document.createElement("TR");
+						var th = document.createElement("TH");
+						th.innerHTML = "Време доласка на посао";
+						tr.appendChild(th);
+						
+						var th = document.createElement("TH");
+						th.innerHTML = "Време одласка са посла";
+						tr.appendChild(th);
+						
+						var th = document.createElement("TH");
+						th.innerHTML = "Остварено радно време";
+						tr.appendChild(th);
+					table.appendChild(tr);
 
-					var th = document.createElement("TH");
-					th.setAttribute("class","brojNaloga");
-					th.innerHTML = "<div class=\"value\">Br. naloga</div>";
-					tr.appendChild(th);
-
-					var th = document.createElement("TH");
-					th.setAttribute("class","radnaJedinica");
-					th.innerHTML = "<div class=\"value\">RJ</div>";
-					tr.appendChild(th);
-
-					var th = document.createElement("TH");
-					th.setAttribute("class","adresa");
-					th.innerHTML = "<div class=\"value\">Adresa</div>";
-					tr.appendChild(th);
-
-					var th = document.createElement("TH");
-					th.setAttribute("class","vreme");
-					th.innerHTML = "<div class=\"value\">Početak</div>";
-					tr.appendChild(th);
-
-					var th = document.createElement("TH");
-					th.setAttribute("class","vreme");
-					th.innerHTML = "<div class=\"value\">Završetak</div>";
-					tr.appendChild(th);
-
-					var th = document.createElement("TH");
-					th.setAttribute("class","opis");
-					th.innerHTML = "<div class=\"value\">Opis</div>";
-					tr.appendChild(th);
-				table.appendChild(tr);
-				for(var j=0;j<majstori[i].dodele.length;j++){
 					var tr = document.createElement("TR");
 						var td = document.createElement("TD");
-						td.setAttribute("class","redniBroj");
-						td.innerHTML = "<div class=\"value\">"+eval(j+1)+".</div>";
+						td.innerHTML = majstori[i].vremeDolaska;
 						tr.appendChild(td);
-
+						
 						var td = document.createElement("TD");
-						td.setAttribute("class","brojNaloga");
-						td.innerHTML = "<div class=\"value\"><a target=\"_blank\" href=\"/nalog/"+majstori[i].dodele[j].nalog+"\">"+majstori[i].dodele[j].nalog+"</a></div>";
+						td.innerHTML = majstori[i].vremeOdlaska;
 						tr.appendChild(td);
+						
+						var radnoVreme = "Неодређено";
+						if(majstori[i].vremeDolaska!="Није се чекирао" && majstori[i].vremeOdlaska!="Није се чекирао"){
+							var dateCheckIn = new Date();
+							dateCheckIn.setHours(Number(majstori[i].vremeDolaska.split(":")[0]))
+							dateCheckIn.setMinutes(Number(majstori[i].vremeDolaska.split(":")[1]))
 
+							var dateCheckOut = new Date();
+							dateCheckOut.setHours(Number(majstori[i].vremeOdlaska.split(":")[0]))
+							dateCheckOut.setMinutes(Number(majstori[i].vremeOdlaska.split(":")[1]));
+
+							var radnoVreme = msToHHMM(dateCheckOut.getTime() - dateCheckIn.getTime())
+						}
+						
 						var td = document.createElement("TD");
-						td.setAttribute("class","radnaJedinica");
-						td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].radnaJedinica+"</div>";
+						td.innerHTML = radnoVreme;
 						tr.appendChild(td);
-
-						var td = document.createElement("TD");
-						td.setAttribute("class","adresa");
-						td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].adresa+"</div>";
-						tr.appendChild(td);
-
-						var td = document.createElement("TD");
-						td.setAttribute("class","vreme");
-						td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].vremeDolaska+"</div>";
-						tr.appendChild(td);
-
-						var td = document.createElement("TD");
-						td.setAttribute("class","vreme");
-						var datumZavrsetkaRadova = new Date(majstori[i].dodele[j].datetimeRadova);
-						datumZavrsetkaRadova.setHours(datumZavrsetkaRadova.getHours() + Number(majstori[i].dodele[j].vremeRadova.split(":")[0]))
-						datumZavrsetkaRadova.setMinutes(datumZavrsetkaRadova.getMinutes() + Number(majstori[i].dodele[j].vremeRadova.split(":")[1]))
-						td.innerHTML = "<div class=\"value\">"+getTimestamp(datumZavrsetkaRadova)+"</div>";
-						tr.appendChild(td);
-
-						var td = document.createElement("TD");
-						td.setAttribute("class","opis");
-						td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].opis+"</div>";
-						tr.appendChild(td);
-
 					table.appendChild(tr);
-				}
+
 				wrap.appendChild(table);
+
+				if(majstori[i].dodele.length>0){
+					var table = document.createElement("TABLE");
+						var tr = document.createElement("TR");
+							var th = document.createElement("TH");
+							th.setAttribute("class","redniBroj");
+							th.innerHTML = "<div class=\"value\">R.Br.</div>";
+							tr.appendChild(th);
+
+							var th = document.createElement("TH");
+							th.setAttribute("class","brojNaloga");
+							th.innerHTML = "<div class=\"value\">Br. naloga</div>";
+							tr.appendChild(th);
+
+							var th = document.createElement("TH");
+							th.setAttribute("class","radnaJedinica");
+							th.innerHTML = "<div class=\"value\">RJ</div>";
+							tr.appendChild(th);
+
+							var th = document.createElement("TH");
+							th.setAttribute("class","adresa");
+							th.innerHTML = "<div class=\"value\">Adresa</div>";
+							tr.appendChild(th);
+
+							var th = document.createElement("TH");
+							th.setAttribute("class","vreme");
+							th.innerHTML = "<div class=\"value\">Početak</div>";
+							tr.appendChild(th);
+
+							var th = document.createElement("TH");
+							th.setAttribute("class","vreme");
+							th.innerHTML = "<div class=\"value\">Završetak</div>";
+							tr.appendChild(th);
+
+							var th = document.createElement("TH");
+							th.setAttribute("class","opis");
+							th.innerHTML = "<div class=\"value\">Opis</div>";
+							tr.appendChild(th);
+						table.appendChild(tr);
+						for(var j=0;j<majstori[i].dodele.length;j++){
+							var tr = document.createElement("TR");
+								var td = document.createElement("TD");
+								td.setAttribute("class","redniBroj");
+								td.innerHTML = "<div class=\"value\">"+eval(j+1)+".</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.setAttribute("class","brojNaloga");
+								td.innerHTML = "<div class=\"value\"><a target=\"_blank\" href=\"/nalog/"+majstori[i].dodele[j].nalog+"\">"+majstori[i].dodele[j].nalog+"</a></div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.setAttribute("class","radnaJedinica");
+								td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].radnaJedinica+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.setAttribute("class","adresa");
+								td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].adresa+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.setAttribute("class","vreme");
+								td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].vremeDolaska+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.setAttribute("class","vreme");
+								var datumZavrsetkaRadova = new Date(majstori[i].dodele[j].datetimeRadova);
+								datumZavrsetkaRadova.setHours(datumZavrsetkaRadova.getHours() + Number(majstori[i].dodele[j].vremeRadova.split(":")[0]))
+								datumZavrsetkaRadova.setMinutes(datumZavrsetkaRadova.getMinutes() + Number(majstori[i].dodele[j].vremeRadova.split(":")[1]))
+								td.innerHTML = "<div class=\"value\">"+getTimestamp(datumZavrsetkaRadova)+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.setAttribute("class","opis");
+								td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].opis+"</div>";
+								tr.appendChild(td);
+
+							table.appendChild(tr);
+						}
+					wrap.appendChild(table);
+				}else{
+					var note = document.createElement("DIV");
+					note.setAttribute("style","font-size:24px;text-align:center;padding:20px;");
+					note.innerHTML = "Није имао додељених радних налога.";
+					wrap.appendChild(note)
+				}
+				
 			document.getElementsByClassName("jucerasnjiUcinak")[0].appendChild(wrap);
 			
 		}

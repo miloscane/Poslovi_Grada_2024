@@ -222,6 +222,18 @@ function detectSwipe(el, callback) {
     });
 }
 
+function msToHHMM(ms) {
+    let totalMinutes = Math.floor(ms / 60000); // 1 minute = 60000 ms
+    let hours = Math.floor(totalMinutes / 60);
+    let minutes = totalMinutes % 60;
+    
+    // Pad with leading zeros if needed
+    hours = String(hours).padStart(2, '0');
+    minutes = String(minutes).padStart(2, '0');
+    
+    return `${hours}:${minutes}`;
+}
+
 var definicijeProizvoda = [
                     {
                       "startCode":"01.01",
