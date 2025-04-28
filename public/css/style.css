@@ -6215,7 +6215,12 @@ input[type=number] {
     border-collapse: collapse;
 }
 
-.jucerasnjiUcinak table td{
+.jucerasnjiUcinak table th{
+    background-color:rgb(32,51,100);
+    color:rgb(255,255,255);
+}
+
+.jucerasnjiUcinak table td, .jucerasnjiUcinak table th{
     text-align:left;
     vertical-align: top;
     border:1px solid rgb(150,150,150);
@@ -6224,18 +6229,35 @@ input[type=number] {
 
 .jucerasnjiUcinak table .redniBroj .value{
     width:30px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow:hidden;
 }
 
 .jucerasnjiUcinak table .brojNaloga .value{
-    width:100px;
+    width:75px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow:hidden;
 }
 
 .jucerasnjiUcinak table .radnaJedinica .value{
-    width:150px;
+    width:60px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow:hidden;
+}
+
+.jucerasnjiUcinak table .vreme .value{
+    width:60px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow:hidden;
 }
 
 .jucerasnjiUcinak table .adresa .value{
-    width:200px;
+    width:100px;
+    word-wrap: break-word; 
 }
 
 .jucerasnjiUcinak table .opis .value{

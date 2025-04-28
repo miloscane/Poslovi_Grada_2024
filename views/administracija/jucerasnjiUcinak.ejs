@@ -16,6 +16,42 @@
 				wrap.appendChild(h1);
 
 				var table = document.createElement("table");
+				var tr = document.createElement("TR");
+					var th = document.createElement("TH");
+					th.setAttribute("class","redniBroj");
+					th.innerHTML = "<div class=\"value\">R.Br.</div>";
+					tr.appendChild(th);
+
+					var th = document.createElement("TH");
+					th.setAttribute("class","brojNaloga");
+					th.innerHTML = "<div class=\"value\">Br. naloga</div>";
+					tr.appendChild(th);
+
+					var th = document.createElement("TH");
+					th.setAttribute("class","radnaJedinica");
+					th.innerHTML = "<div class=\"value\">RJ</div>";
+					tr.appendChild(th);
+
+					var th = document.createElement("TH");
+					th.setAttribute("class","adresa");
+					th.innerHTML = "<div class=\"value\">Adresa</div>";
+					tr.appendChild(th);
+
+					var th = document.createElement("TH");
+					th.setAttribute("class","vreme");
+					th.innerHTML = "<div class=\"value\">Početak</div>";
+					tr.appendChild(th);
+
+					var th = document.createElement("TH");
+					th.setAttribute("class","vreme");
+					th.innerHTML = "<div class=\"value\">Završetak</div>";
+					tr.appendChild(th);
+
+					var th = document.createElement("TH");
+					th.setAttribute("class","opis");
+					th.innerHTML = "<div class=\"value\">Opis</div>";
+					tr.appendChild(th);
+				table.appendChild(tr);
 				for(var j=0;j<majstori[i].dodele.length;j++){
 					var tr = document.createElement("TR");
 						var td = document.createElement("TD");
@@ -36,6 +72,19 @@
 						var td = document.createElement("TD");
 						td.setAttribute("class","adresa");
 						td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].adresa+"</div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","vreme");
+						td.innerHTML = "<div class=\"value\">"+majstori[i].dodele[j].vremeDolaska+"</div>";
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","vreme");
+						var datumZavrsetkaRadova = new Date(majstori[i].dodele[j].datetimeRadova);
+						datumZavrsetkaRadova.setHours(datumZavrsetkaRadova.getHours() + Number(majstori[i].dodele[j].vremeRadova.split(":")[0]))
+						datumZavrsetkaRadova.setMinutes(datumZavrsetkaRadova.getMinutes() + Number(majstori[i].dodele[j].vremeRadova.split(":")[1]))
+						td.innerHTML = "<div class=\"value\">"+getTimestamp(datumZavrsetkaRadova)+"</div>";
 						tr.appendChild(td);
 
 						var td = document.createElement("TD");

@@ -4599,8 +4599,15 @@ server.get('/administracija/jucerasnjiUcinak',async (req,res)=>{
 		if(Number(req.session.user.role)==10){
 			var yesterday = new Date();
 			yesterday.setDate(yesterday.getDate()-1)
-			dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(yesterday),deleted: {$ne:1}}).toArray()
+			dodeljivaniNaloziDB.find({datumRadova:getDateAsStringForInputObject(yesterday),deleted: {$ne:1}}).toArray()
 			.then((dodele)=>{
+				for(var i=0;i<dodele.length;i++){
+					var datumDodele = new Date(dodele[i].datumRadova);
+					datumDodele.setHours(Number(dodele[i].vremeDolaska.split(":")[0]))
+					datumDodele.setMinutes(Number(dodele[i].vremeDolaska.split(":")[1]))
+					dodele[i].datetimeRadova = datumDodele.getTime();
+				}
+				dodele.sort((a, b) => a.datetimeRadova - b.datetimeRadova);
 				var brojeviNaloga = [];
 				for(var i=0;i<dodele.length;i++){
 					if(brojeviNaloga.indexOf(dodele[i].nalog)){
