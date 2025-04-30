@@ -13,6 +13,16 @@ function checkEmail(email){
     );
 }
 
+function generateId(length) {
+  var result           = [];
+  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++ ) {
+    result.push(characters.charAt(Math.floor(Math.random() * charactersLength)));
+  }
+  return result.join('');
+}
+
 function brojSaRazmacima(x) {
   if(!x){
     return 0
@@ -224,6 +234,18 @@ function detectSwipe(el, callback) {
 
 function msToHHMM(ms) {
     let totalMinutes = Math.floor(ms / 60000); // 1 minute = 60000 ms
+    let hours = Math.floor(totalMinutes / 60);
+    let minutes = totalMinutes % 60;
+    
+    // Pad with leading zeros if needed
+    hours = String(hours).padStart(2, '0');
+    minutes = String(minutes).padStart(2, '0');
+    
+    return `${hours}:${minutes}`;
+}
+
+function sToHHMM(ms) {
+    let totalMinutes = Math.floor(ms / 60); // 1 minute = 60000 ms
     let hours = Math.floor(totalMinutes / 60);
     let minutes = totalMinutes % 60;
     

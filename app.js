@@ -815,6 +815,7 @@ var pomocniciDB;
 var checkInMajstoraDB;
 var ekipeDB;
 var opomeneDB;
+var dnevniIzvestajiDB;
 var stariCenovnikJsons = [];
 
 http.listen(process.env.PORT, function(){
@@ -850,7 +851,8 @@ http.listen(process.env.PORT, function(){
 		portalStambenoTestDB	=	client.db("Poslovi_Grada_2024").collection('portalStambenoTest');
 		checkInMajstoraDB			=	client.db("Poslovi_Grada_2024").collection('checkInMajstora');
 		ekipeDB								=	client.db("Poslovi_Grada_2024").collection('Ekipe');
-		opomeneDB								=	client.db("Poslovi_Grada_2024").collection('Opomene');
+		opomeneDB							=	client.db("Poslovi_Grada_2024").collection('Opomene');
+		dnevniIzvestajiDB			=	client.db("Poslovi_Grada_2024").collection('dnevniIzvestaji');
 
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
@@ -4600,7 +4602,7 @@ server.get('/administracija/jucerasnjiUcinak',async (req,res)=>{
 			var yesterday = new Date();
 			yesterday.setDate(yesterday.getDate()-1)
 			dodeljivaniNaloziDB.find({datumRadova:getDateAsStringForInputObject(yesterday),deleted: {$ne:1}}).toArray()
-			.then((dodele)=>{
+			.then(async (dodele)=>{
 				for(var i=0;i<dodele.length;i++){
 					var datumDodele = new Date(dodele[i].datumRadova);
 					datumDodele.setHours(Number(dodele[i].vremeDolaska.split(":")[0]))
@@ -4615,7 +4617,7 @@ server.get('/administracija/jucerasnjiUcinak',async (req,res)=>{
 					}
 				}
 				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
-				.then((nalozi)=>{
+				.then(async (nalozi)=>{
 					for(var i=0;i<dodele.length;i++){
 						for(var j=0;j<nalozi.length;j++){
 							if(dodele[i].nalog==nalozi[j].broj){
@@ -4626,7 +4628,7 @@ server.get('/administracija/jucerasnjiUcinak',async (req,res)=>{
 					}
 
 					majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray()
-					.then((majstori)=>{
+					.then(async (majstori)=>{
 						var majstorIds = [];
 						for(var i=0;i<majstori.length;i++){
 							majstorIds.push(majstori[i].uniqueId);
@@ -4645,7 +4647,7 @@ server.get('/administracija/jucerasnjiUcinak',async (req,res)=>{
 						var monthString = eval(yesterday.getMonth()+1).toString().padStart(2,"0");
 						var dateString = eval(yesterday.getDate()).toString().padStart(2,"0");
 						checkInMajstoraDB.find({month:{$in:[monthString,Number(monthString)]},date:{$in:[dateString,Number(dateString)]},year:yesterday.getFullYear()}).toArray()
-						.then((checkIns)=>{
+						.then(async (checkIns)=>{
 							for(var i=0;i<majstori.length;i++){
 								majstori[i].checkIns = [];
 								for(var j=0;j<checkIns.length;j++){
@@ -4667,11 +4669,63 @@ server.get('/administracija/jucerasnjiUcinak',async (req,res)=>{
 									majstori[i].vremeOdlaska = "Није се чекирао";
 								}
 							}
+
+							var vozila2 = JSON.parse(JSON.stringify(vozila));
+							var startTime = yesterday.toISOString().split('T')[0] + " 00:00:00";
+        			var endTime = yesterday.toISOString().split('T')[0] + " 23:59:59";
+
+							config = {
+						    url: baseUrl + '/api/DailySummary/GetDailySummary',
+						    method: 'POST', // If necessary
+						    headers: { 
+						        'Content-Type': 'application/json',
+						        'Authorization': `Bearer ${token}`
+						    },
+						    data: { 
+						    	'ClientId': process.env.telematicsid, 
+						    	'TimeZone':'Central Standard Time',
+						    	'StartTime': startTime,
+					        'EndTime': endTime
+						    }
+							};
+							console.log("Waiting daily summary")
+							var dailySummary = await axios(config);
+							for(var i=0;i<dailySummary.data.length;i++){
+								for(var j=0;j<vozila2.vozila.Data.length;j++){
+									if(vozila2.vozila.Data[j].DeviceName==dailySummary.data[i].RegNo){
+										vozila2.vozila.Data[j].dailySummary = dailySummary.data[i];
+									}
+								}
+							}
+							
+							for(var i=0;i<vozila2.vozila.Data.length;i++){
+								var config = {
+	                url: baseUrl + '/api/Trip/GetMileageSummary',
+	                method: 'POST',
+	                headers: {
+	                    'Content-Type': 'application/json',
+	                    'Authorization': `Bearer ${token}`
+	                },
+	                data: {
+	                    'ImeiNumber': Number(vozila2.vozila.Data[i].ImeiNumber),
+	                    'StartTime': startTime,
+	                    'EndTime': endTime,
+	                    'TimeZone': 'Central European Standard Time'
+	                }
+		            };
+
+                const response = await axios(config);
+                console.log("Received vozilo "+ i)
+                vozila2.vozila.Data[i].mileageSummary = response.data;
+								await new Promise(resolve => setTimeout(resolve, 2000));
+							}
+
 							
 							res.render("administracija/jucerasnjiUcinak",{
 								pageTitle: "Јучерашњи учинак мајстора",
 								user: req.session.user,
-								majstori: majstori 
+								majstori: majstori,
+								vozila: vozila2
 							})
 						})
 						.catch((error)=>{
@@ -4800,7 +4854,7 @@ server.get('/administracija/danasnjiUcinak',async (req,res)=>{
 							}
 							
 							res.render("administracija/jucerasnjiUcinak",{
-								pageTitle: "Јучерашњи учинак мајстора",
+								pageTitle: "Данашњи учинак мајстора",
 								user: req.session.user,
 								majstori: majstori 
 							})
@@ -7274,7 +7328,233 @@ server.get('/stefan/ucinakDispecera',async (req,res)=>{
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
-})
+});
+
+
+
+server.get('/izvestajMajstoraPick',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray()
+			.then((majstori)=>{
+				res.render("administracija/izvestajMajstoraPick",{
+					pageTitle:"Одабери мајстора и датум",
+					user: req.session.user,
+					majstori: majstori
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 7345.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			majstoriDB.find({uniqueId:req.params.majstorId}).toArray()
+			.then((majstori)=>{
+				var majstor = majstori[0];
+				dnevniIzvestajiDB.find({majstor:req.params.majstorId,date:req.params.date}).toArray()
+				.then((izvestaji)=>{
+					var izvestaj = {};
+					if(izvestaji.length>0){
+						izvestaj = izvestaji[0];
+					}
+
+					var yesterday = new Date(req.params.date);
+
+					var monthString = eval(yesterday.getMonth()+1).toString().padStart(2,"0");
+					var dateString = eval(yesterday.getDate()).toString().padStart(2,"0");
+					checkInMajstoraDB.find({month:{$in:[monthString,Number(monthString)]},date:{$in:[dateString,Number(dateString)]},year:yesterday.getFullYear()}).toArray()
+					.then(async (checkIns)=>{
+						for(var i=0;i<majstori.length;i++){
+							majstori[i].checkIns = [];
+							for(var j=0;j<checkIns.length;j++){
+								if(majstori[i].uniqueId == checkIns[j].uniqueId){
+									majstori[i].checkIns.push(checkIns[j])
+								}
+							}
+						}
+						for(var i=0;i<majstori.length;i++){
+							majstori[i].vremeDolaska = "Није се чекирао";
+							majstori[i].vremeOdlaska = "Није се чекирао";
+							if(majstori[i].checkIns.length>0){
+								majstori[i].vremeDolaska = majstori[i].checkIns[0].timestamp;
+								majstori[i].vremeOdlaska = majstori[i].checkIns[majstori[i].checkIns.length-1].timestamp;
+							}
+						}
+						for(var i=0;i<majstori.length;i++){
+							if(majstori[i].vremeDolaska==majstori[i].vremeOdlaska){
+								majstori[i].vremeOdlaska = "Није се чекирао";
+							}
+						}
+
+						var vozila2 = JSON.parse(JSON.stringify(vozila));
+						var startTime = yesterday.toISOString().split('T')[0] + " 00:00:00";
+      			var endTime = yesterday.toISOString().split('T')[0] + " 23:59:59";
+
+						config = {
+					    url: baseUrl + '/api/DailySummary/GetDailySummary',
+					    method: 'POST', // If necessary
+					    headers: { 
+					        'Content-Type': 'application/json',
+					        'Authorization': `Bearer ${token}`
+					    },
+					    data: { 
+					    	'ClientId': process.env.telematicsid, 
+					    	'TimeZone':'Central Standard Time',
+					    	'StartTime': startTime,
+				        'EndTime': endTime
+					    }
+						};
+						console.log("Waiting daily summary")
+						var dailySummary = await axios(config);
+						for(var i=0;i<dailySummary.data.length;i++){
+							for(var j=0;j<vozila2.vozila.Data.length;j++){
+								if(vozila2.vozila.Data[j].DeviceName==dailySummary.data[i].RegNo){
+									vozila2.vozila.Data[j].dailySummary = dailySummary.data[i];
+								}
+							}
+						}
+						
+						for(var i=0;i<vozila2.vozila.Data.length;i++){
+							var config = {
+                url: baseUrl + '/api/Trip/GetMileageSummary',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                data: {
+                    'ImeiNumber': Number(vozila2.vozila.Data[i].ImeiNumber),
+                    'StartTime': startTime,
+                    'EndTime': endTime,
+                    'TimeZone': 'Central European Standard Time'
+                }
+	            };
+
+              const response = await axios(config);
+              vozila2.vozila.Data[i].mileageSummary = response.data;
+							await new Promise(resolve => setTimeout(resolve, 2000));
+						}
+
+						
+						res.render("administracija/dnevniIzvestajMajstora",{
+							pageTitle: "Дневни извештај мајстора "+ majstor.ime+" за датум "+reshuffleDate(req.params.date),
+							user: req.session.user,
+							majstor: majstor,
+							vozila: vozila2,
+							date: req.params.date,
+							izvestaj: izvestaj
+						})
+					})
+					.catch((error)=>{
+						logError(error);
+						res.render("message",{
+							pageTitle: "Грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+						});
+					})
+
+
+
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 7345.</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 7345.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.post('/dnevniIzvestaj',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			var json = JSON.parse(req.body.json);
+			if(json.uniqueId=="new"){
+				json.uniqueId = generateId(5)+"--"+new Date().getTime();
+				dnevniIzvestajiDB.insertOne(json)
+				.then((dbResponse)=>{
+					res.render("message",{
+						pageTitle: "Извештај унет",
+						user: req.session.user,
+						message: "<div class=\"text\">Извештај унет.</div>"
+					});
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у бази података 7522.</div>"
+					});
+				})
+			}else{
+				dnevniIzvestajiDB.replaceOne({uniqueId:json.uniqueId},json)
+				.then((dbResponse)=>{
+					res.render("message",{
+						pageTitle: "Извештај измењен",
+						user: req.session.user,
+						message: "<div class=\"text\">Извештај измењен.</div>"
+					});
+				})
+				.catch((error)=>{
+					logError(error);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у бази података 7522.</div>"
+					});
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
 
 server.get('/ucinakMajstora',async (req,res)=>{
 	if(req.session.user){
@@ -10982,7 +11262,7 @@ server.get('/majstor/nalozi', async (req, res)=> {
 server.get('/majstor/mesec/:datum', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==60){
-			dodeljivaniNaloziDB.find({majstor:req.session.user.uniqueId,"datum.datum":{$regex:req.params.datum}}).toArray()
+			dodeljivaniNaloziDB.find({majstor:req.session.user.uniqueId,datumRadova:{$regex:req.params.datum.split(".")[1]+"-"+req.params.datum.split(".")[0]}}).toArray()
 			.then((dodele)=>{
 				var brojeviNaloga = [];
 				for(var i=0;i<dodele.length;i++){
@@ -11795,6 +12075,8 @@ server.post('/appLogin',async (req,res)=>{
 })*/
 
 
+var vozila;
+
 setInterval(function(){
 	axios(config)
 	.then(async response => {
@@ -11828,6 +12110,7 @@ setInterval(function(){
 	  };
 	  var response = await axios(config3);
 	  json.vozila = response.data;
+	  vozila = JSON.parse(JSON.stringify(json))
 	  io.emit('lokacijaMajstoraOdgovor',json)
 	})
 	.catch((error)=>{
@@ -12140,6 +12423,21 @@ io.on('connection', function(socket){
 		})
 		.catch((error)=>{
 			logError(error)
+		})
+	})
+
+	socket.on('nalogPoBroju', function(broj,elemId){
+		naloziDB.find({broj:broj.toString()}).toArray()
+		.then((nalozi) => {
+			if(nalozi.length>0){
+				socket.emit('nalogPoBrojuOdgovor',nalozi[0],elemId)
+			}else{
+				socket.emit('nalogPoBrojuOdgovor',"Greska",elemId)
+			}
+		})
+		.catch((error)=>{
+			logError(error)
+				socket.emit('nalogPoBrojuOdgovor',"Greska",elemId)
 		})
 	})
 

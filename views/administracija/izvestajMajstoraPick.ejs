@@ -1,0 +1,29 @@
+<%- include ("partials/header") -%>
+	<script>
+		var majstori = <%-JSON.stringify(majstori)%>;
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+	</script>
+	<div class="pageWidth">
+		<select id="majstori"></select>
+		<script>
+			for(var i=0;i<majstori.length;i++){
+				var option = document.createElement("OPTION");
+				option.setAttribute("value",majstori[i].uniqueId)
+				option.innerHTML = majstori[i].ime;
+				document.getElementById("majstori").appendChild(option)
+			}
+		</script>
+		<br>
+		<input type="date" id="date" oninput="submitForm()">
+		<script>
+			var yesterday = new Date();
+			//yesterday.setDate(yesterday.getDate()-1);
+			document.getElementById("date").value = getDateAsStringForInputObject(yesterday)
+
+			function submitForm(){
+				loadGif();
+				window.location.href = "/izvestajMajstora/"+document.getElementById("majstori").value+"/"+document.getElementById("date").value;
+			}
+		</script>
+	</div>
+<%- include ("partials/footer") -%>

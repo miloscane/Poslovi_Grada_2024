@@ -2,18 +2,99 @@
 	<script>
 		var majstori = <%-JSON.stringify(majstori)%>;
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
-		console.log(majstori)
+		var vozila = <%-JSON.stringify(vozila)%>;
+		console.log(vozila);
 	</script>
 	<div class="pageWidth jucerasnjiUcinak">
 
 	</div>
 	<script>
+		function voziloPick(elem){
+			elem.parentElement.parentElement.getElementsByClassName("dailySummary")[0].innerHTML = "";
+			var voziloName = elem.value;
+			var voziloData;
+			for(var i=0;i<vozila.vozila.Data.length;i++){
+				if(voziloName == vozila.vozila.Data[i].DeviceName){
+					voziloData = vozila.vozila.Data[i]
+				}
+			}
+
+			if(voziloData){
+				var summaryTable = document.createElement("TABLE");
+				summaryTable.setAttribute("class","dailySummaryTable");
+					var tr = document.createElement("TR");
+						var th = document.createElement("TH");
+						th.innerHTML = "Distanca";
+						tr.appendChild(th)
+
+						var th = document.createElement("TH");
+						th.innerHTML = "Vreme voznje";
+						tr.appendChild(th);
+
+						var th = document.createElement("TH");
+						th.innerHTML = "Maksimalna brzina";
+						tr.appendChild(th);
+
+						var th = document.createElement("TH");
+						th.innerHTML = "Broj naglih kocenja";
+						tr.appendChild(th);
+
+						var th = document.createElement("TH");
+						th.innerHTML = "Broj naglih ubrzanja";
+						tr.appendChild(th);
+					summaryTable.appendChild(tr);
+
+					var tr = document.createElement("TR");
+						var th = document.createElement("TD");
+						th.innerHTML = voziloData.dailySummary.DailyDistance.toFixed(2) +" km";
+						tr.appendChild(th)
+
+						var th = document.createElement("TD");
+						th.innerHTML = sToHHMM(voziloData.dailySummary.DrivingTime);
+						tr.appendChild(th);
+
+						var th = document.createElement("TD");
+						th.innerHTML = voziloData.dailySummary.MaxSpeed + " km/h";
+						tr.appendChild(th);
+
+						var th = document.createElement("TD");
+						th.innerHTML = voziloData.dailySummary.NoOfHarshBraking;
+						tr.appendChild(th);
+
+						var th = document.createElement("TD");
+						th.innerHTML = voziloData.dailySummary.NoOfHarshAccel;
+						tr.appendChild(th);
+					summaryTable.appendChild(tr);
+
+					
+				elem.parentElement.parentElement.getElementsByClassName("dailySummary")[0].appendChild(summaryTable)	
+			}
+			
+		}
+
 		for(var i=0;i<majstori.length;i++){
 			var wrap = document.createElement("DIV");
 			wrap.setAttribute("class","wrap");
 				var h1 = document.createElement("H1");
 				h1.innerHTML = majstori[i].ime;
 				wrap.appendChild(h1);
+
+				var vehicleSelect = document.createElement("DIV");
+				vehicleSelect.setAttribute("class","vehicleSelect");
+					var select = document.createElement("SELECT");
+						for(var j = 0;j<vozila.vozila.Data.length;j++){
+							var option = document.createElement("OPTION");
+							option.setAttribute("value",vozila.vozila.Data[j].DeviceName);
+							option.innerHTML = vozila.vozila.Data[j].DeviceName;
+							select.appendChild(option);
+						}
+					select.setAttribute("oninput","voziloPick(this)");
+					vehicleSelect.appendChild(select);
+				wrap.appendChild(vehicleSelect);
+
+				var dailySummary = document.createElement("DIV");
+				dailySummary.setAttribute("class","dailySummary");
+				wrap.appendChild(dailySummary);
 
 				var table = document.createElement("TABLE");
 				table.setAttribute("class","radnoVreme");
@@ -59,6 +140,7 @@
 					table.appendChild(tr);
 
 				wrap.appendChild(table);
+
 
 				if(majstori[i].dodele.length>0){
 					var table = document.createElement("TABLE");
@@ -147,6 +229,11 @@
 					note.innerHTML = "Није имао додељених радних налога.";
 					wrap.appendChild(note)
 				}
+
+				
+				var milleageSummary = document.createElement("DIV");
+				milleageSummary.setAttribute("class","milleageSummary");
+				wrap.appendChild(milleageSummary);
 				
 			document.getElementsByClassName("jucerasnjiUcinak")[0].appendChild(wrap);
 			

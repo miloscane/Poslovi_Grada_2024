@@ -6277,7 +6277,26 @@ input[type=number] {
 .jucerasnjiUcinak table .opis .value{
     width:100%;
 }
+.jucerasnjiUcinak table .opis{
+    width:100%;
+}
 
+.jucerasnjiUcinak table .tip .value{
+    width:100%;
+}
+
+.jucerasnjiUcinak table .tip{
+    width:100%;
+}
+
+.jucerasnjiUcinak table .iznos .value{
+    width:100px;
+    word-wrap: break-word; 
+}
+
+.jucerasnjiUcinak .dailySummaryTable td, .jucerasnjiUcinak .dailySummaryTable th{
+    width:20%;
+}
 
 
 
