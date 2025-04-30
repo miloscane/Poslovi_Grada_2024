@@ -232,6 +232,19 @@ function detectSwipe(el, callback) {
     });
 }
 
+function getTimeDifference(date1, date2) {
+    let d1 = new Date(date1);
+    let d2 = new Date(date2);
+
+    let diff = Math.abs(d2 - d1); // Difference in milliseconds
+
+    let hours = Math.floor(diff / (1000 * 60 * 60));
+    let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    let seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
 function msToHHMM(ms) {
     let totalMinutes = Math.floor(ms / 60000); // 1 minute = 60000 ms
     let hours = Math.floor(totalMinutes / 60);

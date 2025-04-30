@@ -816,6 +816,7 @@ var checkInMajstoraDB;
 var ekipeDB;
 var opomeneDB;
 var dnevniIzvestajiDB;
+var stopoviDB;
 var stariCenovnikJsons = [];
 
 http.listen(process.env.PORT, function(){
@@ -853,6 +854,7 @@ http.listen(process.env.PORT, function(){
 		ekipeDB								=	client.db("Poslovi_Grada_2024").collection('Ekipe');
 		opomeneDB							=	client.db("Poslovi_Grada_2024").collection('Opomene');
 		dnevniIzvestajiDB			=	client.db("Poslovi_Grada_2024").collection('dnevniIzvestaji');
+		stopoviDB							=	client.db("Poslovi_Grada_2024").collection('Stopovi');
 
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
@@ -2568,8 +2570,71 @@ const sendEmail = () => {
     
 };
 
+const saveStops = async () => {
+	var date = new Date("2025-04-30");
+	var vozila2 = JSON.parse(JSON.stringify(vozila));
+	var startTime = date.toISOString().split('T')[0] + " 00:00:00";
+	var endTime = date.toISOString().split('T')[0] + " 23:59:59";
+
+	vozila2.date = getDateAsStringForInputObject(date);
+	config = {
+    url: baseUrl + '/api/DailySummary/GetDailySummary',
+    method: 'POST', // If necessary
+    headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    },
+    data: { 
+    	'ClientId': process.env.telematicsid, 
+    	'TimeZone':'Central Standard Time',
+    	'StartTime': startTime,
+      'EndTime': endTime
+    }
+	};
+	console.log("Waiting daily summary")
+	var dailySummary = await axios(config);
+	for(var i=0;i<dailySummary.data.length;i++){
+		for(var j=0;j<vozila2.vozila.Data.length;j++){
+			if(vozila2.vozila.Data[j].DeviceName==dailySummary.data[i].RegNo){
+				vozila2.vozila.Data[j].dailySummary = dailySummary.data[i];
+			}
+		}
+	}
+	
+	for(var i=0;i<vozila2.vozila.Data.length;i++){
+		var config = {
+      url: baseUrl + '/api/Trip/GetMileageSummary',
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+      },
+      data: {
+          'ImeiNumber': Number(vozila2.vozila.Data[i].ImeiNumber),
+          'StartTime': startTime,
+          'EndTime': endTime,
+          'TimeZone': 'Central European Standard Time'
+      }
+    };
+
+    const response = await axios(config);
+    vozila2.vozila.Data[i].mileageSummary = response.data;
+    
+		await new Promise(resolve => setTimeout(resolve, 2000));
+
+	}
+	console.log(vozila2)
+	stopoviDB.insertOne(vozila2)
+  .then((dbResponse)=>{
+  	console.log("Wrote stops for "+date)
+  })
+  .catch((error)=>{
+  	logError(error)
+  })
+};
 
 schedule.scheduleJob('59 23 * * *', sendEmail);
+schedule.scheduleJob('00 23 * * *', saveStops);
 
 
 server.get('/',async (req,res)=>{
@@ -7363,6 +7428,8 @@ server.get('/izvestajMajstoraPick',async (req,res)=>{
 	}
 });
 
+
+
 server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
@@ -7453,15 +7520,28 @@ server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
 							await new Promise(resolve => setTimeout(resolve, 2000));
 						}
 
-						
-						res.render("administracija/dnevniIzvestajMajstora",{
-							pageTitle: "Дневни извештај мајстора "+ majstor.ime+" за датум "+reshuffleDate(req.params.date),
-							user: req.session.user,
-							majstor: majstor,
-							vozila: vozila2,
-							date: req.params.date,
-							izvestaj: izvestaj
+						magacinReversiDB.find({date:getDateAsStringForInputObject(yesterday),majstor:req.params.majstorId}).toArray()
+						.then((reversi)=>{
+							res.render("administracija/dnevniIzvestajMajstora",{
+								pageTitle: "Дневни извештај мајстора "+ majstor.ime+" за датум "+reshuffleDate(req.params.date),
+								user: req.session.user,
+								majstor: majstor,
+								vozila: vozila2,
+								date: req.params.date,
+								izvestaj: izvestaj,
+								reversi: reversi
+							})
 						})
+						.catch((error)=>{
+							logError(error);
+							res.render("message",{
+								pageTitle: "Грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+							});
+						})
+
+						
 					})
 					.catch((error)=>{
 						logError(error);
