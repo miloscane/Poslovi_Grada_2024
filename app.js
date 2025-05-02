@@ -2571,7 +2571,7 @@ const sendEmail = () => {
 };
 
 const saveStops = async () => {
-	var date = new Date("2025-04-30");
+	var date = new Date();
 	var vozila2 = JSON.parse(JSON.stringify(vozila));
 	var startTime = date.toISOString().split('T')[0] + " 00:00:00";
 	var endTime = date.toISOString().split('T')[0] + " 23:59:59";
@@ -2623,8 +2623,34 @@ const saveStops = async () => {
 		await new Promise(resolve => setTimeout(resolve, 2000));
 
 	}
-	console.log(vozila2)
-	stopoviDB.insertOne(vozila2)
+
+	/*var assetIds = [];
+	for(var i=0;i<vozila2.vozila.Data.length;i++){
+		assetIds.push(vozila2.vozila.Data[i].dailySummary.VehicleId)
+	}
+
+	for(var i=0;i<assetIds.length;i++){
+		var config = {
+      url: baseUrl + '/api/fuel/AssetFuelInfo',
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+      },
+      data: {
+          'AssetId': assetIds[i],
+          'StartDate': startTime,
+          'EndDate': endTime,
+          'TimeZoneID': 'Central European Standard Time'
+      }
+    };
+    console.log(config.data);
+    const response = await axios(config);
+    console.log(response);
+	}
+
+	console.log(vozila2.vozila.Data)*/
+	stopoviDB.insertOne(vozila2.vozila.Data)
   .then((dbResponse)=>{
   	console.log("Wrote stops for "+date)
   })
@@ -3176,7 +3202,7 @@ server.get('/stefan/naslovna',async (req,res)=>{
 				informacije.realizovano = 0;
 				informacije.realizovaniNalozi = 0;
 				informacije.neobracunato = 0;
-				informacije.nezavrseno = 0;
+				informacije.nezavrsxeno = 0;
 				informacije.fakturisano = {};
 				informacije.fakturisano.iznos = 0;
 				informacije.fakturisano.nalozi = 0;
