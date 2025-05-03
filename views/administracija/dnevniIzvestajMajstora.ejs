@@ -30,23 +30,23 @@
 				summaryTable.setAttribute("class","dailySummaryTable");
 					var tr = document.createElement("TR");
 						var th = document.createElement("TH");
-						th.innerHTML = "Distanca";
+						th.innerHTML = "Пређена километража";
 						tr.appendChild(th)
 
 						var th = document.createElement("TH");
-						th.innerHTML = "Vreme voznje";
+						th.innerHTML = "Време вожње";
 						tr.appendChild(th);
 
 						var th = document.createElement("TH");
-						th.innerHTML = "Maksimalna brzina";
+						th.innerHTML = "Максимална брзина";
 						tr.appendChild(th);
 
 						var th = document.createElement("TH");
-						th.innerHTML = "Broj naglih kocenja";
+						th.innerHTML = "Број наглих кочења";
 						tr.appendChild(th);
 
 						var th = document.createElement("TH");
-						th.innerHTML = "Broj naglih ubrzanja";
+						th.innerHTML = "Број наглих убрзања";
 						tr.appendChild(th);
 					summaryTable.appendChild(tr);
 
@@ -167,16 +167,23 @@
 						
 						var th = document.createElement("TH");
 						th.setAttribute("class","vreme")
-						th.innerHTML = "Време вожње ор претходног стопа";
+						th.innerHTML = "Време вожње од претходног стопа";
 						tr.appendChild(th);
-
 					table.appendChild(tr);
 
 					for(var i=0;i<stops.length;i++){
 						var tr = document.createElement("TR");
 							var th = document.createElement("TD");
 							th.setAttribute("class","lokacija")
-							th.innerHTML = stops[i].lokacija;
+							if(stops[i].lokacija.split(",")[0] && stops[i].lokacija.split(",")[1] &&  stops[i].lokacija.split(",")[2] && stops[i].lokacija.split(",")[3]){
+								th.innerHTML = stops[i].lokacija.split(",")[0] + stops[i].lokacija.split(",")[1]+  stops[i].lokacija.split(",")[2] + stops[i].lokacija.split(",")[3];
+							}else{
+								th.innerHTML = stops[i].lokacija;
+								if(stops[i].lokacija=="Baza - Poslovi grada"){
+									th.style.fontWeight = "bold"
+								}
+							}
+							
 							tr.appendChild(th);
 							
 							var th = document.createElement("TD");
@@ -206,7 +213,7 @@
 
 						table.appendChild(tr);
 					}
-				wrap.appendChild(table);
+				elem.parentElement.parentElement.getElementsByClassName("dailySummary")[0].appendChild(table);
 
 			}
 			
@@ -277,16 +284,19 @@
 				table.appendChild(tr);
 			wrap.appendChild(table);
 
-			
-
-			var milleageSummary = document.createElement("DIV");
-			milleageSummary.setAttribute("class","milleageSummary");
-			wrap.appendChild(milleageSummary);
 
 			
 
 			var table = document.createElement("TABLE");
 			table.setAttribute("class","naloziTable");
+			var colGroup = document.createElement("COLGROUP");
+			colGroup.innerHTML = "<col style=\"width: 30px\">   <!-- redniBroj --> " +
+  "<col style=\"width: 100px\">   <!-- brojNaloga --> " +
+  "<col style=\"width: 100px\">   <!-- radnaJedinica --> " +
+  "<col style=\"width: 120px\">  <!-- adresa --> " +
+  "<col style=\"width: 120px\">  <!-- iznos --> " +
+  "<col> " +
+			table.appendChild(colGroup);
 			var tr = document.createElement("TR");
 				var th = document.createElement("TH");
 				th.setAttribute("colspan","6");
@@ -390,12 +400,20 @@
 					table.appendChild(tr);
 					var tr = document.createElement("TR");
 						var td = document.createElement("TD");
-						td.setAttribute("colspan","6");
+						td.setAttribute("colspan","5");
 						td.setAttribute("class","opis")
-						td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\">"+izvestaj.nalozi[i].opis+"</div>"
+						td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Опис налога:</div><div class=\"opisText\">"+izvestaj.nalozi[i].opis+"</div></div>"
 						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("colspan","1");
+						td.setAttribute("class","komentar");
+						var komentar = izvestaj.nalozi[i].komentar ? izvestaj.nalozi[i].komentar : "Нема коментара све одрађено како треба."
+						td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Коментар контроле:</div><div class=\"opisText\">"+komentar+"</div></div>"
+						tr.appendChild(td);
+
 					table.appendChild(tr);
-					milleageSummary.appendChild(table);	
+					wrap.appendChild(table);	
 					startIndex++;
 				}
 				if(izvestaj.nalozi.length>0){
@@ -502,102 +520,59 @@
 				
 			wrap.appendChild(table);
 
-			var button = document.createElement("BUTTON");
-			button.setAttribute("onclick","sacuvajIzvestaj()")
-			button.innerHTML = "SACUVAJ IZVESTAJ";
-			wrap.appendChild(button);
+			
 
 
 
-			if(majstor.dodele){
-				if(majstor.dodele.length>0){
-					var table = document.createElement("TABLE");
-						var tr = document.createElement("TR");
-							var th = document.createElement("TH");
-							th.setAttribute("class","redniBroj");
-							th.innerHTML = "<div class=\"value\">R.Br.</div>";
-							tr.appendChild(th);
+			var tipoviReversa = [
+				{name:"Стандардни",value:"Standardni",kolicina:0},
+				{name:"Замена",value:"Zamena",kolicina:0},
+				{name:"Промена ТЕ",value:"PromenaTE",kolicina:0},
+				{name:"Достава",value:"Dostava",kolicina:0},
+				{name:"Допуна",value:"Dopuna",kolicina:0},
+				{name:"Рекламација",value:"Reklamacija",kolicina:0},
+				{name:"Погрешан попис",value:"PogresanPopis",kolicina:0}
+			];
+			var table = document.createElement("TABLE");
+			table.setAttribute("class","ukupnoReversi");
+				var ukupnaVrednost = 0;
+				for(var i=0;i<reversi.length;i++){
+					for(var j=0;j<reversi[i].zaduzenje.length;j++){
+						ukupnaVrednost += (parseFloat(reversi[i].zaduzenje[j].quantity) - parseFloat(reversi[i].zaduzenje[j].quantity2))*parseFloat(reversi[i].zaduzenje[j].price)
+					}
+					
+				}
+				var tr = document.createElement("TR");
+					var th = document.createElement("TH")
+					th.setAttribute("colspan",tipoviReversa.length);
+					th.setAttribute("style","width:100%;font-size:20px;padding:10px;text-align:center")
+					th.innerHTML = "Укупна вредност узете робе из магацина <span id=\"ukupno-magacin\">"+brojSaRazmacima(ukupnaVrednost)+" РСД</span>";
+					tr.appendChild(th);
+				table.appendChild(tr);
+				
 
-							var th = document.createElement("TH");
-							th.setAttribute("class","brojNaloga");
-							th.innerHTML = "<div class=\"value\">Br. naloga</div>";
-							tr.appendChild(th);
-
-							var th = document.createElement("TH");
-							th.setAttribute("class","radnaJedinica");
-							th.innerHTML = "<div class=\"value\">RJ</div>";
-							tr.appendChild(th);
-
-							var th = document.createElement("TH");
-							th.setAttribute("class","adresa");
-							th.innerHTML = "<div class=\"value\">Adresa</div>";
-							tr.appendChild(th);
-
-							var th = document.createElement("TH");
-							th.setAttribute("class","vreme");
-							th.innerHTML = "<div class=\"value\">Početak</div>";
-							tr.appendChild(th);
-
-							var th = document.createElement("TH");
-							th.setAttribute("class","vreme");
-							th.innerHTML = "<div class=\"value\">Završetak</div>";
-							tr.appendChild(th);
-
-							var th = document.createElement("TH");
-							th.setAttribute("class","opis");
-							th.innerHTML = "<div class=\"value\">Opis</div>";
-							tr.appendChild(th);
-						table.appendChild(tr);
-						for(var j=0;j<majstor.dodele.length;j++){
-							var tr = document.createElement("TR");
-								var td = document.createElement("TD");
-								td.setAttribute("class","redniBroj");
-								td.innerHTML = "<div class=\"value\">"+eval(j+1)+".</div>";
-								tr.appendChild(td);
-
-								var td = document.createElement("TD");
-								td.setAttribute("class","brojNaloga");
-								td.innerHTML = "<div class=\"value\"><a target=\"_blank\" href=\"/nalog/"+majstor.dodele[j].nalog+"\">"+majstor.dodele[j].nalog+"</a></div>";
-								tr.appendChild(td);
-
-								var td = document.createElement("TD");
-								td.setAttribute("class","radnaJedinica");
-								td.innerHTML = "<div class=\"value\">"+majstor.dodele[j].radnaJedinica+"</div>";
-								tr.appendChild(td);
-
-								var td = document.createElement("TD");
-								td.setAttribute("class","adresa");
-								td.innerHTML = "<div class=\"value\">"+majstor.dodele[j].adresa+"</div>";
-								tr.appendChild(td);
-
-								var td = document.createElement("TD");
-								td.setAttribute("class","vreme");
-								td.innerHTML = "<div class=\"value\">"+majstor.dodele[j].vremeDolaska+"</div>";
-								tr.appendChild(td);
-
-								var td = document.createElement("TD");
-								td.setAttribute("class","vreme");
-								var datumZavrsetkaRadova = new Date(majstor.dodele[j].datetimeRadova);
-								datumZavrsetkaRadova.setHours(datumZavrsetkaRadova.getHours() + Number(majstor.dodele[j].vremeRadova.split(":")[0]))
-								datumZavrsetkaRadova.setMinutes(datumZavrsetkaRadova.getMinutes() + Number(majstor.dodele[j].vremeRadova.split(":")[1]))
-								td.innerHTML = "<div class=\"value\">"+getTimestamp(datumZavrsetkaRadova)+"</div>";
-								tr.appendChild(td);
-
-								var td = document.createElement("TD");
-								td.setAttribute("class","opis");
-								td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px\">"+majstor.dodele[j].opis+"</div>";
-								tr.appendChild(td);
-
-							table.appendChild(tr);
+				var tr = document.createElement("TR");
+				for(var i=0;i<tipoviReversa.length;i++){
+					var th = document.createElement("TH")
+					th.innerHTML = tipoviReversa[i].name;
+					tr.appendChild(th);
+					for(var j=0;j<reversi.length;j++){
+						if(reversi[j].tip==tipoviReversa[i].value){
+							tipoviReversa[i].kolicina++; 
 						}
-					wrap.appendChild(table);
-				}else{
-					var note = document.createElement("DIV");
-					note.setAttribute("style","font-size:24px;text-align:center;padding:20px;");
-					note.innerHTML = "Није имао додељених радних налога.";
-					wrap.appendChild(note)
-				}	
-			}
+					}
+				}
+				table.appendChild(tr);	
+				var tr = document.createElement("TR");
+				for(var i=0;i<tipoviReversa.length;i++){
+					var th = document.createElement("TD")
+					th.setAttribute("class",tipoviReversa[i].name);
+					th.innerHTML = tipoviReversa[i].kolicina;
+					tr.appendChild(th);
+				}
+				table.appendChild(tr);	
+				
+			wrap.appendChild(table);
 			
 
 			
@@ -610,10 +585,19 @@
 		wrap.appendChild(dailySummary);
 
 		var button = document.createElement("BUTTON");
-			button.setAttribute("onclick","exportElementAsImage()")
-			button.innerHTML = "Stampaj";
-			wrap.appendChild(button)
+		button.setAttribute("onclick","sacuvajIzvestaj()")
+		button.innerHTML = "SACUVAJ IZVESTAJ";
+		wrap.appendChild(button);
+		
+		var br = document.createElement("BR");
+		wrap.appendChild(br)
+
+		var button = document.createElement("BUTTON");
+		button.setAttribute("onclick","exportElementAsImage()")
+		button.innerHTML = "Stampaj";
+		wrap.appendChild(button)
 	
+
 
 		recalculate()
 		if(izvestaj.vozilo){
@@ -704,9 +688,15 @@
 			document.getElementsByClassName("naloziTable")[0].appendChild(tr);
 			var tr = document.createElement("TR");
 				var td = document.createElement("TD");
-				td.setAttribute("colspan","6");
+				td.setAttribute("colspan","5");
 				td.setAttribute("class","opis")
-				td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px\"></div>"
+				td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Опис налога:</div><div class=\"opisText\"></div></div>"
+				tr.appendChild(td);
+
+				var td = document.createElement("TD");
+				td.setAttribute("colspan","1");
+				td.setAttribute("class","komentar")
+				td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Коментар контроле:</div><div class=\"opisText\"></div></div>"
 				tr.appendChild(td);
 			document.getElementsByClassName("naloziTable")[0].appendChild(tr);
 			startIndex = startIndex+1;
@@ -777,21 +767,54 @@
 		    const element = document.getElementsByClassName("jucerasnjiUcinak")[0];
 		    if (!element) return;
 
+		    // Hide all buttons
 		    const buttons = element.querySelectorAll("button");
 		    buttons.forEach(btn => btn.style.display = "none");
 
+		    // Replace all input elements (except ones with class 'checkbox') with divs
+		    const inputs = element.querySelectorAll("input");
+		    const inputReplacements = [];
+		    inputs.forEach(input => {
+		        if (input.classList.contains("checkbox")) return; // Ignore inputs with class 'checkbox'
+
+		        const div = document.createElement("div");
+
+		        if (input.classList.contains("iznosInput")) {
+		            div.style.cssText = getComputedStyle(input).cssText;
+		            div.textContent = brojSaRazmacima(input.value);
+		        } else {
+		            div.style.cssText = getComputedStyle(input).cssText;
+		            div.textContent = input.value;
+		        }
+
+		        div.className = input.className;
+		        div.style.whiteSpace = "pre-wrap";
+
+		        inputReplacements.push({ original: input, replacement: div });
+		        input.replaceWith(div);
+		    });
+
 		    html2canvas(element, {
-		        scale: 1, // Ensures image resolution matches element width/height in CSS
-		        useCORS: true // In case there are cross-origin images
+		        scale: 1,
+		        useCORS: true
 		    }).then(canvas => {
+		        // Restore original buttons
 		        buttons.forEach(btn => btn.style.display = "");
 
+		        // Restore original inputs
+		        inputReplacements.forEach(({ original, replacement }) => {
+		            replacement.replaceWith(original);
+		        });
+
+		        // Trigger download
 		        const link = document.createElement("a");
 		        link.download = "exported-image.png";
 		        link.href = canvas.toDataURL();
 		        link.click();
 		    });
 		}
+
+
 	</script>
 	<form method="POST" action="/dnevniIzvestaj" style="display:none" id="form">
 		<input type="text" name="json" id="json">

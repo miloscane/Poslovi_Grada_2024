@@ -2409,18 +2409,104 @@ http.listen(process.env.PORT, function(){
 					console.log(error)
 				})*/
 
+		/*var meseci = [
+			{ime:"Maj 2024",str:"05.2024",sorting:0},
+			{ime:"Jun 2024",str:"06.2024",sorting:1},
+			{ime:"Jul 2024",str:"07.2024",sorting:2},
+			{ime:"Avgust 2024",str:"08.2024",sorting:3},
+			{ime:"Septembar 2024",str:"09.2024",sorting:4},
+			{ime:"Oktobar 2024",str:"10.2024",sorting:5},
+			{ime:"Novembar 2024",str:"11.2024",sorting:6},
+			{ime:"Decembar 2024",str:"12.2024",sorting:7},
+			{ime:"Januar 2025",str:"01.2025",sorting:8},
+			{ime:"Februar 2025",str:"02.2025",sorting:9},
+			{ime:"Mart 2025",str:"03.2025",sorting:10},
+			{ime:"April 2025",str:"04.2025",sorting:11},
+			{ime:"Maj 2025",str:"05.2025",sorting:12}
+		]
+
+		naloziDB.find({majstor:{$in:podizvodjaci},statusNaloga:{$nin:["Storniran"]}}).toArray()
+		.then((nalozi)=>{
+			majstoriDB.find({uniqueId:{$in:podizvodjaci}}).toArray()
+			.then((majstori)=>{
+				pricesLowDB.find({}).toArray()
+				.then((pricesLow)=>{
+					pricesLowDB.find({}).toArray()
+					.then((pricesHigh)=>{
+						var cutOff = new Date("2024-05-01");
+						var naloziToExport = [];
+						for(var i=0;i<nalozi.length;i++){
+							if(nalozi[i].datum.datetime>cutOff.getTime()){
+								for(var j=0;j<majstori.length;j++){
+									if(majstori[j].uniqueId==nalozi[i].majstor){
+										nalozi[i].imeMajstora = majstori[j].ime;
+										for(var k=0;k<meseci.length;k++){
+											if(nalozi[i].datum.datum.includes(meseci[k].str)){
+												nalozi[i].mesec = meseci[k].sorting.toString().padStart(2,"0") + " "+ meseci[k].ime;
+											}
+										}
+
+										var cenovnik;
+										if(nalozi[i].majstor=="SeHQZ--1672650353244" || nalozi[i].majstor=="IIwY4--1672650358507"){
+											cenovnik = pricesHigh;
+										}else{
+											cenovnik = pricesLow;
+										}
+
+										var ukupanIznosPodizvodjaca = 0;
+										for(var k=0;k<nalozi[i].obracun.length;k++){
+											for(var l=0;l<cenovnik.length;l++){//code, quantity
+												if(cenovnik[l].code==nalozi[i].obracun[k].code){
+													ukupanIznosPodizvodjaca = ukupanIznosPodizvodjaca + cenovnik[l].price*parseFloat(nalozi[i].obracun[k].quantity);
+												}
+											}
+										}
+										nalozi[i].ukupanIznosPodizvodjaca = ukupanIznosPodizvodjaca;
 
 
+										naloziToExport.push(nalozi[i])
+									}
+								}
+							}
+						}
 
 
+						
+
+						var csvString = "Broj Naloga;Podizvodjac;Mesec;Iznos PG;Iznos\r\n";
+						for(var i=0;i<naloziToExport.length;i++){
+							var nalog = naloziToExport[i];
+							csvString +=  nalog.broj + ";" + nalog.imeMajstora + ";" + nalog.mesec + ";" + nalog.ukupanIznos + ";" + nalog.ukupanIznosPodizvodjaca + "\r\n";
+						}
+						fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+						console.log("Wrote file");
+						
+
+
+					})
+					.catch((error)=>{
+						console.log(error);
+					});
+				})
+				.catch((error)=>{
+					console.log(error);
+				});
+			})
+			.catch((error)=>{
+				console.log(error)
+			})
+			
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 
 
 
 	})
 	.catch(error => {
-		console.log(error)
-		console.log('Failed to connect to database');
 		logError(error);
+		console.log('Failed to connect to database');
 	});
 });
 
@@ -7497,7 +7583,7 @@ server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
 							}
 						}
 
-						var vozila2 = JSON.parse(JSON.stringify(vozila));
+						/*var vozila2 = JSON.parse(JSON.stringify(vozila));
 						var startTime = yesterday.toISOString().split('T')[0] + " 00:00:00";
       			var endTime = yesterday.toISOString().split('T')[0] + " 23:59:59";
 
@@ -7544,18 +7630,55 @@ server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
               const response = await axios(config);
               vozila2.vozila.Data[i].mileageSummary = response.data;
 							await new Promise(resolve => setTimeout(resolve, 2000));
-						}
+						}*/
 
-						magacinReversiDB.find({date:getDateAsStringForInputObject(yesterday),majstor:req.params.majstorId}).toArray()
+
+						magacinReversiDB.find({datum:getDateAsStringForDisplay(yesterday),majstor:req.params.majstorId}).toArray()
 						.then((reversi)=>{
-							res.render("administracija/dnevniIzvestajMajstora",{
-								pageTitle: "Дневни извештај мајстора "+ majstor.ime+" за датум "+reshuffleDate(req.params.date),
-								user: req.session.user,
-								majstor: majstor,
-								vozila: vozila2,
-								date: req.params.date,
-								izvestaj: izvestaj,
-								reversi: reversi
+							proizvodiDB.find({}).toArray()
+							.then((proizvodi)=>{
+								for(var i=0;i<reversi.length;i++){
+									for(var j=0;j<reversi[i].zaduzenje.length;j++){
+										for(var k=0;k<proizvodi.length;k++){
+											if(proizvodi[k].uniqueId==reversi[i].zaduzenje[j].uniqueId){
+												reversi[i].zaduzenje[j].price = proizvodi[k].price;
+												break;
+											}
+										}
+									}
+								}
+
+
+
+								stopoviDB.find({date:getDateAsStringForInputObject(yesterday)}).toArray()
+								.then((stopovi)=>{
+									var vozila2 = stopovi[0]
+									res.render("administracija/dnevniIzvestajMajstora",{
+										pageTitle: "Дневни извештај мајстора "+ majstor.ime+" за датум "+reshuffleDate(req.params.date),
+										user: req.session.user,
+										majstor: majstor,
+										vozila: vozila2,
+										date: req.params.date,
+										izvestaj: izvestaj,
+										reversi: reversi
+									})
+								})
+								.catch((error)=>{
+									logError(error);
+									res.render("message",{
+										pageTitle: "Грешка",
+										user: req.session.user,
+										message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+									});
+								})
+							})
+							.catch((error)=>{
+								logError(error);
+								res.render("message",{
+									pageTitle: "Грешка",
+									user: req.session.user,
+									message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+								});
 							})
 						})
 						.catch((error)=>{

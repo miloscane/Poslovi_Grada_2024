@@ -6277,6 +6277,9 @@ input[type=number] {
 .jucerasnjiUcinak table .opis .value{
     width:100%;
 }
+.jucerasnjiUcinak table .komentar .value{
+    width:100%;
+}
 .jucerasnjiUcinak table .opis{
     width:100%;
 }
@@ -6294,8 +6297,62 @@ input[type=number] {
     word-wrap: break-word; 
 }
 
+.jucerasnjiUcinak table .opis .value .title{
+    font-weight:600;
+    text-align:left;
+}
+
+.jucerasnjiUcinak table .komentar .value .title{
+    font-weight:600;
+    text-align:left;
+}
+
 .jucerasnjiUcinak .dailySummaryTable td, .jucerasnjiUcinak .dailySummaryTable th{
     width:20%;
+}
+
+
+.jucerasnjiUcinak .naloziTable{
+    table-layout: fixed;
+    width:100%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.jucerasnjiUcinak .milleageTable tr:nth-child(even){
+    background-color:rgba(31,52,100,0.1);
+}
+.jucerasnjiUcinak .milleageTable tr:nth-child(odd){
+    background-color:rgba(255,255,255);
+}
+
+.jucerasnjiUcinak .milleageTable .vreme{
+    width:85px;
+}
+
+.jucerasnjiUcinak .milleageTable .kilometri{
+    width:85px;
+}
+
+.jucerasnjiUcinak .milleageTable .lokacija{
+    width:100%;
+}
+
+.jucerasnjiUcinak .naloziTable tr:nth-child(4n),tr:nth-child(4n+1) {
+  background-color: rgba(31,52,100,0.1); /* light blue, change as needed */
+}
+
+.jucerasnjiUcinak .dailySummary{
+    margin-top:30px;
 }
 
 
