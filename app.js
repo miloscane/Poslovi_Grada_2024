@@ -387,7 +387,7 @@ function logError(error){
 	console.log(error)
 	var errorJSON = {};
 	errorJSON.datetime = new Date().getTime();
-	errorJSON.date = new Date().getFullYear()+"."+eval(new Date().getMonth()+1)+"."+new Date().getDate();
+	errorJSON.date = getDateAsStringForDisplay(new Date());
 	errorJSON.error = error.toString()
 	errorJSON.jsonerror = error;
 	errorJSON.errorstack = error.stack;
@@ -10149,6 +10149,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						datetime: timestamp
 					},
 					zahtevalac: stambenoJson.zahtevalac,
+					dispecer: "",
 					obracun:[],
 					ukupanIznos: 0,
 					ukupanIznosPodizvodjaca: 0,
