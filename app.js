@@ -10144,7 +10144,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 					vrstaRada: stambenoJson.tip_naloga,
 					radnaJedinica: stambenoJson.radna_jedinica,
 					datum:{
-						punDatum: currentDate,
+						punDatum: new Date(),
 						datum: getDateAsStringForDisplay(new Date()),
 						datetime: timestamp
 					},
