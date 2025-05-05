@@ -711,6 +711,7 @@
 				ukupanUcinak = ukupanUcinak + iznos;
 			}
 			document.getElementById("ukupno").innerHTML = brojSaRazmacima(ukupanUcinak)+" РСД";
+			document.getElementById("ukupno").dataset.ukupno = ukupanUcinak;
 
 			var tipoviNaloga = [];
 			for(var i=0;i<radovi.length;i++){
@@ -783,7 +784,7 @@
 
 		        if (input.classList.contains("iznosInput")) {
 		            div.style.cssText = getComputedStyle(input).cssText;
-		            div.textContent = brojSaRazmacima(input.value);
+		            div.textContent = brojSaRazmacima(parseFloat(input.value)*0.675);
 		        } else {
 		            div.style.cssText = getComputedStyle(input).cssText;
 		            div.textContent = input.value;
@@ -809,6 +810,11 @@
 		        textarea.replaceWith(div);
 		    });
 
+		    const ukupnoElem = document.getElementById("ukupno");
+		    const originalUkupnoContent = ukupnoElem.innerHTML;
+		    const dataUkupno = ukupnoElem.getAttribute("data-ukupno");
+		    ukupnoElem.textContent = brojSaRazmacima(parseFloat(dataUkupno)*0.675) + " РСД";
+
 		    html2canvas(element, {
 		        scale: 1,
 		        useCORS: true
@@ -820,6 +826,8 @@
 		        inputReplacements.forEach(({ original, replacement }) => {
 		            replacement.replaceWith(original);
 		        });
+
+		        ukupnoElem.innerHTML = originalUkupnoContent;
 
 		        // Trigger download
 		        const link = document.createElement("a");
