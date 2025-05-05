@@ -6307,6 +6307,12 @@ input[type=number] {
     text-align:left;
 }
 
+.jucerasnjiUcinak table .komentar textarea{
+    width:100%;
+    resize:none;
+    height:60px;
+}
+
 .jucerasnjiUcinak .dailySummaryTable td, .jucerasnjiUcinak .dailySummaryTable th{
     width:20%;
 }
@@ -6316,16 +6322,6 @@ input[type=number] {
     table-layout: fixed;
     width:100%;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 .jucerasnjiUcinak .milleageTable tr:nth-child(even){

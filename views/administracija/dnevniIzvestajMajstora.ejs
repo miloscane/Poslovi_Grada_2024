@@ -7,7 +7,7 @@
 		var vozila = <%-JSON.stringify(vozila)%>;
 		var izvestaj = <%-JSON.stringify(izvestaj)%>;
 		var reversi = <%-JSON.stringify(reversi)%>;
-		console.log(reversi)
+		console.log(izvestaj)
 		var date = "<%=date%>";
 		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција"]
 	</script>
@@ -408,8 +408,9 @@
 						var td = document.createElement("TD");
 						td.setAttribute("colspan","1");
 						td.setAttribute("class","komentar");
-						var komentar = izvestaj.nalozi[i].komentar ? izvestaj.nalozi[i].komentar : "Нема коментара све одрађено како треба."
-						td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Коментар контроле:</div><div class=\"opisText\">"+komentar+"</div></div>"
+						console.log(izvestaj.nalozi[i])
+						var komentar = izvestaj.nalozi[i].komentarKontrole ? izvestaj.nalozi[i].komentarKontrole : "Нема коментара све одрађено како треба."
+						td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Коментар контроле:</div><div class=\"opisText\"><textarea class=\"komentarKontrole\">"+komentar+"</textarea></div></div>"
 						tr.appendChild(td);
 
 					table.appendChild(tr);
@@ -696,7 +697,7 @@
 				var td = document.createElement("TD");
 				td.setAttribute("colspan","1");
 				td.setAttribute("class","komentar")
-				td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Коментар контроле:</div><div class=\"opisText\"></div></div>"
+				td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Коментар контроле:</div><div class=\"opisText\"><textarea class=\"komentarKontrole\"></textarea></div></div>"
 				tr.appendChild(td);
 			document.getElementsByClassName("naloziTable")[0].appendChild(tr);
 			startIndex = startIndex+1;
@@ -748,7 +749,8 @@
 				json2.iznos = rowElems[i].getElementsByClassName("iznosInput")[0].value;
 				json2.radnaJedinica = rowElems[i].getElementsByClassName("radnaJedinica")[0].getElementsByClassName("value")[0].innerHTML;
 				json2.adresa = rowElems[i].getElementsByClassName("adresa")[0].getElementsByClassName("value")[0].innerHTML;
-				json2.opis = rowElems[i].nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("value")[0].innerHTML;
+				json2.opis = rowElems[i].nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("opisText")[0].innerHTML;
+				json2.komentarKontrole = rowElems[i].nextElementSibling.getElementsByClassName("komentar")[0].getElementsByClassName("komentarKontrole")[0].value;
 				json2.tipoviRada = [];
 				var checkboxes = rowElems[i].getElementsByClassName("checkbox");
 				for(var j=0;j<checkboxes.length;j++){
@@ -794,6 +796,19 @@
 		        input.replaceWith(div);
 		    });
 
+		    // Replace all textarea elements with divs
+		    const textareas = element.querySelectorAll("textarea");
+		    textareas.forEach(textarea => {
+		        const div = document.createElement("div");
+		        div.style.cssText = getComputedStyle(textarea).cssText;
+		        div.textContent = textarea.value;
+		        div.className = textarea.className;
+		        div.style.whiteSpace = "pre-wrap";
+
+		        inputReplacements.push({ original: textarea, replacement: div });
+		        textarea.replaceWith(div);
+		    });
+
 		    html2canvas(element, {
 		        scale: 1,
 		        useCORS: true
@@ -801,18 +816,19 @@
 		        // Restore original buttons
 		        buttons.forEach(btn => btn.style.display = "");
 
-		        // Restore original inputs
+		        // Restore original inputs and textareas
 		        inputReplacements.forEach(({ original, replacement }) => {
 		            replacement.replaceWith(original);
 		        });
 
 		        // Trigger download
 		        const link = document.createElement("a");
-		        link.download = "exported-image.png";
+		        link.download = document.getElementsByClassName("jucerasnjiUcinak")[0].getElementsByTagName("H1")[0].innerHTML.replace(/\./g, '-');
 		        link.href = canvas.toDataURL();
 		        link.click();
 		    });
 		}
+
 
 
 	</script>
