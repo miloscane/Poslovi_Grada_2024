@@ -6323,6 +6323,20 @@ input[type=number] {
     width:100%;
 }
 
+.jucerasnjiUcinak .ukupnoTable td{
+    text-align:center;
+    font-size:30px;
+}
+
+.jucerasnjiUcinak .ukupnoReversi td{
+    text-align:center;
+    font-size:30px;
+}
+
+.jucerasnjiUcinak .dailySummaryTable td{
+    text-align:center;
+    font-size:30px;
+}
 
 .jucerasnjiUcinak .milleageTable tr:nth-child(even){
     background-color:rgba(31,52,100,0.1);

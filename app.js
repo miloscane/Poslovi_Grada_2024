@@ -7651,8 +7651,60 @@ server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
 
 
 								stopoviDB.find({date:getDateAsStringForInputObject(yesterday)}).toArray()
-								.then((stopovi)=>{
-									var vozila2 = stopovi[0]
+								.then(async (stopovi)=>{
+									if(stopovi.length>0){
+										var vozila2 = stopovi[0];
+									}else{	
+										var vozila2 = JSON.parse(JSON.stringify(vozila));
+										var startTime = yesterday.toISOString().split('T')[0] + " 00:00:00";
+				      			var endTime = yesterday.toISOString().split('T')[0] + " 23:59:59";
+
+										config = {
+									    url: baseUrl + '/api/DailySummary/GetDailySummary',
+									    method: 'POST', // If necessary
+									    headers: { 
+									        'Content-Type': 'application/json',
+									        'Authorization': `Bearer ${token}`
+									    },
+									    data: { 
+									    	'ClientId': process.env.telematicsid, 
+									    	'TimeZone':'Central Standard Time',
+									    	'StartTime': startTime,
+								        'EndTime': endTime
+									    }
+										};
+										console.log("Waiting daily summary")
+										var dailySummary = await axios(config);
+										for(var i=0;i<dailySummary.data.length;i++){
+											for(var j=0;j<vozila2.vozila.Data.length;j++){
+												if(vozila2.vozila.Data[j].DeviceName==dailySummary.data[i].RegNo){
+													vozila2.vozila.Data[j].dailySummary = dailySummary.data[i];
+												}
+											}
+										}
+										
+										for(var i=0;i<vozila2.vozila.Data.length;i++){
+											var config = {
+				                url: baseUrl + '/api/Trip/GetMileageSummary',
+				                method: 'POST',
+				                headers: {
+				                    'Content-Type': 'application/json',
+				                    'Authorization': `Bearer ${token}`
+				                },
+				                data: {
+				                    'ImeiNumber': Number(vozila2.vozila.Data[i].ImeiNumber),
+				                    'StartTime': startTime,
+				                    'EndTime': endTime,
+				                    'TimeZone': 'Central European Standard Time'
+				                }
+					            };
+
+				              const response = await axios(config);
+				              vozila2.vozila.Data[i].mileageSummary = response.data;
+											await new Promise(resolve => setTimeout(resolve, 2000));
+										}
+									}
+									
 									res.render("administracija/dnevniIzvestajMajstora",{
 										pageTitle: "Дневни извештај мајстора "+ majstor.ime+" за датум "+reshuffleDate(req.params.date),
 										user: req.session.user,
