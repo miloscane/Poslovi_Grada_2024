@@ -7,7 +7,6 @@
 		var vozila = <%-JSON.stringify(vozila)%>;
 		var izvestaj = <%-JSON.stringify(izvestaj)%>;
 		var reversi = <%-JSON.stringify(reversi)%>;
-		console.log(izvestaj)
 		var date = "<%=date%>";
 		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција"]
 	</script>
@@ -611,7 +610,7 @@
 				socket.emit("nalogPoBroju",elem.value,elem.id);
 				elem.parentElement.parentElement.parentElement.getElementsByClassName("radnaJedinica")[0].getElementsByClassName("value")[0].innerHTML = "<img width=\"45px\" src=\"/images/loadGif.gif\">";
 				elem.parentElement.parentElement.parentElement.getElementsByClassName("adresa")[0].getElementsByClassName("value")[0].innerHTML = "<img width=\"45px\" src=\"/images/loadGif.gif\">";
-				elem.parentElement.parentElement.parentElement.nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("value")[0].innerHTML = "<img width=\"45px\" src=\"/images/loadGif.gif\">";
+				elem.parentElement.parentElement.parentElement.nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("opisText")[0].innerHTML = "<img width=\"45px\" src=\"/images/loadGif.gif\">";
 			}
 			
 		}
@@ -621,11 +620,11 @@
 			if(data=="Greska"){
 				parent.getElementsByClassName("radnaJedinica")[0].getElementsByClassName("value")[0].innerHTML = "/";
 				parent.getElementsByClassName("adresa")[0].getElementsByClassName("value")[0].innerHTML = "/";
-				parent.nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("value")[0].innerHTML = "/";
+				parent.nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("opisText")[0].innerHTML = "/";
 			}else{
 				parent.getElementsByClassName("radnaJedinica")[0].getElementsByClassName("value")[0].innerHTML = data.radnaJedinica;
 				parent.getElementsByClassName("adresa")[0].getElementsByClassName("value")[0].innerHTML = data.adresa;
-				parent.nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("value")[0].innerHTML = data.opis;
+				parent.nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("opisText")[0].innerHTML = data.opis;
 			}
 			
 		})
