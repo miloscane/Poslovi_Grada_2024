@@ -2657,7 +2657,7 @@ const sendEmail = () => {
 };
 
 const saveStops = async () => {
-	var date = new Date();
+	var date = new Date("2025-05-02");
 	var vozila2 = JSON.parse(JSON.stringify(vozila));
 	var startTime = date.toISOString().split('T')[0] + " 00:00:00";
 	var endTime = date.toISOString().split('T')[0] + " 23:59:59";
@@ -2736,7 +2736,9 @@ const saveStops = async () => {
 	}
 
 	console.log(vozila2.vozila.Data)*/
-	stopoviDB.insertOne(vozila2.vozila.Data)
+
+
+	stopoviDB.insertOne(vozila2)
   .then((dbResponse)=>{
   	console.log("Wrote stops for "+date)
   })
