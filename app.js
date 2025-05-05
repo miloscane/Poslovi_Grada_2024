@@ -2657,7 +2657,7 @@ const sendEmail = () => {
 };
 
 const saveStops = async () => {
-	var date = new Date("2025-05-02");
+	var date = new Date();
 	var vozila2 = JSON.parse(JSON.stringify(vozila));
 	var startTime = date.toISOString().split('T')[0] + " 00:00:00";
 	var endTime = date.toISOString().split('T')[0] + " 23:59:59";
