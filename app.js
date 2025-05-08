@@ -2501,7 +2501,137 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 
+		/*naloziDB.find({vrstaRada:"TEKUCE"}).toArray()
+		.then((nalozi)=>{
+			var startTime = new Date("2024-05-01");
+			var novembar = new Date("2024-11-01");
+			var naloziToShow = [];
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].datum.datetime>=startTime.getTime()){
+					naloziToShow.push(nalozi[i])
+				}
+			}
 
+			var preNovembra = 0;
+			var posleNovembra = 0;
+			for(var i=0;i<naloziToShow.length;i++){
+				if(naloziToShow[i].datum.datetime<=novembar.getTime()){
+					preNovembra = preNovembra + parseFloat(naloziToShow[i].ukupanIznos);
+				}else if(naloziToShow[i].datum.datetime>novembar.getTime()){
+					posleNovembra = posleNovembra + parseFloat(naloziToShow[i].ukupanIznos);
+				}
+			}
+
+			console.log("Tekuce popravke od 01.05.2024 do 01.11.2024")
+			console.log("     "+brojSaRazmacima(parseFloat(preNovembra)));
+			console.log("---")
+
+			console.log("Tekuce popravke od 01.11.2024 do danas")
+			console.log("     "+brojSaRazmacima(posleNovembra))
+			console.log("---")
+
+
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+		/*naloziDB.find({}).toArray()
+		.then(async (nalozi)=>{
+			var startTime = new Date("2024-05-01");
+			var cutOff = new Date("2024-11-01")
+			var naloziToShow = [];
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].datum.datetime>=startTime.getTime()){
+					naloziToShow.push(nalozi[i])
+				}
+			}
+
+			// Create a lookup map for cenovnik
+			const cenovnikMap = {};
+			for (const item of cenovnik) {
+			    cenovnikMap[item.code] = item.name;
+			}
+
+			// Assign names using the map
+			for (const nalog of nalozi) {
+			    for (const obr of nalog.obracun) {
+			        if (cenovnikMap[obr.code]) {
+			            obr.name = cenovnikMap[obr.code];
+			        }
+			    }
+			}
+
+			var naloziToExport = [];
+			var targets = ['3"', '2"/5"', '2"', '6/4"', '5/4"', '1"', '160' , '125' , '110', 'ventil' , 'Ventil'];
+			for(var i=0;i<nalozi.length;i++){
+				var isVodovodKanalizacija = false;
+				for(var j=0;j<nalozi[i].obracun.length;j++){
+					if(nalozi[i].obracun[j].name){
+						if(targets.some(str => nalozi[i].obracun[j].name.includes(str))){
+							isVodovodKanalizacija = true;
+							break;
+						}	
+					}
+					
+				}
+				if(isVodovodKanalizacija){
+					var isStemanje = false;
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(nalozi[i].obracun[j].code.includes("80.03.03.")){
+							var lastNumber = Number(nalozi[i].obracun[j].code.split(".")[3]);
+							if(lastNumber>=17 && lastNumber<=138){
+								isStemanje = true;
+							}
+						}
+					}
+					nalozi[i].tipNaloga = "ZAMENA";
+					var masinski = ['80.03.01.020','80.03.01.019'];
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(nalozi[i].obracun[j].name){
+							if(masinski.indexOf(nalozi[i].obracun[j].code)>=0){
+								nalozi[i].tipNaloga = "MASINSKI ISKOP";
+								break;
+							}	
+						}
+					}
+
+					var rucni = ['80.03.01.001','80.03.01.002','80.03.01.003','80.03.01.004','80.03.01.005','80.03.01.006'];
+					if(nalozi[i].tipNaloga!="MASINSKI ISKOP"){
+						for(var j=0;j<nalozi[i].obracun.length;j++){
+							if(nalozi[i].obracun[j].name){
+								if(rucni.indexOf(nalozi[i].obracun[j].code)>=0){
+									nalozi[i].tipNaloga = "RUCNI ISKOP";
+									break;
+								}	
+							}
+						}	
+					}
+
+					if(!isStemanje){
+						nalozi[i].vreme = "PRE NOVEMBRA";
+						if(nalozi[i].datum.datetime>=cutOff.getTime()){
+							nalozi[i].vreme = "POSLE NOVEMBRA";
+						}
+						naloziToExport.push(nalozi[i])
+					}
+				}
+			}
+
+			var csvString = "Broj naloga;Vreme;Tip naloga;Iznos\r\n";
+			for(var i=0;i<naloziToExport.length;i++){
+				csvString += naloziToExport[i].broj + ";" + naloziToExport[i].vreme + ";" +naloziToExport[i].tipNaloga+ ";" + naloziToExport[i].ukupanIznos +"\r\n";
+			}
+
+			fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+						console.log("Wrote file");
+			
+
+
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
 
 	})
 	.catch(error => {
@@ -2677,7 +2807,9 @@ const saveStops = async () => {
       'EndTime': endTime
     }
 	};
-	console.log("Waiting daily summary")
+	
+	console.log("Waiting daily summary");
+
 	var dailySummary = await axios(config);
 	for(var i=0;i<dailySummary.data.length;i++){
 		for(var j=0;j<vozila2.vozila.Data.length;j++){
@@ -2710,12 +2842,19 @@ const saveStops = async () => {
 
 	}
 
-	/*var assetIds = [];
+	var assetIds = [];
 	for(var i=0;i<vozila2.vozila.Data.length;i++){
+		//console.log(vozila2.vozila.Data[i])
 		assetIds.push(vozila2.vozila.Data[i].dailySummary.VehicleId)
+		//assetIds.push(vozila2.vozila.Data[i].ImeiNumber)
 	}
 
-	for(var i=0;i<assetIds.length;i++){
+	/*console.log("ClientId:")
+	console.log(vozila2.clientInfo)
+	console.log("AssetIds:")
+	console.log(assetIds)*/
+
+	/*for(var i=0;i<assetIds.length;i++){
 		var config = {
       url: baseUrl + '/api/fuel/AssetFuelInfo',
       method: 'POST',
@@ -2732,10 +2871,11 @@ const saveStops = async () => {
     };
     console.log(config.data);
     const response = await axios(config);
+    await new Promise(resolve => setTimeout(resolve, 2000));
     console.log(response);
-	}
+    console.log("##########################REQUEST DONE##################################################")
+	}*/
 
-	console.log(vozila2.vozila.Data)*/
 
 
 	stopoviDB.insertOne(vozila2)
@@ -9967,6 +10107,54 @@ server.get('/magacioner/prekojucerasnjiReversi', async (req, res)=> {
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	} 
 });
+
+server.get('/magacioner/utroseniMaterijal',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			try{
+				var proizvodi = await proizvodiDB.find({}).toArray();
+				var today = new Date();
+			  var dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+			  var mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
+			  var monday = new Date(today);
+			  monday.setDate(today.getDate() + mondayOffset);
+
+			  var week = [];
+			  for (var i = 0; i < 7; i++) {
+			    var date = new Date(monday);
+			    date.setDate(monday.getDate() + i);
+			    week.push(getDateAsStringForDisplay(date));
+			  }
+			  var reversi = await magacinReversiDB.find({datum:{$in:week}}).toArray()
+			  res.render("magacioner/utroseniMaterijal",{
+					pageTitle:"Утрошени материјал ове недеље",
+					proizvodi: proizvodi,
+					reversi: reversi,
+					user: req.session.user
+				})
+			}catch(error){
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2623.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+
+
 
 server.post('/fakturisi', async (req, res)=> {
 	if(req.session.user){

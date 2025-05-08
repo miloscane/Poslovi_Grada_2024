@@ -1,0 +1,94 @@
+<%- include ("partials/header") -%>
+	<script>
+		var proizvodi	=	<%-JSON.stringify(proizvodi)%>;
+		proizvodi = proizvodi.sort((a, b) => {
+			if (a.code < b.code) {
+				return -1;
+			}
+		});
+		var reversi 	=	<%-JSON.stringify(reversi)%>;
+	</script>
+	<div class="magacinStanje">
+		<div class="pageWidth">
+			<div class="ukupnaVrednost">Укупна вредност утрошеног материјала: <span id="vrednost-magacina"></span></div>
+			
+			<script>
+				var ukupnaVrednostMagacina = 0;
+				for(var i=0;i<proizvodi.length;i++){
+					proizvodi[i].utroseno = 0;
+					for(var j=0;j<reversi.length;j++){
+						for(var k=0;k<reversi[j].zaduzenje.length;k++){
+							if(reversi[j].zaduzenje[k].uniqueId==proizvodi[i].uniqueId){
+
+								var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
+								proizvodi[i].ukupnoUzeto = proizvodi[i].ukupnoUzeto + uzeto;
+								var vraceno = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity2);
+								proizvodi[i].utroseno = uzeto - vraceno
+							}
+						}
+					}
+					var cenaProizvoda = isNaN(parseFloat(proizvodi[i].price)) ? 0 : parseFloat(proizvodi[i].price);
+					ukupnaVrednostMagacina = ukupnaVrednostMagacina + proizvodi[i].utroseno*cenaProizvoda;
+					document.getElementById("vrednost-magacina").innerHTML = brojSaRazmacima(ukupnaVrednostMagacina) + " дин.";
+				}
+			</script>
+
+			<div class="lightBlueBox">
+				<div class="inlines">
+					<div class="proizvodiWrap">
+						<div class="buttons" id="kategorije"></div>
+						<script>
+							for(var i=0;i<definicijeProizvoda.length;i++){
+								var mainButton = document.createElement("DIV");
+								mainButton.setAttribute("class","productButton");
+								mainButton.setAttribute("onclick","categoryPick(this)");
+								mainButton.setAttribute("data-code",definicijeProizvoda[i].startCode);
+								mainButton.innerHTML = "<div class=\"value\">"+definicijeProizvoda[i].name+"<br><span class='code'>"+definicijeProizvoda[i].startCode+"</span></div>"
+								document.getElementById("kategorije").appendChild(mainButton);
+							}
+
+							function categoryPick(elem){
+								document.getElementById("kategorije").style.display="none";
+								document.getElementById("proizvodi-lista").innerHTML = "";
+								var code = elem.dataset.code;
+								for(var i=0;i<proizvodi.length;i++){
+									if(proizvodi[i].code.startsWith(code)){
+										var mainButton = document.createElement("DIV");
+										mainButton.setAttribute("class","productButton");
+										mainButton.setAttribute("onclick","productPick(this)");
+										mainButton.setAttribute("data-uniqueid",proizvodi[i].uniqueId);
+										var realnoStanje = proizvodi[i].utroseno;
+										if(realnoStanje.toString().includes(".")){
+											realnoStanje = realnoStanje.toFixed(2)
+										}
+										
+										mainButton.innerHTML = "<div class=\"value\">"+proizvodi[i].name+"<br><span class='code'>"+proizvodi[i].code+"</span><br><span>"+realnoStanje+"</span></div>"
+										document.getElementById("proizvodi-lista").appendChild(mainButton);
+									}
+								}
+								document.getElementById("proizvodi").style.display="block";
+							}
+
+							function goBackToCategories(){
+								document.getElementById("kategorije").style.display="flex";
+								document.getElementById("proizvodi").style.display = "none";
+								clearForm();
+							}
+
+						</script>
+						<div id="proizvodi">
+							<div class="inputWrap">
+								<div class="button" onclick="goBackToCategories()">
+									<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/backIcon.png"></div>
+									<div class="label">Назад</div>
+								</div>
+							</div>
+							<div class="buttons" id="proizvodi-lista"></div>
+						</div>
+					</div>
+					
+				
+			</div>		
+		</div>
+	</div>
+<%- include ("partials/footer") -%>
