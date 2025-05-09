@@ -1,0 +1,39 @@
+<%- include ("partials/header") -%>
+	<script>
+		var json = <%-JSON.stringify(json)%>;
+		console.log(json)
+	</script>
+	<div class="pageWidth">
+		<table>
+			<tbody>
+				<tр><th>ИСТОК</th>
+				<th style="text-align:right">ЗАПАД<th></tr>
+				<tr>
+					<td><%=json.zameneIstok%></td>
+					<td>Замене</td>
+					<td><%=json.zameneZapad%></td>
+				</tr>
+				<tr>
+					<td><%=json.rovoviIstok%></td>
+					<td>Ровови</td>
+					<td><%=json.rovoviZapad%></td>
+				</tr>
+				<tr>
+					<td><%=json.finalizacijaIstok%></td>
+					<td>Финализација</td>
+					<td><%=json.finalizacijaZapad%></td>
+				</tr>
+				<tr>
+					<td><%=json.reklamacijaIstok%></td>
+					<td>Рекламација</td>
+					<td><%=json.reklamacijaZapad%></td>
+				</tr>
+				<tr>
+					<td><%=json.kasnjenjeIstok%></td>
+					<td>Број РН у кашњењу</td>
+					<td><%=json.kasnjenjeZapad%></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>	
+<%- include ("partials/footer") -%>

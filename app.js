@@ -11913,6 +11913,148 @@ server.get('/magacin/vozila', async (req, res)=> {
 	}
 });
 
+server.get('/magacioner/tabla', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==25){
+			try{
+				var yesterday = new Date();
+				yesterday.setDate(yesterday.getDate()-1);
+				var reversi = await magacinReversiDB.find({datum:getDateAsStringForDisplay(yesterday)}).toArray();
+				var validiraniNalozi = await naloziDB.find({"prijemnica.datum.datum":{$regex:eval(yesterday.getMonth()+1).toString().padStart(2,"0")+"."+yesterday.getFullYear()}}).toArray();
+				var otvoreniNalozi = await naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje","Storniran"]}}).toArray();
+				
+				var naloziZaReverse = [];
+				for(var i=0;i<reversi.length;i++){
+						naloziZaReverse.push(reversi[i].broj)
+				}
+				var reversNalozi = await naloziDB.find({broj:{$in:naloziZaReverse}}).toArray();
+				for(var i=0;i<reversi.length;i++){
+					reversi[i].radnaJedinica = "Treca lica";
+					for(var j=0;j<reversNalozi.length;j++){
+						if(reversi[i].nalog==reversNalozi[j].broj){
+							reversi[i].radnaJedinica = reversNalozi[j].radnaJedinica
+						}
+					}
+				}
+
+				var json = {};
+				json.zameneIstok = 0;
+				json.zameneZapad = 0;
+				json.rovoviIstok = 0;
+				json.rovoviZapad = 0;
+				json.finalizacijaIstok = 0;
+				json.finalizacijaZapad = 0;
+				json.reklamacijeIstok = 0;
+				json.reklamacijeZapad = 0;
+				json.kasnjenjeIstok = 0;
+				json.kasnjenjeZapad = 0;
+
+				for(var i=0;i<reversi.length;i++){
+					if(reversi[i].tip=="Zamena" || reversi[i].tip=="PromenaTE"){
+						if(istok.indexOf(reversi[i].radnaJedinica)>=0){
+							json.zameneIstok++;
+						}else if(zapad.indexOf(reversi[i].radnaJedinica)>=0){
+							json.zameneZapad++;
+						}
+					}else if(reversi[i].tip=="Reklamacija"){
+						if(istok.indexOf(reversi[i].radnaJedinica)>=0){
+							json.reklamacijeIstok++;
+						}else if(zapad.indexOf(reversi[i].radnaJedinica)>=0){
+							json.reklamacijeZapad++;
+						}
+					}
+				}
+
+				var rovoviBrojeviNaloga = [];
+				var rovNalozi = [];
+				for(var i=0;i<otvoreniNalozi.length;i++){
+					if(otvoreniNalozi[i].statusNaloga=="Kopanje" && rovoviBrojeviNaloga.indexOf(otvoreniNalozi[i])<0){
+						rovoviBrojeviNaloga.push(otvoreniNalozi[i].broj);
+						rovNalozi.push(otvoreniNalozi[i])
+					}
+				}
+				
+				for(var i=0;i<validiraniNalozi.length;i++){
+					if(rovoviBrojeviNaloga.indexOf(validiraniNalozi[i])<0){
+						var kopanja = ['80.03.01.020','80.03.01.019','80.03.01.001','80.03.01.002','80.03.01.003','80.03.01.004','80.03.01.005','80.03.01.006'];
+						for(var j=0;j<validiraniNalozi[i].obracun.length;j++){
+							rovoviBrojeviNaloga.push(validiraniNalozi[i]);
+							if(kopanja.indexOf(validiraniNalozi[i].obracun[j].code)>=0 &&  rovoviBrojeviNaloga.indexOf(otvoreniNalozi[i])<0){
+								if(istok.indexOf(validiraniNalozi[i].radnaJedinica)>=0){
+									json.rovoviIstok++;
+								}else if(zapad.indexOf(validiraniNalozi[i].radnaJedinica)>=0){
+									json.rovoviZapad++;
+								}
+								break;
+							}
+						}
+					}
+				}
+
+				for(var i=0;i<otvoreniNalozi.length;i++){
+					if(otvoreniNalozi[i].statusNaloga=="Finalizacija" || otvoreniNalozi[i].statusNaloga=="Zakazana finalizacija"){
+						if(istok.indexOf(otvoreniNalozi[i].radnaJedinica)>=0){
+							json.finalizacijaIstok++;
+						}else if(zapad.indexOf(otvoreniNalozi[i].radnaJedinica)>=0){
+							json.finalizacijaZapad++;
+						}
+						break;
+					}
+				}
+
+				for(var i=0;i<otvoreniNalozi.length;i++){
+					if(otvoreniNalozi[i].statusNaloga=="Finalizacija" || otvoreniNalozi[i].statusNaloga=="Zakazana finalizacija"){
+						if(istok.indexOf(validiraniNalozi[i].radnaJedinica)>=0){
+							json.finalizacijaIstok++;
+						}else if(zapad.indexOf(validiraniNalozi[i].radnaJedinica)>=0){
+							json.finalizacijaZapad++;
+						}
+						break;
+					}
+				}
+
+				for(var i=0;i<otvoreniNalozi.length;i++){
+					var today = new Date();
+					var nalogTime = otvoreniNalozi[i].datum.datetime;
+					if( ((today.getTime() - nalogTime)/1000/60/60)>24*60*60 ){
+						if(istok.indexOf(otvoreniNalozi[i].radnaJedinica)>=0){
+							json.kasnjenjeIstok++;
+						}else if(zapad.indexOf(otvoreniNalozi[i].radnaJedinica)>=0){
+							json.kasnjenjeZapad++;
+						}
+						break;
+					}
+					
+				}
+
+
+				res.render("magacioner/tabla",{
+          pageTitle: "Табла",
+          user: req.session.user,
+          reversi: reversi,
+          json: json
+        });
+			}catch(error){
+				logError(error);
+				res.render("message",{
+          pageTitle: "Грешка",
+          user: req.session.user,
+          message: "<div class=\"text\">Грешка у бази података 7622.</div>"
+        });	
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 /*server.get('/temp', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
