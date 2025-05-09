@@ -11921,8 +11921,8 @@ server.get('/magacioner/tabla', async (req, res)=> {
 				yesterday.setDate(yesterday.getDate()-1);
 				var reversi = await magacinReversiDB.find({datum:getDateAsStringForDisplay(yesterday)}).toArray();
 				var validiraniNalozi = await naloziDB.find({"prijemnica.datum.datum":{$regex:eval(yesterday.getMonth()+1).toString().padStart(2,"0")+"."+yesterday.getFullYear()}}).toArray();
-				var otvoreniNalozi = await naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje","Storniran"]}}).toArray();
-				
+				var otvoreniNalozi = await naloziDB.find({statusNaloga:{$nin:["Završeno","Nalog u S","Fakturisan","Spreman za fakturisanje","Storniran"]}}).toArray();
+			
 				var naloziZaReverse = [];
 				for(var i=0;i<reversi.length;i++){
 						naloziZaReverse.push(reversi[i].broj)
@@ -11962,6 +11962,8 @@ server.get('/magacioner/tabla', async (req, res)=> {
 						}else if(zapad.indexOf(reversi[i].radnaJedinica)>=0){
 							json.reklamacijeZapad++;
 						}
+					}else{
+						console.log(reversi[i].tip)
 					}
 				}
 
@@ -11978,16 +11980,22 @@ server.get('/magacioner/tabla', async (req, res)=> {
 					if(rovoviBrojeviNaloga.indexOf(validiraniNalozi[i])<0){
 						var kopanja = ['80.03.01.020','80.03.01.019','80.03.01.001','80.03.01.002','80.03.01.003','80.03.01.004','80.03.01.005','80.03.01.006'];
 						for(var j=0;j<validiraniNalozi[i].obracun.length;j++){
-							rovoviBrojeviNaloga.push(validiraniNalozi[i]);
-							if(kopanja.indexOf(validiraniNalozi[i].obracun[j].code)>=0 &&  rovoviBrojeviNaloga.indexOf(otvoreniNalozi[i])<0){
-								if(istok.indexOf(validiraniNalozi[i].radnaJedinica)>=0){
-									json.rovoviIstok++;
-								}else if(zapad.indexOf(validiraniNalozi[i].radnaJedinica)>=0){
-									json.rovoviZapad++;
-								}
+							
+							if(kopanja.indexOf(validiraniNalozi[i].obracun[j].code)>=0 &&  rovoviBrojeviNaloga.indexOf(otvoreniNalozi[i].broj)<0){
+								rovNalozi.push(validiraniNalozi[i].broj)
+								rovoviBrojeviNaloga.push(validiraniNalozi[i]);
 								break;
+								
 							}
 						}
+					}
+				}
+
+				for(var i=0;i<rovNalozi.length;i++){
+					if(istok.indexOf(rovNalozi[i].radnaJedinica)>=0){
+						json.rovoviIstok++;
+					}else if(zapad.indexOf(rovNalozi[i].radnaJedinica)>=0){
+						json.rovoviZapad++;
 					}
 				}
 
@@ -11998,31 +12006,18 @@ server.get('/magacioner/tabla', async (req, res)=> {
 						}else if(zapad.indexOf(otvoreniNalozi[i].radnaJedinica)>=0){
 							json.finalizacijaZapad++;
 						}
-						break;
-					}
-				}
-
-				for(var i=0;i<otvoreniNalozi.length;i++){
-					if(otvoreniNalozi[i].statusNaloga=="Finalizacija" || otvoreniNalozi[i].statusNaloga=="Zakazana finalizacija"){
-						if(istok.indexOf(validiraniNalozi[i].radnaJedinica)>=0){
-							json.finalizacijaIstok++;
-						}else if(zapad.indexOf(validiraniNalozi[i].radnaJedinica)>=0){
-							json.finalizacijaZapad++;
-						}
-						break;
 					}
 				}
 
 				for(var i=0;i<otvoreniNalozi.length;i++){
 					var today = new Date();
 					var nalogTime = otvoreniNalozi[i].datum.datetime;
-					if( ((today.getTime() - nalogTime)/1000/60/60)>24*60*60 ){
+					if( ((today.getTime() - nalogTime)/1000/60/60)>24 ){
 						if(istok.indexOf(otvoreniNalozi[i].radnaJedinica)>=0){
 							json.kasnjenjeIstok++;
 						}else if(zapad.indexOf(otvoreniNalozi[i].radnaJedinica)>=0){
 							json.kasnjenjeZapad++;
 						}
-						break;
 					}
 					
 				}
