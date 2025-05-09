@@ -3645,7 +3645,7 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 			try{
 				var today = new Date();
 				var nalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Nalog u Stambenom","Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray();
-				var obracunatiNalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray();
+				var obracunatiNalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},"prijemnica.datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray();
 				res.render("kontrola/neizvrseniNalozi",{
 					pageTitle:"Неизвршени налози на дан "+getDateAsStringForDisplay(today),
 					nalozi: nalozi,
