@@ -1,6 +1,8 @@
 <%- include ("partials/header") -%>
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
+		var obracunatiNalozi = <%-JSON.stringify(obracunatiNalozi)%>;
+		console.log(obracunatiNalozi)
 	</script>
 	<div class="pageWidth">
 		<div class="kontrolaNeizvrseniNalozi">
@@ -29,27 +31,54 @@
 					<div class="title">Danas naloga</div>
 					<div class="info" id="danas-naloga"></div>
 				</div>
+				<div class="inlines">
+					<div class="title">Finalizacije</div>
+					<div class="info" id="finalizacije"></div>
+				</div>
+				<div class="inlines">
+					<div class="title">Kopanja</div>
+					<div class="info" id="kopanja"></div>
+				</div>
+				<div class="inlines">
+					<div class="title">Betonaže</div>
+					<div class="info" id="betonaze"></div>
+				</div>
+				<div class="inlines">
+					<div class="title">Asfalt</div>
+					<div class="info" id="asfalt"></div>
+				</div>
 			</div>
 			<div class="nalozi" id="nalozi"></div>
 			<script>
 				var ostvarenIznos = 0;
-				var zavrsenoNaloga = 0;
-				var zavrseni = ["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Storniran","Vraćen"];
-				var neizvrsenoNaloga = 0;
+				var zavrsenoNaloga = obracunatiNalozi.length;
+				var neizvrsenoNaloga = nalozi.length;
 				var danasNaloga = 0;
+				var finalizacije = 0;
+				var asfalt = 0;
+				var beton = 0;
+				var kopanje = 0;
 				for(var i=0;i<nalozi.length;i++){
-					if(!isNaN(parseFloat(nalozi[i].ukupanIznos))){
-						ostvarenIznos = ostvarenIznos + parseFloat(nalozi[i].ukupanIznos);
-					}
-
-					if(zavrseni.indexOf(nalozi[i].statusNaloga)>=0){
-						zavrsenoNaloga++;
-					}else{
-						neizvrsenoNaloga++;
-					}
-
 					if(getDateAsStringForDisplay(new Date())==nalozi[i].datum.datum){
 						danasNaloga++;
+					}
+					if(nalozi[i].statusNaloga=="Finalizacija" || nalozi[i].statusNaloga=="Zakazana finalizacija"){
+						finalizacije++;
+					}
+					if(nalozi[i].statusNaloga=="Asfalt"){
+						asfalt++;
+					}
+					if(nalozi[i].statusNaloga=="Betonaža"){
+						beton++;
+					}
+					if(nalozi[i].statusNaloga=="Kopanje"){
+						kopanje++;
+					}
+				}
+
+				for(var i=0;i<obracunatiNalozi.length;i++){
+					if(!isNaN(parseFloat(obracunatiNalozi[i].ukupanIznos))){
+						ostvarenIznos = ostvarenIznos + parseFloat(obracunatiNalozi[i].ukupanIznos);
 					}
 				}
 
@@ -57,6 +86,10 @@
 				document.getElementById("zavrseno-naloga").innerHTML = zavrsenoNaloga;
 				document.getElementById("neizvrseno-naloga").innerHTML = neizvrsenoNaloga;
 				document.getElementById("danas-naloga").innerHTML = danasNaloga;
+				document.getElementById("finalizacije").innerHTML = finalizacije;
+				document.getElementById("betonaze").innerHTML = beton;
+				document.getElementById("asfalt").innerHTML = asfalt;
+				document.getElementById("kopanja").innerHTML = kopanje;
 
 
 				nalozi.sort((a, b) => b.datum.datetime - a.datum.datetime);
@@ -73,27 +106,25 @@
 				}
 
 				for(var i=0;i<nalozi.length;i++){
-					if(zavrseni.indexOf(nalozi[i].statusNaloga)<0){
-						var nalogWrap = document.createElement("DIV");
-						nalogWrap.setAttribute("class","nalogWrap");
+					var nalogWrap = document.createElement("DIV");
+					nalogWrap.setAttribute("class","nalogWrap");
 
-							var brojNaloga = document.createElement("DIV");
-							brojNaloga.setAttribute("class","brojNaloga");
-							brojNaloga.innerHTML = "<a href='/nalog/"+nalozi[i].broj+"'>"+nalozi[i].broj+"</a>";
-							nalogWrap.appendChild(brojNaloga);
+						var brojNaloga = document.createElement("DIV");
+						brojNaloga.setAttribute("class","brojNaloga");
+						brojNaloga.innerHTML = "<a href='/nalog/"+nalozi[i].broj+"'>"+nalozi[i].broj+"</a>";
+						nalogWrap.appendChild(brojNaloga);
 
-							var adresaNaloga = document.createElement("DIV");
-							adresaNaloga.setAttribute("class","adresaNaloga");
-							adresaNaloga.innerHTML = nalozi[i].adresa+"<br><b>"+nalozi[i].datum.datum+"</b>";
-							nalogWrap.appendChild(adresaNaloga);
+						var adresaNaloga = document.createElement("DIV");
+						adresaNaloga.setAttribute("class","adresaNaloga");
+						adresaNaloga.innerHTML = nalozi[i].adresa+"<br><b>"+nalozi[i].datum.datum+"</b>";
+						nalogWrap.appendChild(adresaNaloga);
 
-							var statusNaloga = document.createElement("DIV");
-							statusNaloga.setAttribute("class","statusNaloga");
-							statusNaloga.innerHTML = nalozi[i].statusNaloga;
-							nalogWrap.appendChild(statusNaloga);
+						var statusNaloga = document.createElement("DIV");
+						statusNaloga.setAttribute("class","statusNaloga");
+						statusNaloga.innerHTML = nalozi[i].statusNaloga;
+						nalogWrap.appendChild(statusNaloga);
 
-						document.getElementById(nalozi[i].radnaJedinica).appendChild(nalogWrap);
-					}
+					document.getElementById(nalozi[i].radnaJedinica).appendChild(nalogWrap);
 					
 				}
 

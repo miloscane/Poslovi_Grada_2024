@@ -3642,65 +3642,24 @@ server.get('/stefan/kategorije',async (req,res)=>{
 server.get('/kontrola/naslovna',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==25){
-			var today = new Date();
-			//"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()}
-			naloziDB.find({statusNaloga:{$nin:["Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray()
-			.then((nalozi)=>{
-				for(var i=0;i<nalozi.length;i++){
-					if(podizvodjaci.indexOf(nalozi[i].majstor)>=0){
-						nalozi.splice(i,1);
-						i--;
-					}
-				}
-
-				//ovo ispod nalazis samo zbog obracuna
-				naloziDB.find({statusNaloga:{$nin:["Storniran","Vraćen"]},"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray()
-				.then((nalozi2)=>{
-					for(var i=0;i<nalozi2.length;i++){
-						if(podizvodjaci.indexOf(nalozi2[i].majstor)>=0){
-							nalozi2.splice(i,1);
-							i--;
-						}
-					}
-
-					for(var i=0;i<nalozi2.length;i++){
-						var nalogExists = false;
-						for(var j=0;j<nalozi.length;j++){
-							if(nalozi[j].broj==nalozi2[i].broj){
-								nalogExists = true;
-								break;
-							}
-						}
-						if(!nalogExists){
-							nalozi.push(nalozi2[i])
-						}
-					}
-
-					res.render("kontrola/neizvrseniNalozi",{
-						pageTitle:"Неизвршени налози на дан "+getDateAsStringForDisplay(today),
-						nalozi: nalozi,
-						user: req.session.user
-					});
-				})
-				.catch((error)=>{
-					console.log(error);
-					res.render("message",{
-						pageTitle: "Грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Грешка у бази података 2347.</div>"
-					});
-				})
-
-				
-			})
-			.catch((error)=>{
-				console.log(error)
+			try{
+				var today = new Date();
+				var nalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Nalog u Stambenom","Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray();
+				var obracunatiNalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},"datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray();
+				res.render("kontrola/neizvrseniNalozi",{
+					pageTitle:"Неизвршени налози на дан "+getDateAsStringForDisplay(today),
+					nalozi: nalozi,
+					obracunatiNalozi: obracunatiNalozi,
+					user: req.session.user
+				});
+			}catch(error){
+				logError(error)
 				res.render("message",{
 					pageTitle: "Грешка",
 					user: req.session.user,
 					message: "<div class=\"text\">Грешка у бази података 2517.</div>"
 				});
-			})
+			}
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -7687,234 +7646,125 @@ server.get('/izvestajMajstoraPick',async (req,res)=>{
 server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
-			majstoriDB.find({uniqueId:req.params.majstorId}).toArray()
-			.then((majstori)=>{
+			try{
+				var majstori = await majstoriDB.find({uniqueId:req.params.majstorId}).toArray();
 				var majstor = majstori[0];
-				dnevniIzvestajiDB.find({majstor:req.params.majstorId,date:req.params.date}).toArray()
-				.then((izvestaji)=>{
-					var izvestaj = {};
-					if(izvestaji.length>0){
-						izvestaj = izvestaji[0];
+				var izvestaji = await dnevniIzvestajiDB.find({majstor:req.params.majstorId,date:req.params.date}).toArray();
+				var izvestaj = {};
+				if(izvestaji.length>0){
+					izvestaj = izvestaji[0];
+				}
+
+				var yesterday = new Date(req.params.date);
+				var monthString = eval(yesterday.getMonth()+1).toString().padStart(2,"0");
+				var dateString = eval(yesterday.getDate()).toString().padStart(2,"0");
+				var checkIns = await checkInMajstoraDB.find({month:{$in:[monthString,Number(monthString)]},date:{$in:[dateString,Number(dateString)]},year:yesterday.getFullYear()}).toArray();
+				for(var i=0;i<majstori.length;i++){
+					majstori[i].checkIns = [];
+					for(var j=0;j<checkIns.length;j++){
+						if(majstori[i].uniqueId == checkIns[j].uniqueId){
+							majstori[i].checkIns.push(checkIns[j])
+						}
 					}
-
-					var yesterday = new Date(req.params.date);
-
-					var monthString = eval(yesterday.getMonth()+1).toString().padStart(2,"0");
-					var dateString = eval(yesterday.getDate()).toString().padStart(2,"0");
-					checkInMajstoraDB.find({month:{$in:[monthString,Number(monthString)]},date:{$in:[dateString,Number(dateString)]},year:yesterday.getFullYear()}).toArray()
-					.then(async (checkIns)=>{
-						for(var i=0;i<majstori.length;i++){
-							majstori[i].checkIns = [];
-							for(var j=0;j<checkIns.length;j++){
-								if(majstori[i].uniqueId == checkIns[j].uniqueId){
-									majstori[i].checkIns.push(checkIns[j])
-								}
+				}
+				for(var i=0;i<majstori.length;i++){
+					majstori[i].vremeDolaska = "Није се чекирао";
+					majstori[i].vremeOdlaska = "Није се чекирао";
+					if(majstori[i].checkIns.length>0){
+						majstori[i].vremeDolaska = majstori[i].checkIns[0].timestamp;
+						majstori[i].vremeOdlaska = majstori[i].checkIns[majstori[i].checkIns.length-1].timestamp;
+					}
+				}
+				for(var i=0;i<majstori.length;i++){
+					if(majstori[i].vremeDolaska==majstori[i].vremeOdlaska){
+						majstori[i].vremeOdlaska = "Није се чекирао";
+					}
+				}
+				var reversi = await magacinReversiDB.find({datum:getDateAsStringForDisplay(yesterday),majstor:req.params.majstorId}).toArray();
+				var proizvodi = await proizvodiDB.find({}).toArray();
+				for(var i=0;i<reversi.length;i++){
+					for(var j=0;j<reversi[i].zaduzenje.length;j++){
+						for(var k=0;k<proizvodi.length;k++){
+							if(proizvodi[k].uniqueId==reversi[i].zaduzenje[j].uniqueId){
+								reversi[i].zaduzenje[j].price = proizvodi[k].price;
+								break;
 							}
 						}
-						for(var i=0;i<majstori.length;i++){
-							majstori[i].vremeDolaska = "Није се чекирао";
-							majstori[i].vremeOdlaska = "Није се чекирао";
-							if(majstori[i].checkIns.length>0){
-								majstori[i].vremeDolaska = majstori[i].checkIns[0].timestamp;
-								majstori[i].vremeOdlaska = majstori[i].checkIns[majstori[i].checkIns.length-1].timestamp;
+					}
+				}
+
+				var stopovi = await stopoviDB.find({date:getDateAsStringForInputObject(yesterday)}).toArray();
+
+				if(stopovi.length>0){
+					var vozila2 = stopovi[0];
+				}else{	
+					var vozila2 = JSON.parse(JSON.stringify(vozila));
+					var startTime = yesterday.toISOString().split('T')[0] + " 00:00:00";
+    			var endTime = yesterday.toISOString().split('T')[0] + " 23:59:59";
+
+					config = {
+				    url: baseUrl + '/api/DailySummary/GetDailySummary',
+				    method: 'POST', // If necessary
+				    headers: { 
+				        'Content-Type': 'application/json',
+				        'Authorization': `Bearer ${token}`
+				    },
+				    data: { 
+				    	'ClientId': process.env.telematicsid, 
+				    	'TimeZone':'Central Standard Time',
+				    	'StartTime': startTime,
+			        'EndTime': endTime
+				    }
+					};
+					console.log("Waiting daily summary")
+					var dailySummary = await axios(config);
+					for(var i=0;i<dailySummary.data.length;i++){
+						for(var j=0;j<vozila2.vozila.Data.length;j++){
+							if(vozila2.vozila.Data[j].DeviceName==dailySummary.data[i].RegNo){
+								vozila2.vozila.Data[j].dailySummary = dailySummary.data[i];
 							}
 						}
-						for(var i=0;i<majstori.length;i++){
-							if(majstori[i].vremeDolaska==majstori[i].vremeOdlaska){
-								majstori[i].vremeOdlaska = "Није се чекирао";
-							}
-						}
+					}
+					
+					for(var i=0;i<vozila2.vozila.Data.length;i++){
+						var config = {
+              url: baseUrl + '/api/Trip/GetMileageSummary',
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              data: {
+                  'ImeiNumber': Number(vozila2.vozila.Data[i].ImeiNumber),
+                  'StartTime': startTime,
+                  'EndTime': endTime,
+                  'TimeZone': 'Central European Standard Time'
+              }
+            };
 
-						/*var vozila2 = JSON.parse(JSON.stringify(vozila));
-						var startTime = yesterday.toISOString().split('T')[0] + " 00:00:00";
-      			var endTime = yesterday.toISOString().split('T')[0] + " 23:59:59";
-
-						config = {
-					    url: baseUrl + '/api/DailySummary/GetDailySummary',
-					    method: 'POST', // If necessary
-					    headers: { 
-					        'Content-Type': 'application/json',
-					        'Authorization': `Bearer ${token}`
-					    },
-					    data: { 
-					    	'ClientId': process.env.telematicsid, 
-					    	'TimeZone':'Central Standard Time',
-					    	'StartTime': startTime,
-				        'EndTime': endTime
-					    }
-						};
-						console.log("Waiting daily summary")
-						var dailySummary = await axios(config);
-						for(var i=0;i<dailySummary.data.length;i++){
-							for(var j=0;j<vozila2.vozila.Data.length;j++){
-								if(vozila2.vozila.Data[j].DeviceName==dailySummary.data[i].RegNo){
-									vozila2.vozila.Data[j].dailySummary = dailySummary.data[i];
-								}
-							}
-						}
-						
-						for(var i=0;i<vozila2.vozila.Data.length;i++){
-							var config = {
-                url: baseUrl + '/api/Trip/GetMileageSummary',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                data: {
-                    'ImeiNumber': Number(vozila2.vozila.Data[i].ImeiNumber),
-                    'StartTime': startTime,
-                    'EndTime': endTime,
-                    'TimeZone': 'Central European Standard Time'
-                }
-	            };
-
-              const response = await axios(config);
-              vozila2.vozila.Data[i].mileageSummary = response.data;
-							await new Promise(resolve => setTimeout(resolve, 2000));
-						}*/
-
-
-						magacinReversiDB.find({datum:getDateAsStringForDisplay(yesterday),majstor:req.params.majstorId}).toArray()
-						.then((reversi)=>{
-							proizvodiDB.find({}).toArray()
-							.then((proizvodi)=>{
-								for(var i=0;i<reversi.length;i++){
-									for(var j=0;j<reversi[i].zaduzenje.length;j++){
-										for(var k=0;k<proizvodi.length;k++){
-											if(proizvodi[k].uniqueId==reversi[i].zaduzenje[j].uniqueId){
-												reversi[i].zaduzenje[j].price = proizvodi[k].price;
-												break;
-											}
-										}
-									}
-								}
-
-
-
-								stopoviDB.find({date:getDateAsStringForInputObject(yesterday)}).toArray()
-								.then(async (stopovi)=>{
-									if(stopovi.length>0){
-										var vozila2 = stopovi[0];
-									}else{	
-										var vozila2 = JSON.parse(JSON.stringify(vozila));
-										var startTime = yesterday.toISOString().split('T')[0] + " 00:00:00";
-				      			var endTime = yesterday.toISOString().split('T')[0] + " 23:59:59";
-
-										config = {
-									    url: baseUrl + '/api/DailySummary/GetDailySummary',
-									    method: 'POST', // If necessary
-									    headers: { 
-									        'Content-Type': 'application/json',
-									        'Authorization': `Bearer ${token}`
-									    },
-									    data: { 
-									    	'ClientId': process.env.telematicsid, 
-									    	'TimeZone':'Central Standard Time',
-									    	'StartTime': startTime,
-								        'EndTime': endTime
-									    }
-										};
-										console.log("Waiting daily summary")
-										var dailySummary = await axios(config);
-										for(var i=0;i<dailySummary.data.length;i++){
-											for(var j=0;j<vozila2.vozila.Data.length;j++){
-												if(vozila2.vozila.Data[j].DeviceName==dailySummary.data[i].RegNo){
-													vozila2.vozila.Data[j].dailySummary = dailySummary.data[i];
-												}
-											}
-										}
-										
-										for(var i=0;i<vozila2.vozila.Data.length;i++){
-											var config = {
-				                url: baseUrl + '/api/Trip/GetMileageSummary',
-				                method: 'POST',
-				                headers: {
-				                    'Content-Type': 'application/json',
-				                    'Authorization': `Bearer ${token}`
-				                },
-				                data: {
-				                    'ImeiNumber': Number(vozila2.vozila.Data[i].ImeiNumber),
-				                    'StartTime': startTime,
-				                    'EndTime': endTime,
-				                    'TimeZone': 'Central European Standard Time'
-				                }
-					            };
-
-				              const response = await axios(config);
-				              vozila2.vozila.Data[i].mileageSummary = response.data;
-											await new Promise(resolve => setTimeout(resolve, 2000));
-										}
-									}
-									
-									res.render("administracija/dnevniIzvestajMajstora",{
-										pageTitle: "Дневни извештај мајстора "+ majstor.ime+" за датум "+reshuffleDate(req.params.date),
-										user: req.session.user,
-										majstor: majstor,
-										vozila: vozila2,
-										date: req.params.date,
-										izvestaj: izvestaj,
-										reversi: reversi
-									})
-								})
-								.catch((error)=>{
-									logError(error);
-									res.render("message",{
-										pageTitle: "Грешка",
-										user: req.session.user,
-										message: "<div class=\"text\">Грешка у бази података 4582.</div>"
-									});
-								})
-							})
-							.catch((error)=>{
-								logError(error);
-								res.render("message",{
-									pageTitle: "Грешка",
-									user: req.session.user,
-									message: "<div class=\"text\">Грешка у бази података 4582.</div>"
-								});
-							})
-						})
-						.catch((error)=>{
-							logError(error);
-							res.render("message",{
-								pageTitle: "Грешка",
-								user: req.session.user,
-								message: "<div class=\"text\">Грешка у бази података 4582.</div>"
-							});
-						})
-
-						
-					})
-					.catch((error)=>{
-						logError(error);
-						res.render("message",{
-							pageTitle: "Грешка",
-							user: req.session.user,
-							message: "<div class=\"text\">Грешка у бази података 4582.</div>"
-						});
-					})
-
-
-
+            const response = await axios(config);
+            vozila2.vozila.Data[i].mileageSummary = response.data;
+						await new Promise(resolve => setTimeout(resolve, 2000));
+					}
+				}
+				
+				res.render("administracija/dnevniIzvestajMajstora",{
+					pageTitle: "Дневни извештај мајстора "+ majstor.ime+" за датум "+reshuffleDate(req.params.date),
+					user: req.session.user,
+					majstor: majstor,
+					vozila: vozila2,
+					date: req.params.date,
+					izvestaj: izvestaj,
+					reversi: reversi
 				})
-				.catch((error)=>{
-					logError(error);
-					res.render("message",{
-						pageTitle: "Програмска грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Дошло је до грешке у бази податка 7345.</div>"
-					});
-				})
-			})
-			.catch((error)=>{
+			}catch(error){
 				logError(error);
 				res.render("message",{
-					pageTitle: "Програмска грешка",
+					pageTitle: "Грешка",
 					user: req.session.user,
-					message: "<div class=\"text\">Дошло је до грешке у бази податка 7345.</div>"
+					message: "<div class=\"text\">Грешка у бази података 4582.</div>"
 				});
-			})
+			}
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
