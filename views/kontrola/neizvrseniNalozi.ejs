@@ -47,6 +47,10 @@
 					<div class="title">Asfalt</div>
 					<div class="info" id="asfalt"></div>
 				</div>
+				<div class="inlines">
+					<div class="title">Zamena</div>
+					<div class="info" id="zamena"></div>
+				</div>
 			</div>
 			<div class="nalozi" id="nalozi"></div>
 			<script>
@@ -58,6 +62,7 @@
 				var asfalt = 0;
 				var beton = 0;
 				var kopanje = 0;
+				var zamena = 0;
 				for(var i=0;i<nalozi.length;i++){
 					if(getDateAsStringForDisplay(new Date())==nalozi[i].datum.datum){
 						danasNaloga++;
@@ -73,6 +78,9 @@
 					}
 					if(nalozi[i].statusNaloga=="Kopanje"){
 						kopanje++;
+					}
+					if(nalozi[i].statusNaloga=="Zamena"){
+						zamena++;
 					}
 				}
 
@@ -90,6 +98,7 @@
 				document.getElementById("betonaze").innerHTML = beton;
 				document.getElementById("asfalt").innerHTML = asfalt;
 				document.getElementById("kopanja").innerHTML = kopanje;
+				document.getElementById("zamena").innerHTML = zamena;
 
 
 				nalozi.sort((a, b) => b.datum.datetime - a.datum.datetime);
