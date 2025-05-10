@@ -1,0 +1,48 @@
+<%- include ("partials/header") -%>
+	<script>
+		var potrosnja = <%-JSON.stringify(potrosnja)%>;
+		var proizvodi = <%-JSON.stringify(proizvodi)%>;
+		console.log(potrosnja)
+	</script>
+	<style>
+		.dvonedeljnaPotrosnja .row{
+			padding:10px;
+
+		}
+		.dvonedeljnaPotrosnja .row:nth-child(even){
+			background-color:rgba(0,0,0,0.05);
+		}
+	</style>
+	<div class="pageWidth">
+		<div class="dvonedeljnaPotrosnja" id="potrosnja"></div>
+		<script>
+			for(var i=0;i<potrosnja.length;i++){
+				var title = document.createElement("H1");
+				title.innerHTML = potrosnja[i].dates[potrosnja[i].dates.length-1] + " - " + potrosnja[i].dates[0];
+				document.getElementById("potrosnja").appendChild(title);
+
+				var potrosnjaElem = document.createElement("DIV");
+				potrosnjaElem.setAttribute("class","potrosnjaWrap");
+				for(var j=0;j<potrosnja[i].spojenaPotrosnja.length;j++){
+					var proizvod = getProizvodByCode(potrosnja[i].spojenaPotrosnja[j].uniqueId);
+					var row = document.createElement("DIV");
+					row.setAttribute("class","row");
+						var inline = document.createElement("DIV");
+						inline.setAttribute("class","inline");
+						inline.setAttribute("style","display:inline-block;vertical-align:middle;width:300px;");
+						inline.innerHTML = proizvod.name;
+						row.appendChild(inline)
+
+						var inline = document.createElement("DIV");
+						inline.setAttribute("class","inline");
+						inline.setAttribute("style","display:inline-block;vertical-align:middle;");
+						inline.innerHTML = potrosnja[i].spojenaPotrosnja[j].utroseno + " "+proizvod.unit;
+						row.appendChild(inline);
+					potrosnjaElem.appendChild(row);
+				}
+				document.getElementById("potrosnja").appendChild(potrosnjaElem);
+
+			}
+		</script>
+	</div>	
+<%- include ("partials/footer") -%>

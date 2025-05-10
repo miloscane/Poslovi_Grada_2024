@@ -127,6 +127,24 @@ function getMajstorByCode(majstorId){
   return majstor
 }
 
+
+function getProizvodByCode(uniqueId){
+  var proizvod = {};
+  if(proizvodi){
+    for(var i=0;i<proizvodi.length;i++){
+      if(proizvodi[i].uniqueId==uniqueId){
+        proizvod = proizvodi[i]
+      }
+    }
+    if(!proizvod.name){
+      console.log("No proizvod found")
+    }
+  }else{
+    console.log("No array proizvodi defined");
+  }
+  return proizvod
+}
+
 function getPriceItemByCode(code){
   var json = {};
   if(cenovnik){

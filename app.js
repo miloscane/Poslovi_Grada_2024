@@ -12050,43 +12050,80 @@ server.get('/magacioner/tabla', async (req, res)=> {
 	}
 });
 
-/*server.get('/temp', async (req, res)=> {
+server.get('/magacioner/dvonedeljnaPotrosnja', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
-			stariUcinakMajstoraDB.find({}).toArray()
-			.then((ucinci)=>{
-				majstoriDB.find({}).toArray()
-				.then((majstori)=>{
-					for(var i=0;i<majstori.length;i++){
-						majstori[i].ucinci = [];
-						for(var j=0;j<ucinci.length;j++){
-							if(ucinci[j].majstor==majstori[i].uniqueId){
-								majstori[i].ucinci.push(ucinci[j]);
-							}
-						}
-					}
-					for(var i=0;i<majstori.length;i++){
-						if(majstori[i].ucinci.length==0){
-							majstori.splice(i,1);
-							i--;
-						}
-					}
-					res.render("temp",{
-						pageTitle: "Ucinak",
-						user: req.session.user,
-						majstori: majstori,
-						kategorije: stariCenovnikJsons
-					})
-				})
-				.catch((error)=>{
-					console.log(error);
-					res.send(error)
-				})
-			})
-			.catch((error)=>{
-				console.log(error);
-				res.send(error)
-			})
+		if(Number(req.session.user.role)==50){
+			try{
+				const startDate = new Date();
+			  const chunks = [];
+
+			  for (let w = 0; w < 4; w++) {
+			    const chunk = {};
+			    chunk.dates = [];
+			    for (let d = 0; d < 14; d++) {
+			      const date = new Date(startDate);
+			      date.setDate(startDate.getDate() - (w * 14 + d));
+			      chunk.dates.push(getDateAsStringForDisplay(date)); // format YYYY-MM-DD
+			    }
+			    chunks.push(chunk);
+			  }
+			  var proizvodi = await proizvodiDB.find({}).toArray();
+			  for(var i=0;i<chunks.length;i++){
+			  	var reversi = await magacinReversiDB.find({datum:{$in:chunks[i].dates}}).toArray()
+			  	chunks[i].reversi = JSON.parse(JSON.stringify(reversi));
+			  	chunks[i].spojenaPotrosnja = [];
+			  	for(var j=0;j<chunks[i].reversi.length;j++){
+			  		for(var k=0;k<chunks[i].reversi[j].zaduzenje.length;k++){
+			  			chunks[i].reversi[j].zaduzenje[k].code = "0";
+			  			for(var l=0;l<proizvodi.length;l++){
+			  				if(chunks[i].reversi[j].zaduzenje[k].uniqueId==proizvodi[l].uniqueId){
+			  					chunks[i].reversi[j].zaduzenje[k].code = proizvodi[l].code;
+			  				}
+			  			}
+
+			  			var proizvodIndex = -1;
+				  		for(var l=0;l<chunks[i].spojenaPotrosnja.length;l++){
+				  			if(chunks[i].reversi[j].zaduzenje[k].uniqueId==chunks[i].spojenaPotrosnja[l].uniqueId){
+				  				proizvodIndex = l;
+				  				break;
+				  			}
+				  		}
+				  		var uzeto = isNaN(parseFloat(chunks[i].reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(chunks[i].reversi[j].zaduzenje[k].quantity);
+				  		var vraceno = isNaN(parseFloat(chunks[i].reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(chunks[i].reversi[j].zaduzenje[k].quantity2);
+				  		
+				  		var utroseno = uzeto - vraceno;
+				  		
+				  		if(proizvodIndex==-1){
+				  			chunks[i].spojenaPotrosnja.push({uniqueId:chunks[i].reversi[j].zaduzenje[k].uniqueId,code:chunks[i].reversi[j].zaduzenje[k].code,utroseno:utroseno});
+				  		}else{
+				  			chunks[i].spojenaPotrosnja[proizvodIndex].utroseno = chunks[i].spojenaPotrosnja[proizvodIndex].utroseno + utroseno;
+				  		}
+
+				  		
+			  		}
+			  	}
+			  }
+
+			  for(var i=0;i<chunks.length;i++){
+			  	chunks[i].spojenaPotrosnja.sort((a, b) => a.code.localeCompare(b.code));
+			  }
+			  
+				res.render("magacioner/dvonedeljnaPotrosnja",{
+					pageTitle: "Двонедељна потрошња материјала",
+					user: req.session.user,
+					potrosnja: chunks,
+					proizvodi: proizvodi
+				});
+
+			}catch(error){
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података.</div>"
+				});
+			}
+			
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -12097,7 +12134,7 @@ server.get('/magacioner/tabla', async (req, res)=> {
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	} 
-});*/
+});
 
 server.post('/nalozi/:stringdata',async (req,res)=>{
 	var receivedString	=	req.params.stringdata;
