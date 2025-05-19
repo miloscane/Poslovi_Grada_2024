@@ -1169,7 +1169,7 @@ http.listen(process.env.PORT, function(){
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var month = 3;
+			var month = 4;
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
@@ -2633,6 +2633,154 @@ http.listen(process.env.PORT, function(){
 			console.log(error)
 		})*/
 
+
+
+//ertik, izmedju
+
+		/*naloziDB.find({}).toArray()
+		.then(async (nalozi)=>{
+			var startTime = new Date("2024-02-01");
+			var cutOff = new Date()
+			var naloziToShow = [];
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].datum.datetime>=startTime.getTime()){
+					naloziToShow.push(nalozi[i])
+				}
+			}
+
+			// Create a lookup map for cenovnik
+			const cenovnikMap = {};
+			for (const item of cenovnik) {
+			    cenovnikMap[item.code] = item.name;
+			}
+
+			// Assign names using the map
+			for (const nalog of nalozi) {
+			    for (const obr of nalog.obracun) {
+			        if (cenovnikMap[obr.code]) {
+			            obr.name = cenovnikMap[obr.code];
+			        }
+			    }
+			}
+
+			var naloziToExport = [];
+			var exported = [];
+			var slic = ["80.03.03.017","80.03.03.018","80.03.03.019","80.03.03.020","80.03.03.021","80.03.03.022","80.03.03.023","80.03.03.024"];
+			var krpljenje = ["80.03.03.121","80.03.03.122","80.03.03.123","80.03.03.124","80.03.03.125","80.03.03.126","80.03.03.127","80.03.03.128","80.03.03.129","80.03.03.130","80.03.03.131","80.03.03.132","80.03.03.133","80.03.03.133","80.03.03.134","80.03.03.135","80.03.03.136","80.03.03.137","80.03.03.138"];
+			for(var i=0;i<nalozi.length;i++){
+				var jesteSlic = false;
+				var jesteKrp = false;
+				for(var j=0;j<nalozi[i].obracun.length;j++){
+					if(slic.indexOf(nalozi[i].obracun[j].code)>=0){
+						jesteSlic = true;
+					}
+
+					if(krpljenje.indexOf(nalozi[i].obracun[j].code)>=0){
+						jesteKrp = true;
+					}
+				}
+				if(jesteSlic && jesteKrp){
+					exported.push(nalozi[i].broj);
+					naloziToExport.push(nalozi[i]);
+				}
+			}
+
+
+			var targets = ['ertik', 'ERTIK','spit', 'SPIT','STAN','stan','Stan','st.','St.','ST.'];
+			var excludeTargets = ['dgu', 'agu'];
+			for (var i = 0; i < nalozi.length; i++) {
+				for(var j=0;j<targets.length;j++){
+					if(nalozi[i].opis){
+						if(nalozi[i].opis.includes(targets[j])){
+							if (exported.indexOf(nalozi[i].broj) < 0) {
+								var shouldExclude = false;
+								for(var k=0;k<excludeTargets.length;k++){
+									if(nalozi[i].opis.includes(excludeTargets[k])){
+										shouldExclude = true;
+									}
+								}
+								if(!shouldExclude){
+									naloziToExport.push(nalozi[i]);
+									exported.push(nalozi[i].broj)
+								}
+								
+							}	
+						}
+					}
+					
+				}
+			}
+
+			var csvString = "Broj naloga;Vreme;Iznos\r\n";
+			naloziToExport.sort((a, b) => a.datum.datetime - b.datum.datetime);
+			for(var i=0;i<naloziToExport.length;i++){
+				csvString += naloziToExport[i].broj + ";" + naloziToExport[i].datum.datum.split(".")[1]+"."+naloziToExport[i].datum.datum.split(".")[2] + ";" + naloziToExport[i].ukupanIznos +"\r\n";
+			}
+
+			fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+			console.log("Wrote file");
+			
+
+
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
+
+		/*naloziDB.find({majstor:{$in:podizvodjaci}}).toArray()
+		.then((nalozi)=>{
+			var cutOff = new Date("2025-02-01");
+			var naloziToExport = [];
+			for(var i=0;i<nalozi.length;i++){
+				if(Number(nalozi[i].datum.datetime)>cutOff.getTime()){
+					naloziToExport.push(nalozi[i])
+				}
+			}
+
+			majstoriDB.find({uniqueId:{$in:podizvodjaci}}).toArray()
+			.then((majstori)=>{
+				var json = [];
+				for(var i=0;i<majstori.length;i++){
+					var tempJson = {};
+					tempJson.podizvodjac = majstori[i].ime;
+					tempJson.uniqueId = majstori[i].uniqueId;
+					tempJson.nalozi = [];
+					tempJson.pare = 0;
+					json.push(tempJson)
+				}
+
+				for(var i=0;i<json.length;i++){
+					for(var j=0;j<naloziToExport.length;j++){
+						if(naloziToExport[j].majstor==json[i].uniqueId){
+							json[i].nalozi.push(naloziToExport[j]);
+							if(!isNaN(parseFloat(naloziToExport[j].ukupanIznos))){
+								json[i].pare = json[i].pare + parseFloat(naloziToExport[j].ukupanIznos);
+							}
+						}
+					}
+				}
+
+				for(var i=0;i<json.length;i++){
+					console.log(json[i].podizvodjac)
+					console.log("Ukupno novca: "+brojSaRazmacima(json[i].pare));
+					console.log("Ukupno naloga: "+json[i].nalozi.length)
+					console.log("------------------")
+				}
+
+
+
+			})
+			.catch((error)=>{
+				console.log(error)
+			})
+			
+
+		})
+		.catch((error)=>{
+			console.log(error)
+		})*/
+
 	})
 	.catch(error => {
 		logError(error);
@@ -2852,9 +3000,9 @@ const saveStops = async () => {
 	/*console.log("ClientId:")
 	console.log(vozila2.clientInfo)
 	console.log("AssetIds:")
-	console.log(assetIds)*/
+	console.log(assetIds)
 
-	/*for(var i=0;i<assetIds.length;i++){
+	for(var i=0;i<assetIds.length;i++){
 		var config = {
       url: baseUrl + '/api/fuel/AssetFuelInfo',
       method: 'POST',
@@ -2869,11 +3017,14 @@ const saveStops = async () => {
           'TimeZoneID': 'Central European Standard Time'
       }
     };
-    console.log(config.data);
+    //console.log(config.data);
     const response = await axios(config);
     await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log(response);
+    if(response.data.length>0){
+    	console.log(response.data[0].refills);
     console.log("##########################REQUEST DONE##################################################")
+    }
+    
 	}*/
 
 
@@ -2886,6 +3037,8 @@ const saveStops = async () => {
   	logError(error)
   })
 };
+
+//setTimeout(function(){saveStops();},11000)
 
 schedule.scheduleJob('59 23 * * *', sendEmail);
 schedule.scheduleJob('00 23 * * *', saveStops);
@@ -9455,8 +9608,7 @@ server.post('/novi-revers', async (req, res)=> {
 		if(Number(req.session.user.role)==50){
 			var json = JSON.parse(req.body.json);
 			json.uniqueId = generateId(7)+"--"+new Date().getTime();
-			json.datum = getDateAsStringForDisplay(new Date());
-			json.datetime = new Date().getTime();
+			json.datetime = Number(json.datetime);
 			magacinReversiDB.insertOne(json)
 			.then((dbResponse)=>{
 				res.redirect("/magacioner/revers/"+json.uniqueId);
@@ -9488,7 +9640,9 @@ server.post('/izmeni-revers', async (req, res)=> {
 				majstor: json.majstor,
 				zaduzenje: json.zaduzenje,
 				nalog: json.nalog,
-				adresa: json.adresa
+				adresa: json.adresa,
+				datetime: Number(json.datetime),
+				datum: json.datum
 			}};
 			magacinReversiDB.updateOne({uniqueId:json.uniqueId},setObj)
 			.then((dbResponse)=>{

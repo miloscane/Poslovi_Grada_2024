@@ -199,7 +199,57 @@
 									<script>
 										var datumReversa = new Date(Number(revers.datetime));
 										var datum = revers.datum ? revers.datum : reshuffleDate(revers.date);
-										document.getElementById("date").innerHTML = datum + " "+ datumReversa.getHours()+":"+datumReversa.getMinutes();
+										document.getElementById("date").innerHTML = datum + " "+ datumReversa.getHours().toString().padStart(2,"0")+":"+datumReversa.getMinutes().toString().padStart(2,"0");
+									</script>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Datum izdavanja robe:</div>
+									<input type="date" id="datum-reversa">
+									<script>
+										document.getElementById("datum-reversa").value = getDateAsStringForInputObject(datumReversa)
+									</script>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Vreme izdavanja robe:</div>
+									<select id="vreme-reversa">
+										<option value="07:00">07:00</option>
+										<option value="07:30">07:30</option>
+										<option value="08:00">08:00</option>
+										<option value="08:30">08:30</option>
+										<option value="09:00">09:00</option>
+										<option value="09:30">09:30</option>
+										<option value="10:00">10:00</option>
+										<option value="10:30">10:30</option>
+										<option value="11:00">11:00</option>
+										<option value="11:30">11:30</option>
+										<option value="12:00">12:00</option>
+										<option value="12:30">12:30</option>
+										<option value="13:00">13:00</option>
+										<option value="13:30">13:30</option>
+										<option value="14:00">14:00</option>
+										<option value="14:30">14:30</option>
+										<option value="15:00">15:00</option>
+										<option value="15:30">15:30</option>
+										<option value="16:00">16:00</option>
+										<option value="16:30">16:30</option>
+										<option value="17:00">17:00</option>
+										<option value="17:30">17:30</option>
+										<option value="18:00">18:00</option>
+										<option value="18:30">18:30</option>
+										<option value="19:00">19:00</option>
+										<option value="19:30">19:30</option>
+										<option value="20:00">20:00</option>
+										<option value="20:30">20:30</option>
+										<option value="21:00">21:00</option>
+										<option value="21:30">21:30</option>
+										<option value="22:00">22:00</option>
+										<option value="22:30">22:30</option>
+									</select>
+									<script>
+										var currentHours = new Date(Number(revers.datetime)).getHours().toString().padStart(2,"0")
+										var currentMinutes = new Date(Number(revers.datetime)).getMinutes();
+										currentMinutes = currentMinutes>29 ? "30" : "00";
+										document.getElementById("vreme-reversa").value = currentHours + ":" + currentMinutes;
 									</script>
 								</div>
 								<div class="inputWrap">
@@ -354,6 +404,12 @@
 													json.majstor = document.getElementById("majstor-reversa").value;
 													json.nalog = document.getElementById("broj-naloga").value;
 													json.adresa = document.getElementById("adresa-naloga").value;
+													var date = new Date(document.getElementById("datum-reversa").value);
+													var timestamp = document.getElementById("vreme-reversa").value;
+													date.setHours(Number(timestamp.split(":")[0]));
+													date.setMinutes(Number(timestamp.split(":")[1]));
+													json.datetime = date.getTime();
+													json.datum = getDateAsStringForDisplay(date);
 													json.zaduzenje = [];
 													for(var i=0;i<zaduzenjeElems.length;i++){
 														var zaduzenjeJson = {};
