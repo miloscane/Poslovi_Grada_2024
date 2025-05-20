@@ -12079,9 +12079,10 @@ server.get('/magacioner/tabla', async (req, res)=> {
 			
 				var naloziZaReverse = [];
 				for(var i=0;i<reversi.length;i++){
-						naloziZaReverse.push(reversi[i].broj)
+						naloziZaReverse.push(reversi[i].nalog)
 				}
 				var reversNalozi = await naloziDB.find({broj:{$in:naloziZaReverse}}).toArray();
+
 				for(var i=0;i<reversi.length;i++){
 					reversi[i].radnaJedinica = "Treca lica";
 					for(var j=0;j<reversNalozi.length;j++){
