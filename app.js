@@ -12075,7 +12075,7 @@ server.get('/magacioner/tabla', async (req, res)=> {
 				yesterday.setDate(yesterday.getDate()-1);
 				var reversi = await magacinReversiDB.find({datum:getDateAsStringForDisplay(yesterday)}).toArray();
 				var validiraniNalozi = await naloziDB.find({"prijemnica.datum.datum":{$regex:eval(yesterday.getMonth()+1).toString().padStart(2,"0")+"."+yesterday.getFullYear()}}).toArray();
-				var otvoreniNalozi = await naloziDB.find({statusNaloga:{$nin:["Završeno","Nalog u S","Fakturisan","Spreman za fakturisanje","Storniran"]}}).toArray();
+				var otvoreniNalozi = await naloziDB.find({statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Fakturisan","Spreman za fakturisanje","Storniran"]}}).toArray();
 			
 				var naloziZaReverse = [];
 				for(var i=0;i<reversi.length;i++){
@@ -12135,7 +12135,7 @@ server.get('/magacioner/tabla', async (req, res)=> {
 						var kopanja = ['80.03.01.020','80.03.01.019','80.03.01.001','80.03.01.002','80.03.01.003','80.03.01.004','80.03.01.005','80.03.01.006'];
 						for(var j=0;j<validiraniNalozi[i].obracun.length;j++){
 							
-							if(kopanja.indexOf(validiraniNalozi[i].obracun[j].code)>=0 &&  rovoviBrojeviNaloga.indexOf(otvoreniNalozi[i].broj)<0){
+							if(kopanja.indexOf(validiraniNalozi[i].obracun[j].code)>=0 &&  rovoviBrojeviNaloga.indexOf(validiraniNalozi[i].broj)<0){
 								rovNalozi.push(validiraniNalozi[i].broj)
 								rovoviBrojeviNaloga.push(validiraniNalozi[i]);
 								break;
