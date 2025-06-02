@@ -1,0 +1,25 @@
+<%- include ("partials/header") -%>
+	<script>
+		var stavke	=	<%-JSON.stringify(stavke)%>;
+		stavke.sort((a, b) => a.naziv.localeCompare(b.naziv));
+	</script>
+	<div class="magacinStanje magacinRevers">
+		<div class="pageWidth">
+			<h1>Укупно издат материјал</h1>
+			<table id="ukupno"></table>
+			<script>
+				for(var i=0;i<stavke.length;i++){
+					var tr = document.createElement("TR");
+						var td = document.createElement("TD");
+						td.innerHTML = stavke[i].naziv;
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.innerHTML = stavke[i].kolicina;
+						tr.appendChild(td);
+					document.getElementById("ukupno").appendChild(tr);
+				}
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

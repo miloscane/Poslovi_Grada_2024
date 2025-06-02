@@ -819,7 +819,7 @@ var dnevniIzvestajiDB;
 var stopoviDB;
 var stariCenovnikJsons = [];
 
-http.listen(process.env.PORT, function(){
+http.listen(process.env.PORT, async function(){
 	console.log("Poslovi Grada 2024");
 	console.log("Server Started v1.4");
 	console.log("Timezone offset: "+new Date().getTimezoneOffset())
@@ -827,7 +827,7 @@ http.listen(process.env.PORT, function(){
 	console.log("Connecting to database....");
 	var dbConnectionStart	=	new Date().getTime();
 	client.connect()
-	.then(() => {
+	.then(async () => {
 		console.log("Connected to database in " + eval(new Date().getTime()/1000-dbConnectionStart/1000).toFixed(2)+"s")
 		usersDB								=	client.db("Poslovi_Grada_2024").collection('Users');
 		naloziDB							=	client.db("Poslovi_Grada_2024").collection('Nalozi');
@@ -2780,6 +2780,70 @@ http.listen(process.env.PORT, function(){
 		.catch((error)=>{
 			console.log(error)
 		})*/
+
+
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var naloziToExport = [];
+		for(var i=0;i<nalozi.length;i++){
+			if(nalozi[i].prijemnica.datum.datum.includes("05.2025")){
+				naloziToExport.push(nalozi[i])
+			}
+		}
+		var brojeviNaloga = [];
+		for(var i=0;i<naloziToExport.length;i++){
+			brojeviNaloga.push(naloziToExport[i].broj)
+		}	
+		var reversi = await magacinReversiDB.find({nalog:{$in:brojeviNaloga}}).toArray();
+
+		var proizvodi = await proizvodiDB.find({}).toArray();
+		var zaduzeneStavke = [];
+		for(var i=0;i<reversi.length;i++){
+			for(var j=0;j<reversi[i].zaduzenje.length;j++){
+				var stavkaPostoji = false;
+				var indexStavke = -1;
+				for(var k=0;k<zaduzeneStavke.length;k++){
+					if(zaduzeneStavke[k].uniqueId==reversi[i].zaduzenje[j].uniqueId){
+						stavkePostoji = true;
+						indexStavke = k;
+						break;
+					}
+				}
+				var uzeto = isNaN(parseFloat(reversi[i].zaduzenje[j].quantity)) ? 0 : parseFloat(reversi[i].zaduzenje[j].quantity);
+				var vraceno = isNaN(parseFloat(reversi[i].zaduzenje[j].quantity2)) ? 0 : parseFloat(reversi[i].zaduzenje[j].quantity2);
+				if(stavkaPostoji){
+					
+					zaduzeneStavke[indexStavke].kolicina += uzeto - vraceno;
+				}else{
+					var json = {};
+					json.uniqueId = reversi[i].zaduzenje[j].uniqueId;
+					json.kolicina = uzeto - vraceno;
+					zaduzeneStavke.push(json)
+				}
+			}
+		}
+
+		for(var i=0;i<zaduzeneStavke.length;i++){
+			zaduzeneStavke[i].cena = 0;
+			zaduzeneStavke[i].naziv = 0;
+			for(var j=0;j<proizvodi.length;j++){
+				if(proizvodi[j].uniqueId==zaduzeneStavke[i].uniqueId){
+					zaduzeneStavke[i].cena = isNaN(parseFloat(proizvodi[j].price)) ? 0 : parseFloat(proizvodi[j].price);
+					zaduzeneStavke[i].naziv = proizvodi[j].name;
+				}
+			}
+		}
+
+		var csvString = "Naziv;Kolicina;Cena stavke\r\n"
+		for(var i=0;i<zaduzeneStavke.length;i++){
+			csvString+=zaduzeneStavke[i].naziv+";"+zaduzeneStavke[i].kolicina+";"+zaduzeneStavke[i].cena+"\r\n"
+		}
+		fs.writeFileSync("potrosnja.csv",csvString,{encoding:"utf8"});
+		console.log("Wrote file")*/
+
+
+
+
+
 
 	})
 	.catch(error => {
@@ -12276,6 +12340,75 @@ server.get('/magacioner/dvonedeljnaPotrosnja', async (req, res)=> {
 					pageTitle: "Програмска грешка",
 					user: req.session.user,
 					message: "<div class=\"text\">Грешка у бази података.</div>"
+				});
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	} 
+});
+
+server.get('/magacioner/jucerasnjiMaterijal', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			try{
+				var yesterday = new Date();
+				yesterday.setDate(yesterday.getDate()-1);
+				var proizvodi = await proizvodiDB.find({}).toArray();
+				var reversi = await magacinReversiDB.find({datum:getDateAsStringForDisplay(yesterday)}).toArray();
+				var majstori = await majstoriDB.find({}).toArray();
+				var stavke = [];
+				for(var i=0;i<reversi.length;i++){
+					for(var j=0;j<reversi[i].zaduzenje.length;j++){
+						var indexStavke = -1;
+						for(var k=0;k<stavke.length;k++){
+							if(stavke[k].uniqueId==reversi[i].zaduzenje[j].uniqueId){
+								indexStavke = k;
+								break;
+							}
+						}
+						if(indexStavke>=0){
+							stavke[indexStavke].kolicina += parseFloat(reversi[i].zaduzenje[j].quantity);
+						}else{
+							var stavkaJson = {};
+							stavkaJson.uniqueId = reversi[i].zaduzenje[j].uniqueId;
+							stavkaJson.kolicina = parseFloat(reversi[i].zaduzenje[j].quantity);
+							stavke.push(stavkaJson);
+							//console.log(stavke)
+						}
+
+					}
+				}
+
+				for(var i=0;i<stavke.length;i++){
+					for(var j=0;j<proizvodi.length;j++){
+						if(stavke[i].uniqueId==proizvodi[j].uniqueId){
+							stavke[i].naziv = proizvodi[j].name;
+						}
+					}
+				}
+
+
+
+				//console.log(stavke);
+				res.render("magacioner/jucersanjeStavke",{
+					pageTitle:"Јучерашње ставке",
+					user: req.session.user,
+					stavke: stavke
+				})
+			}catch(err){
+				logError(err)
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 12368.</div>"
 				});
 			}
 			
