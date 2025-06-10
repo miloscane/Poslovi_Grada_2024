@@ -9942,48 +9942,27 @@ server.get('/magacioner/pretragaReversa',async (req,res)=>{
 server.get('/brzaPretragaReversa/:brojNaloga', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==50){
-			magacinReversiDB.find({nalog:req.params.brojNaloga}).toArray()
-			.then((reversi)=>{
-				naloziDB.find({broj:req.params.brojNaloga.toString()}).toArray()
-				.then((nalozi)=>{
-					majstoriDB.find({}).toArray()
-					.then((majstori)=>{
-						res.render("magacioner/rezultatPretrage",{
-							pageTitle: "Резлтати претраге реверса по налогу "+req.params.brojNaloga,
-							user: req.session.user,
-							reversi: reversi,
-							majstori: majstori,
-							nalozi: nalozi
-						});
-					})
-					.catch((error)=>{
-						logError(error);
-						res.render("message",{
-							pageTitle: "Програмска грешка",
-							user: req.session.user,
-							message: "<div class=\"text\">Дошло је до грешке у бази податка 3261.</div>"
-						});
-					})
-					
-				})
-				.catch((error)=>{
-					logError(error);
-					res.render("message",{
-						pageTitle: "Програмска грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Дошло је до грешке у бази податка 3264.</div>"
-					});
-				})
-				
-			})
-			.catch((error)=>{
-				logError(error);
+			try{
+				var reversi = await magacinReversiDB.find({nalog:req.params.brojNaloga}).toArray();
+				var nalozi = await naloziDB.find({broj:req.params.brojNaloga.toString()}).toArray();
+				var majstori = await majstoriDB.find({}).toArray();
+				var proizvodi = await proizvodiDB.find({}).toArray();
+				res.render("magacioner/rezultatPretrage",{
+					pageTitle: "Резлтати претраге реверса по налогу "+req.params.brojNaloga,
+					user: req.session.user,
+					reversi: reversi,
+					majstori: majstori,
+					proizvodi: proizvodi,
+					nalozi: nalozi
+				});
+			}catch(err){
+				logError(err);
 				res.render("message",{
 					pageTitle: "Програмска грешка",
 					user: req.session.user,
-					message: "<div class=\"text\">Дошло је до грешке у бази податка 3261.</div>"
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3264.</div>"
 				});
-			})
+			}
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -9999,48 +9978,27 @@ server.get('/brzaPretragaReversa/:brojNaloga', async (req, res)=> {
 server.post('/pretraga-reversa', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==50){
-			magacinReversiDB.find({nalog:req.body.brojnaloga}).toArray()
-			.then((reversi)=>{
-				naloziDB.find({broj:req.body.brojnaloga.toString()}).toArray()
-				.then((nalozi)=>{
-					majstoriDB.find({}).toArray()
-					.then((majstori)=>{
-						res.render("magacioner/rezultatPretrage",{
-							pageTitle: "Резлтати претраге реверса по налогу "+req.body.brojnaloga,
-							user: req.session.user,
-							reversi: reversi,
-							majstori: majstori,
-							nalozi: nalozi
-						});
-					})
-					.catch((error)=>{
-						logError(error);
-						res.render("message",{
-							pageTitle: "Програмска грешка",
-							user: req.session.user,
-							message: "<div class=\"text\">Дошло је до грешке у бази податка 3261.</div>"
-						});
-					})
-					
-				})
-				.catch((error)=>{
-					logError(error);
-					res.render("message",{
-						pageTitle: "Програмска грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Дошло је до грешке у бази податка 3264.</div>"
-					});
-				})
-				
-			})
-			.catch((error)=>{
-				logError(error);
+			try{
+				var reversi = await magacinReversiDB.find({nalog:req.body.brojnaloga}).toArray();
+				var nalozi = await naloziDB.find({broj:req.body.brojnaloga.toString()}).toArray();
+				var majstori = await majstoriDB.find({}).toArray();
+				var proizvodi = await proizvodiDB.find({}).toArray();
+				res.render("magacioner/rezultatPretrage",{
+					pageTitle: "Резлтати претраге реверса по налогу "+req.body.brojnaloga,
+					user: req.session.user,
+					reversi: reversi,
+					majstori: majstori,
+					proizvodi: proizvodi,
+					nalozi: nalozi
+				});
+			}catch(err){
+				logError(err);
 				res.render("message",{
 					pageTitle: "Програмска грешка",
 					user: req.session.user,
-					message: "<div class=\"text\">Дошло је до грешке у бази податка 3261.</div>"
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3264.</div>"
 				});
-			})
+			}
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -10062,52 +10020,30 @@ server.get('/magacioner/danasnjiReversi', async (req, res)=> {
 			var today = new Date();
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
-			magacinReversiDB.find({datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()}}).toArray()
-			.then((reversi)=>{
+			try{
+				var reversi = await magacinReversiDB.find({datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()}}).toArray();
 				var naloziToFind = [];
 				for(var i=0;i<reversi.length;i++){
 					naloziToFind.push(reversi[i].nalog);
 				}
-				naloziDB.find({broj:{$in:naloziToFind}}).toArray()
-				.then((nalozi)=>{
-					majstoriDB.find({}).toArray()
-					.then((majstori)=>{
-						res.render("magacioner/rezultatPretrage",{
-							pageTitle: "Данашњи реверси",
-							user: req.session.user,
-							reversi: reversi,
-							majstori: majstori,
-							nalozi: nalozi
-						});
-					})
-					.catch((error)=>{
-						logError(error);
-						res.render("message",{
-							pageTitle: "Програмска грешка",
-							user: req.session.user,
-							message: "<div class=\"text\">Дошло је до грешке у бази податка 3439.</div>"
-						});
-					})
-					
-				})
-				.catch((error)=>{
-					logError(error);
-					res.render("message",{
-						pageTitle: "Програмска грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Дошло је до грешке у бази податка 3449.</div>"
-					});
-				})
-				
-			})
-			.catch((error)=>{
-				logError(error);
+				var nalozi = await naloziDB.find({broj:{$in:naloziToFind}}).toArray();
+				var majstori = await majstoriDB.find({}).toArray();
+				res.render("magacioner/rezultatPretrage",{
+					pageTitle: "Данашњи реверси",
+					user: req.session.user,
+					reversi: reversi,
+					majstori: majstori,
+					proizvodi: proizvodi,
+					nalozi: nalozi
+				});
+			}catch(err){
+				logError(err);
 				res.render("message",{
 					pageTitle: "Програмска грешка",
 					user: req.session.user,
-					message: "<div class=\"text\">Дошло је до грешке у бази податка 3459.</div>"
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3449.</div>"
 				});
-			})
+			}
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -10171,52 +10107,34 @@ server.get('/magacioner/prekojucerasnjiReversi', async (req, res)=> {
 			today.setDate(today.getDate()-2);
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
-			magacinReversiDB.find({datum:{$regex:dateString+"."+monthString}}).toArray()
-			.then((reversi)=>{
+			try{
+				var reversi = await magacinReversiDB.find({datum:{$regex:dateString+"."+monthString}}).toArray();
 				var naloziToFind = [];
 				for(var i=0;i<reversi.length;i++){
 					naloziToFind.push(reversi[i].nalog);
 				}
-				naloziDB.find({broj:{$in:naloziToFind}}).toArray()
-				.then((nalozi)=>{
-					majstoriDB.find({}).toArray()
-					.then((majstori)=>{
-						res.render("magacioner/rezultatPretrage",{
-							pageTitle: "Јучерашњи реверси",
-							user: req.session.user,
-							reversi: reversi,
-							majstori: majstori,
-							nalozi: nalozi
-						});
-					})
-					.catch((error)=>{
-						logError(error);
-						res.render("message",{
-							pageTitle: "Програмска грешка",
-							user: req.session.user,
-							message: "<div class=\"text\">Дошло је до грешке у бази податка 3439.</div>"
-						});
-					})
-					
-				})
-				.catch((error)=>{
-					logError(error);
-					res.render("message",{
-						pageTitle: "Програмска грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Дошло је до грешке у бази податка 3449.</div>"
-					});
-				})
-				
-			})
-			.catch((error)=>{
-				logError(error);
+				var nalozi = await naloziDB.find({broj:{$in:naloziToFind}}).toArray();
+				var proizvodi = await proizvodiDB.find({}).toArray();
+				var majstori = await majstoriDB.find({}).toArray();
+				res.render("magacioner/rezultatPretrage",{
+					pageTitle: "Јучерашњи реверси",
+					user: req.session.user,
+					reversi: reversi,
+					majstori: majstori,
+					proizvodi: proizvodi,
+					nalozi: nalozi
+				});		
+			}catch(err){
+				logError(err);
 				res.render("message",{
 					pageTitle: "Програмска грешка",
 					user: req.session.user,
-					message: "<div class=\"text\">Дошло је до грешке у бази податка 3459.</div>"
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3449.</div>"
 				});
-			})
+			}
+				
+
+			
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
