@@ -1166,10 +1166,82 @@ http.listen(process.env.PORT, async function(){
 
 		//ZA PREMIJUS
 
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var hmNalozi = await client.db("Hausmajstor").collection('Nalozi').find({}).toArray();
+		for(var i=0;i<hmNalozi.length;i++){
+			//hmNalozi.vrstaRada = "HAUSMAJSTOR"
+			nalozi.push(hmNalozi[i])
+		}
+
+		var naloziToExport = [];
+		var month = 5;
+		for(var i=0;i<nalozi.length;i++){
+			if(nalozi[i].faktura.broj){
+				if(nalozi[i].faktura.broj.length>3){
+					if(nalozi[i].prijemnica.datum.datum.includes("."+month.toString().padStart(2,'0')+".2025")){
+						naloziToExport.push(nalozi[i])
+					}
+				}
+			}
+		}
+
+		for(var i=0;i<naloziToExport.length;i++){
+			if(naloziToExport[i].prijemnica.datum.datum){
+				if(naloziToExport[i].prijemnica.datum.datum.length>3){
+					var dateElements = naloziToExport[i].prijemnica.datum.datum.split(".");
+					naloziToExport[i].sorting = new Date(dateElements[2]+"-"+dateElements[1]+"-"+dateElements[0]).getTime();
+				}
+			}
+		}
+
+		naloziToExport.sort((a, b) => parseFloat(b.sorting) - parseFloat(a.sorting));
+
+		var problemNalozi = [];
+
+		var csvString = "Broj Fakture;Datum PDV;Iznos/Osnovica;Penal;PDV;Iznos sa penalom i PDV;PG Iznos/Osnovica;PG PDV;PG Penal;PG Iznos sa PDVom;Vrsta Naloga\r\n";
+		for(var i=0;i<naloziToExport.length;i++){
+			var osnovica = parseFloat(naloziToExport[i].ukupanIznos);
+			var iznosPenala = eval(osnovica* (100 - naloziToExport[i].faktura.penal)/100);
+			var pdv = osnovica<=500000 ? osnovica*0.2 : 0;
+			var iznosSaPenalomIPdv = osnovica + pdv - iznosPenala;
+			var umanjenje = naloziToExport[i].vrstaRada=="HAUSMAJSTOR" ? 1 : 0.675;
+			var pgOsnovica = osnovica * umanjenje;
+			var pgPdv = pgOsnovica <=500000 ? pgOsnovica*0.2 : 0;
+			var pgPenal = iznosPenala;
+			var pgIznosSaPDVom = pgOsnovica + pgPdv - pgPenal;
+
+			if(!isNaN(osnovica)){
+				datumPDV = naloziToExport[i].prijemnica.datum.datum;
+				csvString += naloziToExport[i].faktura.broj + ";" + datumPDV + ";" + osnovica.toFixed(2) + ";" + iznosPenala.toFixed(2) + ";" + pdv.toFixed(2) + ";" + iznosSaPenalomIPdv.toFixed(2) + ";" +pgOsnovica.toFixed(2) + ";" + pgPdv.toFixed(2) + ";" + pgPenal.toFixed(2) + ";" + pgIznosSaPDVom.toFixed(2) + ";" + naloziToExport[i].vrstaRada + "\r\n"
+				
+				//csvString += naloziToExport[i].faktura.broj + "," +datumPDV+ "," + iznosBezPDVa + "," + pdv + "," + iznosSaPDVom+"\r\n";
+				if(osnovica==0){
+					naloziToExport[i].problem = "Iznos naloga je nula";
+					console.log(naloziToExport[i].broj)
+					console.log("Nula")
+					problemNalozi.push(naloziToExport[i]);
+				}
+			}else{
+				naloziToExport[i].problem = "Nedefinisan iznos";
+				console.log("Nema iznos");
+				problemNalozi.push(naloziToExport[i]);
+			}
+		}
+		for(var i=0;i<problemNalozi.length;i++){
+			csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
+		}
+		fs.writeFileSync("./PG-Premijus-"+month+"-2025.csv",csvString,"utf8");
+		console.log("Written Premijus")*/
+
+
+
+
+
+
 		/*naloziDB.find({}).toArray()
 		.then((nalozi)=>{
 			var naloziToExport = [];
-			var month = 4;
+			var month = 5;
 			for(var i=0;i<nalozi.length;i++){
 				if(nalozi[i].faktura.broj){
 					if(nalozi[i].faktura.broj.length>3){
@@ -1231,6 +1303,8 @@ http.listen(process.env.PORT, async function(){
 		.catch((error)=>{
 			console.log(error)
 		})*/
+
+
 
 
 
@@ -10053,52 +10127,31 @@ server.get('/magacioner/jucerasnjiReversi', async (req, res)=> {
 			today.setDate(today.getDate()-1);
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
-			magacinReversiDB.find({datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()}}).toArray()
-			.then((reversi)=>{
+			try{
+				var reversi = await magacinReversiDB.find({datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()}}).toArray();
 				var naloziToFind = [];
 				for(var i=0;i<reversi.length;i++){
 					naloziToFind.push(reversi[i].nalog);
 				}
-				naloziDB.find({broj:{$in:naloziToFind}}).toArray()
-				.then((nalozi)=>{
-					majstoriDB.find({}).toArray()
-					.then((majstori)=>{
-						res.render("magacioner/rezultatPretrage",{
-							pageTitle: "Јучерашњи реверси",
-							user: req.session.user,
-							reversi: reversi,
-							majstori: majstori,
-							nalozi: nalozi
-						});
-					})
-					.catch((error)=>{
-						logError(error);
-						res.render("message",{
-							pageTitle: "Програмска грешка",
-							user: req.session.user,
-							message: "<div class=\"text\">Дошло је до грешке у бази податка 3439.</div>"
-						});
-					})
-					
-				})
-				.catch((error)=>{
-					logError(error);
-					res.render("message",{
-						pageTitle: "Програмска грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Дошло је до грешке у бази податка 3449.</div>"
-					});
-				})
-				
-			})
-			.catch((error)=>{
-				logError(error);
+				var nalozi = await naloziDB.find({broj:{$in:naloziToFind}}).toArray();
+				var majstori = await majstoriDB.find({}).toArray();
+				var proizvodi = await proizvodiDB.find({}).toArray();
+				res.render("magacioner/rezultatPretrage",{
+					pageTitle: "Јучерашњи реверси",
+					user: req.session.user,
+					reversi: reversi,
+					majstori: majstori,
+					proizvodi: proizvodi,
+					nalozi: nalozi
+				});
+			}catch(err){
+				logError(err);
 				res.render("message",{
 					pageTitle: "Програмска грешка",
 					user: req.session.user,
-					message: "<div class=\"text\">Дошло је до грешке у бази податка 3459.</div>"
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3439.</div>"
 				});
-			})
+			}
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",

@@ -3,6 +3,8 @@
 		var nalozi = <%-JSON.stringify(nalozi)%>;
 		var reversi = <%-JSON.stringify(reversi)%>;
 		var majstori = <%-JSON.stringify(majstori)%>;
+		reversi.sort((a, b) => a.majstor.localeCompare(b.majstor));
+		var proizvodi = <%-JSON.stringify(proizvodi)%>;
 	</script>
 	<div class="pageWidth">
 		<div class="rezultatPretrageReversa">
@@ -62,5 +64,156 @@
 				}
 			</script>
 		</div>
+		<div class="inputWrap">
+			<div class="button" onclick="stampaj()">Stampaj reverse</div>
+		</div>
+		<%- include ("partials/printer") -%>
+		<div style="overflow:hidden;height:1px;width:1px;">
+			<canvas id="logo-canvas" height="306" width="300"></canvas>
+			<script>
+				var logoCanvas = document.getElementById('logo-canvas');
+				var logoCanvasContext = logoCanvas.getContext('2d');
+				var logoLogoBlob;
+				function make_base3(){
+				  base_image3 = new Image();
+				  base_image3.crossOrigin="anonymous"
+				  //base_image3.src = 'https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturaLogo.png';
+				  base_image3.src = '/images/fakturaLogo.png';
+				  base_image3.onload = function(){
+				    logoCanvasContext.drawImage(base_image3, 0, 0);
+				    logoLogoBlob 	=	logoCanvas.toDataURL("image/png", 1.0);
+
+				  }
+				}
+				make_base3();
+			</script>
+		</div>
+		<div style="overflow:hidden;width:1px;height:1px">
+			<canvas id="logo-stambeno-canvas" height="87" width="238"></canvas>
+			<script>
+				var logoStambenoCanvas = document.getElementById('logo-stambeno-canvas');
+				var logoStambenoCanvasContext = logoStambenoCanvas.getContext('2d');
+				var logoStambenoLogoBlob;
+				function make_base4(){
+				  base_image4 = new Image();
+				  base_image4.crossOrigin="anonymous"
+				  base_image4.src = 'https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo_stambeno.png';
+				  base_image4.onload = function(){
+				    logoStambenoCanvasContext.drawImage(base_image4, 0, 0);
+				    logoStambenoLogoBlob 	=	logoStambenoCanvas.toDataURL("image/png", 1.0);
+
+				  }
+				}
+				make_base4();
+			</script>
+		</div>
+
+		<script>
+			function getProductById(uniqueId){
+				var product = {};
+				for(var i=0;i<proizvodi.length;i++){
+					if(proizvodi[i].uniqueId==uniqueId){
+						product = proizvodi[i];
+					}
+				}
+				return product;
+			}
+
+			function stampaj(){
+				doc = new jsPDF({
+					orientation: 'p',
+					unit: 'mm',
+					format: 'a4',
+					compress: true
+					//putOnlyUsedFonts:true
+				});
+				pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+				pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+				doc.addFileToVFS("PTSans.ttf", PTSans);
+				doc.addFileToVFS("PTSansBold.ttf", PTSansBold);
+				doc.addFont('PTSans.ttf', 'PTSans', 'normal');
+				doc.addFont('PTSansBold.ttf', 'PTSans', 'bold');
+
+				doc.setFont('PTSans'); // set font
+				doc.getFontList("PTSans");
+
+				for(var i=0;i<reversi.length;i++){
+					var yPos = 40;
+					var xPos = 12;
+					
+					if(logoStambenoLogoBlob){
+						doc.addImage(logoStambenoLogoBlob, 'PNG', 5, 5, 119/mm, 43/mm,'','FAST');
+					}
+
+			        doc.setFontType("bold");
+					doc.setFontSize(20);
+			        doc.text("Реверс по налогу број "+reversi[i].nalog,pageWidth/2,yPos,'center');
+			        yPos = yPos + 10;
+			        if(reversi[i].tip=="Standardni"){
+						doc.text("Стандардни",pageWidth/2,yPos,'center');
+					}else if(reversi[i].tip=="Zamena"){
+						doc.text("Замена",pageWidth/2,yPos,'center');
+					}else if(reversi[i].tip=="PromenaTE"){
+						doc.text("Промена Теренске Екипе",pageWidth/2,yPos,'center');
+					}else if(reversi[i].tip=="Dostava"){
+						doc.text("Достава",pageWidth/2,yPos,'center');
+					}else if(reversi[i].tip=="Dopuna"){
+						doc.text("Допуна",pageWidth/2,yPos,'center');
+					}else if(reversi[i].tip=="Reklamacija"){
+						doc.text("Рекламација",pageWidth/2,yPos,'center');
+					}else if(reversi[i].tip=="PogresanPopis"){
+						doc.text("Погрешан попис",pageWidth/2,yPos,'center');
+					}
+			        doc.setFontType("normal");
+					doc.setFontSize(16);
+					yPos = yPos + 10;
+					var adresa = reversi[i].adresa ? reversi[i].adresa : " ";
+					doc.text(adresa,pageWidth/2,yPos,'center');
+					yPos = yPos + 10;
+			        doc.text(vremePrijema(reversi[i].datetime),pageWidth/2,yPos,'center');
+					yPos = yPos + 10;
+			        doc.setFontType("bold");
+					doc.text("Требован материјал:",5,yPos);
+					doc.text("Уграђен материјал:",150,yPos);
+					doc.setFontType("normal");
+					doc.setFontSize(14);
+					yPos = yPos + 7;
+					for(var j=0;j<reversi[i].zaduzenje.length;j++){
+			        	doc.setFontType("bold");
+						doc.text(eval(j+1).toString()+".",5,yPos);
+						doc.setFontType("normal");
+						doc.text(getProductById(reversi[i].zaduzenje[j].uniqueId).name,15,yPos);
+						doc.text(reversi[i].zaduzenje[j].quantity+" kom.",120,yPos);
+						//doc.text(revers.zaduzenje[i].quantity2+" kom.",150,yPos);
+						doc.text("_____ kom.",150,yPos);
+						yPos = yPos + 7;
+						if(yPos>285){
+							doc.addPage()
+							yPos = 5;
+						}
+					}
+					yPos = yPos + 7;
+					if(yPos>285){
+						doc.addPage()
+						yPos = 5;
+					}
+					doc.setFontType("bold");
+					doc.text(getMajstorByCode(reversi[i].majstor).ime,5,yPos);
+					yPos = yPos + 15;
+					if(yPos>285){
+						doc.addPage()
+						yPos = 5;
+					}
+					doc.setDrawColor(0);
+			        doc.setFillColor(0,0,0);
+					doc.rect(5, yPos, 50, 0.4, 'F');
+
+					doc.addPage();
+				}
+				
+
+		        window.open(doc.output('bloburl'), '_blank');
+			}
+		</script>
 	</div>
 <%- include ("partials/footer") -%>
