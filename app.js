@@ -10028,6 +10028,7 @@ server.get('/magacioner/danasnjiReversi', async (req, res)=> {
 				}
 				var nalozi = await naloziDB.find({broj:{$in:naloziToFind}}).toArray();
 				var majstori = await majstoriDB.find({}).toArray();
+				var proizvodi = await proizvodiDB.find({}).toArray();
 				res.render("magacioner/rezultatPretrage",{
 					pageTitle: "Данашњи реверси",
 					user: req.session.user,
