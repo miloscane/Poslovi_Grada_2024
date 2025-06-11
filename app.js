@@ -10647,16 +10647,15 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						var setObj	=	{ $set: {
 							statusNaloga: "Završeno"
 						}};
-						await naloziDB.updateOne({uniqueId:nalog.uniqueId},setObj);
-
+						await client.db("Hausmajstor").collection('Nalozi').updateOne({uniqueId:nalog.uniqueId},setObj);
 					}else if(stambenoJson.vrsta_promene=="STATUS" && stambenoJson.status_code=="VRACEN"){
 						var podizvodjac = podizvodjaci.indexOf(nalozi[0].majstor)>=0 ? "ПОДИЗВОЂАЧА" : "";
 						var setObj	=	{ $set: {
 							statusNaloga: "Vraćen"
 						}};
-						await naloziDB.updateOne({uniqueId:nalog.uniqueId},setObj);
+						await client.db("Hausmajstor").collection('Nalozi').updateOne({uniqueId:nalog.uniqueId},setObj);
 
-						var mailTo = podizvodjaci.indexOf(nalozi[0].majstor)>=0 ? "milica.radun@poslovigrada.rs" : "milica.radun@poslovigrada.rs";
+						var mailTo = podizvodjaci.indexOf(nalozi[0].majstor)>=0 ? "milica.radun@poslovigrada.rs,vladeta.stamenkovic@poslovigrada.rs" : "milica.radun@poslovigrada.rs,vladeta.stamenkovic@poslovigrada.rs";
 						var mailOptions = {
 							from: '"Portal HitnoApp" <admin@hitnoapp.rs>',
 							to: mailTo,
@@ -10674,10 +10673,10 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						var setObj	=	{ $set: {
 							statusNaloga: "Storniran"
 						}};
-						await naloziDB.updateOne({uniqueId:nalog.uniqueId},setObj)
+						await client.db("Hausmajstor").collection('Nalozi').updateOne({uniqueId:nalog.uniqueId},setObj)
 						var mailOptions = {
 							from: '"Portal HitnoApp" <admin@hitnoapp.rs>',
-							to: 'milica.radun@poslovigrada.rs',
+							to: 'milica.radun@poslovigrada.rs,vladeta.stamenkovic@poslovigrada.rs',
 							subject: 'Nalog broj '+nalog.broj+' je storniran',
 							html: 'Zdravo,<br>Nalog <a href=\"https://portal.hitnoapp.rs/nalog/'+nalog.broj+'\">'+nalog.broj+'</a> je storniran.<br> Radna Jedinica: '+nalog.radnaJedinica+'<br>Adresa: '+nalog.adresa+'.'
 						};
