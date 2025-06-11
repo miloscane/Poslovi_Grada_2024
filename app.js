@@ -10642,7 +10642,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 							statusNaloga: "Nalog u Stambenom",
 							ukupanIznos: ukupanIznos
 						}};
-						await naloziDB.updateOne({uniqueId:nalog.uniqueId},setObj);
+						await client.db("Hausmajstor").collection('Nalozi').updateOne({uniqueId:nalog.uniqueId},setObj);
 					}else if(stambenoJson.vrsta_promene=="STATUS" && stambenoJson.status_code=="IZVRSEN"){
 						var setObj	=	{ $set: {
 							statusNaloga: "Završeno"
