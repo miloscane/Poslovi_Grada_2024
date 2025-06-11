@@ -10480,7 +10480,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 					//POSALJI MAIL DA IMA NOVI
 					var mailOptions = {
 						from: '"Portal HitnoApp" <admin@hitnoapp.rs>',
-						to: "miloscane@gmail.com,office@poslovigrada.rs",
+						to: "vladeta.stamenkovic@poslovigrada.rs",
 						subject: 'Novi nalog za Hausmajstora '+nalogJson.broj,
 						html: 'Otvoren je novi nalog za hausmajstora <a href="https://portal.hitnoapp.rs/nalog/'+nalogJson.broj+'">'+nalogJson.broj+'</a>.<br><b>Opis:</b><br>'+nalogJson.opis+'<br>'+mailPotpis
 					};
