@@ -1,6 +1,7 @@
 <%- include ("partials/header") -%>
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
+		var majstori = <%-JSON.stringify(majstori)%>;
 	</script>
 	<div class="pageWidth">
 		<div class="otvoreniNalozi">
@@ -129,6 +130,42 @@
 						</div>
 					</div>
 					<div class="filter">
+						<div class="label">Приказани мајстори:</div>
+						<div class="checkboxes">
+							<select id="majstor-naloga" oninput="generateTable()">
+								<option value="Svi" default="default">Svi</option>
+								<option value="Nijedan">Nijedan</option>
+								<optgroup label="Мајстори" id="majstori-pg"></optgroup>
+								<optgroup label="Финализери" id="finalizeri"></optgroup>
+								<optgroup label="Воме" id="vome"></optgroup>
+								<optgroup label="Podizvodjaci" id="majstori-podizvodjaci"></optgroup>
+							</select>
+							<script>
+								majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+								for(var i=0;i<majstori.length;i++){
+									if(!majstori[i].inactive){
+										var option = document.createElement("OPTION");
+										option.setAttribute("value",majstori[i].uniqueId);
+										option.innerHTML	=	majstori[i].ime;	
+										
+										if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
+											document.getElementById("majstori-podizvodjaci").appendChild(option);
+										}else{
+											if(majstori[i].tipRada.indexOf("Finalizacija")>=0){
+												document.getElementById("finalizeri").appendChild(option);
+											}else if(majstori[i].tipRada.indexOf("Voma")>=0){
+												document.getElementById("vome").appendChild(option);
+											}else{
+												document.getElementById("majstori-pg").appendChild(option);
+											}
+											
+										}
+									}
+								}
+							</script>
+						</div>
+					</div>
+					<div class="filter">
 						<div class="label">Филтер Адресе:</div>
 						<div class="checkboxes">
 							<input type="text" id="adresa-filter" oninput="adresaFilter(this)">
@@ -152,6 +189,7 @@
 								<td><div class="value radnaJedinica">Радна јединица</div></td>
 								<td><div class="value adresa">Адреса</div></td>
 								<td><div class="value status">Статус</div></td>
+								<td><div class="value majstor">Majstor</div></td>
 							</tr>
 						</table>
 					</div>
@@ -186,6 +224,9 @@
 					for(var i=0;i<nalozi.length;i++){
 						//isfiltriraj ovde
 						if(opstineToShow.indexOf(nalozi[i].radnaJedinica)>=0){
+							
+							var filterMajstora = document.getElementById("majstor-naloga").value;
+
 							var nalogToPush = {};
 							nalogToPush.broj = nalozi[i].broj;
 							nalogToPush.datum = nalozi[i].datum.datum;
@@ -195,17 +236,27 @@
 							nalogToPush.majstor = nalozi[i].majstor;
 							nalogToPush.kasni = nalozi[i].kasni;
 							
-							if(statusToShow=="Svi"){
-								naloziToShow.push(nalogToPush);
+							if(filterMajstora!="Svi"){
+								if(nalogToPush.majstor==filterMajstora){
+									if(statusToShow=="Svi"){
+										naloziToShow.push(nalogToPush);
+									}else{
+										if(nalozi[i].statusNaloga==statusToShow){
+											naloziToShow.push(nalogToPush);
+										}
+									}
+								}
 							}else{
-								if(nalozi[i].statusNaloga==statusToShow){
+								if(statusToShow=="Svi"){
 									naloziToShow.push(nalogToPush);
+								}else{
+									if(nalozi[i].statusNaloga==statusToShow){
+										naloziToShow.push(nalogToPush);
+									}
 								}
 							}
 							
-							
 						}
-						
 					}
 
 					var zakazani		=	0;
@@ -290,6 +341,13 @@
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value status");
 								div.innerHTML = naloziToShow[i].statusNaloga;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value majstor");
+								div.innerHTML = getMajstorByCode(naloziToShow[i].majstor).ime ? getMajstorByCode(naloziToShow[i].majstor).ime : "Nijedan";
 								td.appendChild(div);
 							tr.appendChild(td);
 							
