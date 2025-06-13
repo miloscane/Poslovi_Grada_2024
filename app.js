@@ -360,7 +360,7 @@ const uploadPrijemnica = multer({
 
 var mailPotpis = "<br>&nbsp;<br>Срдачан поздрав,<br>ВиК Портал Послова Града<br><img style='width:200px' src='https://portal.poslovigrada.rs/images/logo.png'>";
 var resetPassLimit = 1.8e6; //30 minuta
-var podizvodjaci  = ["SeHQZ--1672650353244","IIwY4--1672650358507","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","ylSnq--1672041756318"];
+var podizvodjaci  = ["SeHQZ--1672650353244","IIwY4--1672650358507","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","ylSnq--1672041756318","mile--1672650353244"];
 var radneJedinice = ["NOVI BEOGRAD","ZEMUN","ČUKARICA","SAVSKI VENAC","VRAČAR","RAKOVICA","ZVEZDARA","VOŽDOVAC","STARI GRAD","PALILULA"];
 var meseciJson    = [{name:"Februar 2024",string:"02.2024"},{name:"Mart 2024",string:"03.2024"},{name:"April 2024",string:"04.2024"},{name:"Maj 2024",string:"05.2024"},{name:"Jun 2024",string:"06.2024"},{name:"Jul 2024",string:"07.2024"},{name:"Avgust 2024",string:"08.2024"},{name:"Septembar 2024",string:"09.2024"},{name:"Oktobar 2024",string:"10.2024"},{name:"Novembar 2024",string:"11.2024"},{name:"Decembar 2024",string:"12.2024"},{name:"Januar 2025",string:"01.2025"},{name:"Februar 2025",string:"02.2025"},{name:"Mart 2025",string:"03.2025"},{name:"April 2024",string:"04.2025"}]
 var daniUNedelji 	=	["Недеља","Понедељак","Уторак","Среда","Четвртак","Петак","Субота"];
@@ -5794,7 +5794,7 @@ server.get('/nalog/:broj',async (req,res)=>{
 										var cenovnikPodizvodjaca = [];
 										if(podizvodjaci.indexOf(nalozi[0].majstor)>=0){
 											podizvodjac = 1;
-											if(nalozi[0].majstor=="SeHQZ--1672650353244" || nalozi[0].majstor=="IIwY4--1672650358507"){
+											if(nalozi[0].majstor=="SeHQZ--1672650353244" || nalozi[0].majstor=="IIwY4--1672650358507" || nalozi[0].majstor=="mile--1672650353244"){
 												cenovnikPodizvodjaca = cenovnikHigh;
 											}else{
 												cenovnikPodizvodjaca = cenovnikLow;
@@ -6082,7 +6082,7 @@ server.get('/nalog/:broj',async (req,res)=>{
 										}
 										if(nalozi[0].majstor==req.session.user.nalozi){
 											var cenovnikZaPrikaz = [];
-											if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507"){
+											if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507" || req.session.user.nalozi=="mile--1672650353244"){
 												cenovnikZaPrikaz = cenovnikHigh;
 											}else{
 												cenovnikZaPrikaz = cenovnikLow;
@@ -9137,7 +9137,7 @@ server.get('/podizvodjac/zavrseniNalozi',async (req,res)=>{
 					}
 				}
 				var cenovnikZaPrikaz = [];
-				if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507"){
+				if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507" || req.session.user.nalozi=="mile--1672650353244"){
 					cenovnikZaPrikaz = cenovnikHigh;
 				}else{
 					cenovnikZaPrikaz = cenovnikLow;
@@ -9189,7 +9189,7 @@ server.get('/podizvodjac/vraceniNalozi',async (req,res)=>{
 					delete nalozi[i].ukupanIznos;
 				}
 				var cenovnikZaPrikaz = [];
-				if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507"){
+				if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507" || req.session.user.nalozi=="mile--1672650353244"){
 					cenovnikZaPrikaz = cenovnikHigh;
 				}else{
 					cenovnikZaPrikaz = cenovnikLow;
@@ -9255,7 +9255,7 @@ server.get('/podizvodjac/obradjeniNalozi',async (req,res)=>{
 						nalozi[i].statusNaloga = "Možete fakturisati";
 					}
 					var cenovnikZaPrikaz = [];
-					if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507"){
+					if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507" || req.session.nalozi=="mile--1672650353244"){
 						cenovnikZaPrikaz = cenovnikHigh;
 					}else{
 						cenovnikZaPrikaz = cenovnikLow;
