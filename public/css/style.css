@@ -6228,12 +6228,30 @@ input[type=number] {
 }
 
 .jucerasnjiUcinak .radnoVreme td, .jucerasnjiUcinak .radnoVreme th{
-    width:33.33%;
+    width:25%;
 }
 
 .jucerasnjiUcinak .radnoVreme td{
-    font-size:26px;
+    font-size:16px;
     text-align:center;
+}
+
+.jucerasnjiUcinak .radnoVreme td input{
+    width:100%;
+    text-align:center;
+}
+
+.jucerasnjiUcinak .komentarVremena textarea{
+    width:100%;
+    resize:none;
+}
+
+.jucerasnjiUcinak .komentarVremena textarea::placeholder{
+    color:rgba(100,100,100,0.5);
+}
+
+.jucerasnjiUcinak .radnoVreme td input::placeholder{
+    color:rgba(100,100,100,0.5);
 }
 
 .jucerasnjiUcinak table th{
@@ -6246,6 +6264,10 @@ input[type=number] {
     vertical-align: top;
     border:1px solid rgb(150,150,150);
     padding:5px;
+}
+
+.jucerasnjiUcinak table td .value input{
+    max-width:100%;
 }
 
 .jucerasnjiUcinak table .redniBroj .value{
@@ -6263,10 +6285,15 @@ input[type=number] {
 }
 
 .jucerasnjiUcinak table .radnaJedinica .value{
-    width:60px;
+    width:120px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow:hidden;
+}
+
+
+.jucerasnjiUcinak table td .value .adresa input{
+    max-width:100%;
 }
 
 .jucerasnjiUcinak table .vreme .value{
@@ -6277,7 +6304,7 @@ input[type=number] {
 }
 
 .jucerasnjiUcinak table .adresa .value{
-    width:100px;
+    width:100%;
     word-wrap: break-word; 
 }
 
@@ -6318,6 +6345,10 @@ input[type=number] {
     width:100%;
     resize:none;
     height:60px;
+}
+
+.jucerasnjiUcinak table .komentar textarea::placeholder{
+    color:rgba(100,100,100,0.5);
 }
 
 .jucerasnjiUcinak .dailySummaryTable td, .jucerasnjiUcinak .dailySummaryTable th{
@@ -6372,7 +6403,41 @@ input[type=number] {
     margin-top:30px;
 }
 
+.jucerasnjiUcinak .prisustvoCheckboxes .checkboxWrap{
+    display:inline-block;
+    vertical-align:top;
+    width:250px;
+    padding:10px;
+    font-size:14px;
+    border-radius:4px;
+    border:2px solid rgb(32,51,100);
+    margin-right:20px;
+    margin-bottom:20px;
+    cursor:pointer;
+}
 
+
+.jucerasnjiUcinak .prisustvoCheckboxes .checkboxWrap input{
+    pointer-events: none;
+    display:inline-block;
+    vertival-align:middle;
+}
+
+.jucerasnjiUcinak .prisustvoCheckboxes .checkboxWrap .label{
+    pointer-events: none;
+    display:inline-block;
+    vertival-align:middle;
+    padding-left:10px;
+}
+
+.jucerasnjiUcinak .prisustvoCheckboxes .checkboxWrapActive{
+    background-color:rgb(32,51,100) !important;
+    color:rgb(255,255,255) !important;
+}
+
+.jucerasnjiUcinak .prisustvoCheckboxes .checkboxWrap:hover{
+    background-color:rgba(32,51,100,0.1);
+}
 
 .administracija2 .title{
     font-weight:500;

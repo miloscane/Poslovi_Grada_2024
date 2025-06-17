@@ -8068,6 +8068,8 @@ server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
 	}
 });
 
+
+
 server.post('/dnevniIzvestaj',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
