@@ -6246,6 +6246,58 @@ input[type=number] {
     resize:none;
 }
 
+
+.jucerasnjiUcinak table{
+    /*table-layout: fixed;*/
+    width:100%;
+    border-collapse: collapse;
+}
+
+.jucerasnjiUcinak .stimulacijaTable{
+    width:100%;
+    margin-bottom:20px;
+}
+
+.jucerasnjiUcinak .stimulacijaTable td, .jucerasnjiUcinak .stimulacijaTable th{
+    width:50%;
+}
+
+.jucerasnjiUcinak .stimulacijaTable th{
+    text-align: center;
+    font-size:20px
+}
+
+.jucerasnjiUcinak .stimulacijaTable td{
+    font-size:20px;
+    text-align:center;
+}
+
+.jucerasnjiUcinak .stimulacijaTable td input{
+    width:100%;
+    text-align:center;
+}
+
+.jucerasnjiUcinak .stimulacijaTable td textarea{
+    width:100%;
+    text-align:left;
+    resize:none;
+}
+
+.jucerasnjiUcinak .stimulacijaTable td input::placeholder{
+    color:rgba(100,100,100,0.3);
+}
+
+.jucerasnjiUcinak .stimulacijaTable td textarea::placeholder{
+    color:rgba(100,100,100,0.3);
+}
+
+
+
+.jucerasnjiUcinak .komentarVremena textarea{
+    width:100%;
+    resize:none;
+}
+
 .jucerasnjiUcinak .komentarVremena textarea::placeholder{
     color:rgba(100,100,100,0.5);
 }
@@ -6400,7 +6452,6 @@ input[type=number] {
 }
 
 .jucerasnjiUcinak .dailySummary{
-    margin-top:30px;
 }
 
 .jucerasnjiUcinak .prisustvoCheckboxes .checkboxWrap{

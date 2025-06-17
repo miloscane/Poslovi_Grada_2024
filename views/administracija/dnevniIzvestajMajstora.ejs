@@ -49,23 +49,42 @@
 				}
 			wrap.appendChild(checkboxes);
 
-			var title = document.createElement("DIV");
-			title.setAttribute("style","font-size:20px;font-weight:600;margin-top:15px;")
-			title.innerHTML = "Вожено возило:";
-			var vehicleSelect = document.createElement("DIV");
-			vehicleSelect.setAttribute("class","vehicleSelect");
-			
-				var select = document.createElement("SELECT");
-				select.setAttribute("id","vozilo");
-					for(var j = 0;j<vozila.vozila.Data.length;j++){
-						var option = document.createElement("OPTION");
-						option.setAttribute("value",vozila.vozila.Data[j].DeviceName);
-						option.innerHTML = vozila.vozila.Data[j].DeviceName;
-						select.appendChild(option);
-					}
-				select.setAttribute("oninput","voziloPick(this)");
-				vehicleSelect.appendChild(select);
-			wrap.appendChild(vehicleSelect);
+			var table = document.createElement("TABLE");
+			table.setAttribute("class","stimulacijaTable");
+				var tr = document.createElement("TR");
+					var th = document.createElement("TH");
+					th.innerHTML = "Награда";
+					tr.appendChild(th);
+					
+					var th = document.createElement("TH");
+					th.innerHTML = "Казна";
+					tr.appendChild(th);
+				table.appendChild(tr);
+
+				var tr = document.createElement("TR");
+					var td = document.createElement("TD");
+					var nagrada = izvestaj.nagrada ? izvestaj.nagrada: "";
+					td.innerHTML = "<input type=\"number\" placeholder=\"0 РСД\" class=\"nagrada\" value=\""+nagrada+"\">";	
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					var kazna = izvestaj.kazna ? izvestaj.kazna : "";
+					td.innerHTML = "<input type=\"number\" placeholder=\"0 РСД\" class=\"kazna\" value=\""+kazna+"\">";	
+					tr.appendChild(td);
+				table.appendChild(tr);
+
+				var tr = document.createElement("TR");
+					var td = document.createElement("TD");
+					var nagradaRazlog = izvestaj.nagradaRazlog ? izvestaj.nagradaRazlog : "";
+					td.innerHTML = "<textarea placeholder=\"Разлог награђивања\" class=\"nagradaRazlog\">"+nagradaRazlog+"</textarea>";	
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					var kaznaRazlog = izvestaj.kaznaRazlog ? izvestaj.kaznaRazlog : "";
+					td.innerHTML = "<textarea placeholder=\"Разлог кажњавања\" class=\"kaznaRazlog\">"+kaznaRazlog+"</textarea>";	
+					tr.appendChild(td);
+				table.appendChild(tr);
+			wrap.appendChild(table);
 
 			var table = document.createElement("TABLE");
 			table.setAttribute("class","radnoVreme");
@@ -261,9 +280,13 @@
 
 
 			var button = document.createElement("BUTTON");
-			button.setAttribute("onclick","dodajRed()")
+			button.setAttribute("onclick","dodajRed()");
+			button.style.width="100%";
+			button.style.marginBottom="30px";
 			button.innerHTML = "DODAJ RED";
 			wrap.appendChild(button)
+
+
 
 			
 
@@ -319,6 +342,25 @@
 				
 			wrap.appendChild(table);
 		document.getElementsByClassName("jucerasnjiUcinak")[0].appendChild(wrap);
+
+		var title = document.createElement("DIV");
+			title.setAttribute("style","font-size:20px;font-weight:600;margin-top:15px;")
+			title.innerHTML = "Вожено возило:";
+			wrap.appendChild(title)
+			var vehicleSelect = document.createElement("DIV");
+			vehicleSelect.setAttribute("class","vehicleSelect");
+			
+				var select = document.createElement("SELECT");
+				select.setAttribute("id","vozilo");
+					for(var j = 0;j<vozila.vozila.Data.length;j++){
+						var option = document.createElement("OPTION");
+						option.setAttribute("value",vozila.vozila.Data[j].DeviceName);
+						option.innerHTML = vozila.vozila.Data[j].DeviceName;
+						select.appendChild(option);
+					}
+				select.setAttribute("oninput","voziloPick(this)");
+				vehicleSelect.appendChild(select);
+			wrap.appendChild(vehicleSelect);
 
 		var dailySummary = document.createElement("DIV");
 		dailySummary.setAttribute("class","dailySummary");
@@ -462,6 +504,10 @@
 			json.prviNalog = document.getElementsByClassName("prviNalog")[0].value;
 			json.odsustvo = "";
 			json.komentarVremena = document.getElementById("komentar-vremena").value;
+			json.nagrada = document.getElementsByClassName("nagrada")[0].value;
+			json.nagradaRazlog = document.getElementsByClassName("nagradaRazlog")[0].value;
+			json.kazna = document.getElementsByClassName("kazna")[0].value;
+			json.kaznaRazlog = document.getElementsByClassName("kaznaRazlog")[0].value;
 			var checkboxes = document.getElementById("prisustvo-checkboxes").getElementsByClassName("checkbox");
 			for(var i=0;i<checkboxes.length;i++){
 				if(checkboxes[i].checked){
