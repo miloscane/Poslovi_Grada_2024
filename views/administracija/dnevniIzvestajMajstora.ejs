@@ -8,7 +8,7 @@
 		var izvestaj = <%-JSON.stringify(izvestaj)%>;
 		var reversi = <%-JSON.stringify(reversi)%>;
 		var date = "<%=date%>";
-		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Топлане","Потребма вома","Нема приступа","ГЗР","Одбијају сарадњу","Неспремно"]
+		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Топлане","Потребма вома","Нема приступа","ГЗР","Одбијају сарадњу","Неспремно"];
 	</script>
 	<div class="pageWidth jucerasnjiUcinak">
 
@@ -402,7 +402,7 @@
 				parent.nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("opisText")[0].innerHTML = "/";
 			}else{
 				parent.getElementsByClassName("radnaJedinica")[0].getElementsByClassName("radnaJedinicaInput")[0].value = data.radnaJedinica;
-				parent.getElementsByClassName("adresa")[0].getElementsByClassName("adresaInput")[0].innerHTML = data.adresa;
+				parent.getElementsByClassName("adresa")[0].getElementsByClassName("adresaInput")[0].value = data.adresa;
 				parent.nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("opisText")[0].innerHTML = data.opis;
 			}
 			
