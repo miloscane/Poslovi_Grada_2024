@@ -10339,24 +10339,31 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				}
 			};
 
-			await izvestajiDB.insertOne(izvestajJson);
+			
 			await stambenoDB.insertOne(nalogJSON);
 			var nalozi = await naloziDB.find({broj:nalogJSON.reqBody.note_details[0].broj_naloga.toString()}).toArray();
-
-			if (note.kreirao_belesku.toLowerCase().includes("stambeno")) {
-				var nalog = nalozi[0];
-				io.emit(
-					"notification",
-					"noviKomentar",
-					"<div class=\"title\">KOMENTAR STAMBENOG</div>"+
-					 "<div class=\"text\">"+
-					  "<a href=\"/nalog/"+nalog.broj+"\" target=\"blank\">"+nalog.broj+"</a> -"+ 
-					  "<span class=\"adresa\">"+nalog.adresa+"</span> - "+
-					  "<span class=\"radnaJedinica\">"+nalog.radnaJedinica+"</span>"+
-					 "</div>",
-					nalog.radnaJedinica
-				);
+			if(nalozi.length==0){
+				var nalozi = await client.db("Hausmajstor").collection('Nalozi').find({broj:nalogJSON.reqBody.note_details[0].broj_naloga.toString()}).toArray();
+				await client.db("Hausmajstor").collection('Izvestaji').insertOne(izvestajJson);
+			}else{
+				await izvestajiDB.insertOne(izvestajJson);
+				if (note.kreirao_belesku.toLowerCase().includes("stambeno")) {
+					var nalog = nalozi[0];
+					io.emit(
+						"notification",
+						"noviKomentar",
+						"<div class=\"title\">KOMENTAR STAMBENOG</div>"+
+						 "<div class=\"text\">"+
+						  "<a href=\"/nalog/"+nalog.broj+"\" target=\"blank\">"+nalog.broj+"</a> -"+ 
+						  "<span class=\"adresa\">"+nalog.adresa+"</span> - "+
+						  "<span class=\"radnaJedinica\">"+nalog.radnaJedinica+"</span>"+
+						 "</div>",
+						nalog.radnaJedinica
+					);
+				}
 			}
+
+			
 
 			res.status(200).json({
 				code: "200",
