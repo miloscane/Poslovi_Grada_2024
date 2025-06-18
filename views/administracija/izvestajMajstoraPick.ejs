@@ -1,6 +1,20 @@
 <%- include ("partials/header") -%>
+<style>
+	.pageWidth{
+		width:100% !important;
+		max-width:none !important;
+	}
+</style>
+	<!-- Include html2canvas from CDN -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 	<script>
+
 		var majstori = <%-JSON.stringify(majstori)%>;
+		var izvestaji = <%-JSON.stringify(izvestaji)%>;
+		var yesterday = new Date(<%- JSON.stringify(yesterday) %>);
+		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Топлане","Потребма вома","Нема приступа","ГЗР","Одбијају сарадњу","Неспремно"];
+		console.log(izvestaji)
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 	</script>
 	<div class="pageWidth">
@@ -24,6 +38,167 @@
 				loadGif();
 				window.location.href = "/izvestajMajstora/"+document.getElementById("majstori").value+"/"+document.getElementById("date").value;
 			}
+		</script>
+		<div class="overviewForm">
+			<div class="naloziWrap">
+				<div class="title">Структура радних налога по мајсторима за дан <span id="dan"></span> <span id="datum"></span></div>
+				<script>
+					document.getElementById("dan").innerHTML = daniUNedelji[(yesterday.getDay() + 6) % 7];
+					document.getElementById("datum").innerHTML = getDateAsStringForDisplay(yesterday);
+					const danSpan = document.getElementById("dan");
+					const datumSpan = document.getElementById("datum");
+
+					// Replace the <span> with its text content
+					danSpan.replaceWith(document.createTextNode(danSpan.textContent));
+					datumSpan.replaceWith(document.createTextNode(datumSpan.textContent));
+				</script>
+				<div id="nalozi"></div>
+				<div class="absoluteLogo"><img src="/favicon.png"></div>
+			</div>
+			<div class="buttonWrap"><button onclick="exportElementAsImage(this.parentElement.parentElement.getElementsByClassName('naloziWrap')[0])">Stampaj</button></div>
+			
+		</div>
+		<script>
+			var table = document.createElement("TABLE");
+				var tr = document.createElement("TR");
+					var th = document.createElement("TH");
+					th.innerHTML = "Мајстор";
+					tr.appendChild(th);
+					
+					for(var i=0;i<radovi.length;i++){
+						var th = document.createElement("TH");
+						th.innerHTML = radovi[i];
+						tr.appendChild(th);	
+					}
+
+					var th = document.createElement("TH");
+					th.innerHTML = "Укупно";
+					tr.appendChild(th);	
+
+				table.appendChild(tr);
+
+				for(var i=0;i<majstori.length;i++){
+					var tr = document.createElement("TR");
+						var td = document.createElement("TD");
+						td.innerHTML = majstori[i].ime;
+						tr.appendChild(td);
+
+						var kategorijeRada = [];
+						for(var j=0;j<radovi.length;j++){
+							var json = {};
+							json.kategorija = radovi[j];
+							json.kolicina = 0;
+							for(var k=0;k<izvestaji.length;k++){
+								if(izvestaji[k].majstor==majstori[i].uniqueId){
+									for(var l=0;l<izvestaji[k].nalozi.length;l++){
+										if(izvestaji[k].nalozi[l].tipoviRada[0]==json.kategorija){
+											json.kolicina++;
+										}
+									}
+								}
+							}
+							kategorijeRada.push(json)
+						}
+						var ukupno = 0;
+						for(var j=0;j<kategorijeRada.length;j++){
+							ukupno = ukupno + kategorijeRada[j].kolicina;
+						}
+
+						if(ukupno!=0){
+							for(var j=0;j<kategorijeRada.length;j++){
+								var td = document.createElement("TD");
+								td.innerHTML = kategorijeRada[j].kolicina;
+								tr.appendChild(td);
+							}
+
+							var td = document.createElement("TD");
+							td.innerHTML = ukupno;
+							tr.appendChild(td);
+						}else{
+							var td = document.createElement("TD");
+							var odsustvo = "НЕМА ИЗВЕШТАЈА"
+							for(var k=0;k<izvestaji.length;k++){
+								if(izvestaji[k].majstor==majstori[i].uniqueId){
+									odsustvo = izvestaji[k].odsustvo ? izvestaji[k].odsustvo : "НЕДЕФИНИСАНО";
+								}
+							}
+							td.setAttribute("colspan",radovi.length+1)
+							td.setAttribute("style","text-align:left;font-weight:500")
+							td.innerHTML = odsustvo;
+							tr.appendChild(td);
+						}
+
+						
+
+						
+					table.appendChild(tr);
+				}
+				var tr = document.createElement("TR");
+					var td = document.createElement("TD");
+					td.innerHTML = "УКУПНО";
+					tr.appendChild(td);
+
+					var kategorijeRada = [];
+					for(var j=0;j<radovi.length;j++){
+						var json = {};
+						json.kategorija = radovi[j];
+						json.kolicina = 0;
+						kategorijeRada.push(json)
+					}
+
+					for(var j=0;j<kategorijeRada.length;j++){
+						var td = document.createElement("TD");
+						for(var k=0;k<izvestaji.length;k++){
+							//if(izvestaji[k].majstor==majstori[i].uniqueId){
+								for(var l=0;l<izvestaji[k].nalozi.length;l++){
+									if(izvestaji[k].nalozi[l].tipoviRada[0]==kategorijeRada[j].kategorija){
+										kategorijeRada[j].kolicina++;
+									}
+								}
+							//}
+						}
+						td.innerHTML = kategorijeRada[j].kolicina;
+						tr.appendChild(td);
+					}
+
+					var td = document.createElement("TD");
+					var ukupno = 0;
+					for(var j=0;j<kategorijeRada.length;j++){
+						ukupno = ukupno + kategorijeRada[j].kolicina;
+					}
+					td.innerHTML = ukupno;
+					tr.appendChild(td);
+				table.appendChild(tr);
+			document.getElementById("nalozi").appendChild(table);
+
+			function exportElementAsImage(elem) {
+			    const element = elem;
+			    if (!element) return;
+
+			    // Save original style
+			    const originalHeight = element.style.height;
+			    const originalOverflow = element.style.overflow;
+
+			    // Expand to full content height
+			    element.style.height = element.scrollHeight + "px";
+			    element.style.overflow = "visible";
+
+			    html2canvas(element, {
+			        scale: 1,
+			        useCORS: true
+			    }).then(canvas => {
+			        // Revert to original style
+			        element.style.height = originalHeight;
+			        element.style.overflow = originalOverflow;
+
+			        // Trigger download
+			        const link = document.createElement("a");
+			        link.download = elem.getElementsByClassName("title")[0]?.innerHTML.replace(/\./g, '-') || "image";
+			        link.href = canvas.toDataURL();
+			        link.click();
+			    });
+			}
+
 		</script>
 	</div>
 <%- include ("partials/footer") -%>

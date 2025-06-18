@@ -7904,22 +7904,26 @@ server.get('/stefan/ucinakDispecera',async (req,res)=>{
 server.get('/izvestajMajstoraPick',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
-			majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray()
-			.then((majstori)=>{
+			try{
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
+				var yesterday = new Date();
+				yesterday.setDate(yesterday.getDate()-1);
+				var izvestaji = await dnevniIzvestajiDB.find({date:getDateAsStringForInputObject(yesterday)}).toArray();
 				res.render("administracija/izvestajMajstoraPick",{
 					pageTitle:"Одабери мајстора и датум",
 					user: req.session.user,
-					majstori: majstori
+					majstori: majstori,
+					izvestaji: izvestaji,
+					yesterday: yesterday
 				})
-			})
-			.catch((error)=>{
-				logError(error);
+			}catch(err){
+				logError(err);
 				res.render("message",{
 					pageTitle: "Програмска грешка",
 					user: req.session.user,
 					message: "<div class=\"text\">Дошло је до грешке у бази податка 7345.</div>"
 				});
-			})
+			}
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
