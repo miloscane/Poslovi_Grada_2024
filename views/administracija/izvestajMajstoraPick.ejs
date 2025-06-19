@@ -12,7 +12,7 @@
 
 		var majstori = <%-JSON.stringify(majstori)%>;
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
-		var yesterday = new Date(<%- JSON.stringify(yesterday) %>);
+		var yesterdayServer = new Date(<%- JSON.stringify(yesterday) %>);
 		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Топлане","Потребма вома","Нема приступа","ГЗР","Одбијају сарадњу","Неспремно"];
 		console.log(izvestaji)
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
@@ -43,8 +43,8 @@
 			<div class="naloziWrap">
 				<div class="title">Структура радних налога по мајсторима за дан <span id="dan"></span> <span id="datum"></span></div>
 				<script>
-					document.getElementById("dan").innerHTML = daniUNedelji[(yesterday.getDay() + 6) % 7];
-					document.getElementById("datum").innerHTML = getDateAsStringForDisplay(yesterday);
+					document.getElementById("dan").innerHTML = daniUNedelji[(yesterdayServer.getDay() + 6) % 7];
+					document.getElementById("datum").innerHTML = getDateAsStringForDisplay(yesterdayServer);
 					const danSpan = document.getElementById("dan");
 					const datumSpan = document.getElementById("datum");
 
@@ -107,11 +107,13 @@
 						if(ukupno!=0){
 							for(var j=0;j<kategorijeRada.length;j++){
 								var td = document.createElement("TD");
+								td.setAttribute("style","font-weight:500;font-size:20px")
 								td.innerHTML = kategorijeRada[j].kolicina;
 								tr.appendChild(td);
 							}
 
 							var td = document.createElement("TD");
+								td.setAttribute("style","font-weight:700;font-size:20px")
 							td.innerHTML = ukupno;
 							tr.appendChild(td);
 						}else{

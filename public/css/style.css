@@ -6576,6 +6576,7 @@ input[type=number] {
 
 .overviewForm table tr:last-child{
     font-weight:700;
+    font-size:20px;
 }
 
 .overviewForm table tr:nth-child(odd){
