@@ -5165,6 +5165,45 @@ server.get('/administracija/stanjePoOpstinama',async (req,res)=>{
 	}
 });
 
+server.get('/administracija/stanjePodizvodjaca',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var month = eval(new Date().getMonth()+1).toString().padStart(2,"0")+"."+new Date().getFullYear();
+				var naloziPoPrijemnicama = await naloziDB.find({majstor:{$in: podizvodjaci},"prijemnica.datum.datum":{$regex:month}}).toArray();
+				var otvoreniNalozi = await naloziDB.find({statusNaloga:{$nin:["Storniran"]},majstor:{$in: podizvodjaci},"prijemnica.broj":""}).toArray();
+				var majstori = await majstoriDB.find({uniqueId:{$in:podizvodjaci}}).toArray();
+				var nalozi = naloziPoPrijemnicama;
+				for(var i=0;i<otvoreniNalozi.length;i++){
+					nalozi.push(otvoreniNalozi[i]);
+				}
+
+				res.render("administracija/stanjePodizvodjaca",{
+					pageTitle: "Стање подизвођача",
+					user: req.session.user,
+					majstori:majstori,
+					nalozi: nalozi 
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 5178.</div>"
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.get('/administracija/jucerasnjiUcinak',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){

@@ -14,7 +14,6 @@
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
 		var yesterdayServer = new Date(<%- JSON.stringify(yesterday) %>);
 		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Потребма вома","Нема приступа","Одбијају сарадњу","Неспремно"];
-		console.log(izvestaji)
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 	</script>
 	<div class="pageWidth">
