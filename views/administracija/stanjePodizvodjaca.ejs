@@ -22,6 +22,7 @@
 						<div class="text" style="font-size:12px">Без обрачуна: <span id="neobracunati-prikazanih-naloga"></span></div>
 						<div class="text" style="font-size:12px">Са пријемницом: <span id="prijemnica-prikazanih-naloga"></span></div>
 						<div class="text" style="font-size:12px">Износи са пријемница: <span id="prijemnica-iznos-prikazanih-naloga"></span></div>
+						<div class="text" style="font-size:12px">Апроксимиран укупан износ: <span id="aproksimacija-prikazanih-naloga"></span></div>
 					</div>
 				</div>
 			</div>
@@ -175,6 +176,7 @@
 					document.getElementById("neobracunati-prikazanih-naloga").innerHTML		=	naloziBezObracuna;
 					document.getElementById("prijemnica-prikazanih-naloga").innerHTML		=	naloziSaPrijemnicom;
 					document.getElementById("prijemnica-iznos-prikazanih-naloga").innerHTML	=	brojSaRazmacima(iznosSaPrijemnicom);
+					document.getElementById("aproksimacija-prikazanih-naloga").innerHTML	=	brojSaRazmacima(ukupanIznos+naloziBezObracuna*iznosSaPrijemnicom/naloziSaPrijemnicom);
 				}
 
 				generateTable();
