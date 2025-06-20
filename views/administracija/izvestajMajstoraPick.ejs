@@ -13,7 +13,7 @@
 		var majstori = <%-JSON.stringify(majstori)%>;
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
 		var yesterdayServer = new Date(<%- JSON.stringify(yesterday) %>);
-		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Топлане","Потребма вома","Нема приступа","ГЗР","Одбијају сарадњу","Неспремно"];
+		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Потребма вома","Нема приступа","Одбијају сарадњу","Неспремно"];
 		console.log(izvestaji)
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 	</script>
@@ -30,10 +30,6 @@
 		<br>
 		<input type="date" id="date" oninput="submitForm()">
 		<script>
-			var yesterday = new Date();
-			//yesterday.setDate(yesterday.getDate()-1);
-			//document.getElementById("date").value = getDateAsStringForInputObject(yesterday)
-
 			function submitForm(){
 				loadGif();
 				window.location.href = "/izvestajMajstora/"+document.getElementById("majstori").value+"/"+document.getElementById("date").value;
