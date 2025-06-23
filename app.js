@@ -10161,7 +10161,7 @@ server.get('/magacioner/prekojucerasnjiReversi', async (req, res)=> {
 				var proizvodi = await proizvodiDB.find({}).toArray();
 				var majstori = await majstoriDB.find({}).toArray();
 				res.render("magacioner/rezultatPretrage",{
-					pageTitle: "Јучерашњи реверси",
+					pageTitle: "Прекојучерашњи реверси",
 					user: req.session.user,
 					reversi: reversi,
 					majstori: majstori,
