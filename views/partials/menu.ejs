@@ -112,6 +112,12 @@
 								</div>
 							</div>
 							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="#">Трећа лица <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/trecaLica" onclick="loadGif()">Преглед</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/trecaLica/noviNalog" onclick="loadGif()">Нови налог</a><div class="bottomBorder"></div></div>
+								</div>
+							</div>
 						<% }else if(Number(user.role)==20){ %>
 							<div class="menuItem"><a href="/dispecer/sviNalozi">Налози <span class="carret">&or;</span></a><div class="rightBorder"></div>
 								<div class="subMenu">

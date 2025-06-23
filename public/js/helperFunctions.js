@@ -287,6 +287,63 @@ function sToHHMM(ms) {
     return `${hours}:${minutes}`;
 }
 
+function smartSplitCSVLine(line) {
+  const result = [];
+  let current = '';
+  let insideQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    const nextChar = line[i + 1];
+
+    if (char === '"') {
+      if (insideQuotes && nextChar === '"') {
+        // Escaped quote (""), add one quote
+        current += '"';
+        i++; // Skip next quote
+      } else {
+        // Toggle insideQuotes
+        insideQuotes = !insideQuotes;
+      }
+    } else if (char === ',' && !insideQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current); // Push the last field
+
+  return result;
+}
+
+function parseLocalizedNumber(input) {
+  if (typeof input === "number") return input; // Already a number
+
+  if (typeof input !== "string") return NaN; // Not a string or number
+
+  // Remove all whitespace (space as thousand separator)
+  input = input.replace(/\s/g, '');
+
+  const lastComma = input.lastIndexOf(',');
+  const lastDot = input.lastIndexOf('.');
+
+  let decimalSeparator;
+  if (lastComma > lastDot) {
+    decimalSeparator = ',';
+  } else {
+    decimalSeparator = '.';
+  }
+
+  // Replace all separators except the last decimal with ''
+  const cleaned = input.replace(/[.,]/g, (match, offset) => {
+    return offset === (decimalSeparator === ',' ? lastComma : lastDot) ? '.' : '';
+  });
+
+  return parseFloat(cleaned);
+}
+
+
 var definicijeProizvoda = [
                     {
                       "startCode":"01.01",

@@ -6614,6 +6614,243 @@ input[type=number] {
     font-weight: 400;
 }
 
+.trecaLica .inputWrap{
+    max-width: 100%;
+    width:100%;
+}
+
+.trecaLica .inputWrap input[type="number"]{
+    padding:10px 10px;
+    font-size:14px;
+    color:rgb(37,57,101);
+    line-height:20px;
+    width:100%;
+    outline:none;
+    box-shadow:1px 1px 4px rgba(37,57,101,0);
+    border:1px solid rgb(37,57,101);
+    -webkit-transition:all ease 0.5s;
+    -moz-transition:all ease 0.5s;
+    -ms-transition:all ease 0.5s;
+    -o-transition:all ease 0.5s;
+    transition:all ease 0.5s;
+}
+
+.trecaLica .inputWrap input[type="number"]:focus{
+    box-shadow:1px 1px 4px rgba(37,57,101,0.5);
+}
+
+.trecaLica .inputWrap #naziv{
+    text-align: center;
+    font-weight:600;
+    font-size:22px;
+}
+
+.trecaLica .inputWrap input{
+    text-align: center;
+}
+
+.trecaLica .inputWrap input::placeholder{
+    color:rgba(32,51,100,0.3);
+}
+
+.trecaLica .inlineHalf{
+    font-size:0;
+    width:100%;
+}
+
+.trecaLica .inlineHalf .inline{
+    width:50%;
+    display:inline-block;
+    vertical-align: top;
+    padding:10px 20px;
+}
+
+.trecaLica .kreiranje .cenovnik .header{
+    margin:10px 0;
+    font-size:0px;
+}
+
+.trecaLica .kreiranje .cenovnik .header .inline{
+    display:inline-block;
+    vertical-align: top;
+    font-size:12px;
+    width:25%;
+    padding:10px;
+}
+
+
+.trecaLica .kreiranje .cenovnik .firstRow{
+    text-align:center;
+}
+
+
+
+.trecaLica .kreiranje .cenovnik .row {
+    display: flex;
+    align-items: stretch;     /* Equal height */
+    text-align: left;
+    flex-wrap: nowrap;        /* All items on one row */
+    overflow-x: auto;         /* Optional scroll if too many items */
+}
+
+.trecaLica .kreiranje .cenovnik .row .item {
+    flex: 1;                  /* Equal width */
+    font-size: 12px;
+    text-align: left;
+    box-sizing: border-box;
+    border: 1px solid rgb(100, 100, 100);
+    word-wrap: break-word;    /* Allow text to wrap */
+    overflow-wrap: break-word;
+    white-space: normal;      /* Allow multiline text */
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    max-height:200px;
+    overflow-y:scroll;
+    padding:5px;
+}
+
+.trecaLica .kreiranje .cenovnik .firstRow .item{
+    text-align:center;
+    font-weight:600;
+}
+
+.trecaLica .kreiranje .cenovnik #formiran-cenovnik{
+    height:400px;
+    overflow-x:hidden;
+    border:1px solid rgb(0,0,0);
+}
+
+.trecaLica .kreiranje .krajnjiCenovnik{
+    margin-top:3px;
+    height:400px;
+    overflow-y:scroll;
+    border:1px solid rgb(100,100,100);
+}
+
+.trecaLica .kreiranje .krajnjiCenovnik .row {
+    font-size:0px;
+}
+
+.trecaLica .kreiranje .krajnjiCenovnik .row .item {
+    display:inline-block;
+    vertical-align: top;
+    font-size:12px;
+    border: 1px solid rgb(100, 100, 100);
+    padding:5px;
+    height:70px;
+    overflow-y:scroll;
+    width:150px;
+}
+
+.trecaLica .kreiranje .krajnjiCenovnik .firstRow .item{
+    text-align:center;
+    font-weight:600;
+    height:30px;
+}
+
+.trecaLica .kreiranje .krajnjiCenovnik .firstRow .naziv{
+    text-align:left;
+}
+
+
+.trecaLica .kreiranje .krajnjiCenovnik .row .naziv{
+    width:calc(100% - 500px);
+    text-align:left;
+}
+
+.trecaLica .kreiranje .krajnjiCenovnik .row .broj{
+    width:50px;
+    text-align:left;
+}
+
+.trecaLica .boxesWrap{
+    display:flex;
+    flex-wrap: wrap;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    margin-top:20px;
+    margin-bottom:40px;
+}
+
+.trecaLica .boxesWrap .box{
+    width: calc(33.333% - 20px);
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    margin:5px;
+    background-color:rgb(37,57,101);
+    color:rgb(255,255,255);
+    font-size:0;
+    -webkit-transition:all ease 0.5s;
+    -moz-transition:all ease 0.5s;
+    -ms-transition:all ease 0.5s;
+    -o-transition:all ease 0.5s;
+    transition:all ease 0.5s;
+    padding:20px;
+    position:relative;
+}
+
+.trecaLica .boxesWrap .box:hover{
+    background-color:rgb(93,142,220);
+}
+
+.trecaLica .boxesWrap .box .naziv{
+    font-weight:700;
+    font-size:20px;
+    color:rgb(255,255,255);
+    text-align:center;
+}
+
+.trecaLica .boxesWrap .box .icon{
+    width:72px;
+    display:inline-block;
+    vertical-align: top;
+    margin-right:10px;
+}
+
+.trecaLica .boxesWrap .box .info{
+    width:calc(100% - 82px);
+    display:inline-block;
+    vertical-align: top;
+    font-size:14px;
+}
+
+.trecaLica .boxesWrap .box .info .title{
+    font-size:26px;
+    font-weight:700;
+}
+
+.trecaLica .boxesWrap .box .info .text{
+    font-size:18px;
+    font-weight:400;
+    margin:5px auto;
+}
+
+.trecaLica .boxesWrap .box .info .note{
+    font-size:12px;
+    font-weight:200;
+}
+
+.trecaLica .boxesWrap .box select{
+    background-color:rgba(0,0,0,0.4);
+    color:rgb(255,255,255);
+}
+
+.trecaLica .boxesWrap .box input, .trecaLica .boxesWrap .box textarea{
+    background-color:rgba(0,0,0,0.4);
+    color:rgb(255,255,255);
+    outline:none;
+    border:1px solid rgb(255,255,255);
+    border-radius:2px;
+    padding:5px;
+    font-size:14px;
+    width:100%;
+}
+
+.trecaLica .boxesWrap .box textarea{
+    resize:none;
+    height:200px;
+}
+
 @media screen and (max-width: 1100px) {
     .pageWidth{
         padding-left:10px;

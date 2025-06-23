@@ -1,0 +1,296 @@
+<%- include ("partials/header") -%>
+	<script>
+		var treceLice = <%-JSON.stringify(treceLice)%>;
+		var nalog = <%-JSON.stringify(nalog)%>;
+		var cenovnik = treceLice.cenovnik;
+		var izvestaji = <%-JSON.stringify(izvestaji)%>;
+	</script>
+	<div class="pageWidth">
+		<div class="administracijaNalog nalog">
+			<div class="boxesWrap">
+				<div class="box" style="cursor:pointer;" onclick="window.open('https://www.google.com/maps/search/?api=1&query='+treceLice.adresa.replace(/,/g, '%2C').replace(/ /g, '+'),'_blank')">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/locationIcon.png"></div>
+					<div class="info">
+						<div class="title">Адреса</div>
+						<div class="text"><span id="adresa-naloga"></span></div>
+						<script>
+							document.getElementById("adresa-naloga").innerHTML = treceLice.adresa;
+						</script>
+						<div class="note">Кликни да видиш на мапи</div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/statusIcon.png"></div>
+					<div class="info">
+						<div class="title">Статус</div>
+						<div class="text">
+							<select id="status-naloga">
+								<option value="Primljen" default="default">Примљен</option>
+								<option value="Radovi u toku">Радови у току</option>
+								<option value="Finalizacija">Финализација</option>
+								<option value="Završeno">Завршено</option>
+								<option value="Spreman za obračun">Спреман за обрачун</option>
+								<option value="Spreman za fakturisanje">Спреман за фактурисање</option>
+								<option value="Fakturisan">Фактурисан</option>
+								<option value="Storniran">Сторниран</option>
+							</select>
+							<script>
+								document.getElementById("status-naloga").value=nalog.statusNaloga;
+							</script>
+						</div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumIcon.png"></div>
+					<div class="info">
+						<div class="title">Датум налога</div>
+						<div class="text"><span id="datum-naloga"></span></div>
+						<script>
+							document.getElementById("datum-naloga").innerHTML = nalog.datum.datum;
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
+					<div class="info">
+						<div class="title">Назив пројекта</div>
+						<div class="text"><span id="naziv-projekta"></span></div>
+						<script>
+							document.getElementById("naziv-projekta").innerHTML = nalog.nazivProjekta;
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Износ налога</div>
+						<div class="text"><span id="iznos-naloga"></span></div>
+						<script>
+							document.getElementById("iznos-naloga").innerHTML = brojSaRazmacima(nalog.ukupanIznos);
+						</script>
+					</div>
+				</div>
+			</div>
+			<%- include ("partials/obracunNaloga") -%>
+			<div class="detalji">
+				<div class="title">Оператива</div>
+				<div class="boxesWrap">
+					<div class="box">
+						<div class="info">
+							<div class="title">Опис налога</div>
+							<div class="text"><%=nalog.opisNaloga%></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="izvestaji">
+				<div class="title">Извештаји</div>
+				<div class="qrWrap">
+					<div id="qr"></div>
+					<div class="sticker"><div class="relative"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png"></div></div>
+					<div class="note"><div>Скенирајте како би додали слике са вашег телефона.</div></div>
+				</div>
+				<script src="/js/qr.js"></script>
+				<script>
+					function generateQr(accessCode){
+						document.getElementById("qr").innerHTML = "";
+						document.getElementById("qr").title = "";
+						var qrcode = new QRCode("qr", {
+						    text: "https://vik2024.poslovigrada.rs/nalog/<%=nalog.broj%>/"+accessCode+"/"+encodeURIComponent(user.email),
+						    width: 150,
+						    height: 150,
+						    colorDark : "#000000",
+						    colorLight : "#ffffff",
+						    correctLevel : QRCode.CorrectLevel.M
+						});
+					}
+					generateQr("<%=phoneAccessCode%>")
+					socket.on("phoneAccessCode",function(code){
+						generateQr(code);
+					})
+				</script>
+				<div id="komentari"></div>
+				<script>
+					for(var i=0;i<izvestaji.length;i++){
+						var izvestajBox = document.createElement("DIV");
+						if(izvestaji[i].user.email == "<%=user.email%>"){
+							izvestajBox.setAttribute("class","izvestajBox izvestajUser");
+						}else{
+							izvestajBox.setAttribute("class","izvestajBox");
+						}
+							var izvestajName = document.createElement("DIV");
+							izvestajName.setAttribute("class","name");
+							izvestajName.innerHTML = izvestaji[i].user.name + " <span>"+datetimeToReadable(izvestaji[i].datetime)+"</span>";
+							izvestajBox.appendChild(izvestajName);
+
+							var izvestajText = document.createElement("DIV");
+							izvestajText.setAttribute("class","text");
+							izvestajText.innerHTML = izvestaji[i].izvestaj;
+							izvestajBox.appendChild(izvestajText);
+
+							var izvestajPhotos = document.createElement("DIV");
+							izvestajPhotos.setAttribute("class","previewImages");
+							for(var j=0;j<izvestaji[i].photos.length;j++){
+								var izvestajPhoto = document.createElement("DIV");
+								izvestajPhoto.setAttribute("class","imagePreview")
+								izvestajPhoto.setAttribute("onclick","previewImage(this,\""+nalog.broj+"\")");;
+									var izvestajImage = document.createElement("IMG");
+									izvestajImage.setAttribute("class","image");
+									izvestajImage.setAttribute("src",izvestaji[i].photos[j])
+									izvestajPhoto.appendChild(izvestajImage);
+								izvestajPhotos.appendChild(izvestajPhoto);
+							}
+							if(izvestaji[i].signature){
+								var signCanvas = document.createElement("CANVAS");
+								signCanvas.setAttribute("width","1000");
+								signCanvas.setAttribute("height","1000");
+								izvestajPhotos.appendChild(signCanvas);
+								var signPad = new SignaturePad(signCanvas,{penColor: "rgb(0,0,0)"});
+								signPad.fromData(izvestaji[i].signature);
+								var photo = document.createElement("DIV");
+								photo.setAttribute("class","imagePreview");
+								photo.setAttribute("onclick","previewImage(this)");
+								photo.setAttribute("style","background:none");
+									var image = document.createElement("IMG");
+									image.setAttribute("class","image");
+									image.setAttribute("src",signPad.toDataURL());
+									photo.appendChild(image);
+								izvestajPhotos.appendChild(photo);
+								signCanvas.remove();
+							}
+							izvestajBox.appendChild(izvestajPhotos);
+						document.getElementById("komentari").appendChild(izvestajBox);
+
+					}
+				</script>
+				<div class="inputWrapper">
+					<div class="inputWrap buttonWrap izvestajInputWrap">
+						<textarea id="komentar" placeholder="Текст извештаја"></textarea>
+						<div class="previewImages" id="preview-images"></div>
+						<div class="buttonWrap" onclick="document.getElementById('slike-input').click()">
+							<div class="button">
+								<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/addImageIcon.png"></div>
+								<div class="label">Додај слике</div>
+								<form method="POST" action="/edit-nalog-treca-lica" id="form" enctype="multipart/form-data" style="display:none;">
+									<input type="text" name="json" id="json">
+									<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
+								</form>
+								<script>
+									document.getElementById("slike-input").onchange = evt => {
+										document.getElementById("preview-images").innerHTML = "";
+										for(var i=0;i<document.getElementById("slike-input").files.length;i++){
+											var imagePreview =	document.createElement("DIV");
+											imagePreview.setAttribute("class","imagePreview");
+											imagePreview.setAttribute("onclick","previewImage(this,"+nalog.broj+")");
+												var image = document.createElement("IMG");
+												image.setAttribute("class","image");
+												image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
+												imagePreview.appendChild(image)
+											document.getElementById("preview-images").appendChild(imagePreview);
+										}
+										if(document.getElementById("slike-input").files.length>20){
+											alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 20 слика по извештају. Уколико желите да окачите више од 10 слика направите два извештаја.");
+											document.getElementById("preview-images").innerHTML = "";
+											document.getElementById("slike-input").value = "";
+										}
+									}
+								</script>
+							</div>
+						</div>
+						<div class="dropSlike" id="drop-zone" style="">Или превуци слике овде</div>
+						<script>
+							var dropContainer = document.getElementById("drop-zone");
+							dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
+							  evt.preventDefault();
+							};
+
+							dropContainer.ondrop = function(evt) {
+							  // pretty simple -- but not for IE :(
+							  	document.getElementById("slike-input").files = evt.dataTransfer.files;
+							  	document.getElementById("drop-zone").classList.remove("dropHot");
+							  	document.getElementById("preview-images").innerHTML = "";
+								for(var i=0;i<document.getElementById("slike-input").files.length;i++){
+									var imagePreview =	document.createElement("DIV");
+									imagePreview.setAttribute("class","imagePreview");
+									imagePreview.setAttribute("onclick","previewImage(this)");
+										var image = document.createElement("IMG");
+										image.setAttribute("class","image");
+										image.setAttribute("src",URL.createObjectURL(document.getElementById("slike-input").files[i]));
+										imagePreview.appendChild(image)
+									document.getElementById("preview-images").appendChild(imagePreview);
+								}
+								if(document.getElementById("slike-input").files.length>20){
+									alert("УПОЗОРЕЊЕ!! Могуће је окачити максимално 20 слика по извештају. Уколико желите да окачите више од 10 слика направите два извештаја.");
+									document.getElementById("preview-images").innerHTML = "";
+									document.getElementById("slike-input").value = "";
+								}
+							  evt.preventDefault();
+							};
+
+							dropContainer.ondragover = function(evt) {
+							  evt.preventDefault();
+							  document.getElementById("drop-zone").classList.add("dropHot");
+							};
+
+							dropContainer.ondragleave = function(evt) {
+							  evt.preventDefault();
+							  document.getElementById("drop-zone").classList.remove("dropHot");
+							};
+						</script>
+					</div>
+				</div>
+				<div class="saveNalog">
+					<div class="inputWrapper">
+						<div class="inputWrap">
+							<div class="button" onclick="saveNalog()">САЧУВАЈ ИЗМЕНЕ НА НАЛОГУ</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<script>
+				if(nalog.obracun){
+					for(var i=0;i<nalog.obracun.length;i++){
+						addRow({code:nalog.obracun[i].code,quantity:nalog.obracun[i].quantity,price:nalog.obracun[i].price})
+					}
+					calculateTable();
+				}
+				addRow();
+
+				function saveNalog(){
+					var nalogJson = {};
+					nalogJson.id = nalog.uniqueId;
+					nalogJson.broj = nalog.broj;
+					nalogJson.status = document.getElementById("status-naloga").value;
+					nalogJson.obracun = [];
+					var obracuni = document.getElementById("obracun-wrap").getElementsByClassName("row");
+					var ukupanIznos = 0;
+					for(var i=0;i<obracuni.length;i++){
+						var obracunElem = obracuni[i];
+						
+						if(obracunElem.getElementsByClassName("sifra")[0].getElementsByTagName("INPUT")[0].value){
+							var obracunJson = {};
+							obracunJson.code		= 	obracunElem.getElementsByClassName("sifra")[0].getElementsByTagName("INPUT")[0].value;
+							obracunJson.quantity	= 	obracunElem.getElementsByClassName("kolicina")[0].getElementsByTagName("INPUT")[0].value;
+							var iznosStavke = getPriceByCode(obracunJson.code) ? parseFloat(getPriceByCode(obracunJson.code).price)*obracunJson.quantity : 0;	
+							
+							ukupanIznos = ukupanIznos + iznosStavke;
+							nalogJson.obracun.push(obracunJson);
+						}
+					}
+					nalogJson.ukupanIznos = ukupanIznos;
+					nalogJson.izvestaj = document.getElementById("komentar").value;
+
+					nalogJson.stariNalog = {};
+					nalogJson.stariNalog.statusNaloga = nalog.statusNaloga;
+					nalogJson.stariNalog.obracun = nalog.obracun;
+					document.getElementById("json").value = JSON.stringify(nalogJson);
+					loadGif();
+					document.getElementById("form").submit();
+				}
+
+				
+				
+			</script>
+		</div>
+	</div>	
+<%- include ("partials/footer") -%>

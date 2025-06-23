@@ -817,6 +817,10 @@ var ekipeDB;
 var opomeneDB;
 var dnevniIzvestajiDB;
 var stopoviDB;
+var trecaLicaDB;
+var cenovniciTrecihLicaDB;
+var naloziTrecihLicaDB;
+var izvestajiTrecihLicaDB;
 var stariCenovnikJsons = [];
 
 http.listen(process.env.PORT, async function(){
@@ -855,6 +859,10 @@ http.listen(process.env.PORT, async function(){
 		opomeneDB							=	client.db("Poslovi_Grada_2024").collection('Opomene');
 		dnevniIzvestajiDB			=	client.db("Poslovi_Grada_2024").collection('dnevniIzvestaji');
 		stopoviDB							=	client.db("Poslovi_Grada_2024").collection('Stopovi');
+		trecaLicaDB						=	client.db("Poslovi_Grada_2024").collection('Treca Lica');
+		cenovniciTrecihLicaDB = client.db("Poslovi_Grada_2024").collection('Cenovnici Trecih Lica')
+		naloziTrecihLicaDB 		= client.db("Poslovi_Grada_2024").collection('Nalozi Trecih Lica');
+		izvestajiTrecihLicaDB = client.db("Poslovi_Grada_2024").collection('Izvestaji Trecih Lica');
 
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
@@ -10332,6 +10340,334 @@ server.get('/uspesnoFakturisano',async (req,res)=>{
 		}
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/trecaLica',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var trecaLica = await trecaLicaDB.find({}).toArray();
+				res.render("trecaLica/home",{
+					pageTitle: "Трећа лица",
+					user: req.session.user,
+					trecaLica: trecaLica
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 103481.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
+
+server.get('/trecaLica/new',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var trecaLica = await trecaLicaDB.find({}).toArray()
+				res.render("trecaLica/kreiranje",{
+					pageTitle: "Креирање трећег лица",
+					trecaLica: trecaLica,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 10384.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
+
+server.post('/novoTreceLice', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var json = JSON.parse(req.body.json);
+				var cenovnik = JSON.parse(JSON.stringify(json.cenovnik));
+				delete json.cenovnik;
+				json.uniqueId = generateId(7)+"--"+new Date().getTime();
+
+				await trecaLicaDB.insertOne(json);
+				var cenovnikJson = {};
+				cenovnikJson.uniqueId = json.uniqueId;
+				cenovnikJson.cenovnik = cenovnik;
+				await cenovniciTrecihLicaDB.insertOne(cenovnikJson);
+				res.render("message",{
+					pageTitle: "Успешно додато",
+					user: req.session.user,
+					message: "<div class=\"text\">Треће лице "+јson.naziv+" успешно додато.</div>"
+				});
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 10409.</div>"
+				})
+			}
+
+
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+
+
+server.get('/trecaLica/noviNalog',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var trecaLica = await trecaLicaDB.find({}).toArray();
+				res.render("trecaLica/noviNalog",{
+					pageTitle: "Креирање трећег лица",
+					trecaLica: trecaLica,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 10384.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
+
+server.get('/trecaLica/:uniqueId',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var trecaLica = await trecaLicaDB.find({uniqueId:req.params.uniqueId}).toArray();
+
+				if(trecaLica.length>0){
+					var cenovnik = await cenovniciTrecihLicaDB.find({uniqueId:req.params.uniqueId}).toArray();
+					var treceLice = trecaLica[0];
+					treceLice.cenovnik = cenovnik[0].cenovnik;
+					var nalozi = await naloziTrecihLicaDB.find({treceLice:req.params.uniqueId}).toArray();
+					res.render("trecaLica/administracija",{
+						pageTitle: "Администрација трећег лица",
+						treceLice: treceLice,
+						nalozi: nalozi,
+						user: req.session.user
+					})
+				}else{
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Непостојеће треће лице.</div>"
+					})
+				}
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 10384.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
+
+server.post('/noviNalogTrecihLica', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var json = JSON.parse(req.body.json);
+				json.uniqueId = generateId(7)+"--"+new Date().getTime();
+
+				var nalozi = await naloziTrecihLicaDB.find({}).toArray();
+				json.broj = eval(nalozi.length+1).toString().padStart(7,"0");
+				json.kreirao = req.session.user;
+				json.datum = {};
+				json.datum.datetime = new Date().getTime();
+				json.datum.datum = getDateAsStringForDisplay(new Date());
+				json.obracun = [];
+				json.statusNaloga = "Primljen";
+				json.ukupanIznos = 0;
+
+				await naloziTrecihLicaDB.insertOne(json);
+
+				res.redirect("/trecaLica/nalog/"+json.uniqueId);
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 10409.</div>"
+				})
+			}
+
+
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.get('/trecaLica/nalog/:uniqueId',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var nalozi = await naloziTrecihLicaDB.find({uniqueId:req.params.uniqueId}).toArray();
+
+				if(nalozi.length>0){
+					var nalog = nalozi[0];
+					var trecaLica = await trecaLicaDB.find({uniqueId:nalozi[0].treceLice}).toArray();
+					var treceLice = trecaLica[0];
+					var cenovnik = await cenovniciTrecihLicaDB.find({uniqueId:nalozi[0].treceLice}).toArray();
+					treceLice.cenovnik = cenovnik[0].cenovnik;
+					var izvestaji = await izvestajiTrecihLicaDB.find({nalogId:req.params.uniqueId}).toArray();
+					res.render("trecaLica/nalog",{
+						pageTitle: "Налог број "+nalozi[0].broj,
+						treceLice: treceLice,
+						nalog: nalog,
+						izvestaji: izvestaji,
+						phoneAccessCode: phoneAccessCode,
+						user: req.session.user
+					})
+				}else{
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Непостојећи налог.</div>"
+					})
+				}
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 10384.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.post('/edit-nalog-treca-lica', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+				uploadSlika(req, res, async function (error) {
+				    if (error) {
+				      logError(error);
+				      return res.render("message",{pageTitle: "Грешка",message: "<div class=\"text\">Дошло је до грешке приликом качења слика.</div>",user: req.session.user});
+				    }
+				    var nalogJson = JSON.parse(req.body.json);
+				    //console.log(nalogJson);
+				    var izvestajJson = {};
+				    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
+				    izvestajJson.nalog		=	nalogJson.broj;
+				    izvestajJson.nalogId	=	nalogJson.id;
+				    izvestajJson.datetime 	=	new Date().getTime();
+				    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
+				    izvestajJson.izvestaj	=	nalogJson.izvestaj;
+				    izvestajJson.user 		=	req.session.user;
+				    izvestajJson.photos		=	[];
+				    for(var i=0;i<req.files.length;i++){
+				    	izvestajJson.photos.push(req.files[i].transforms[0].location)
+				    }
+				    try{
+				    	if(izvestajJson.izvestaj!="" || izvestajJson.photos.length>0){
+								//ima izvestaja
+								await  izvestajiTrecihLicaDB.insertOne(izvestajJson);
+							}
+				    	if( nalogJson.status==nalogJson.stariNalog.statusNaloga  && JSON.stringify(nalogJson.obracun)==JSON.stringify(nalogJson.stariNalog.obracun)){
+								//nema izmena na nalogu
+							}else{
+								//ima izmena na nalogu
+								var setObj	=	{ $set: {
+									statusNaloga: nalogJson.status,
+									obracun: nalogJson.obracun,
+									ukupanIznos: nalogJson.ukupanIznos,
+									izmenio: req.session.user
+								}};
+								await naloziTrecihLicaDB.updateOne({uniqueId:nalogJson.id},setObj);
+							}
+							res.redirect("/trecaLica/nalog/"+nalogJson.id);
+				    }catch(err){
+				    	logError(err);
+							res.render("message",{
+								pageTitle: "Програмска грешка",
+								user:req.session.user,
+								message: "<div class=\"text\">Дошло је до грешке у бази податка 10642.</div>"
+							});
+				    }
+					
+				});
+			
+		}else{
+			res.send("Nije definisan nivo korisnika");
+		}
+	}else{
+		res.redirect("/login");
 	}
 });
 

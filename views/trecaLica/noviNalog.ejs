@@ -1,0 +1,82 @@
+<%- include ("partials/header") -%>
+	<script>
+		var trecaLica = <%-JSON.stringify(trecaLica)%>;
+		console.log(trecaLica)
+	</script>
+	<div class="pageWidth trecaLica">
+		<div class="boxesWrap">
+			<div class="box">
+				<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/statusIcon.png"></div>
+				<div class="info">
+					<div class="title">Треће лице</div>
+					<div class="text">
+						<select id="lice-naloga"></select>
+						<script>
+							for(var i=0;i<trecaLica.length;i++){
+								var option = document.createElement("OPTION");
+								option.setAttribute("value",trecaLica[i].uniqueId);
+								option.innerHTML = trecaLica[i].naziv;
+								document.getElementById("lice-naloga").appendChild(option);
+							}
+						</script>
+					</div>
+					<div class="note"></div>
+				</div>
+			</div>
+			<div class="box">
+				<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/statusIcon.png"></div>
+				<div class="info">
+					<div class="title">Назив пројекта</div>
+					<div class="text">
+						<input type="text" id="naziv-projekta">
+					</div>
+					<div class="note"></div>
+				</div>
+			</div>
+			<div style="width:100%"></div>
+			<div class="box">
+				<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/statusIcon.png"></div>
+				<div class="info">
+					<div class="title">Опис налога</div>
+					<div class="text">
+						<textarea type="text" id="opis-naloga"></textarea>
+					</div>
+					<div class="note"></div>
+				</div>
+			</div>
+		</div>
+		<div class="inputWrap">
+			<div class="button" onclick="save()">КРЕИРАЈ НАЛОГ</div>
+		</div>
+		<form method="POST" action="/noviNalogTrecihLica" style="display:none" id="form">
+			<input type="text" name="json" id="json">
+		</form>
+		<script>
+			function save(){
+				var json = {};
+				json.treceLice = document.getElementById("lice-naloga").value;
+				json.nazivProjekta = document.getElementById("naziv-projekta").value;
+				json.opisNaloga = document.getElementById("opis-naloga").value;
+
+				if(!json.treceLice){
+					alert("Нисте одабрали треће лице");
+					return;
+				}
+
+				if(!json.nazivProjekta){
+					alert("Нисте укуцали назив пројекта");
+					return;
+				}
+
+				if(!json.opisNaloga){
+					alert("Нисте укуцали опис налога");
+					return;
+				}
+
+				document.getElementById("json").value = JSON.stringify(json);
+				loadGif();
+				document.getElementById("form").submit();
+			}
+		</script>
+	</div>
+<%- include ("partials/footer") -%>

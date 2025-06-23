@@ -1,0 +1,24 @@
+<%- include ("partials/header") -%>
+	<script>
+		var trecaLica = <%-JSON.stringify(trecaLica)%>;
+		console.log(trecaLica)
+	</script>
+	<div class="pageWidth trecaLica">
+		<div class="boxesWrap" id="treca-lica"></div>
+		<script>
+			for(var i=0;i<trecaLica.length;i++){
+				var treceLiceBox = document.createElement("DIV");
+				treceLiceBox.setAttribute("class","box");
+				treceLiceBox.setAttribute("onclick","window.location.href=\"/trecaLica/"+trecaLica[i].uniqueId+"\"")
+					var naziv = document.createElement("DIV");
+					naziv.setAttribute("class","naziv");
+					naziv.innerHTML = trecaLica[i].naziv;
+					treceLiceBox.appendChild(naziv);
+				document.getElementById("treca-lica").appendChild(treceLiceBox);
+			}
+		</script>
+		<div class="inputWrap">
+			<div class="button"><a href="/trecaLica/new">NOVO TRECE LICE</a></div>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>
