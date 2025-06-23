@@ -7954,7 +7954,7 @@ server.get('/izvestajMajstoraPick',async (req,res)=>{
 			try{
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
 				var yesterday = new Date();
-				yesterday.setDate(yesterday.getDate()-1);
+				yesterday.setDate(yesterday.getDate()-3);
 				var izvestaji = await dnevniIzvestajiDB.find({date:getDateAsStringForInputObject(yesterday)}).toArray();
 				res.render("administracija/izvestajMajstoraPick",{
 					pageTitle:"Одабери мајстора и датум",
@@ -10152,7 +10152,7 @@ server.get('/magacioner/prekojucerasnjiReversi', async (req, res)=> {
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
 			try{
-				var reversi = await magacinReversiDB.find({datum:{$regex:dateString+"."+monthString}}).toArray();
+				var reversi = await magacinReversiDB.find({datum:{$regex:dateString+"."+monthString+"."+today.getFullYear()}}).toArray();
 				var naloziToFind = [];
 				for(var i=0;i<reversi.length;i++){
 					naloziToFind.push(reversi[i].nalog);
