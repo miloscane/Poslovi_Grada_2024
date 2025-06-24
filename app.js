@@ -7954,7 +7954,7 @@ server.get('/izvestajMajstoraPick',async (req,res)=>{
 			try{
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
 				var yesterday = new Date();
-				yesterday.setDate(yesterday.getDate()-3);
+				yesterday.setDate(yesterday.getDate()-1);
 				var izvestaji = await dnevniIzvestajiDB.find({date:getDateAsStringForInputObject(yesterday)}).toArray();
 				res.render("administracija/izvestajMajstoraPick",{
 					pageTitle:"Одабери мајстора и датум",
