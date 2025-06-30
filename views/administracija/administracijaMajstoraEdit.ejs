@@ -149,6 +149,21 @@
 						<input type="checkbox" id="aktivan" style="width:20px;height:20px">
 					</div>
 				</div>
+				<div style="border-bottom:2px solid rgb(32,51,100);margin:10px auto"></div>
+				<div style="font-weight:600;color:rgb(32,51,100);text-align: center;">ПРИСТУП ПОРТАЛУ</div>
+
+				<div class="singleLineInput">
+					<div class="name">Електронска пошта</div>
+					<div class="inputWrapper">
+						<input type="text" id="username">
+					</div>
+				</div>
+				<div class="singleLineInput">
+					<div class="name">Лозинка</div>
+					<div class="inputWrapper">
+						<input type="text" id="password">
+					</div>
+				</div>
 				<div class="inputWrap" style="margin-top:15px;width:300px">
 					<div class="button" onclick="saveIzmene()">Сачувај измене</div>
 				</div>
@@ -279,6 +294,14 @@
 					}
 				}
 			}
+
+			if(majstor.username){
+				document.getElementById("username").value = majstor.username;
+			}
+
+			if(majstor.password){
+				document.getElementById("password").value = majstor.actualPassword;
+			}
 			
 			function saveIzmene(){
 				var izmenaJson = {};
@@ -304,6 +327,9 @@
 						izmenaJson.tipRada.push(tipovi[i].value)
 					}
 				}
+				izmenaJson.username = document.getElementById("username").value;
+				izmenaJson.actualPassword = document.getElementById("password").value;
+
 				document.getElementById("json").value = JSON.stringify(izmenaJson);
 				loadGif();
 				document.getElementById("form").submit();

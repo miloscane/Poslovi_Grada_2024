@@ -5821,6 +5821,11 @@ input[type=number] {
     font-size:18px;
 }
 
+.majstorMesec .box .value{
+    font-weight:300;
+    font-size:14px;
+}
+
 .majstorMesec .bodoviWrap{
     background-color:rgb(32,51,100);
 }
@@ -5886,31 +5891,6 @@ input[type=number] {
     width:100%;
 }
 
-.majstorMesec .vremena{
-    font-size:0;
-    text-align: left;
-}
-
-.majstorMesec .vremena .inline{
-    font-size:14px;
-    display:inline-block;
-    vertical-align: top;
-    width:50%;
-}
-
-.majstorMesec .vremena .inline .title{
-    font-weight:600;
-}
-
-.majstorMesec .vremena .inline .vreme{
-    font-weight:300;
-    font-style:italic;
-}
-
-.majstorMesec .vremena .inline:last-child{
-    text-align: right;
-}
-
 .majstorMesec .swipeable .subTitle{
     font-weight:600;
     font-size:14px;
@@ -5933,12 +5913,7 @@ input[type=number] {
 }
 
 .majstorMesec .nalozi .nalog{
-    padding: 5px;
-    padding-left:10px;
-}
-
-.majstorMesec .nalozi .nalog{
-    padding: 5px;
+    padding: 10px;
     padding-left:10px;
 }
 
@@ -5955,6 +5930,29 @@ input[type=number] {
     font-size:0px;
 }
 
+.majstorMesec .nalozi .nalog .brojNaloga{
+    display:inline-block;
+    vertical-align: top;
+    font-size:14px;
+    font-weight:600;
+    width:75px;
+}
+
+.majstorMesec .nalozi .nalog .adresa{
+    display:inline-block;
+    vertical-align: top;
+}
+
+.majstorMesec .nalozi .nalog .tip{
+    display:inline-block;
+    vertical-align: top;
+    font-size:12px;
+}
+
+.majstorMesec .nalozi .nalog .komentar{
+    font-size:12px;
+}
+
 .majstorMesec .nalozi .nalog .adresa .radnaJedinica{
     display:inline-block;
     vertical-align: top;
@@ -5966,7 +5964,24 @@ input[type=number] {
     display:inline-block;
     vertical-align: top;
     font-size:14px;
-    width:calc(100% - 100px);
+    width:200px;
+}
+
+.majstorMesec .nalozi .nalog .tipNaloga{
+    display:inline-block;
+    vertical-align: top;
+    font-size:14px;
+}
+
+.majstorMesec .odsutanNaslov{
+    width:100%;
+}
+
+.majstorMesec .odsutanNaslov .title{
+    text-align:center;
+    font-size:30px;
+    font-weight:700;
+    color:rgb(32,51,100);
 }
 
 
@@ -6849,6 +6864,33 @@ input[type=number] {
 .trecaLica .boxesWrap .box textarea{
     resize:none;
     height:200px;
+}
+
+.majstorMesec .boxesWrap{
+    display:flex;
+    flex-wrap: wrap;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+.majstorMesec .boxesWrap .box{
+    width: calc(50% - 20px);
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    margin:5px;
+    background-color:rgb(37,57,101);
+    color:rgb(255,255,255);
+    font-size:0;
+    -webkit-transition:all ease 0.5s;
+    -moz-transition:all ease 0.5s;
+    -ms-transition:all ease 0.5s;
+    -o-transition:all ease 0.5s;
+    transition:all ease 0.5s;
+    padding:10px;
+    border-radius:8px;
+    position:relative;
 }
 
 @media screen and (max-width: 1100px) {
