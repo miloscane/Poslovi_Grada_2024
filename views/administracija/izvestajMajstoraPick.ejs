@@ -12,7 +12,6 @@
 
 		var majstori = <%-JSON.stringify(majstori)%>;
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
-		var yesterdayServer = new Date(<%- JSON.stringify(yesterday) %>);
 		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Потребма вома","Нема приступа","Одбијају сарадњу","Неспремно"];
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 	</script>
@@ -36,16 +35,16 @@
 		</script>
 		<div class="overviewForm">
 			<div class="naloziWrap">
-				<div class="title">Структура радних налога по мајсторима за дан <span id="dan"></span> <span id="datum"></span></div>
+				<div class="title">Структура радних налога по мајсторима за дан <input type="date" id="datum-izvestaja" value="<%=date%>" oninput="window.location.href='/izvestajMajstoraPick/'+this.value"></div>
 				<script>
-					document.getElementById("dan").innerHTML = daniUNedelji[(yesterdayServer.getDay() + 6) % 7];
+					/*document.getElementById("dan").innerHTML = daniUNedelji[(yesterdayServer.getDay() + 6) % 7];
 					document.getElementById("datum").innerHTML = getDateAsStringForDisplay(yesterdayServer);
 					const danSpan = document.getElementById("dan");
 					const datumSpan = document.getElementById("datum");
 
 					// Replace the <span> with its text content
 					danSpan.replaceWith(document.createTextNode(danSpan.textContent));
-					datumSpan.replaceWith(document.createTextNode(datumSpan.textContent));
+					datumSpan.replaceWith(document.createTextNode(datumSpan.textContent));*/
 				</script>
 				<div id="nalozi"></div>
 				<div class="absoluteLogo"><img src="/favicon.png"></div>

@@ -8017,22 +8017,48 @@ server.get('/stefan/ucinakDispecera',async (req,res)=>{
 	}
 });
 
-
+//Branko Milosevic 066/8247660, zovi ga sutra za komp za obracunavanje itd aplikacija, zaks
 
 server.get('/izvestajMajstoraPick',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
 			try{
-				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
 				var yesterday = new Date();
 				yesterday.setDate(yesterday.getDate()-1);
-				var izvestaji = await dnevniIzvestajiDB.find({date:getDateAsStringForInputObject(yesterday)}).toArray();
+				res.redirect("/izvestajMajstoraPick/"+getDateAsStringForInputObject(yesterday));
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 7345.</div>"
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/izvestajMajstoraPick/:date',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				//req.params.date je za izvestaje koji postoje
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
+				var izvestaji = await dnevniIzvestajiDB.find({date:getDateAsStringForInputObject(new Date(req.params.date))}).toArray();
 				res.render("administracija/izvestajMajstoraPick",{
 					pageTitle:"Одабери мајстора и датум",
 					user: req.session.user,
 					majstori: majstori,
 					izvestaji: izvestaji,
-					yesterday: yesterday
+					date: req.params.date
 				})
 			}catch(err){
 				logError(err);
