@@ -5243,6 +5243,7 @@ server.get('/administracija/stanjePodizvodjaca',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
 			try{
+				
 				var month = eval(new Date().getMonth()+1).toString().padStart(2,"0")+"."+new Date().getFullYear();
 				var naloziPoPrijemnicama = await naloziDB.find({majstor:{$in: podizvodjaci},"prijemnica.datum.datum":{$regex:month}}).toArray();
 				var otvoreniNalozi = await naloziDB.find({statusNaloga:{$nin:["Storniran"]},majstor:{$in: podizvodjaci},"prijemnica.broj":""}).toArray();
