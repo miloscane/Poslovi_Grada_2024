@@ -960,70 +960,14 @@ http.listen(process.env.PORT, async function(){
 			console.log(error)
 		})*/
 
-
-		navigacijaInfoDB.find({}).toArray()
-		.then((info)=>{
-			for(var i=0;i<info.length;i++){
-				if(Number(info[i].status)==1){
-					navigacijaInfo.push(info[i])
-				}
-			}
-			console.log("Navigacija inicijalizovana");
-		})
-		.catch((error)=>{
-			console.log(error)
-		})
+		navigacijaInfo = await navigacijaInfoDB.find({}).toArray();
+		console.log("Navigacija inicijalizovana");		
+		cenovnik = await pricesDB.find({}).toArray();
+		stariCenovnik = await stariCenovnikDB.find({}).toArray()
+		cenovnikHigh = await pricesHighDB.find({}).toArray()
+		cenovnikLow = pricesLowDB.find({}).toArray()
+		console.log("Cenovnici inicijalizovani")
 		
-
-		
-
-		pricesDB.find({}).toArray()
-		.then((prices)=>{
-			for(var i=0;i<prices.length;i++){
-				delete prices[i]._id;
-			}
-			cenovnik = prices;
-			console.log("Cenovnik inicijalizovan");
-
-		})
-		.catch((error)=>{
-			logError(error);
-		});
-
-		stariCenovnikDB.find({}).toArray()
-		.then((prices)=>{
-			for(var i=0;i<prices.length;i++){
-				delete prices[i]._id;
-			}
-			stariCenovnik = prices;
-		})
-		.catch((error)=>{
-			logError(error);
-		});
-
-		pricesHighDB.find({}).toArray()
-		.then((prices)=>{
-			for(var i=0;i<prices.length;i++){
-				delete prices[i]._id;
-			}
-			cenovnikHigh = prices;
-			console.log("Cenovnik visokih podizvodjaca inicijalizovan");
-		})
-		.catch((error)=>{
-			logError(error);
-		});
-
-		pricesLowDB.find({}).toArray()
-		.then((prices)=>{
-			for(var i=0;i<prices.length;i++){
-				delete prices[i]._id;
-			}
-			cenovnikLow = prices;
-			console.log("Cenovnik niskih podizvodjaca inicijalizovan");
-		})
-		.catch((error)=>{
-			logError(error);
-		});
 
 		
 
@@ -2405,91 +2349,7 @@ http.listen(process.env.PORT, async function(){
 			console.log(error)
 		})*/
 
-				/*naloziDB.find({"datum.datum":{$regex:"02.2025"}}).toArray()
-				.then((nalozi)=>{
-					var woma = ["80.02.09.020","80.02.09.021","80.02.09.022"];
-					var rucno = ["80.02.09.001","80.02.09.002","80.02.09.003","80.02.09.004","80.02.09.005"];
-					var crp = ["80.02.09.009","80.02.09.010","80.02.09.012","80.02.09.025"];
-					var kop = ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
-					var mas = ["80.03.01.019","80.03.01.020","80.03.01.025"];
-					var kup = ["80.01.05.057","80.01.05.058","80.01.05.059","80.01.05.060","80.01.05.061","80.01.05.062","80.01.05.063","80.01.05.064"];
-
-					for(var i=0;i<nalozi.length;i++){
-						nalozi[i].tipNaloga = "ZAMENA";
-						if(parseFloat(nalozi[i].ukupanIznos)==0){
-							nalozi.splice(i,1);
-							i--;
-						}
-					}
-
-
-					for(var i=0;i<nalozi.length;i++){
-						if(nalozi[i].tipNaloga=="ZAMENA"){
-							for(var k=0;k<nalozi[i].obracun.length;k++){
-								if(kop.indexOf(nalozi[i].obracun[k].code)>=0){
-									nalozi[i].tipNaloga = "KOPANJE";
-								}
-							}
-						}
-						
-
-						if(nalozi[i].tipNaloga=="ZAMENA"){
-							for(var k=0;k<nalozi[i].obracun.length;k++){
-								if(woma.indexOf(nalozi[i].obracun[k].code)>=0){
-									nalozi[i].tipNaloga = "WOMA";
-								}
-							}
-						}
-
-						
-
-						if(nalozi[i].tipNaloga=="ZAMENA"){
-							for(var k=0;k<nalozi[i].obracun.length;k++){
-								if(rucno.indexOf(nalozi[i].obracun[k].code)>=0){
-									if(parseFloat(nalozi[i].ukupanIznos)<20000){
-										nalozi[i].tipNaloga = "SAJLA";
-									}
-								}
-							}
-						}
-
-						
-
-						if(nalozi[i].tipNaloga=="ZAMENA"){
-							for(var k=0;k<nalozi[i].obracun.length;k++){
-								if(kup.indexOf(nalozi[i].obracun[k].code)>=0){
-									if(parseFloat(nalozi[i].ukupanIznos)<5500){
-										//nalozi[i].tipNaloga = "SPOJKA";
-									}
-								}
-							}
-						}
-
-						
-						if(nalozi[i].tipNaloga=="ZAMENA"){
-							if(nalozi[i].obracun.length==2){
-								if(nalozi[i].obracun[0].code=="80.04.01.002" && nalozi[i].obracun[1].code=="80.04.01.005"){
-									nalozi[i].tipNaloga = "LOKALNO";
-								}else if(nalozi[i].obracun[0].code=="80.04.01.005" && nalozi[i].obracun[1].code=="80.04.01.002"){
-									nalozi[i].tipNaloga = "LOKALNO";
-								}
-							}else if(nalozi[i].obracun.length==1){
-								if(nalozi[i].obracun[0].code=="80.04.01.002" || nalozi[i].obracun[0].code=="80.04.01.005"){
-									nalozi[i].tipNaloga = "LOKALNO";
-								}
-							}
-						}
-					}
-					var csvString = "Broj naloga;Radna Jedinica;Tip;Iznos\r\n";
-					for(var i=0;i<nalozi.length;i++){
-						csvString += nalozi[i].broj + ";" +nalozi[i].radnaJedinica +";"+nalozi[i].tipNaloga+";"+ nalozi[i].ukupanIznos+"\r\n"; 
-					}					
-					fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
-					console.log("Wrote file");
-				})
-				.catch((error)=>{
-					console.log(error)
-				})*/
+				
 
 		/*var meseci = [
 			{ime:"Maj 2024",str:"05.2024",sorting:0},
@@ -2991,6 +2851,186 @@ http.listen(process.env.PORT, async function(){
 		console.log("  Станови: " + brojSaRazmacima(iznosStanova) + " дин. / " + brojStanova + " налога" )
 		console.log(brojeviNaloga)*/
 
+		/*var nalozi = await naloziDB.find({"prijemnica.datum.datum":{$regex:"06.2025"}}).toArray();
+		var sifreOdgusenja = ["80.02.09.001","80.02.09.002","80.02.09.005","80.02.10.007","80.02.10.003"];
+		var naloziJson = []
+		for(var i=0;i<nalozi.length;i++){
+			var imaOdgusenje = false;
+			var json = {};
+			json.iznos = 0;
+			json.nalog = nalozi[i].broj;
+			json.radnaJedinica = nalozi[i].radnaJedinica;
+			json.adresa = nalozi[i].adresa;
+			for(var j=0;j<nalozi[i].obracun.length;j++){
+				if(sifreOdgusenja.indexOf(nalozi[i].obracun[j].code)>=0){
+					for(var k=0;k<cenovnik.length;k++){
+						if(nalozi[i].obracun[j].code==cenovnik[k].code){
+							json.iznos = json.iznos + parseFloat(cenovnik[k].price)*parseFloat(nalozi[i].obracun[j].quantity);
+							//break;
+						}
+					}
+					imaOdgusenje = true;
+				}
+			}
+			if(imaOdgusenje){
+				json.iznos = json.iznos + 1150;
+				naloziJson.push(json);
+			}
+		}
+
+		var csvString = "Broj naloga;Radna Jedinica;Adresa;Iznos\r\n";
+		for(var i=0;i<naloziJson.length;i++){
+			csvString += naloziJson[i].nalog +";"+naloziJson[i].radnaJedinica+";"+naloziJson[i].adresa+";"+naloziJson[i].iznos+"\r\n";
+		}
+		fs.writeFileSync("odgusenja.csv",csvString,{encoding:"utf8"});
+		console.log("Wrote file")*/
+
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var ukupnoStavki = 0;
+		var ukupnoSaKolicinama = 0;
+		var cenovnikAnaliza = await pricesDB.find({}).toArray();
+		for(var i=0;i<cenovnikAnaliza.length;i++){
+			cenovnikAnaliza[i].korisceno = 0;
+			cenovnikAnaliza[i].koriscenaKolicina = 0;
+		}
+		console.log("Analiziram ukupno stavke")
+		for(var i=0;i<nalozi.length;i++){
+			for(var j=0;j<nalozi[i].obracun.length;j++){
+				ukupnoStavki++;
+				var kolicina = isNaN(parseFloat(nalozi[i].obracun[j].quantity)) ? 0 : parseFloat(nalozi[i].obracun[j].quantity);
+				if(kolicina==0){
+					//console.log(nalozi[i].obracun[j].quantity)
+				}
+				ukupnoSaKolicinama = ukupnoSaKolicinama + kolicina;
+			}
+		}
+		console.log("Ukupno stavki: "+ukupnoStavki)
+		console.log("Ukupno stavki sa kolicinama: "+ukupnoSaKolicinama);
+
+		for(var i=0;i<nalozi.length;i++){
+			for(var j=0;j<nalozi[i].obracun.length;j++){
+				for(var k=0;k<cenovnikAnaliza.length;k++){
+					
+					if(nalozi[i].obracun[j].code==cenovnikAnaliza[k].code){
+						cenovnikAnaliza[k].korisceno++;
+						var kolicina = isNaN(parseFloat(nalozi[i].obracun[j].quantity)) ? 0 : parseFloat(nalozi[i].obracun[j].quantity);
+						cenovnikAnaliza[k].koriscenaKolicina = cenovnikAnaliza[k].koriscenaKolicina + kolicina;
+						break;
+					}
+				}
+			}
+		}
+
+
+		var maksimum = 6;
+		var csvString = "Sifra stavke;Naziv stavke;Jedinica mere;Cena;Procenat Koriscenja;Skaliran procenat koriscenja [6%];Procenat koriscenja kolicina;Skaliran procenat koriscenja kolicina [6%]\r\n";
+		for(var i=0;i<cenovnikAnaliza.length;i++){
+			cenovnikAnaliza[i].procenatKoriscenja = eval(100*cenovnikAnaliza[i].korisceno/ukupnoStavki);
+			cenovnikAnaliza[i].skaliranProcenatKoriscenja = 100*(cenovnikAnaliza[i].procenatKoriscenja)/maksimum;
+
+			cenovnikAnaliza[i].procenatKoriscenjaKolicina = eval(100*cenovnikAnaliza[i].koriscenaKolicina/ukupnoSaKolicinama);
+			cenovnikAnaliza[i].skaliranProcenatKoriscenjaKolicina = 100*(cenovnikAnaliza[i].procenatKoriscenjaKolicina)/maksimum;
+			csvString += cenovnikAnaliza[i].code +";"+cenovnikAnaliza[i].name+";"+cenovnikAnaliza[i].unit+";"+cenovnikAnaliza[i].price+";"+cenovnikAnaliza[i].procenatKoriscenja+";"+cenovnikAnaliza[i].skaliranProcenatKoriscenja+";"+cenovnikAnaliza[i].procenatKoriscenjaKolicina+";"+cenovnikAnaliza[i].skaliranProcenatKoriscenjaKolicina+"\r\n";
+		}
+		fs.writeFileSync("analiza.csv",csvString,{encoding:"utf8"});
+		console.log("wrote file")*/
+
+		/*var nalozi = [];
+		var naloziApril = await naloziDB.find({"datum.datum":{$regex:"04.2025"}}).toArray();
+		for(var i=0;i<naloziApril.length;i++){
+			naloziApril[i].mesec = "April 2025";
+			nalozi.push(naloziApril[i])
+		}
+		var naloziMaj = await naloziDB.find({"datum.datum":{$regex:"05.2025"}}).toArray();
+		for(var i=0;i<naloziMaj.length;i++){
+			naloziMaj[i].mesec = "Maj 2025";
+			nalozi.push(naloziMaj[i])
+		}
+		var naloziJun = await naloziDB.find({"datum.datum":{$regex:"06.2025"}}).toArray();
+		for(var i=0;i<naloziJun.length;i++){
+			naloziJun[i].mesec = "Jun 2025";
+			nalozi.push(naloziJun[i]);
+		}
+		var woma	= ["80.02.09.020","80.02.09.021","80.02.09.022"];
+		var rucno = ["80.02.09.001","80.02.09.002","80.02.09.003","80.02.09.004","80.02.09.005"];
+		var crp   = ["80.02.09.009","80.02.09.010","80.02.09.012","80.02.09.025"];
+		var kop 	= ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
+		var mas 	= ["80.03.01.019","80.03.01.020","80.03.01.025"];
+		var kup 	= ["80.01.05.057","80.01.05.058","80.01.05.059","80.01.05.060","80.01.05.061","80.01.05.062","80.01.05.063","80.01.05.064"];
+
+		for(var i=0;i<nalozi.length;i++){
+			console.log(nalozi[i].mesec)
+			nalozi[i].tipNaloga = "ZAMENA";
+			if(parseFloat(nalozi[i].ukupanIznos)==0){
+				nalozi.splice(i,1);
+				i--;
+			}
+		}
+
+
+		for(var i=0;i<nalozi.length;i++){
+			if(nalozi[i].tipNaloga=="ZAMENA"){
+				for(var k=0;k<nalozi[i].obracun.length;k++){
+					if(kop.indexOf(nalozi[i].obracun[k].code)>=0){
+						nalozi[i].tipNaloga = "KOPANJE";
+					}
+				}
+			}
+			
+
+			if(nalozi[i].tipNaloga=="ZAMENA"){
+				for(var k=0;k<nalozi[i].obracun.length;k++){
+					if(woma.indexOf(nalozi[i].obracun[k].code)>=0){
+						nalozi[i].tipNaloga = "WOMA";
+					}
+				}
+			}
+
+			
+
+			if(nalozi[i].tipNaloga=="ZAMENA"){
+				for(var k=0;k<nalozi[i].obracun.length;k++){
+					if(rucno.indexOf(nalozi[i].obracun[k].code)>=0){
+						if(parseFloat(nalozi[i].ukupanIznos)<20000){
+							nalozi[i].tipNaloga = "SAJLA";
+						}
+					}
+				}
+			}
+
+			
+
+			if(nalozi[i].tipNaloga=="ZAMENA"){
+				for(var k=0;k<nalozi[i].obracun.length;k++){
+					if(kup.indexOf(nalozi[i].obracun[k].code)>=0){
+						if(parseFloat(nalozi[i].ukupanIznos)<5500){
+							//nalozi[i].tipNaloga = "SPOJKA";
+						}
+					}
+				}
+			}
+
+			
+			if(nalozi[i].tipNaloga=="ZAMENA"){
+				if(nalozi[i].obracun.length==2){
+					if(nalozi[i].obracun[0].code=="80.04.01.002" && nalozi[i].obracun[1].code=="80.04.01.005"){
+						nalozi[i].tipNaloga = "LOKALNO";
+					}else if(nalozi[i].obracun[0].code=="80.04.01.005" && nalozi[i].obracun[1].code=="80.04.01.002"){
+						nalozi[i].tipNaloga = "LOKALNO";
+					}
+				}else if(nalozi[i].obracun.length==1){
+					if(nalozi[i].obracun[0].code=="80.04.01.002" || nalozi[i].obracun[0].code=="80.04.01.005"){
+						nalozi[i].tipNaloga = "LOKALNO";
+					}
+				}
+			}
+		}
+		var csvString = "Broj naloga;Mesec;Radna Jedinica;Tip;Iznos\r\n";
+		for(var i=0;i<nalozi.length;i++){
+			csvString += nalozi[i].broj + ";"+nalozi[i].mesec+";" +nalozi[i].radnaJedinica +";"+nalozi[i].tipNaloga+";"+ nalozi[i].ukupanIznos+"\r\n"; 
+		}					
+		fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+		console.log("Wrote file");*/
 
 
 	})
@@ -5243,7 +5283,7 @@ server.get('/administracija/stanjePodizvodjaca',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
 			try{
-				
+
 				var month = eval(new Date().getMonth()+1).toString().padStart(2,"0")+"."+new Date().getFullYear();
 				var naloziPoPrijemnicama = await naloziDB.find({majstor:{$in: podizvodjaci},"prijemnica.datum.datum":{$regex:month}}).toArray();
 				var otvoreniNalozi = await naloziDB.find({statusNaloga:{$nin:["Storniran"]},majstor:{$in: podizvodjaci},"prijemnica.broj":""}).toArray();
