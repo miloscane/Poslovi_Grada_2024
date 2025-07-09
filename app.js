@@ -965,7 +965,7 @@ http.listen(process.env.PORT, async function(){
 		cenovnik = await pricesDB.find({}).toArray();
 		stariCenovnik = await stariCenovnikDB.find({}).toArray()
 		cenovnikHigh = await pricesHighDB.find({}).toArray()
-		cenovnikLow = pricesLowDB.find({}).toArray()
+		cenovnikLow = await pricesLowDB.find({}).toArray()
 		console.log("Cenovnici inicijalizovani")
 		
 
@@ -1126,7 +1126,7 @@ http.listen(process.env.PORT, async function(){
 		}
 
 		var naloziToExport = [];
-		var month = 5;
+		var month = 6;
 		for(var i=0;i<nalozi.length;i++){
 			if(nalozi[i].faktura.broj){
 				if(nalozi[i].faktura.broj.length>3){
@@ -13398,8 +13398,10 @@ io.on('connection', function(socket){
 						warnings.push("Nije moguce odrediti broj fakture za nalog "+nalogToPush.broj+", broj fakture"+nalogToPush.brojFakture);
 					}else{
 						if(Number(nalogToPush.faktura.samoBroj)>=Number(odBroja) && Number(nalogToPush.faktura.samoBroj)<=Number(doBroja)){
-							if(nalogToPush.faktura.broj.includes("2025"))
-							naloziToSend.push(nalogToPush)
+							if(nalogToPush.faktura.broj.includes("2025")){
+								naloziToSend.push(nalogToPush)	
+							}
+							
 						}
 					}
 				}else{
