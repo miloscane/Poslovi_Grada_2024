@@ -8781,7 +8781,7 @@ server.get('/dispecer/rasporedRadova', async(req,res)=>{
 server.get('/dispecer/sviNalozi',async (req,res)=>{
 	if(req.session.user){
 			if(Number(req.session.user.role)==20){
-				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"]}}).toArray()
+				naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Nalog u Stambenom","Storniran","Spreman za fakturisanje","Fakturisan","Spreman za obračun"]}}).toArray()
 				.then((nalozi) => {
 					for(var i=0;i<nalozi.length;i++){
 						delete nalozi[i]._id;
@@ -8826,9 +8826,9 @@ server.get('/dispecer/sviNalozi',async (req,res)=>{
 server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 	if(req.session.user){
 			if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
-				var skriveniStatusi = ["Završeno","Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
+				var skriveniStatusi = ["Završeno","Nalog u Stambenom","Storniran","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
 				if(Number(req.session.user.role)==10){
-					skriveniStatusi = ["Nalog u Stambenom","Storniran","Vraćen","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
+					skriveniStatusi = ["Nalog u Stambenom","Storniran","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
 				}
 				try{
 					var nalozi = await naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:skriveniStatusi}}).toArray();

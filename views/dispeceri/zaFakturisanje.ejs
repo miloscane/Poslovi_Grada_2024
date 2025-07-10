@@ -1,0 +1,82 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+	</script>
+	<div class="pageWidth">
+		<div class="zavrseniNalozi">
+			<div class="boxesWrap">
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/sumIcon.png"></div>
+					<div class="info">
+						<div class="title">Укупно налога</div>
+						<div class="text"><%=nalozi.length%></div>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturaIcon.png"></div>
+					<div class="info">
+						<div class="title">Износ</div>
+						<div class="text"><span id="iznos-prikazanih-naloga"></span></div>
+					</div>
+				</div>
+			</div>
+			<div class="lightBlueBox">
+				<div class="tableWrap">
+					<div class="tableHeader">
+						<table>
+							<tr>
+								<td><div class="value redniBroj">Редни број</div></td>
+								<td><div class="value brojNaloga">Број налога</div></td>
+								<td><div class="value iznos">Износ</div></td>
+							</tr>
+						</table>
+					</div>
+					<div class="table" id="table"></div>
+				</div>
+			</div>
+			<script>
+				var naloziToShow = [];
+				function generateTable(){
+					naloziToShow = nalozi;
+					var ukupanIznos = 0;
+					document.getElementById("table").innerHTML = "";
+					var table = document.createElement("TABLE");
+					for(var i=0;i<naloziToShow.length;i++){
+						ukupanIznos = ukupanIznos + parseFloat(naloziToShow[i].ukupanIznos);
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1)+".";
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value brojNaloga");
+									var a = document.createElement("A");
+									a.setAttribute("href","/nalog/"+naloziToShow[i].broj);
+									a.setAttribute("target","_blank");
+									a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)'");
+									a.innerHTML = naloziToShow[i].broj;
+									div.appendChild(a);
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value iznos");
+								div.innerHTML = brojSaRazmacima(naloziToShow[i].ukupanIznos);
+								td.appendChild(div);
+							tr.appendChild(td);
+						table.appendChild(tr);
+					}
+					document.getElementById("table").appendChild(table);
+
+				}
+
+				generateTable();
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>
