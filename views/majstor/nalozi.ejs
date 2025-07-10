@@ -132,7 +132,7 @@
 														photo.appendChild(image);
 													photos.appendChild(photo);
 												}
-												if(nalog.izvestaji[i].signature){
+												/*if(nalog.izvestaji[i].signature){
 													//console.log(nalog.izvestaji[i].signature)
 													var signCanvas = document.createElement("CANVAS");
 													signCanvas.setAttribute("width","1000");
@@ -150,7 +150,7 @@
 														photo.appendChild(image);
 													photos.appendChild(photo);
 													signCanvas.remove();
-												}
+												}*/
 
 											izvestaj.appendChild(photos);
 										izvestajiWrap.appendChild(izvestaj);
@@ -160,7 +160,7 @@
 							
 							var statusWrap = document.createElement("DIV");
 							statusWrap.setAttribute("class","statusWrap");
-							if(!nalog.odlazak){
+							/*if(!nalog.odlazak){
 								var button = document.createElement("DIV");
 								button.setAttribute("class","button");
 								button.setAttribute("onclick","setStatus(0)");
@@ -178,7 +178,7 @@
 								button.setAttribute("onclick","setStatus(2)");
 								button.innerHTML = "ЗАВРШИО";
 								statusWrap.appendChild(button);
-							}
+							}*/
 
 							izvestaji.appendChild(statusWrap);
 
@@ -238,7 +238,7 @@
 									buttonWrap.appendChild(button);
 								novIzvestaj.appendChild(buttonWrap);
 								
-								var slikaPotpisa = document.createElement("DIV");
+								/*var slikaPotpisa = document.createElement("DIV");
 								slikaPotpisa.setAttribute("id","slika-potpisa");
 								novIzvestaj.appendChild(slikaPotpisa);
 
@@ -249,7 +249,7 @@
 									button.setAttribute("onclick","openPotpis()");
 									button.innerHTML = "Потпис станара";
 									buttonWrap.appendChild(button);
-								novIzvestaj.appendChild(buttonWrap);
+								novIzvestaj.appendChild(buttonWrap);*/
 								
 
 
@@ -287,7 +287,7 @@
 				}
 
 				function saveIzvestaj(){
-					if(document.getElementById("tekst-izvestaja").value=="" && document.getElementById("slike-input").files.length==0 && !document.getElementById("slika-potpisa").dataset.signature){
+					if(document.getElementById("tekst-izvestaja").value=="" && document.getElementById("slike-input").files.length==0){// && !document.getElementById("slika-potpisa").dataset.signature
 						alert("Нисте укуцали извештај нити окачили фотографију");
 					}else{
 						var json = {};
@@ -303,9 +303,9 @@
 							}
 						}
 						json.izvestaj = document.getElementById("tekst-izvestaja").value;
-						if(document.getElementById("slika-potpisa").dataset.signature){
+						/*if(document.getElementById("slika-potpisa").dataset.signature){
 							json.signature = JSON.parse(document.getElementById("slika-potpisa").dataset.signature);
-						}
+						}*/
 						document.getElementById("json").value = JSON.stringify(json);
 						loadGif();
 						document.getElementById("form").submit();

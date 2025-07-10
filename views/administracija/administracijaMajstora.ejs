@@ -1,6 +1,7 @@
 <%- include ("partials/header") -%>
 <script>
 	var majstori = <%-JSON.stringify(majstori)%>;
+	majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 	var pomocnici = <%-JSON.stringify(pomocnici)%>;
 	var users = <%-JSON.stringify(users)%>;
 	users.sort((a, b) => Number(a.role) - Number(b.role));

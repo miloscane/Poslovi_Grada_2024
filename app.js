@@ -3313,7 +3313,7 @@ server.get('/',async (req,res)=>{
 		}else if(Number(req.session.user.role)==50){
 			res.redirect("/magacioner/stanje")
 		}else if(Number(req.session.user.role)==60){
-			res.redirect("/majstor/mesec/"+eval(new Date().getMonth()+1).toString().padStart(2,"0")+"."+new Date().getFullYear())
+			res.redirect("/majstor/mesec")
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -12113,72 +12113,54 @@ server.get('/mesecnoPrisustvo/:mesec/:majstor', async (req, res)=> {
 	}
 });
 
+
+
 server.get('/majstor/nalozi', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==60){
 			var today = new Date();
 			today.setDate(today.getDate());
-			dodeljivaniNaloziDB.find({majstor:req.session.user.uniqueId,"datum.datum":getDateAsStringForDisplay(today)}).toArray()
-			.then((nalozi)=>{
+			try{
+				var today = new Date();
+				today.setDate(today.getDate());
+				var nalozi = await dodeljivaniNaloziDB.find({majstor:req.session.user.uniqueId,"datum.datum":getDateAsStringForDisplay(today)}).toArray();
 				var brojeviNaloga = [];
 				for(var i=0;i<nalozi.length;i++){
 					if(brojeviNaloga.indexOf(nalozi[i].nalog)<0){
 						brojeviNaloga.push(nalozi[i].nalog);
 					}
 				}
-				naloziDB.find({broj:{$in:brojeviNaloga}}).toArray()
-				.then((nalozi2)=>{
-					for(var i=0;i<nalozi.length;i++){
-						nalozi[i].izvestaji = [];
-						for(var j=0;j<nalozi2.length;j++){
-							if(nalozi2[j].broj==nalozi[i].nalog){
-								nalozi[i].opis = nalozi2[j].opis;
-								nalozi[i].zahtevalac = nalozi2[j].zahtevalac;
-							}
+				var nalozi2 = await naloziDB.find({broj:{$in:brojeviNaloga}}).toArray();
+				for(var i=0;i<nalozi.length;i++){
+					nalozi[i].izvestaji = [];
+					for(var j=0;j<nalozi2.length;j++){
+						if(nalozi2[j].broj==nalozi[i].nalog){
+							nalozi[i].opis = nalozi2[j].opis;
+							nalozi[i].zahtevalac = nalozi2[j].zahtevalac;
 						}
 					}
-					izvestajiDB.find({nalog:{$in:brojeviNaloga}}).toArray()
-					.then((izvestaji)=>{
-						for(var i=0;i<nalozi.length;i++){
-							for(var j=0;j<izvestaji.length;j++){
-								if(izvestaji[j].nalog==nalozi[i].nalog){
-									nalozi[i].izvestaji.push(izvestaji[j]);
-								}
-							}
+				}
+				var izvestaji = await izvestajiDB.find({nalog:{$in:brojeviNaloga}}).toArray();
+				for(var i=0;i<nalozi.length;i++){
+					for(var j=0;j<izvestaji.length;j++){
+						if(izvestaji[j].nalog==nalozi[i].nalog){
+							nalozi[i].izvestaji.push(izvestaji[j]);
 						}
-						res.render("majstor/nalozi",{
-							pageTitle: "Данашњи налози",
-							user: req.session.user,
-							nalozi: nalozi
-						});
-					})
-					.catch((error)=>{
-						logError(error);
-						res.render("message",{
-	            pageTitle: "Грешка",
-	            user: req.session.user,
-	            message: "<div class=\"text\">Грешка у бази података 6690.</div>"
-		        });	
-					})
-					
-				})
-				.catch((error)=>{
-					logError(error);
-					res.render("message",{
-            pageTitle: "Грешка",
-            user: req.session.user,
-            message: "<div class=\"text\">Грешка у бази података 6679.</div>"
-	        });	
-				})
-			})
-			.catch((error)=>{
+					}
+				}
+				res.render("majstor/nalozi",{
+					pageTitle: "Данашњи налози",
+					user: req.session.user,
+					nalozi: nalozi
+				});
+			}catch(err){
 				logError(error);
 				res.render("message",{
-            pageTitle: "Грешка",
-            user: req.session.user,
-            message: "<div class=\"text\">Грешка у бази података 6669.</div>"
+          pageTitle: "Грешка",
+          user: req.session.user,
+          message: "<div class=\"text\">Грешка у бази података 6690.</div>"
         });
-			})
+			}
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -12191,11 +12173,14 @@ server.get('/majstor/nalozi', async (req, res)=> {
 	} 
 });
 
+server.get('/majstor/mesec', async (req, res)=> {
+	res.redirect("/majstor/mesec/"+eval(new Date().getMonth()+1).toString().padStart(2,"0")+"."+new Date().getFullYear())
+});
+
 server.get('/majstor/mesec/:datum', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==60){
 			try{
-				console.log(new Date().getFullYear()+"-"+req.params.datum.split(".")[1]+"-"+req.params.datum.split(".")[0])
 				var izvestaji = await dnevniIzvestajiDB.find({majstor:req.session.user.uniqueId,date:{$regex:req.params.datum.split(".")[1]+"-"+req.params.datum.split(".")[0]}}).toArray();
 				res.render("majstor/majstorMesec",{
 					user: req.session.user,
@@ -12240,7 +12225,7 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 				    izvestajJson.izvestaj	=	nalogJson.izvestaj;
 				    izvestajJson.user 		=	req.session.user;
 				    izvestajJson.photos		=	[];
-				    izvestajJson.signature = nalogJson.signature ? nalogJson.signature : [];
+				    //izvestajJson.signature = nalogJson.signature ? nalogJson.signature : [];
 				    for(var i=0;i<req.files.length;i++){
 				    	izvestajJson.photos.push(req.files[i].transforms[0].location)
 				    }
