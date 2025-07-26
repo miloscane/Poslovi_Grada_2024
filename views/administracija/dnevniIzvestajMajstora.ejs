@@ -9,6 +9,7 @@
 		var reversi = <%-JSON.stringify(reversi)%>;
 		var date = "<%=date%>";
 		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Потребма вома","Нема приступа","Одбијају сарадњу","Неспремно"];
+		var noviRadovi = ["Замена","Одгушење","Констатација"]
 	</script>
 	<div class="pageWidth jucerasnjiUcinak">
 
@@ -161,8 +162,8 @@
 			colGroup.innerHTML = "<col style=\"width: 30px\">   <!-- redniBroj --> " +
   "<col style=\"width: 100px\">   <!-- brojNaloga --> " +
   "<col style=\"width: 150px\">   <!-- radnaJedinica --> " +
-  "<col style=\"width: 220px\">  <!-- adresa --> " 
-  "<col> " +
+  "<col style=\"width: 220px\">  <!-- adresa --> " +  
+  "<col> ";
 			table.appendChild(colGroup);
 			var tr = document.createElement("TR");
 				var th = document.createElement("TH");
@@ -227,7 +228,7 @@
 						th.setAttribute("class","tip");
 							var value = document.createElement("DIV");
 							value.setAttribute("class","value");
-							radovi.forEach(function(r, index) {
+							noviRadovi.forEach(function(r, index) {
 							    var label = document.createElement("label");
 							    label.style.display = "inline-block";
 							    label.style.marginRight = "30px"; // Add space here
@@ -240,6 +241,12 @@
 							    checkbox.value = r;
 							    if(izvestaj.nalozi[i].tipoviRada.indexOf(r)>=0){
 							    	checkbox.checked = true;
+							    }
+							    var stariRadovi = ["Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Потребма вома","Нема приступа","Одбијају сарадњу","Неспремно"];
+							    for(var j=0;j<izvestaj.nalozi[i].tipoviRada.length;j++){
+							    	if(stariRadovi.indexOf(izvestaj.nalozi[i].tipoviRada[j])>=0 && r=="Констатација"){
+							    		checkbox.checked = true;
+							    	}
 							    }
 							    checkbox.id = startIndex+"radovi_" + index;
 
@@ -436,7 +443,7 @@
 				th.setAttribute("class","tip");
 					var value = document.createElement("DIV");
 					value.setAttribute("class","value");
-					radovi.forEach(function(r, index) {
+					noviRadovi.forEach(function(r, index) {
 					    var label = document.createElement("label");
 					    label.style.display = "inline-block";
 					    label.style.marginRight = "30px"; // Add space here

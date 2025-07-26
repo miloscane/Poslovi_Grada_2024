@@ -2,6 +2,7 @@
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
 		var cenovnik = <%-JSON.stringify(cenovnik)%>;
+		var cenovnik2024 = <%-JSON.stringify(cenovnik2024)%>;
 	</script>
 	<div class="pageWidth podizvodjaci">
 		<div class="zavrseniNalozi obradjeniNalozi">
@@ -46,12 +47,21 @@
 				specifikacija.brojFakture = "";
 				specifikacija.brojSpecifikacije = "";
 				specifikacija.nalozi = [];
-				function getPriceByCode(code){
-					for(var i=0;i<cenovnik.length;i++){
-						if(cenovnik[i].code==code){
-							return cenovnik[i].price;
+				function getPriceByCode(code,vik){
+					if(vik=="VIK 2025"){
+						for(var i=0;i<cenovnik.length;i++){
+							if(cenovnik[i].code==code){
+								return cenovnik[i].price;
+							}
+						}	
+					}else{
+						for(var i=0;i<cenovnik2024.length;i++){
+							if(cenovnik2024[i].code==code){
+								return cenovnik2024[i].price;
+							}
 						}
 					}
+					
 				}
 				var naloziToShow;
 				function generateTable(){
