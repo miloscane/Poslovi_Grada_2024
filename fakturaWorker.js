@@ -29,6 +29,12 @@ function generatePremijusSaPenalom(info){
 	var pdv 			=	info.pdv ? info.pdv : "35"; //35 je datum prometa a 3 je datum slanja
 	var datumIspostavljanjaNarudzbenice = info.datumPrometa.split(".")[2]+"-"+info.datumPrometa.split(".")[1]+"-"+info.datumPrometa.split(".")[0];
 	var penal 			=	100-parseFloat(info.penal);
+	var brojUgovora 	=	"???";
+	if(info.vik=="2024"){
+		brojUgovora = "OP-00052/23-OS"
+	}else if(info.vik=="2025"){
+		brojUgovora = "OP-00022/25"
+	}
 	var xml 	=	'<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:cec="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:sbt="http://mfin.gov.rs/srbdt/srbdtext" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'+
 	   '<cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:mfin.gov.rs:srbdt:2021</cbc:CustomizationID>'+
 	   '<cbc:ID>'+info.brojFakture+'</cbc:ID>'+
@@ -44,7 +50,7 @@ function generatePremijusSaPenalom(info){
 			'<cbc:ID>'+info.brojNaloga+'</cbc:ID>'+
 		'</cac:OrderReference>'+
 	   '<cac:OriginatorDocumentReference>'+
-	      '<cbc:ID>OP-00052/23-OS</cbc:ID>'+
+	      '<cbc:ID>'+brojUgovora+'</cbc:ID>'+
 	   '</cac:OriginatorDocumentReference>'+
 	   '<cac:AccountingSupplierParty>'+
 	      '<cac:Party>'+
@@ -211,6 +217,12 @@ function generatePremijusBezPenala(info){
 	var pdv 			=	info.pdv ? info.pdv : "35"; //35 je datum prometa a 3 je datum slanja
 	var datumIspostavljanjaNarudzbenice = info.datumPrometa.split(".")[2]+"-"+info.datumPrometa.split(".")[1]+"-"+info.datumPrometa.split(".")[0];
 	var penal 			=	100-parseFloat(info.penal);
+	var brojUgovora 	=	"???";
+	if(info.vik=="2024"){
+		brojUgovora = "OP-00052/23-OS"
+	}else if(info.vik=="2025"){
+		brojUgovora = "OP-00022/25"
+	}
 	var xml	=	'<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:cec="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:sbt="http://mfin.gov.rs/srbdt/srbdtext" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'+
 	   '<cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:mfin.gov.rs:srbdt:2021</cbc:CustomizationID>'+
 	   '<cbc:ID>'+info.brojFakture+'</cbc:ID>'+
@@ -226,7 +238,7 @@ function generatePremijusBezPenala(info){
 			'<cbc:ID>'+info.brojNaloga+'</cbc:ID>'+
 		'</cac:OrderReference>'+
 	   '<cac:OriginatorDocumentReference>'+
-	      '<cbc:ID>OP-00052/23-OS</cbc:ID>'+
+	      '<cbc:ID>'+brojUgovora+'</cbc:ID>'+
 	   '</cac:OriginatorDocumentReference>'+
 	   '<cac:AccountingSupplierParty>'+
 	      '<cac:Party>'+
@@ -362,6 +374,12 @@ function generatePremijusPrekoPolaMilBezPenala(info){
 	var pdv 			=	info.pdv ? info.pdv : "35"; //35 je datum prometa a 3 je datum slanja
 	var datumIspostavljanjaNarudzbenice = info.datumPrometa.split(".")[2]+"-"+info.datumPrometa.split(".")[1]+"-"+info.datumPrometa.split(".")[0];
 	var penal 			=	100-parseFloat(info.penal);
+	var brojUgovora 	=	"???";
+	if(info.vik=="2024"){
+		brojUgovora = "OP-00052/23-OS"
+	}else if(info.vik=="2025"){
+		brojUgovora = "OP-00022/25"
+	}
 	var xml	=	'<Invoice xmlns:cec="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:sbt="http://mfin.gov.rs/srbdt/srbdtext" xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">'+
 	  '<cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:mfin.gov.rs:srbdt:2022</cbc:CustomizationID>'+
 	  '<cbc:ID>'+info.brojFakture+'</cbc:ID>'+
@@ -377,7 +395,7 @@ function generatePremijusPrekoPolaMilBezPenala(info){
 	    '<cbc:ID>'+info.brojNaloga+'</cbc:ID>'+
 	  '</cac:OrderReference>'+
 	  '<cac:ContractDocumentReference>'+
-	    '<cbc:ID>OP-00052/23-OS</cbc:ID>'+
+	    '<cbc:ID>'+brojUgovora+'</cbc:ID>'+
 	  '</cac:ContractDocumentReference>'+
 	  '<cac:AccountingSupplierParty>'+
 	    '<cac:Party>'+

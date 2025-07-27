@@ -1032,7 +1032,7 @@ http.listen(process.env.PORT, async function(){
 		}
 		var response = await pricesHighDB.insertMany(cenovnikPodizvodjaca);
 		console.log(response)*/
-		
+
 		//var response = await pricesHighDB.insertMany(toInsert);
 		//console.log(response);
 
@@ -10401,9 +10401,6 @@ server.get('/magacioner/utroseniMaterijal',async (req,res)=>{
 	}
 });
 
-
-
-
 server.post('/fakturisi', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==40){
@@ -10424,11 +10421,14 @@ server.post('/fakturisi', async (req, res)=> {
 				var nalozi = await naloziDB.find({broj:json.brojNaloga.toString()}).toArray();
 				var nalozi2024 = await nalozi2024DB.find({broj:json.brojNaloga.toString()}).toArray();
 				if(nalozi.length>0){
-					await naloziDB.updateOne({broj:json.brojNaloga.toString()},setObj)
+					await naloziDB.updateOne({broj:json.brojNaloga.toString()},setObj);
+					json.vik = "2025";
 				}else if(nalozi2024.length>0){
 					nalog2024 = true;
 					await nalozi2024DB.updateOne({broj:json.brojNaloga.toString()},setObj)
+					json.vik = "2024";
 				}
+
 				const worker 		=	new Worker("./fakturaWorker.js",{ env:SHARE_ENV});
 				worker.postMessage(req.body.json);
 				worker.on("message",async (data)=>{
