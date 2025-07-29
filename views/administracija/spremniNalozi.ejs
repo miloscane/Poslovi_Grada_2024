@@ -111,10 +111,18 @@
 							nalogToPush.adresa = nalozi[i].adresa;
 							nalogToPush.statusNaloga = nalozi[i].statusNaloga;	
 							nalogToPush.brojFakture = nalozi[i].faktura.broj ? nalozi[i].faktura.broj : "";
-							nalogToPush.ukupanIznos = nalozi[i].ukupanIznos;							
+							nalogToPush.ukupanIznos = nalozi[i].ukupanIznos;
+							nalogToPush.vik = "VIK??";
+							if(nalozi[i].digitalizacija){
+								if(nalozi[i].digitalizacija.stambeno){
+									if(nalozi[i].digitalizacija.stambeno.vik){
+										nalogToPush.vik = nalozi[i].digitalizacija.stambeno.vik;
+									}
+								}
+							}							
+														
 							naloziToShow.push(nalogToPush);	
 						}
-						
 					}
 
 					document.getElementById("table").innerHTML = "";
@@ -150,7 +158,7 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojFakture");
-								div.innerHTML = naloziToShow[i].brojFakture;
+								div.innerHTML = naloziToShow[i].vik;
 								td.appendChild(div);
 							tr.appendChild(td);
 							

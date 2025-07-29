@@ -1010,15 +1010,21 @@ http.listen(process.env.PORT, async function(){
 		/*var cenovnikPodizvodjaca = await pricesDB.find({}).toArray();
 		for(var i=0;i<cenovnikPodizvodjaca.length;i++){
 			cenovnikPodizvodjaca[i].price = "???";
+			//console.log(cenovnikPodizvodjaca[i].code)
 		}
 
+		console.log("***************************************************************************************");
+		console.log("***************************************************************************************");
+		console.log("***************************************************************************************");
+		console.log("***************************************************************************************");
+		console.log("***************************************************************************************");
 		var stringArray = fs.readFileSync("podizvodjaci.csv",{encoding:"utf8"}).split("\r\n");
 		for(var i=0;i<stringArray.length;i++){
 			var array = smartSplitCSVLine(stringArray[i]);
-			console.log(array)
 			for(var j=0;j<cenovnikPodizvodjaca.length;j++){
 				if(cenovnikPodizvodjaca[j].code==array[0]){
-					cenovnikPodizvodjaca[j].price = parseFloat(array[1].replace(/,/g, ''))
+					//console.log(array[0])
+					cenovnikPodizvodjaca[j].price = parseFloat(array[1].replace(/,/g, ''));
 				}
 			}
 
@@ -1026,10 +1032,15 @@ http.listen(process.env.PORT, async function(){
 		var counter = 0;
 		for(var i=0;i<cenovnikPodizvodjaca.length;i++){
 			if(cenovnikPodizvodjaca[i].price=="???"){
-				console.log(cenovnikPodizvodjaca[i])
+				//console.log(cenovnikPodizvodjaca[i])
 				counter++;
+				if(isNaN(cenovnikPodizvodjaca[i].price)){
+					console.log("Problem: ")
+					console.log(cenovnikPodizvodjaca[i])
+				}
 			}
 		}
+		console.log("DONE")
 		var response = await pricesHighDB.insertMany(cenovnikPodizvodjaca);
 		console.log(response)*/
 
@@ -4917,7 +4928,7 @@ server.get('/spremniNalozi',async (req,res)=>{
 				for(var i=0;i<nalozi.length;i++){
 					delete nalozi[i]._id;
 					delete nalozi[i].uniqueId;
-					delete nalozi[i].digitalizacija;
+					//delete nalozi[i].digitalizacija;
 					delete nalozi[i].opis;
 					delete nalozi[i].vrstaRada;
 					delete nalozi[i].kategorijeRadova;
@@ -4927,6 +4938,51 @@ server.get('/spremniNalozi',async (req,res)=>{
 				}
 				res.render("administracija/spremniNalozi",{
 					pageTitle:Number(req.session.user.role)==10 ? "Спремни за фактурисање" : "Спремни налози",
+					nalozi: nalozi,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 1443.</div>"
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/storniraniNalozi',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==40){
+			try{
+				var nalozi = await naloziDB.find({statusNaloga:"Storniran"}).toArray();
+				var nalozi2024 = await nalozi2024DB.find({statusNaloga:"Storniran"}).toArray();
+				for(var i=0;i<nalozi2024.length;i++){
+					nalozi.push(nalozi2024[i])
+				}
+				for(var i=0;i<nalozi.length;i++){
+					delete nalozi[i]._id;
+					delete nalozi[i].uniqueId;
+					//delete nalozi[i].digitalizacija;
+					delete nalozi[i].opis;
+					delete nalozi[i].vrstaRada;
+					delete nalozi[i].kategorijeRadova;
+					delete nalozi[i].punaAdresa;
+					delete nalozi[i].obracun;
+					delete nalozi[i].prijemnica;
+				}
+				res.render("administracija/spremniNalozi",{
+					pageTitle:"Сторнирани налози",
 					nalozi: nalozi,
 					user: req.session.user
 				})
@@ -6376,6 +6432,10 @@ server.get('/nalog/:broj',async (req,res)=>{
 				if(nalog2024){
 					nalozi[0] = nalozi2024[0];
 				}
+				var cenovnikPG = cenovnik;
+				if(nalog2024){
+					cenovnikPG = cenovnik2024;
+				}
 				if(Number(req.session.user.role)==10){
 					var podizvodjac = 0;
 					var cenovnikPodizvodjaca = [];
@@ -6394,10 +6454,12 @@ server.get('/nalog/:broj',async (req,res)=>{
 								cenovnikPodizvodjaca = cenovnikHigh;
 							}
 						}
-						for(var i=0;i<cenovnik.length;i++){
+						
+						
+						for(var i=0;i<cenovnikPG.length;i++){
 							for(var j=0;j<cenovnikPodizvodjaca.length;j++){
-								if(cenovnik[i].code==cenovnikPodizvodjaca[j].code){
-									cenovnik[i].podizvodjacPrice = cenovnikPodizvodjaca[j].price;
+								if(cenovnikPG[i].code==cenovnikPodizvodjaca[j].code){
+									cenovnikPG[i].podizvodjacPrice = cenovnikPodizvodjaca[j].price;
 									break;
 								}
 							}
@@ -6407,7 +6469,7 @@ server.get('/nalog/:broj',async (req,res)=>{
 						pageTitle:"Налог број " + req.params.broj,
 						nalog: nalozi[0],
 						majstori: majstori,
-						cenovnik: cenovnik,
+						cenovnik: cenovnikPG,
 						stariCenovnik: stariCenovnik,
 						istorijat: istorijat,
 						izvestaji: izvestaji,
@@ -8932,6 +8994,77 @@ server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 	}
 });
 
+server.get('/dispecer/storniraniNalozi',async (req,res)=>{
+	if(req.session.user){
+			if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
+				try{
+					var nalozi = await naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:"Storniran"}).toArray();
+					var nalozi2024 = await nalozi2024DB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:"Storniran"}).toArray();
+					for(var i=0;i<nalozi2024.length;i++){
+						nalozi.push(nalozi2024[i])
+					}
+					var brojeviNaloga = [];
+					for(var i=0;i<nalozi.length;i++){
+						delete nalozi[i]._id;
+						delete nalozi[i].uniqueId;
+						delete nalozi[i].digitalizacija;
+						delete nalozi[i].opis;
+						delete nalozi[i].vrstaRada;
+						delete nalozi[i].kategorijeRadova;
+						delete nalozi[i].punaAdresa;
+						delete nalozi[i].obracun;
+						delete nalozi[i].ukupanIznos;
+						delete nalozi[i].faktura;
+						delete nalozi[i].prijemnica;
+						brojeviNaloga.push(nalozi[i].broj)
+					}
+					var dodele = dodeljivaniNaloziDB.find({nalog:{$in:brojeviNaloga}}).toArray();
+					for(var i=0;i<nalozi.length;i++){
+						nalozi[i].dodele = [];
+						for(var j=0;j<dodele.length;j++){
+							if(dodele[j].nalog==nalozi[i].broj){
+								nalozi[i].dodele.push(dodele[j])
+							}
+						}
+					}
+
+					for(var i=0;i<nalozi.length;i++){
+						nalozi[i].kasni = true;
+						var today = new Date();
+						today.setHours(0,0,0,0);
+						for(var j=0;j<nalozi[i].dodele.length;j++){
+							if(new Date(nalozi[i].dodele[j].datumRadova).getTime()>=today.getTime()){
+								nalozi[i].kasni = false;
+							}
+						}
+					}
+					var majstori = await majstoriDB.find({}).toArray();
+					res.render("dispeceri/otvoreniNalozi",{
+						pageTitle:"Отворени налози",
+						user: req.session.user,
+						majstori: majstori,
+						nalozi: nalozi
+					});
+				}catch(err){
+					logError(err);
+					res.render("message",{
+						pageTitle: "Програмска грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 281.</div>"
+					});
+				}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+});
+
 server.get('/dispecer/dodeljeniNalozi',async (req,res)=>{
 	if(req.session.user){
 			if(Number(req.session.user.role)==20){
@@ -9209,8 +9342,12 @@ server.get('/podizvodjac/pretragaNaloga',async (req,res)=>{
 server.post('/pretragaNalogaPoAdresi', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
-			naloziDB.find({adresa:{$regex:req.body.adresa}}).toArray()
-			.then((nalozi) => {
+			try{
+				var nalozi = await naloziDB.find({adresa:{ $regex: req.body.adresa, $options: 'i' }}).toArray();
+				var nalozi2024 = await nalozi2024DB.find({adresa:{ $regex: req.body.adresa, $options: 'i' }}).toArray();
+				for(var i=0;i<nalozi2024.length;i++){
+					nalozi.push(nalozi2024[i])
+				}
 				for(var i=0;i<nalozi.length;i++){
 					delete nalozi[i]._id;
 					delete nalozi[i].uniqueId;
@@ -9229,18 +9366,21 @@ server.post('/pretragaNalogaPoAdresi', async (req, res)=> {
 					user: req.session.user,
 					nalozi: nalozi
 				})
-			})
-			.catch((error)=>{
-				logError(error);
+			}catch(err){
+				logError(err);
 				res.render("message",{
 					pageTitle: "Програмска грешка",
 					user: req.session.user,
 					message: "<div class=\"text\">Дошло је до грешке у бази податка 940.</div>"
 				});
-			});
+			}
 		}else if(Number(req.session.user.role)==30){
-			naloziDB.find({majstor:req.session.user.nalozi,adresa:{$regex:req.body.adresa}}).toArray()
-			.then((nalozi) => {
+			try{
+				var nalozi = await naloziDB.find({majstor:req.session.user.nalozi,adresa:{ $regex: req.body.adresa, $options: 'i' }}).toArray();
+				var nalozi2024 = await nalozi2024DB.find({majstor:req.session.user.nalozi,adresa:{ $regex: req.body.adresa, $options: 'i' }}).toArray();
+				for(var i=0;i<nalozi2024.length;i++){
+					nalozi.push(nalozi2024[i])
+				}
 				for(var i=0;i<nalozi.length;i++){
 					delete nalozi[i]._id;
 					delete nalozi[i].uniqueId;
@@ -9259,15 +9399,15 @@ server.post('/pretragaNalogaPoAdresi', async (req, res)=> {
 					user: req.session.user,
 					nalozi: nalozi
 				})
-			})
-			.catch((error)=>{
-				logError(error);
+			}catch(err){
+				logError(err);
 				res.render("message",{
 					pageTitle: "Програмска грешка",
 					user: req.session.user,
 					message: "<div class=\"text\">Дошло је до грешке у бази податка 940.</div>"
 				});
-			});
+			}
+			
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -9324,6 +9464,53 @@ server.get('/podizvodjac/otvoreniNalozi',async (req,res)=>{
 				}
 				res.render("podizvodjaci/otvoreniNalozi",{
 					pageTitle:"Отворени налози",
+					user: req.session.user,
+					nalozi: nalozi
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 1243.</div>"
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/podizvodjac/storniraniNalozi',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==30){
+			try{
+				var nalozi = await naloziDB.find({majstor:req.session.user.nalozi,statusNaloga:"Storniran"}).toArray();
+				var nalozi2024 = await nalozi2024DB.find({majstor:req.session.user.nalozi,statusNaloga:"Storniran"}).toArray()
+				for(var i=0;i<nalozi2024.length;i++){
+					nalozi.push(nalozi2024[i])
+				}
+				for(var i=0;i<nalozi.length;i++){
+					delete nalozi[i]._id;
+					delete nalozi[i].uniqueId;
+					delete nalozi[i].digitalizacija;
+					delete nalozi[i].opis;
+					delete nalozi[i].vrstaRada;
+					delete nalozi[i].kategorijeRadova;
+					delete nalozi[i].punaAdresa;
+					delete nalozi[i].obracun;
+					delete nalozi[i].ukupanIznos;
+					delete nalozi[i].faktura;
+					delete nalozi[i].prijemnica;
+				}
+				res.render("podizvodjaci/otvoreniNalozi",{
+					pageTitle:"Сторнирани налози",
 					user: req.session.user,
 					nalozi: nalozi
 				})
