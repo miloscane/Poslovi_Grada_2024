@@ -29,7 +29,7 @@ function generatePremijusSaPenalom(info){
 	var pdv 			=	info.pdv ? info.pdv : "35"; //35 je datum prometa a 3 je datum slanja
 	var datumIspostavljanjaNarudzbenice = info.datumPrometa.split(".")[2]+"-"+info.datumPrometa.split(".")[1]+"-"+info.datumPrometa.split(".")[0];
 	var penal 			=	100-parseFloat(info.penal);
-	var brojUgovora 	=	"???";
+	var brojUgovora 	=	"OP-00022/25";
 	if(info.vik=="2024"){
 		brojUgovora = "OP-00052/23-OS"
 	}else if(info.vik=="2025"){
@@ -217,7 +217,7 @@ function generatePremijusBezPenala(info){
 	var pdv 			=	info.pdv ? info.pdv : "35"; //35 je datum prometa a 3 je datum slanja
 	var datumIspostavljanjaNarudzbenice = info.datumPrometa.split(".")[2]+"-"+info.datumPrometa.split(".")[1]+"-"+info.datumPrometa.split(".")[0];
 	var penal 			=	100-parseFloat(info.penal);
-	var brojUgovora 	=	"???";
+	var brojUgovora 	=	"OP-00022/25";
 	if(info.vik=="2024"){
 		brojUgovora = "OP-00052/23-OS"
 	}else if(info.vik=="2025"){
@@ -374,7 +374,7 @@ function generatePremijusPrekoPolaMilBezPenala(info){
 	var pdv 			=	info.pdv ? info.pdv : "35"; //35 je datum prometa a 3 je datum slanja
 	var datumIspostavljanjaNarudzbenice = info.datumPrometa.split(".")[2]+"-"+info.datumPrometa.split(".")[1]+"-"+info.datumPrometa.split(".")[0];
 	var penal 			=	100-parseFloat(info.penal);
-	var brojUgovora 	=	"???";
+	var brojUgovora 	=	"OP-00022/25";
 	if(info.vik=="2024"){
 		brojUgovora = "OP-00052/23-OS"
 	}else if(info.vik=="2025"){
