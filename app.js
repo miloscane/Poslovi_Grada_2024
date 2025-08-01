@@ -10617,7 +10617,7 @@ server.post('/fakturisi', async (req, res)=> {
 				}
 
 				const worker 		=	new Worker("./fakturaWorker.js",{ env:SHARE_ENV});
-				worker.postMessage(req.body.json);
+				worker.postMessage(JSON.stringify(json));
 				worker.on("message",async (data)=>{
 					try{
 						var fakturaResponse = JSON.parse(data);
