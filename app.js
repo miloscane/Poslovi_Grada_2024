@@ -3455,8 +3455,40 @@ http.listen(process.env.PORT, async function(){
 			}
 		}*/
 
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var nalozi2024 = await nalozi2024DB.find({}).toArray();
+		for(var i=0;i<nalozi2024.length;i++){
+			nalozi.push(nalozi2024[i])
+		}
+		var naloziToExport = [];
+		for(var i=0;i<nalozi.length;i++){
+			if(nalozi[i].prijemnica.datum.datum.includes("06.2025")){
+				var woma = ["80.02.09.020","80.02.09.021","80.02.09.022"];
+				nalozi[i].iznosWoma = 0;
+				for(var j=0;j<nalozi[i].obracun.length;j++){
+					if(woma.indexOf(nalozi[i].obracun[j].code)>=0){
+						for(var k=0;k<cenovnik.length;k++){
+							if(cenovnik[k].code==nalozi[i].obracun[j].code){
+								nalozi[i].iznosWoma += nalozi[i].obracun[j].quantity*cenovnik[k].price;
+								break;
+							}
+							
+						}
+						
+					}
+				}
+				if(nalozi[i].iznosWoma>0){
+					naloziToExport.push(nalozi[i]);
+				}
+			}
+		}
 
-
+		var csvString = "Broj naloga;Radna Jedinica;Datum Naloga; Datum Prijemnice; Iznos naloga; Iznos Wome\r\n";
+		for(var i=0;i<naloziToExport.length;i++){
+			csvString += naloziToExport[i].broj + ";" +naloziToExport[i].radnaJedinica +";"+ naloziToExport[i].datum.datum + ";" + naloziToExport[i].prijemnica.datum.datum+ ";" +naloziToExport[i].ukupanIznos +";"+naloziToExport[i].iznosWoma+"\r\n"; 
+		}					
+		fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+		console.log("Wrote file")*/
 
 
 	})
