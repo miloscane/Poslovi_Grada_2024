@@ -3491,6 +3491,82 @@ http.listen(process.env.PORT, async function(){
 		console.log("Wrote file")*/
 
 
+		//var kop = ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
+			//var mas = ["80.03.01.019","80.03.01.020","80.03.01.025"];
+		//Hermina kopanje rucno
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var nalozi2024 = await nalozi2024DB.find({}).toArray();
+		for(var i=0;i<nalozi2024.length;i++){
+			nalozi.push(nalozi2024[i])
+		}
+		var naloziToExport = [];
+		for(var i=0;i<nalozi.length;i++){
+			if(nalozi[i].prijemnica.datum.datum.includes("06.2025")){
+				var kop = ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
+				nalozi[i].iznosKop = 0;
+				for(var j=0;j<nalozi[i].obracun.length;j++){
+					if(kop.indexOf(nalozi[i].obracun[j].code)>=0){
+						for(var k=0;k<cenovnik.length;k++){
+							if(cenovnik[k].code==nalozi[i].obracun[j].code){
+								nalozi[i].iznosKop += nalozi[i].obracun[j].quantity*cenovnik[k].price;
+								break;
+							}
+							
+						}
+						
+					}
+				}
+				if(nalozi[i].iznosKop>0){
+					naloziToExport.push(nalozi[i]);
+				}
+			}
+		}
+
+		var csvString = "Broj naloga;Radna Jedinica;Datum Naloga; Datum Prijemnice; Iznos naloga; Iznos Kopanja\r\n";
+		for(var i=0;i<naloziToExport.length;i++){
+			csvString += naloziToExport[i].broj + ";" +naloziToExport[i].radnaJedinica +";"+ naloziToExport[i].datum.datum + ";" + naloziToExport[i].prijemnica.datum.datum+ ";" +naloziToExport[i].ukupanIznos +";"+naloziToExport[i].iznosKop+"\r\n"; 
+		}					
+		fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+		console.log("Wrote file")*/
+
+
+		//Hermina masinsko kopanje
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var nalozi2024 = await nalozi2024DB.find({}).toArray();
+		for(var i=0;i<nalozi2024.length;i++){
+			nalozi.push(nalozi2024[i])
+		}
+		var naloziToExport = [];
+		for(var i=0;i<nalozi.length;i++){
+			if(nalozi[i].prijemnica.datum.datum.includes("06.2025")){
+				var mas = ["80.03.01.019","80.03.01.020","80.03.01.025"];
+				nalozi[i].iznosKop = 0;
+				for(var j=0;j<nalozi[i].obracun.length;j++){
+					if(mas.indexOf(nalozi[i].obracun[j].code)>=0){
+						for(var k=0;k<cenovnik.length;k++){
+							if(cenovnik[k].code==nalozi[i].obracun[j].code){
+								nalozi[i].iznosKop += nalozi[i].obracun[j].quantity*cenovnik[k].price;
+								break;
+							}
+							
+						}
+						
+					}
+				}
+				if(nalozi[i].iznosKop>0){
+					naloziToExport.push(nalozi[i]);
+				}
+			}
+		}
+
+		var csvString = "Broj naloga;Radna Jedinica;Datum Naloga; Datum Prijemnice; Iznos naloga; Iznos Kopanja\r\n";
+		for(var i=0;i<naloziToExport.length;i++){
+			csvString += naloziToExport[i].broj + ";" +naloziToExport[i].radnaJedinica +";"+ naloziToExport[i].datum.datum + ";" + naloziToExport[i].prijemnica.datum.datum+ ";" +naloziToExport[i].ukupanIznos +";"+naloziToExport[i].iznosKop+"\r\n"; 
+		}					
+		fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+		console.log("Wrote file")*/
+
+
 	})
 	.catch(error => {
 		logError(error);
@@ -13571,11 +13647,15 @@ io.on('connection', function(socket){
 		});
 	});
 
-	socket.on('listaFakturisanihNalogaPoBroju', function(odBroja,doBroja){
+	socket.on('listaFakturisanihNalogaPoBroju', async function(odBroja,doBroja){
 		var dbFindStart	=	new Date().getTime();
 		var warnings = [];
-		naloziDB.find({statusNaloga:"Fakturisan"}).toArray()
-		.then((nalozi) => {
+		try{
+			var nalozi = await naloziDB.find({statusNaloga:"Fakturisan"}).toArray();
+			var nalozi2024 = await nalozi2024DB.find({statusNaloga:"Fakturisan"}).toArray();
+			for(var i=0;i<nalozi2024.length;i++){
+				nalozi.push(nalozi2024[i]);
+			}
 			var naloziToSend	=	[];
 			for(var i=0;i<nalozi.length;i++){
 				var nalogToPush = {};
@@ -13645,11 +13725,10 @@ io.on('connection', function(socket){
 			});
 			socket.emit('listaFakturisanihNalogaPoBrojuOdgovor',1,statistika,naloziToSend,"Found "+naloziToSend.length+" in " + eval(new Date().getTime()/1000-dbFindStart/1000).toFixed(2)+"s",warnings);	
 			
-		})
-		.catch((error)=>{
+		}catch(err){
 			logError(error);
 			socket.emit('listaFakturisanihNalogaOdgovor',0,{},[],"Greska u pretrazi naloga",error);
-		});
+		}
 	});
 
 	socket.on('adresaPoBroju', function(broj){
