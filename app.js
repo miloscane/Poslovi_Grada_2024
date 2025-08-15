@@ -46,7 +46,7 @@ var websiteHeader = {
 };
 
 var websiteOptions = {
-    url: 'https://poslovigrada.rs/nalog',
+    url: 'https://www.poslovigrada.rs/nalog',
     method: 'POST',
     headers: websiteHeader
 };
@@ -11393,7 +11393,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				}
 
 				var websiteConfig = {
-			    url: 'https://poslovigrada.rs/nalog',
+			    url: 'https://www.poslovigrada.rs/nalog',
 			    method: 'POST',
 			    headers: websiteHeader,
 			    data: JSON.stringify({datum: nalogJson.digitalizacija.datum,vreme: new Date().getHours().toString().padStart(2,"0")+":"+new Date().getMinutes().toString().padStart(2,"0"),radnaJedinica: nalogJson.radnaJedinica, adresa: nalogJson.adresa})
@@ -12344,7 +12344,7 @@ server.get('/majstor/nalozi', async (req, res)=> {
 			try{
 				var today = new Date();
 				today.setDate(today.getDate());
-				var nalozi = await dodeljivaniNaloziDB.find({majstor:req.session.user.uniqueId,"datum.datum":getDateAsStringForDisplay(today)}).toArray();
+				var nalozi = await dodeljivaniNaloziDB.find({majstor:req.session.user.uniqueId,"datumRadova":getDateAsStringForInputObject(today)}).toArray();
 				var brojeviNaloga = [];
 				for(var i=0;i<nalozi.length;i++){
 					if(brojeviNaloga.indexOf(nalozi[i].nalog)<0){
