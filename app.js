@@ -12492,66 +12492,38 @@ server.get('/majstor/mesec/:datum', async (req, res)=> {
 server.post('/izvestaj-majstora', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==60){
-				uploadSlika(req, res, function (error) {
-				    if (error) {
-				      logError(error);
-				      return res.render("message",{pageTitle: "Грешка",message: "<div class=\"text\">Дошло је до грешке приликом качења слика.</div>",user: req.session.user});
-				    }
-				    var nalogJson = JSON.parse(req.body.json);
-				    var izvestajJson = {};
-				    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
-				    izvestajJson.nalog		=	nalogJson.broj;
-				    izvestajJson.datetime 	=	new Date().getTime();
-				    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
-				    izvestajJson.izvestaj	=	nalogJson.izvestaj;
-				    izvestajJson.user 		=	req.session.user;
-				    izvestajJson.photos		=	[];
-				    //izvestajJson.signature = nalogJson.signature ? nalogJson.signature : [];
-				    for(var i=0;i<req.files.length;i++){
-				    	izvestajJson.photos.push(req.files[i].transforms[0].location)
-				    }
-						izvestajiDB.insertOne(izvestajJson)
-						.then((dbResponse)=>{
-							/*var mailOptions = {
-								from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
-								to: nalogJson.email,
-								subject: 'Нови извештај мајстора на налогу број '+nalogJson.nalog,
-								html: 'Поштовани/а '+nalogJson.dispecer+' <br>,'+izvestajJson.user.ime+' је окачио нови извештај за налог број '+izvestajJson.nalog+' / '+nalogJson.radnaJedinica+' / '+nalogJson.adresa+'.<br><a href=\"https://vik2024.poslovigrada.rs/nalog/'+izvestajJson.nalog+'\">Отвори налог на порталу</a>.'
-							};
-
-							transporter.sendMail(mailOptions, (error, info) => {
-								if (error) {
-									logError(error);
-									res.redirect("/majstor/nalozi");
-								}else{
-									res.redirect("/majstor/nalozi");
-								}
-							})*/
-							var nalog = await naloziDB.find({broj:nalogJson.broj.toString()}).toArray()[0];
-							io.emit(
-								"notification",
-								"noviKomentar",
-								"<div class=\"title\">Komentar majstora</div>"+
-								 "<div class=\"text\">"+
-								  "<a href=\"/nalog/"+nalogJson.broj+"\" target=\"blank\">"+nalogJson.broj+"</a> -"+ 
-								  "<span class=\"adresa\">"+nalog.adresa+"</span> - "+
-								  "<span class=\"radnaJedinica\">"+nalog.radnaJedinica+"</span>"+
-								 "</div>",
-								nalog.radnaJedinica
-							);
-							res.redirect("/majstor/nalog/"+nalogJson.broj);
-						})
-						.catch((error)=>{
-							logError(error);
-							res.render("message",{
-								pageTitle: "Програмска грешка",
-								user:req.session.user,
-								message: "<div class=\"text\">Дошло је до грешке у бази податка 6784.</div>"
-							});
-						})
-						
-					
-					
+				uploadSlika(req, res, async function (error) {
+			    if (error) {
+			      logError(error);
+			      return res.render("message",{pageTitle: "Грешка",message: "<div class=\"text\">Дошло је до грешке приликом качења слика.</div>",user: req.session.user});
+			    }
+			    var nalogJson = JSON.parse(req.body.json);
+			    var izvestajJson = {};
+			    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
+			    izvestajJson.nalog		=	nalogJson.broj;
+			    izvestajJson.datetime 	=	new Date().getTime();
+			    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
+			    izvestajJson.izvestaj	=	nalogJson.izvestaj;
+			    izvestajJson.user 		=	req.session.user;
+			    izvestajJson.photos		=	[];
+			    //izvestajJson.signature = nalogJson.signature ? nalogJson.signature : [];
+			    for(var i=0;i<req.files.length;i++){
+			    	izvestajJson.photos.push(req.files[i].transforms[0].location)
+			    }
+			    await izvestajiDB.insertOne(izvestajJson)
+					var nalog = await naloziDB.find({broj:nalogJson.broj.toString()}).toArray()[0];
+					io.emit(
+						"notification",
+						"noviKomentar",
+						"<div class=\"title\">Komentar majstora</div>"+
+						 "<div class=\"text\">"+
+						  "<a href=\"/nalog/"+nalogJson.broj+"\" target=\"blank\">"+nalogJson.broj+"</a> -"+ 
+						  "<span class=\"adresa\">"+nalog.adresa+"</span> - "+
+						  "<span class=\"radnaJedinica\">"+nalog.radnaJedinica+"</span>"+
+						 "</div>",
+						nalog.radnaJedinica
+					);
+					res.redirect("/majstor/nalog/"+nalogJson.broj);
 				});
 			
 		}else{
