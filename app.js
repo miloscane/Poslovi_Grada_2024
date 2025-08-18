@@ -12510,20 +12510,30 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 			    for(var i=0;i<req.files.length;i++){
 			    	izvestajJson.photos.push(req.files[i].transforms[0].location)
 			    }
-			    await izvestajiDB.insertOne(izvestajJson)
-					var nalog = await naloziDB.find({broj:nalogJson.broj.toString()}).toArray()[0];
-					io.emit(
-						"notification",
-						"noviKomentar",
-						"<div class=\"title\">Komentar majstora</div>"+
-						 "<div class=\"text\">"+
-						  "<a href=\"/nalog/"+nalogJson.broj+"\" target=\"blank\">"+nalogJson.broj+"</a> -"+ 
-						  "<span class=\"adresa\">"+nalog.adresa+"</span> - "+
-						  "<span class=\"radnaJedinica\">"+nalog.radnaJedinica+"</span>"+
-						 "</div>",
-						nalog.radnaJedinica
-					);
-					res.redirect("/majstor/nalog/"+nalogJson.broj);
+			    try{
+			    	await izvestajiDB.insertOne(izvestajJson)
+						var nalog = await naloziDB.find({broj:nalogJson.broj.toString()}).toArray()[0];
+						io.emit(
+							"notification",
+							"noviKomentar",
+							"<div class=\"title\">Komentar majstora</div>"+
+							 "<div class=\"text\">"+
+							  "<a href=\"/nalog/"+nalogJson.broj+"\" target=\"blank\">"+nalogJson.broj+"</a> -"+ 
+							  "<span class=\"adresa\">"+nalog.adresa+"</span> - "+
+							  "<span class=\"radnaJedinica\">"+nalog.radnaJedinica+"</span>"+
+							 "</div>",
+							nalog.radnaJedinica
+						);
+						res.redirect("/majstor/nalog/"+nalogJson.broj);
+			    }catch(err){
+			    	logError(err);
+			    	res.render("message",{
+		          pageTitle: "Грешка",
+		          user: req.session.user,
+		          message: "<div class=\"text\">Грешка у бази података 12520.</div>"
+		        });
+			    }
+			    
 				});
 			
 		}else{
