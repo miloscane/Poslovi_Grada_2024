@@ -11310,6 +11310,8 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						datum: getDateAsStringForDisplay(new Date()),
 						datetime: timestamp
 					},
+					rokRadova: stambenoJson.rok_datum,
+					datumIzdavanjaNaloga: stambenoJson.vreme_izdavanja_naloga,
 					zahtevalac: stambenoJson.zahtevalac,
 					dispecer: "",
 					obracun:[],
