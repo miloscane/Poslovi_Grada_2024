@@ -12497,20 +12497,21 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 			      logError(error);
 			      return res.render("message",{pageTitle: "Грешка",message: "<div class=\"text\">Дошло је до грешке приликом качења слика.</div>",user: req.session.user});
 			    }
-			    var nalogJson = JSON.parse(req.body.json);
-			    var izvestajJson = {};
-			    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
-			    izvestajJson.nalog		=	nalogJson.broj;
-			    izvestajJson.datetime 	=	new Date().getTime();
-			    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
-			    izvestajJson.izvestaj	=	nalogJson.izvestaj;
-			    izvestajJson.user 		=	req.session.user;
-			    izvestajJson.photos		=	[];
-			    //izvestajJson.signature = nalogJson.signature ? nalogJson.signature : [];
-			    for(var i=0;i<req.files.length;i++){
-			    	izvestajJson.photos.push(req.files[i].transforms[0].location)
-			    }
+			    
 			    try{
+			    	var nalogJson = JSON.parse(req.body.json);
+				    var izvestajJson = {};
+				    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
+				    izvestajJson.nalog		=	nalogJson.broj;
+				    izvestajJson.datetime 	=	new Date().getTime();
+				    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
+				    izvestajJson.izvestaj	=	nalogJson.izvestaj;
+				    izvestajJson.user 		=	req.session.user;
+				    izvestajJson.photos		=	[];
+				    //izvestajJson.signature = nalogJson.signature ? nalogJson.signature : [];
+				    for(var i=0;i<req.files.length;i++){
+				    	izvestajJson.photos.push(req.files[i].transforms[0].location)
+				    }
 			    	await izvestajiDB.insertOne(izvestajJson)
 						var nalog = await naloziDB.find({broj:nalogJson.broj.toString()}).toArray()[0];
 						io.emit(
