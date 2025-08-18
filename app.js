@@ -12513,7 +12513,8 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 				    	izvestajJson.photos.push(req.files[i].transforms[0].location)
 				    }
 			    	await izvestajiDB.insertOne(izvestajJson)
-						var nalog = await naloziDB.find({broj:nalogJson.broj.toString()}).toArray()[0];
+						var nalozi = await naloziDB.find({broj:nalogJson.broj.toString()}).toArray();
+						var nalog = nalozi[0]
 						io.emit(
 							"notification",
 							"noviKomentar",
