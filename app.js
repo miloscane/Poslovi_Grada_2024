@@ -4123,7 +4123,7 @@ server.post('/login',async (req,res)=>{
 		res.redirect("/")
 	}else{
 		const loginJson = JSON.parse(req.body.json)
-		const username = loginJson.username;
+		const username = loginJson.username.toLowerCase();
 		const password = hashString(loginJson.password);
 		usersDB.find({email:username}).toArray()
 		.then((korisnici) => {
