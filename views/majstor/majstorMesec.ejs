@@ -1,7 +1,6 @@
 <%- include ("partials/header") -%>
 	<script>
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
-		console.log(izvestaji)
 		var datum = "<%=datum%>";
 		var mesec = datum.split(".")[0];
 		var godina = datum.split(".")[1];
@@ -45,22 +44,23 @@
 				var nalozi = 0;
 				var nagrade = 0;
 				var kazne = 0;
+				var bod = 500;//1 bod = 500 dinara;
 				for(var i=0;i<izvestaji.length;i++){
 					if(izvestaji[i].odsustvo=="Присутан"){
 						radniDani++;
 					}
 					nalozi = nalozi + izvestaji[i].nalozi.length;
-					if(!isNaN(parseFloat(izvestaji[i].nagrade))){
-						nagrade = kazne + parseFloat(izvestaji[i].nagrade);
+					if(!isNaN(parseFloat(izvestaji[i].nagrada))){
+						nagrade = kazne + parseFloat(izvestaji[i].nagrada);
 					}
-					if(!isNaN(parseFloat(izvestaji[i].kazne))){
-						kazne = kazne + parseFloat(izvestaji[i].kazne);
+					if(!isNaN(parseFloat(izvestaji[i].kazna))){
+						kazne = kazne + parseFloat(izvestaji[i].kazna);
 					}
 				}
 				document.getElementById("radni-dani").innerHTML = radniDani;
 				document.getElementById("nalozi").innerHTML = nalozi;
-				document.getElementById("nagrade").innerHTML = brojSaRazmacima(nagrade);
-				document.getElementById("kazne").innerHTML = brojSaRazmacima(kazne);
+				document.getElementById("nagrade").innerHTML = eval(nagrade/bod).toFixed(0) + " boda";
+				document.getElementById("kazne").innerHTML = eval(kazne/bod).toFixed(0) + " boda";
 			</script>
 			<div class="swipeable">
 				<div class="arrow arrowLeft" onclick="moveDay(-1)"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/chevronLeft.svg"></div>
@@ -171,12 +171,13 @@
 								box.setAttribute("style","background-color:#008000")
 									var title = document.createElement("DIV");
 									title.setAttribute("class","title");
-									title.innerHTML = "Награда";
+									title.innerHTML = "Стимулација";
 									box.appendChild(title);
 
 									var value = document.createElement("DIV");
 									value.setAttribute("class","value");
-									value.innerHTML = izvestaj.nagrada ? brojSaRazmacima(izvestaj.nagrada) : "0,00";
+									var bodovi = eval(parseFloat(izvestaj.nagrada)/bod).toFixed(0)=="1" ? " бод" : " бода";
+									value.innerHTML = izvestaj.nagrada ? eval(parseFloat(izvestaj.nagrada)/bod).toFixed(0)+bodovi : bodovi;
 									box.appendChild(value);
 
 									if(izvestaj.nagrada){
@@ -192,15 +193,17 @@
 
 							if(izvestaj.kazna){
 								var box = document.createElement("DIV");
-								box.setAttribute("class","box")
+								box.setAttribute("class","box");
+								box.setAttribute("style","background-color:rgb(180,0,0)")
 									var title = document.createElement("DIV");
 									title.setAttribute("class","title");
-									title.innerHTML = "Казна";
+									title.innerHTML = "Дестимулација";
 									box.appendChild(title);
 
 									var value = document.createElement("DIV");
 									value.setAttribute("class","value");
-									value.innerHTML = izvestaj.kazna ? brojSaRazmacima(izvestaj.kazna) : "0,00";
+									var bodovi = eval(parseFloat(izvestaj.kazna)/bod).toFixed(0)=="1" ? " бод" : " бода";
+									value.innerHTML = izvestaj.kazna ? eval(parseFloat(izvestaj.kazna)/bod).toFixed(0)+bodovi : bodovi;
 									box.appendChild(value);
 
 									

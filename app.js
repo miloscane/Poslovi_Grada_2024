@@ -12334,8 +12334,6 @@ server.get('/mesecnoPrisustvo/:mesec/:majstor', async (req, res)=> {
 	}
 });
 
-
-
 server.get('/majstor/nalozi', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==60){
@@ -12394,6 +12392,68 @@ server.get('/majstor/nalozi', async (req, res)=> {
 	} 
 });
 
+server.get('/majstor/nalog/:broj', async (req, res) => {
+    if (!req.session.user) {
+       return res.redirect("/login?url=" + encodeURIComponent(req.url));
+    }
+
+    if (Number(req.session.user.role) !== 60) {
+      return res.render("message", {
+          pageTitle: "Greska",
+          user: req.session.user,
+          message: "<div class=\"text\">Vas nalog nije ovlascen da vidi ovu stranicu.</div>"
+      });
+    }
+ 
+    try {
+        const nalozi = await naloziDB.find({ broj: req.params.broj }).toArray();
+        if (nalozi.length === 0) {
+            return res.render("message", {
+                pageTitle: "Greska",
+                user: req.session.user,
+                message: "<div class=\"text\">Nepostojeci nalog</div>"
+            });
+        }
+
+        const nalog = nalozi[0];
+
+        /*if (nalog.majstor !== req.session.user.uniqueId) {
+            return res.render("message", {
+                pageTitle: "Greska",
+                user: req.session.user,
+                message: "<div class=\"text\">Nalog nije dodeljen vama.</div>"
+            });
+        }*/
+
+        /*if (["Spreman za fakturisanje", "Nalog u Stambenom", "Fakturisan"].includes(nalog.statusNaloga)) {
+            return res.render("message", {
+                pageTitle: "Greska",
+                user: req.session.user,
+                message: "<div class=\"text\">Nalog je u procesu obrade od strane administracije.</div>"
+            });
+        }*/
+
+        const izvestaji = await izvestajiDB.find({ nalog: req.params.broj }).toArray();
+        var dodele = await dodeljivaniNaloziDB.find({nalog:req.params.broj,datumRadova:getDateAsStringForInputObject(new Date()),majstor:req.session.user.uniqueId}).toArray();
+
+        res.render("majstor/nalog", {
+            pageTitle: "Nalog broj " + nalog.broj,
+            user: req.session.user,
+            izvestaji: izvestaji,
+            dodele: dodele,
+            nalog: nalog
+        });
+
+    } catch (error) {
+        logError(error);
+        return res.render("message", {
+            pageTitle: "Programska greska",
+            user: req.session.user,
+            message: "<div class=\"text\">Greska u bazi podataka.</div>"
+        });
+    }
+});
+
 server.get('/majstor/mesec', async (req, res)=> {
 	res.redirect("/majstor/mesec/"+eval(new Date().getMonth()+1).toString().padStart(2,"0")+"."+new Date().getFullYear())
 });
@@ -12440,7 +12500,7 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 				    var nalogJson = JSON.parse(req.body.json);
 				    var izvestajJson = {};
 				    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
-				    izvestajJson.nalog		=	nalogJson.nalog;
+				    izvestajJson.nalog		=	nalogJson.broj;
 				    izvestajJson.datetime 	=	new Date().getTime();
 				    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
 				    izvestajJson.izvestaj	=	nalogJson.izvestaj;
@@ -12452,7 +12512,7 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 				    }
 						izvestajiDB.insertOne(izvestajJson)
 						.then((dbResponse)=>{
-							var mailOptions = {
+							/*var mailOptions = {
 								from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
 								to: nalogJson.email,
 								subject: 'Нови извештај мајстора на налогу број '+nalogJson.nalog,
@@ -12466,7 +12526,20 @@ server.post('/izvestaj-majstora', async (req, res)=> {
 								}else{
 									res.redirect("/majstor/nalozi");
 								}
-							})
+							})*/
+							var nalog = await naloziDB.find({broj:nalogJson.broj.toString()}).toArray()[0];
+							io.emit(
+								"notification",
+								"noviKomentar",
+								"<div class=\"title\">Komentar majstora</div>"+
+								 "<div class=\"text\">"+
+								  "<a href=\"/nalog/"+nalogJson.broj+"\" target=\"blank\">"+nalogJson.broj+"</a> -"+ 
+								  "<span class=\"adresa\">"+nalog.adresa+"</span> - "+
+								  "<span class=\"radnaJedinica\">"+nalog.radnaJedinica+"</span>"+
+								 "</div>",
+								nalog.radnaJedinica
+							);
+							res.redirect("/majstor/nalog/"+nalogJson.broj);
 						})
 						.catch((error)=>{
 							logError(error);

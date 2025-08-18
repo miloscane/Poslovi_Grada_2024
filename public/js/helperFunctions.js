@@ -343,6 +343,30 @@ function parseLocalizedNumber(input) {
   return parseFloat(cleaned);
 }
 
+function generateTimes(startHour, endHour, interval) {
+  const times = [];
+  for (let h = startHour; h <= endHour; h++) {
+    for (let m = 0; m < 60; m += interval) {
+      if (h === endHour && m > 0) break; // stop at 22:00 exactly
+      const hour = String(h).padStart(2, "0");
+      const minute = String(m).padStart(2, "0");
+      times.push(`${hour}:${minute}`);
+    }
+  }
+  return times;
+}
+
+function isIntersecting(el1, el2) {
+  const r1 = el1.getBoundingClientRect();
+  const r2 = el2.getBoundingClientRect();
+
+  return !(
+    r1.top > r2.bottom ||
+    r1.right < r2.left ||
+    r1.bottom < r2.top ||
+    r1.left > r2.right
+  );
+}
 
 var definicijeProizvoda = [
                     {

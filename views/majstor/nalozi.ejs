@@ -10,7 +10,142 @@
 			<div class="buttonWrap">
 				<div class="button" onclick="loadGif();location.reload()">Освежи</div>
 			</div>
-			<div id="nalozi"></div>
+			<div class="naloziWrap">
+				<div class="timetable" id="timetable"></div>
+				<div id="nowMarker"></div>
+				<div class="listaNaloga" id="lista-naloga"></div>			
+			</div>
+			<script>
+				var pocetak = 7;
+				var kraj = 22;
+				var times = generateTimes(pocetak,kraj,60);
+				for(var i=0;i<times.length;i++){
+					var timeWrap = document.createElement("DIV");
+					timeWrap.setAttribute("class","timeWrap");
+						var time = document.createElement("DIV");
+						time.setAttribute("class","time");
+						time.innerHTML = times[i];
+						timeWrap.appendChild(time);
+					document.getElementById("timetable").appendChild(timeWrap);
+				}
+
+				// constants for your layout
+				const SLOT_HEIGHT = 60;           // px per hour block (.timeWrap)
+				const MIN_PER_HOUR = 60;
+
+				function placeNowMarker({
+				  el = document.getElementById('timetable'),
+				  marker = document.getElementById('nowMarker'),
+				  startHour = pocetak, // 7
+				  endHour = kraj,      // 22
+				  clamp = true
+				} = {}) {
+				  // if you want, force the container height from count of timeWraps:
+				  // el.style.height = `${el.children.length * SLOT_HEIGHT}px`;
+
+				  const now = new Date();
+				  const minutesSinceStart = (now.getHours() - startHour) * MIN_PER_HOUR + now.getMinutes();
+				  const totalMinutes = (endHour - startHour) * MIN_PER_HOUR;
+
+				  // px/minute based on your fixed hour height
+				  const pxPerMinute = SLOT_HEIGHT / MIN_PER_HOUR;
+
+				  let topPx = minutesSinceStart * pxPerMinute;
+
+				  if (clamp) {
+				    const maxTop = el.clientHeight - marker.offsetHeight; // keep fully inside
+				    topPx = Math.max(0, Math.min(maxTop, topPx));
+				  }
+
+				  marker.style.top = `${topPx}px`;
+				  marker.title = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+				}
+
+				// initial + minute-aligned updates (same as you had)
+				placeNowMarker();
+				(function scheduleNextTick(){
+				  const now = new Date();
+				  const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+				  setTimeout(() => {
+				    placeNowMarker();
+				    setInterval(placeNowMarker, 60 * 1000);
+				  }, Math.max(0, msToNextMinute));
+				})();
+				window.addEventListener('resize', placeNowMarker);
+
+				function getTopPosition(vremeDolaska, slotHeight = 60) {
+   				  const [hourStr, minuteStr] = vremeDolaska.split(":");
+				  const hour = parseInt(hourStr, 10);
+				  const minute = parseInt(minuteStr, 10);
+				  const MIN_PER_HOUR = 60;
+				  const minutesSinceStart = (hour - pocetak) * MIN_PER_HOUR + minute;
+				  const pxPerMinute = slotHeight / MIN_PER_HOUR;
+
+				  let topPx = minutesSinceStart * pxPerMinute;
+
+				  // clamp between 0 and total height
+				  const maxTop = (kraj - pocetak) * slotHeight;
+				  topPx = Math.max(0, Math.min(maxTop, topPx));
+
+				  return topPx;
+				}
+
+				function getHeightFromDuration(duration, slotHeight = 60) {
+				  const [h, m] = duration.split(":").map(Number);
+				  const totalMinutes = h * 60 + m;
+				  const pxPerMinute = slotHeight / 60;
+
+				  return totalMinutes * pxPerMinute;
+				}
+
+				for(var i=0;i<nalozi.length;i++){
+					var nalogWrap = document.createElement("DIV");
+					nalogWrap.setAttribute("class","nalogWrap");
+					nalogWrap.setAttribute("onclick","window.location.href='/majstor/nalog/"+nalozi[i].nalog+"'");
+						var relative = document.createElement("DIV");
+						relative.setAttribute("style","position:relative;width:100%;height:100%");
+							var title = document.createElement("DIV");
+							title.setAttribute("class","brojNaloga");
+							title.innerHTML = nalozi[i].nalog;
+							relative.appendChild(title);
+
+							var title = document.createElement("DIV");
+							title.setAttribute("class","radnaJedinica");
+							title.innerHTML = nalozi[i].radnaJedinica;
+							relative.appendChild(title);
+
+							var title = document.createElement("DIV");
+							title.setAttribute("class","adresa");
+							title.innerHTML = nalozi[i].adresa;
+							relative.appendChild(title);
+						nalogWrap.appendChild(relative);
+						
+					nalogWrap.style.top = getTopPosition(nalozi[i].vremeDolaska)+"px";
+					nalogWrap.style.height = getHeightFromDuration(nalozi[i].vremeRadova)+"px";
+					document.getElementById("lista-naloga").appendChild(nalogWrap);
+				}
+
+				//Ispomeraj ukoliko se preklapaju
+				var naloziElems = document.getElementsByClassName("nalogWrap");
+				var timesToCheck = 4;
+				for(var i=0;i<timesToCheck;i++){
+					for(var j=0;j<naloziElems.length;j++){
+						var nalogElem = naloziElems[j];
+						for(var k=0;k<naloziElems.length;k++){
+							if(nalogElem!=naloziElems[k]){
+								if(isIntersecting(nalogElem,naloziElems[k])){
+									nalogElem.style.left = eval(nalogElem.getBoundingClientRect().left-90 + nalogElem.getBoundingClientRect().width+2)+"px";//90 is offset from left because of timetable
+									console.log("moved")
+								}
+							}
+						}
+					}
+				}
+				
+			</script>
+
+
+			<!--<div id="nalozi"></div>
 			<script>
 				for(var i=0;i<nalozi.length;i++){
 					if(jedinstveniBrojevi.indexOf(nalozi[i].nalog)<0){
@@ -374,7 +509,7 @@
 			<form method="POST" action="/statusOdMajstora" id="status-form" style="display:none">
 				<input type="text" id="status-id" name="statusid">
 				<input type="text" id="status-code" name="code">
-			</form>
+			</form>-->
 		</div>
 	</div>
 <%- include ("partials/footer") -%>

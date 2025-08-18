@@ -1,0 +1,156 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalog = <%-JSON.stringify(nalog)%>;		
+		var izvestaji = <%-JSON.stringify(izvestaji)%>;		
+		var dodele = <%-JSON.stringify(dodele)%>;	
+		console.log(dodele)	
+	</script>
+	<script src="/js/signature.js"></script>
+	<div class="pageWidth">
+		<div class="administracijaNalog nalog">
+			
+			<div class="boxesWrap">
+				<div class="box" style="cursor:pointer;" onclick="window.open('https://www.google.com/maps/search/?api=1&query='+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+'),'_blank')">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/locationIcon.png"></div>
+					<div class="info">
+						<div class="title"><%=nalog.radnaJedinica%></div>
+						<div class="text"><span id="adresa-naloga"></span></div>
+						<script>
+							document.getElementById("adresa-naloga").innerHTML = nalog.adresa;
+						</script>
+						<div class="note">Klikni da vidis na mapi</div>
+					</div>
+				</div>
+			</div>
+			<div class="detalji">
+				<div class="title">Operativa</div>
+				<div class="boxesWrap">
+					<div class="box">
+						<div class="info">
+							<div class="title">Opis kvara</div>
+							<div class="text"><%=nalog.opis%><br>&nbsp;<br><span id="zahtevalac"></span></div>
+							<script>
+								if(nalog.zahtevalac){
+									document.getElementById("zahtevalac").innerHTML = nalog.zahtevalac;
+								}
+							</script>
+						</div>
+						<div class="boxMore"><%=nalog.vrstaRada%></div>
+					</div>
+					
+				</div>
+			</div>
+			<div class="izvestaji">
+				<div class="title">Izvestaji</div>
+				<div id="komentari"></div>
+				<script>
+					document.getElementById("komentari").style.marginTop = "0px";
+				</script>
+				<script>
+					for(var i=0;i<izvestaji.length;i++){
+						var izvestajBox = document.createElement("DIV");
+						if(izvestaji[i].user.email == "<%=user.email%>"){
+							izvestajBox.setAttribute("class","izvestajBox izvestajUser");
+						}else{
+							izvestajBox.setAttribute("class","izvestajBox");
+						}
+							var izvestajName = document.createElement("DIV");
+							izvestajName.setAttribute("class","name");
+							izvestajName.innerHTML = izvestaji[i].user.name + " <span>"+datetimeToReadable(izvestaji[i].datetime)+"</span>";
+							izvestajBox.appendChild(izvestajName);
+
+							var izvestajText = document.createElement("DIV");
+							izvestajText.setAttribute("class","text");
+							izvestajText.innerHTML = izvestaji[i].izvestaj;
+							izvestajBox.appendChild(izvestajText);
+
+							var izvestajPhotos = document.createElement("DIV");
+							izvestajPhotos.setAttribute("class","previewImages");
+							for(var j=0;j<izvestaji[i].photos.length;j++){
+								var izvestajPhoto = document.createElement("DIV");
+								izvestajPhoto.setAttribute("class","imagePreview")
+								izvestajPhoto.setAttribute("onclick","previewImage(this)");;
+									var izvestajImage = document.createElement("IMG");
+									izvestajImage.setAttribute("class","image");
+									izvestajImage.setAttribute("src",izvestaji[i].photos[j])
+									izvestajPhoto.appendChild(izvestajImage);
+								izvestajPhotos.appendChild(izvestajPhoto);
+							}
+							izvestajBox.appendChild(izvestajPhotos);
+						document.getElementById("komentari").appendChild(izvestajBox);
+
+					}
+				</script>
+				<div class="inputWrapper">
+					<div class="inputWrap buttonWrap izvestajInputWrap">
+						<textarea id="komentar" placeholder="Tekst izvestaja"></textarea>
+						<div class="previewImages" id="preview-images"></div>
+						<form method="POST" action="/izvestaj-majstora" id="form" style="display:none;" enctype="multipart/form-data">
+							<input type="text" name="json" id="json">
+							<input type="file" id="slike-input" name="image"  accept="image/*" multiple>
+						</form>
+						<div class="buttonWrap" onclick="document.getElementById('slike-input').click()">
+							<div class="button">
+								<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/addImageIcon.png"></div>
+								<div class="label">Dodaj slike</div>
+								<script>
+									document.getElementById("slike-input").onchange = async (evt) => {
+										const input = evt.target;
+										const files = Array.from(input.files);
+										const previewContainer = document.getElementById("preview-images");
+
+										previewContainer.innerHTML = "";
+
+										for (let file of files) {
+											const imagePreview = document.createElement("DIV");
+											imagePreview.className = "imagePreview";
+											imagePreview.setAttribute("onclick", "previewImage(this," + nalog.broj + ")");
+											
+											const image = document.createElement("IMG");
+											image.className = "image";
+											image.src = URL.createObjectURL(file);
+											imagePreview.appendChild(image);
+
+											previewContainer.appendChild(imagePreview);
+										}
+
+										if (files.length > 20) {
+											alert("Moguće je kačiti maksimalno 20 slika po izveštaju.");
+											previewContainer.innerHTML = "";
+											input.value = "";
+										} else {
+											//input.files = dt.files; // override original files with converted list
+										}
+									};
+								</script>
+
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				<div class="saveNalog">
+					<div class="inputWrapper">
+						<div class="inputWrap">
+							<div class="button" onclick="saveNalog()">Sacuvaj izmene</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<script>
+
+				function saveNalog(){
+					var nalogJson = {};
+					nalogJson.broj = nalog.broj;
+					nalogJson.izvestaj = document.getElementById("komentar").value;
+					//var zavrseno = confirm("Da li je nalog završen? Stisnite 'Ok' ako jeste");
+					//nalogJson.zavrseno = zavrseno;
+					document.getElementById("json").value = JSON.stringify(nalogJson);
+					loadGif();
+					document.getElementById("form").submit();
+				}
+			</script>
+			
+		</div>
+	</div>	
+<%- include ("partials/footer") -%>
