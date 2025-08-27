@@ -1,6 +1,8 @@
 <%- include ("partials/header") -%>
 	<script>
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
+		console.log(izvestaji);
+		console.log(user.ucinakNaloga);
 		var datum = "<%=datum%>";
 		var mesec = datum.split(".")[0];
 		var godina = datum.split(".")[1];
@@ -8,9 +10,9 @@
 	<div class="majstorMesec">
 		<div class="selectMesec">
 			<select id="odabir-meseca" oninput="pickMesec()">
-				<option value="06.2025">Jun 2025</option>
-				<option value="07.2025">Jul 2025</option>
-				<option value="08.2025">Avgust 2025</option>
+				<option value="06.2025">Јун 2025</option>
+				<option value="07.2025">Јул 2025</option>
+				<option value="08.2025">Август 2025</option>
 			</select>
 			<script>
 				document.getElementById("odabir-meseca").value = datum;
@@ -21,42 +23,130 @@
 			</script>
 		</div>
 		<div class="pageWidth majstorMesec">
+			<div class="slobodnaSubota">
+				<div class="title">Преостало до слободне суботе!</div>
+				<div class="fillWrap">
+					<div class="fill" id="subota-fill"></div>
+				</div>
+				<div class="extra" id="subota-extra"></div>
+				<script>
+					for(var i=0;i<user.ucinakNaloga.length;i++){
+						user.ucinakNaloga[i].odradjeno = 0;
+					}
+					var monday = getMonday(new Date());
+					monday.setHours(0)
+					monday.setMinutes(0)
+					for(var i=0;i<izvestaji.length;i++){
+						var datumIzvestaja = new Date(izvestaji[i].date);
+						if(datumIzvestaja.getTime()>=monday.getTime()){
+							for(var j=0;j<izvestaji[i].nalozi.length;j++){
+								for(var k=0;k<user.ucinakNaloga.length;k++){
+									if(izvestaji[i].nalozi[j].tipoviRada.indexOf(user.ucinakNaloga[k].tipNaloga)>=0){
+										user.ucinakNaloga[k].odradjeno++;
+									}
+								}
+							}
+						}
+					}
+
+					function getTotalPercentage(arr) {
+						const totalNaloga = arr.reduce((sum, item) => sum + item.brojNaloga, 0);
+						const totalOdradjeno = arr.reduce((sum, item) => sum + item.odradjeno, 0);
+
+						if (totalNaloga === 0) return 0;
+						return (totalOdradjeno / totalNaloga) * 100;
+					}
+					document.getElementById("subota-fill").style.width = getTotalPercentage(user.ucinakNaloga)+"%";
+
+					for(var i=0;i<user.ucinakNaloga.length;i++){
+						var inlineWrap = document.createElement("DIV");
+						inlineWrap.setAttribute("class","inlineWrap");
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+							inline.innerHTML = user.ucinakNaloga[i].tipNaloga+": ";
+							inlineWrap.appendChild(inline);
+							
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+							inline.innerHTML = user.ucinakNaloga[i].odradjeno+" / "+user.ucinakNaloga[i].brojNaloga;
+							inlineWrap.appendChild(inline);
+						document.getElementById("subota-extra").appendChild(inlineWrap);
+						
+
+						
+					}
+
+
+				</script>
+			</div>
+			<div class="plata">
+				<div class="main">
+					<div class="title">Очекивани учинак</div>
+					<div class="value" id="ocekivan-ucinak">3 200 000,00 дин.</div>
+					<div class="title">Остварени учинак</div>
+					<div class="value" id="ostvaren-ucinak"></div>
+					<div class="title">Очекивана плата</div>
+					<div class="value" id="ocekivana-plata"></div>
+					<div class="title">Остварени бодови</div>
+					<div class="value" id="ostvareni-bodovi"></div>
+					<div class="title">Тренутна плата</div>
+					<div class="value" id="trenutna-plata"></div>
+					<script>
+						var bod = 500;//1 bod = 500 dinara;
+						var ostvarenUcinak = 0;
+						for(var i=0;i<izvestaji.length;i++){
+							for(var j=0;j<izvestaji[i].nalozi.length;j++){
+								ostvarenUcinak = ostvarenUcinak + parseFloat(izvestaji[i].nalozi[j].iznosNaloga);
+							}
+						}
+						document.getElementById("ostvaren-ucinak").innerHTML = brojSaRazmacima(ostvarenUcinak)+" дин.";
+
+						document.getElementById("ocekivana-plata").innerHTML = parseFloat(user.mesecnaPlata)/bod + " бода";
+
+						var nagrade = 0;
+						var kazne = 0;
+						var radniDani = 0;
+						var nalozi = 0;
+						for(var i=0;i<izvestaji.length;i++){
+							if(izvestaji[i].odsustvo=="Присутан"){
+								radniDani++;
+							}
+							nalozi = nalozi + izvestaji[i].nalozi.length;
+							if(!isNaN(parseFloat(izvestaji[i].nagrada))){
+								nagrade = kazne + parseFloat(izvestaji[i].nagrada);
+							}
+							if(!isNaN(parseFloat(izvestaji[i].kazna))){
+								kazne = kazne + parseFloat(izvestaji[i].kazna);
+							}
+						}
+
+						document.getElementById("ostvareni-bodovi").innerHTML = (nagrade-kazne)/bod;
+
+						document.getElementById("trenutna-plata").innerHTML = eval((ostvarenUcinak/3200000)*parseFloat(user.mesecnaPlata)/bod).toFixed(0) + " бода";
+					</script>
+				</div>
+			</div>
 			<div class="boxesWrap" style="background-color:rgb(240,240,240);padding:20px">
-				<div class="box">
-					<div class="title">Radni dani:</div>
+				<div class="box" style="display:none">
+					<div class="title">Радни дани:</div>
 					<div class="value" id="radni-dani"></div>
 				</div>
-				<div class="box">
-					<div class="title">Nalozi:</div>
+				<div class="box" style="display:none">
+					<div class="title">Налози:</div>
 					<div class="value" id="nalozi"></div>
 				</div>
 				<div class="box">
-					<div class="title">Nagrade:</div>
+					<div class="title">Стимулације:</div>
 					<div class="value" id="nagrade"></div>
 				</div>
 				<div class="box">
-					<div class="title">Kazne:</div>
+					<div class="title">Дестимулације:</div>
 					<div class="value" id="kazne"></div>
 				</div>
 			</div>
 			<script>
-				var radniDani = 0;
-				var nalozi = 0;
-				var nagrade = 0;
-				var kazne = 0;
-				var bod = 500;//1 bod = 500 dinara;
-				for(var i=0;i<izvestaji.length;i++){
-					if(izvestaji[i].odsustvo=="Присутан"){
-						radniDani++;
-					}
-					nalozi = nalozi + izvestaji[i].nalozi.length;
-					if(!isNaN(parseFloat(izvestaji[i].nagrada))){
-						nagrade = kazne + parseFloat(izvestaji[i].nagrada);
-					}
-					if(!isNaN(parseFloat(izvestaji[i].kazna))){
-						kazne = kazne + parseFloat(izvestaji[i].kazna);
-					}
-				}
+				
+				
 				document.getElementById("radni-dani").innerHTML = radniDani;
 				document.getElementById("nalozi").innerHTML = nalozi;
 				document.getElementById("nagrade").innerHTML = eval(nagrade/bod).toFixed(0) + " boda";
@@ -156,7 +246,7 @@
 							odsutanNalov.setAttribute("class","odsutanNaslov");
 								var title = document.createElement("DIV");
 								title.setAttribute("class","title");
-								title.innerHTML = izvestaj.odsustvo ? izvestaj.odsustvo : "Нема нформација";
+								title.innerHTML = izvestaj.odsustvo ? izvestaj.odsustvo : "Нема информација";
 								odsutanNalov.appendChild(title);
 							vremena.appendChild(odsutanNalov);
 						}
@@ -262,6 +352,17 @@
 											tipNaloga.innerHTML = "<b>Komentar kontrole:</b> ";
 											tipNaloga.innerHTML += izvestaj.nalozi[j].komentarKontrole;
 											nalogElem.appendChild(tipNaloga);	
+										}
+
+										if(izvestaj.nalozi[j].iznosNaloga==0){
+											var card = document.createElement("DIV");
+											card.setAttribute("class","card");
+											nalogElem.appendChild(card)
+										}else{
+											var card = document.createElement("DIV");
+											card.setAttribute("class","cardOpened");
+											card.innerHTML = brojSaRazmacima(izvestaj.nalozi[j].iznosNaloga)
+											nalogElem.appendChild(card)
 										}
 										
 

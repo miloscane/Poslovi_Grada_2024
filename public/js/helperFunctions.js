@@ -368,6 +368,13 @@ function isIntersecting(el1, el2) {
   );
 }
 
+function getMonday(date = new Date()) {
+  const d = new Date(date);
+  const day = d.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
+  return new Date(d.setDate(diff));
+}
+
 var definicijeProizvoda = [
                     {
                       "startCode":"01.01",

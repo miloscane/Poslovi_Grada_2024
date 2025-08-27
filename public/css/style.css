@@ -5918,6 +5918,7 @@ input[type=number] {
 .majstorMesec .nalozi .nalog{
     padding: 10px;
     padding-left:10px;
+    position:relative;
 }
 
 .majstorMesec .nalozi .nalog:nth-child(even){
@@ -5956,6 +5957,42 @@ input[type=number] {
     font-size:12px;
 }
 
+.majstorMesec .nalozi .nalog .tip .card{
+
+}
+
+.majstorMesec .nalozi .nalog .card {
+  width: 60px;
+  height: 30px;
+  border-radius: 4px;
+  position: absolute;
+  top:0;
+  right:0;
+  overflow: hidden;
+  border: 1px solid #0003;
+  box-shadow: 0 2px 4px #0005, 0 0 0 1px #fff3 inset;
+  background:url(https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/PokerCard.png);
+  background-size: 100% 100%;
+}
+
+.majstorMesec .nalozi .nalog .cardOpened {
+  min-width: 60px;
+  height: 30px;
+  border-radius: 4px;
+  position: absolute;
+  top:0;
+  right:0;
+  overflow: hidden;
+  border: 1px solid #0003;
+  box-shadow: 0 2px 4px #0005, 0 0 0 1px #fff3 inset;
+  font-size:12px;
+  line-height: 25px;
+  padding:3px;
+}
+
+
+
+
 .majstorMesec .nalozi .nalog .adresa .radnaJedinica{
     display:inline-block;
     vertical-align: top;
@@ -5987,6 +6024,72 @@ input[type=number] {
     color:rgb(32,51,100);
 }
 
+.majstorMesec .slobodnaSubota{
+    width:90%;
+    margin:10px auto;
+}
+
+.majstorMesec .slobodnaSubota .title{
+    font-weight:600;
+    font-size:18px;
+    color:rgb(31,52,100);
+    margin-bottom:5px;
+}
+
+.majstorMesec .slobodnaSubota .fillWrap{
+    border-radius:15px;
+    width:100%;
+    height:20px;
+    overflow:hidden;
+    border:2px solid rgb(180,0,0);
+    position:relative;
+}
+
+.majstorMesec .slobodnaSubota .fillWrap .fill{
+    position:absolute;
+    top:0;
+    bottom:0;
+    background-color:rgb(31,52,100);
+}
+
+.majstorMesec .slobodnaSubota .extra .inlineWrap{
+    margin-bottom:2px;
+    font-size:14px;
+    padding:3px;
+}
+
+.majstorMesec .slobodnaSubota .extra .inlineWrap:nth-child(even){
+    background-color:rgba(0,0,0,0.05);
+}
+
+.majstorMesec .slobodnaSubota .extra .inline{
+    display:inline-block;
+    vertical-align: middle;
+}
+
+.majstorMesec .slobodnaSubota .extra .inline:first-child{
+    font-weight:600;
+    width:120px;
+}
+
+.majstorMesec .plata{
+    border-radius:5px;
+    background-color: rgb(32,51,100);
+    color:rgb(255,255,255);
+    padding:10px;
+    text-align: center;
+}
+
+
+.majstorMesec .plata .title{
+    font-size:16px;
+    font-weight:700;
+}
+.majstorMesec .plata .value{
+    font-size:14px;
+    font-weight:400;
+    margin-bottom:5px;
+}
 
 #page-title .refreshButton{
     position:absolute;
