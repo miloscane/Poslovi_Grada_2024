@@ -12661,6 +12661,25 @@ server.get('/majstor/nalog/:broj', async (req, res) => {
     }
 });
 
+server.get('/majstor/pravilnik', async (req, res) => {
+    if (!req.session.user) {
+       return res.redirect("/login?url=" + encodeURIComponent(req.url));
+    }
+
+    if (Number(req.session.user.role) !== 60) {
+      return res.render("message", {
+          pageTitle: "Greska",
+          user: req.session.user,
+          message: "<div class=\"text\">Vas nalog nije ovlascen da vidi ovu stranicu.</div>"
+      });
+    }
+
+    res.render("majstor/pravilnik", {
+			pageTitle: "Pravilnik",
+			user: req.session.user,
+    });
+});
+
 server.get('/majstor/mesec', async (req, res)=> {
 	res.redirect("/majstor/mesec/"+eval(new Date().getMonth()+1).toString().padStart(2,"0")+"."+new Date().getFullYear())
 });
