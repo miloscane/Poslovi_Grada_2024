@@ -440,6 +440,11 @@ function reshuffleDate(date){//gets yyyy-mm-dd and returns dd.mm.yyyy
   return  array[2]+"."+array[1]+"."+array[0];
 }
 
+function reshuffleDate2(date){//gets yyyy-mm-dd and returns dd.mm.yyyy
+  var array = date.split(".");
+  return  array[2]+"-"+array[1]+"-"+array[0];
+}
+
 function istiDatum(d1, d2) {
   return d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&
@@ -856,6 +861,7 @@ var cenovniciTrecihLicaDB;
 var naloziTrecihLicaDB;
 var izvestajiTrecihLicaDB;
 var stariCenovnikJsons = [];
+var stareSpecifikacijePodizvodjacaDB;
 
 http.listen(process.env.PORT, async function(){
 	console.log("Poslovi Grada 2024");
@@ -883,6 +889,7 @@ http.listen(process.env.PORT, async function(){
 		magacinUlaziDB				=	client.db("Poslovi_Grada_2024").collection('magacinUlazi');
 		magacinReversiDB			=	client.db("Poslovi_Grada_2024").collection('magacinReversi');
 		specifikacijePodizvodjacaDB			=	client.db("Poslovi_Grada_2024").collection('specifikacijePodizvodjaca');
+		stareSpecifikacijePodizvodjacaDB			=	client.db("Poslovi_Grada_2024").collection('stareSpecifikacijePodizvodjaca');
 		errorDB								=	client.db("Poslovi_Grada_2024").collection('errors');
 		stambenoDB 						=	client.db("Poslovi_Grada_2024").collection('PortalStambeno');
 		stambeno2DB 					=	client.db("Poslovi_Grada_2024").collection('PortalStambeno2');
@@ -3792,6 +3799,101 @@ http.listen(process.env.PORT, async function(){
 		}					
 		fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
 		console.log("Wrote file");*/
+
+		/*var specifikacije = await specifikacijePodizvodjacaDB.find({}).toArray();
+		var brojeviNaloga = [];
+		for(var i=0;i<specifikacije.length;i++){
+			for(var j=0;j<specifikacije[i].nalozi.length;j++){
+				brojeviNaloga.push(specifikacije[i].nalozi[j].broj);
+			}
+		}
+		console.log("Specifikacije nadjene")
+		var nalozi2024 = await nalozi2024DB.find({broj:{$in:brojeviNaloga}}).toArray();
+		var nalozi = await naloziDB.find({broj:{$in:brojeviNaloga}}).toArray();
+		console.log("Nalozi nadjeni")
+		for(var i=0;i<nalozi2024.length;i++){
+			nalozi.push(nalozi2024[i]);
+		}
+
+		for(var i=0;i<specifikacije.length;i++){
+			console.log(specifikacije[i].brojSpecifikacije)
+			console.log(specifikacije[i].datum.datum)
+			for(var j=0;j<specifikacije[i].nalozi.length;j++){
+				for(var k=0;k<nalozi.length;k++){
+					if(nalozi[k].broj==specifikacije[i].nalozi[j].broj){
+						specifikacije[i].nalozi[j].vik = "VIK 2024";
+						if(nalozi[k].digitalizacija.stambeno){
+							if(nalozi[k].digitalizacija.stambeno.vik){
+								specifikacije[i].nalozi[j].vik = nalozi[k].digitalizacija.stambeno.vik;
+							}
+						}
+						console.log(specifikacije[i].nalozi[j].vik)
+						
+					}
+				}
+			}
+			console.log("------------------------")
+		}
+		console.log("DONE")*/
+
+		var specifikacije = await specifikacijePodizvodjacaDB.find({}).toArray();
+		var specifikacijeZaImport = [];
+		for(var i=0;i<specifikacije.length;i++){
+			var datumSpecifikacije = new Date(reshuffleDate2(specifikacije[i].datum.datum));
+			datumSpecifikacije.setHours(0);
+			datumSpecifikacije.setMinutes(0);
+			var cutOff = new Date("2025-06-08");
+			cutOff.setHours(0);
+			cutOff.setMinutes(0);
+			//console.log(datumSpecifikacije.getTime() + " vs "+cutOff.getTime())
+			if(datumSpecifikacije.getTime()<=cutOff.getTime()){
+				specifikacijeZaImport.push(specifikacije[i])
+			}
+		}
+
+		/*var brojeviNaloga = [];
+		for(var i=0;i<specifikacijeZaImport.length;i++){
+			for(var j=0;j<specifikacijeZaImport[i].nalozi.length;j++){
+				brojeviNaloga.push(specifikacijeZaImport[i].nalozi[j].broj);
+			}
+		}
+		var nalozi2024 = await nalozi2024DB.find({broj:{$in:brojeviNaloga}}).toArray();
+		var nalozi = await naloziDB.find({broj:{$in:brojeviNaloga}}).toArray();
+		console.log("Nalozi nadjeni")
+		for(var i=0;i<nalozi2024.length;i++){
+			nalozi.push(nalozi2024[i]);
+		}
+
+		for(var i=0;i<specifikacijeZaImport.length;i++){
+			console.log(specifikacijeZaImport[i].brojSpecifikacije)
+			console.log(specifikacijeZaImport[i].datum.datum)
+			for(var j=0;j<specifikacijeZaImport[i].nalozi.length;j++){
+				for(var k=0;k<nalozi.length;k++){
+					if(nalozi[k].broj==specifikacijeZaImport[i].nalozi[j].broj){
+						specifikacijeZaImport[i].nalozi[j].vik = "VIK 2024";
+						if(nalozi[k].digitalizacija.stambeno){
+							if(nalozi[k].digitalizacija.stambeno.vik){
+								specifikacijeZaImport[i].nalozi[j].vik = nalozi[k].digitalizacija.stambeno.vik;
+							}
+						}
+						console.log(specifikacijeZaImport[i].nalozi[j].vik)
+						
+					}
+				}
+			}
+			console.log("------------------------")
+		}*/
+		//var deletionIds = [];
+		//for(var i=0;i<specifikacijeZaImport.length;i++){
+			//deletionIds.push(specifikacijeZaImport[i].uniqueId);
+		//}
+		//var response = await specifikacijePodizvodjacaDB.deleteMany({uniqueId:{$in:deletionIds}});
+		//var response = await stareSpecifikacijePodizvodjacaDB.insertMany(specifikacijeZaImport);
+		//console.log(response)
+		//console.log("DONE")
+
+
+
 
 	})
 	.catch(error => {
