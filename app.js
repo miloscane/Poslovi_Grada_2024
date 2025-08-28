@@ -3836,20 +3836,20 @@ http.listen(process.env.PORT, async function(){
 		}
 		console.log("DONE")*/
 
-		var specifikacije = await specifikacijePodizvodjacaDB.find({}).toArray();
+		/*var specifikacije = await specifikacijePodizvodjacaDB.find({}).toArray();
 		var specifikacijeZaImport = [];
 		for(var i=0;i<specifikacije.length;i++){
 			var datumSpecifikacije = new Date(reshuffleDate2(specifikacije[i].datum.datum));
 			datumSpecifikacije.setHours(0);
 			datumSpecifikacije.setMinutes(0);
-			var cutOff = new Date("2025-06-08");
+			var cutOff = new Date("2025-07-28");
 			cutOff.setHours(0);
 			cutOff.setMinutes(0);
 			//console.log(datumSpecifikacije.getTime() + " vs "+cutOff.getTime())
 			if(datumSpecifikacije.getTime()<=cutOff.getTime()){
 				specifikacijeZaImport.push(specifikacije[i])
 			}
-		}
+		}*/
 
 		/*var brojeviNaloga = [];
 		for(var i=0;i<specifikacijeZaImport.length;i++){
@@ -3883,6 +3883,7 @@ http.listen(process.env.PORT, async function(){
 			}
 			console.log("------------------------")
 		}*/
+
 		//var deletionIds = [];
 		//for(var i=0;i<specifikacijeZaImport.length;i++){
 			//deletionIds.push(specifikacijeZaImport[i].uniqueId);
