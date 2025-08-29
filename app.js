@@ -10091,10 +10091,11 @@ server.get('/podizvodjac/obradjeniNalozi',async (req,res)=>{
 		if(Number(req.session.user.role)==30){
 			try{
 				var nalozi = await naloziDB.find({majstor:req.session.user.nalozi,statusNaloga:"Fakturisan"}).toArray()
-				var nalozi2024 = await nalozi2024DB.find({majstor:req.session.user.nalozi,statusNaloga:"Fakturisan"}).toArray();
+				/*var nalozi2024 = await nalozi2024DB.find({majstor:req.session.user.nalozi,statusNaloga:"Fakturisan"}).toArray();
 				for(var i=0;i<nalozi2024.length;i++){
 					nalozi.push(nalozi2024[i]);
-				}
+				}*/
+				
 				var specifikacije = await specifikacijePodizvodjacaDB.find({}).toArray();
 				var naloziNaSpecifikacijama = [];
 				for(var i=0;i<specifikacije.length;i++){
@@ -10130,7 +10131,6 @@ server.get('/podizvodjac/obradjeniNalozi',async (req,res)=>{
 				res.render("podizvodjaci/obradjeniNalozi",{
 					pageTitle:"Обрађени налози",
 					cenovnik: cenovnikZaPrikaz,
-					cenovnik2024: cenovnikHigh2024,
 					user: req.session.user,
 					nalozi: nalozi
 				})
