@@ -3468,7 +3468,7 @@ http.listen(process.env.PORT, async function(){
 
 
 		//ZA HERMINU
-		/*var mesec = "07.2025"
+		/*var mesec = "08.2025"
 		//Hermina Wome
 		var nalozi = await naloziDB.find({}).toArray();
 		var nalozi2024 = await nalozi2024DB.find({}).toArray();
@@ -3540,11 +3540,11 @@ http.listen(process.env.PORT, async function(){
 			csvString += naloziToExport[i].broj + ";" +naloziToExport[i].radnaJedinica +";"+naloziToExport[i].adresa+";"+ naloziToExport[i].datum.datum + ";" + naloziToExport[i].prijemnica.datum.datum+ ";" +naloziToExport[i].ukupanIznos +";"+naloziToExport[i].iznosKop+"\r\n"; 
 		}					
 		fs.writeFileSync("naloziRucnoKopanje.csv",csvString,{encoding:"Utf8"})
-		console.log("Wrote file")
+		console.log("Wrote file")*/
 
 
 		//Hermina masinsko kopanje
-		var nalozi = await naloziDB.find({}).toArray();
+		/*var nalozi = await naloziDB.find({}).toArray();
 		var nalozi2024 = await nalozi2024DB.find({}).toArray();
 		for(var i=0;i<nalozi2024.length;i++){
 			nalozi.push(nalozi2024[i])
@@ -3893,6 +3893,128 @@ http.listen(process.env.PORT, async function(){
 		//console.log(response)
 		//console.log("DONE")
 
+
+		/*var nalozi = await nalozi2024DB.find({"prijemnica.datum.datum":{$regex:"09.2024"}}).toArray();
+
+		var woma	= ["80.02.09.020","80.02.09.021","80.02.09.022"];
+		var rucno = ["80.02.09.001","80.02.09.002","80.02.09.003","80.02.09.004","80.02.09.005"];
+		var crp   = ["80.02.09.009","80.02.09.010","80.02.09.012","80.02.09.025"];
+		var kop 	= ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.025"];
+		var mas 	= ["80.03.01.019","80.03.01.020","80.03.01.025"];
+		var kup 	= ["80.01.05.057","80.01.05.058","80.01.05.059","80.01.05.060","80.01.05.061","80.01.05.062","80.01.05.063","80.01.05.064"];
+
+		for(var i=0;i<nalozi.length;i++){
+			nalozi[i].tipNaloga = "ZAMENA";
+			if(parseFloat(nalozi[i].ukupanIznos)==0){
+				nalozi.splice(i,1);
+				i--;
+			}
+		}
+
+
+		for(var i=0;i<nalozi.length;i++){
+			if(nalozi[i].tipNaloga=="ZAMENA"){
+				for(var k=0;k<nalozi[i].obracun.length;k++){
+					if(kop.indexOf(nalozi[i].obracun[k].code)>=0){
+						nalozi[i].tipNaloga = "ZAMENA";//Kopanje
+					}
+				}
+			}
+			
+
+			if(nalozi[i].tipNaloga=="ZAMENA"){
+				for(var k=0;k<nalozi[i].obracun.length;k++){
+					if(woma.indexOf(nalozi[i].obracun[k].code)>=0){
+						nalozi[i].tipNaloga = "WOMA";
+					}
+				}
+			}
+
+			
+
+			if(nalozi[i].tipNaloga=="ZAMENA"){
+				for(var k=0;k<nalozi[i].obracun.length;k++){
+					if(rucno.indexOf(nalozi[i].obracun[k].code)>=0){
+						if(parseFloat(nalozi[i].ukupanIznos)<20000){
+							nalozi[i].tipNaloga = "SAJLA";
+						}
+					}
+				}
+			}
+
+			
+
+			if(nalozi[i].tipNaloga=="ZAMENA"){
+				for(var k=0;k<nalozi[i].obracun.length;k++){
+					if(kup.indexOf(nalozi[i].obracun[k].code)>=0){
+						if(parseFloat(nalozi[i].ukupanIznos)<5500){
+							nalozi[i].tipNaloga = "ZAMENA";//Spojka
+						}
+					}
+				}
+			}
+
+			
+			if(nalozi[i].tipNaloga=="ZAMENA"){
+				if(nalozi[i].obracun.length==2){
+					if(nalozi[i].obracun[0].code=="80.04.01.002" && nalozi[i].obracun[1].code=="80.04.01.005"){
+						nalozi[i].tipNaloga = "LOKALNO";
+					}else if(nalozi[i].obracun[0].code=="80.04.01.005" && nalozi[i].obracun[1].code=="80.04.01.002"){
+						nalozi[i].tipNaloga = "LOKALNO";
+					}
+				}else if(nalozi[i].obracun.length==1){
+					if(nalozi[i].obracun[0].code=="80.04.01.002" || nalozi[i].obracun[0].code=="80.04.01.005"){
+						nalozi[i].tipNaloga = "LOKALNO";
+					}
+				}
+			}
+		}
+
+		var kategorije = [];
+		for(var i=0;i<nalozi.length;i++){
+			var kategorijaPostoji = false;
+			for(var j=0;j<kategorije.length;j++){
+				if(nalozi[i].tipNaloga==kategorije[j].tipNaloga){
+					kategorijaPostoji = true;
+					break;
+				}
+			}
+			if(!kategorijaPostoji){
+				var json = {};
+				json.tipNaloga = nalozi[i].tipNaloga;
+				json.radneJedinice = [];
+				for(var j=0;j<radneJedinice.length;j++){
+					var json2 = {};
+					json2.radnaJedinica = radneJedinice[j];
+					json2.brojNaloga = 0;
+					json.radneJedinice.push(json2)
+				}
+				kategorije.push(json);
+			}
+			
+		}
+
+		for(var i=0;i<nalozi.length;i++){
+			for(var j=0;j<kategorije.length;j++){
+				if(nalozi[i].tipNaloga==kategorije[j].tipNaloga){
+					for(var k=0;k<kategorije[j].radneJedinice.length;k++){
+						if(kategorije[j].radneJedinice[k].radnaJedinica==nalozi[i].radnaJedinica){
+							kategorije[j].radneJedinice[k].brojNaloga++;
+						}
+						
+					}
+				}
+			}
+		}
+
+		for(var i=0;i<kategorije.length;i++){
+			console.log(kategorije[i].tipNaloga)
+			for(var j=0;j<kategorije[i].radneJedinice.length;j++){
+				console.log("  "+kategorije[i].radneJedinice[j].radnaJedinica)
+				console.log("  "+kategorije[i].radneJedinice[j].brojNaloga)
+			}
+		}*/
+		
 
 
 
@@ -10095,7 +10217,7 @@ server.get('/podizvodjac/obradjeniNalozi',async (req,res)=>{
 				for(var i=0;i<nalozi2024.length;i++){
 					nalozi.push(nalozi2024[i]);
 				}*/
-				
+
 				var specifikacije = await specifikacijePodizvodjacaDB.find({}).toArray();
 				var naloziNaSpecifikacijama = [];
 				for(var i=0;i<specifikacije.length;i++){

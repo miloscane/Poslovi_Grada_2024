@@ -10,8 +10,6 @@
 	<div class="majstorMesec">
 		<div class="selectMesec">
 			<select id="odabir-meseca" oninput="pickMesec()">
-				<option value="06.2025">Јун 2025</option>
-				<option value="07.2025">Јул 2025</option>
 				<option value="08.2025">Август 2025</option>
 			</select>
 			<script>
@@ -23,7 +21,7 @@
 			</script>
 		</div>
 		<div class="pageWidth majstorMesec">
-			<div class="slobodnaSubota">
+			<!--<div class="slobodnaSubota">
 				<div class="title">Преостало до слободне суботе!</div>
 				<div class="fillWrap">
 					<div class="fill" id="subota-fill"></div>
@@ -78,31 +76,60 @@
 
 
 				</script>
-			</div>
+			</div>-->
+
 			<div class="plata">
-				<div class="main">
-					<div class="title">Очекивани учинак</div>
-					<div class="value" id="ocekivan-ucinak">3 200 000,00 дин.</div>
-					<div class="title">Остварени учинак</div>
-					<div class="value" id="ostvaren-ucinak"></div>
-					<div class="title">Очекивана плата</div>
-					<div class="value" id="ocekivana-plata"></div>
-					<div class="title">Остварени бодови</div>
-					<div class="value" id="ostvareni-bodovi"></div>
-					<div class="title">Тренутна плата</div>
-					<div class="value" id="trenutna-plata"></div>
+				<div class="plotWrap">
+					<div class="ticksWrap" id="ticks"></div>
+					<div class="plataFinal">
+						<div class="tick" id="plata-tick">
+							<div style="position:relative;width:100%;height:100%">
+								<div class="value" id="plata-value"></div>
+							</div>
+						</div>
+					</div>
+					<div class="fill" id="plata-fill"></div>
 					<script>
-						var bod = 500;//1 bod = 500 dinara;
+						var bodPlate = 500;
+						var bodNaloga = 10000;
+						var maxPlata = 350000;
+						var maxValue = 350000/bodPlate;
+						var tickIncrement = 50000/bodPlate;
+						var steps = maxValue / tickIncrement;
+
+						for (var i = 0; i <= steps; i++) {
+							var percent = i / steps;
+							var mainTick = document.createElement("DIV");
+							mainTick.className = "mainTick";
+							mainTick.style.left = percent * 100 + "%";
+								var relative = document.createElement("DIV");
+								relative.style.cssText = "position:relative;width:100%;height:100%";
+
+									var number = document.createElement("DIV");
+									number.className = "number";
+									number.innerHTML = (maxValue * percent).toFixed(0);
+									relative.appendChild(number);
+								mainTick.appendChild(relative);
+							document.getElementById("ticks").appendChild(mainTick);
+
+							if (i < steps) {
+								var nextPercent = (i + 1) / steps;
+								for (var j = 0; j < 3; j++) {
+									var subPercent = percent + (j + 1) / 4 * (nextPercent - percent);
+									var subTick = document.createElement("DIV");
+									subTick.className = "subTick";
+									subTick.style.left = subPercent * 100 + "%";
+									document.getElementById("ticks").appendChild(subTick);
+								}
+							}	
+						}
 						var ostvarenUcinak = 0;
 						for(var i=0;i<izvestaji.length;i++){
 							for(var j=0;j<izvestaji[i].nalozi.length;j++){
 								ostvarenUcinak = ostvarenUcinak + parseFloat(izvestaji[i].nalozi[j].iznosNaloga);
 							}
 						}
-						document.getElementById("ostvaren-ucinak").innerHTML = brojSaRazmacima(ostvarenUcinak)+" дин.";
-
-						document.getElementById("ocekivana-plata").innerHTML = parseFloat(user.mesecnaPlata)/bod + " бода";
-
+						var ostvareniBodovi = ostvarenUcinak/(bodNaloga/2);
 						var nagrade = 0;
 						var kazne = 0;
 						var radniDani = 0;
@@ -119,12 +146,16 @@
 								kazne = kazne + parseFloat(izvestaji[i].kazna);
 							}
 						}
+						ostvareniBodovi = ostvareniBodovi + nagrade/bodPlate - kazne/bodPlate;
 
-						document.getElementById("ostvareni-bodovi").innerHTML = (nagrade-kazne)/bod;
+						var percent = ostvareniBodovi/(maxValue) *100;
+						document.getElementById("plata-fill").style.width = percent+"%";
+						document.getElementById("plata-tick").style.left = percent+"%";
+						document.getElementById("plata-value").innerHTML = ostvareniBodovi.toFixed(0);
 
-						document.getElementById("trenutna-plata").innerHTML = eval((ostvarenUcinak/3200000)*parseFloat(user.mesecnaPlata)/bod).toFixed(0) + " бода";
 					</script>
 				</div>
+				
 			</div>
 			<div class="boxesWrap" style="background-color:rgb(240,240,240);padding:20px">
 				<div class="box" style="display:none">
@@ -149,8 +180,8 @@
 				
 				document.getElementById("radni-dani").innerHTML = radniDani;
 				document.getElementById("nalozi").innerHTML = nalozi;
-				document.getElementById("nagrade").innerHTML = eval(nagrade/bod).toFixed(0) + " boda";
-				document.getElementById("kazne").innerHTML = eval(kazne/bod).toFixed(0) + " boda";
+				document.getElementById("nagrade").innerHTML = eval(nagrade/bodPlate).toFixed(0) + " boda";
+				document.getElementById("kazne").innerHTML = eval(kazne/bodPlate).toFixed(0) + " boda";
 			</script>
 			<div class="swipeable">
 				<div class="arrow arrowLeft" onclick="moveDay(-1)"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/chevronLeft.svg"></div>
@@ -266,8 +297,8 @@
 
 									var value = document.createElement("DIV");
 									value.setAttribute("class","value");
-									var bodovi = eval(parseFloat(izvestaj.nagrada)/bod).toFixed(0)=="1" ? " бод" : " бода";
-									value.innerHTML = izvestaj.nagrada ? eval(parseFloat(izvestaj.nagrada)/bod).toFixed(0)+bodovi : bodovi;
+									var bodovi = eval(parseFloat(izvestaj.nagrada)/bodPlate).toFixed(0)=="1" ? " бод" : " бода";
+									value.innerHTML = izvestaj.nagrada ? eval(parseFloat(izvestaj.nagrada)/bodPlate).toFixed(0)+bodovi : bodovi;
 									box.appendChild(value);
 
 									if(izvestaj.nagrada){
@@ -292,8 +323,8 @@
 
 									var value = document.createElement("DIV");
 									value.setAttribute("class","value");
-									var bodovi = eval(parseFloat(izvestaj.kazna)/bod).toFixed(0)=="1" ? " бод" : " бода";
-									value.innerHTML = izvestaj.kazna ? eval(parseFloat(izvestaj.kazna)/bod).toFixed(0)+bodovi : bodovi;
+									var bodovi = eval(parseFloat(izvestaj.kazna)/bodPlate).toFixed(0)=="1" ? " бод" : " бода";
+									value.innerHTML = izvestaj.kazna ? eval(parseFloat(izvestaj.kazna)/bodPlate).toFixed(0)+bodovi : bodovi;
 									box.appendChild(value);
 
 									
@@ -361,7 +392,7 @@
 										}else{
 											var card = document.createElement("DIV");
 											card.setAttribute("class","cardOpened");
-											card.innerHTML = brojSaRazmacima(izvestaj.nalozi[j].iznosNaloga)
+											card.innerHTML = eval(izvestaj.nalozi[j].iznosNaloga/(bodNaloga/2)).toFixed(0)
 											nalogElem.appendChild(card)
 										}
 										
