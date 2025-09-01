@@ -5034,14 +5034,14 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 		if(Number(req.session.user.role)==25){
 			try{
 				var today = new Date();
-				var nalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Nalog u Stambenom","Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray();
-				var nalozi2024 = await nalozi2024DB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Nalog u Stambenom","Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray();
+				var nalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Nalog u Stambenom","Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:radneJedinice}}).toArray();
+				var nalozi2024 = await nalozi2024DB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Nalog u Stambenom","Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:radneJedinice}}).toArray();
 				for(var i=0;i<nalozi2024.length;i++){
 					nalozi.push(nalozi2024[i]);
 				}
 
-				var obracunatiNalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},"prijemnica.datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray();
-				var obracunatiNalozi2024 = await nalozi2024DB.find({majstor:{$nin:podizvodjaci},"prijemnica.datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:req.session.user.radneJedinice}}).toArray();
+				var obracunatiNalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},"prijemnica.datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:radneJedinice}}).toArray();
+				var obracunatiNalozi2024 = await nalozi2024DB.find({majstor:{$nin:podizvodjaci},"prijemnica.datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:radneJedinice}}).toArray();
 				for(var i=0;i<obracunatiNalozi2024.length;i++){
 					obracunatiNalozi.push(obracunatiNalozi2024[i]);
 				}
@@ -12904,6 +12904,7 @@ server.get('/majstor/pravilnik', async (req, res) => {
 			user: req.session.user,
     });
 });
+
 
 server.get('/majstor/mesec', async (req, res)=> {
 	res.redirect("/majstor/mesec/"+eval(new Date().getMonth()+1).toString().padStart(2,"0")+"."+new Date().getFullYear())

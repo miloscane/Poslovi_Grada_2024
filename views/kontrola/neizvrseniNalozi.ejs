@@ -10,8 +10,8 @@
 				<div class="mainTitle" id="opstine"></div>
 				<script>
 					var str = ""
-					for(var i=0;i<user.radneJedinice.length;i++){
-						str += user.radneJedinice[i] + ", ";
+					for(var i=0;i<radneJedinice.length;i++){
+						str += radneJedinice[i] + ", ";
 					}
 					document.getElementById("opstine").innerHTML = str.slice(0, -2)
 				</script>
@@ -103,13 +103,13 @@
 
 				nalozi.sort((a, b) => b.datum.datetime - a.datum.datetime);
 
-				for(var i=0;i<user.radneJedinice.length;i++){
+				for(var i=0;i<radneJedinice.length;i++){
 					var naloziWrap = document.createElement("DIV");
 					naloziWrap.setAttribute("class","naloziWrap");
-					naloziWrap.setAttribute("id",user.radneJedinice[i]);
+					naloziWrap.setAttribute("id",radneJedinice[i]);
 						var title = document.createElement("DIV");
 						title.setAttribute("class","title");
-						title.innerHTML = user.radneJedinice[i];
+						title.innerHTML = radneJedinice[i];
 						naloziWrap.appendChild(title);
 					document.getElementById("nalozi").appendChild(naloziWrap);
 				}

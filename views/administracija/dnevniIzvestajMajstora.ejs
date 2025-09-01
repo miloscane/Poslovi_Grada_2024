@@ -6,6 +6,7 @@
 		var majstor = <%-JSON.stringify(majstor)%>;
 		var vozila = <%-JSON.stringify(vozila)%>;
 		var izvestaj = <%-JSON.stringify(izvestaj)%>;
+		console.log(izvestaj)
 		var reversi = <%-JSON.stringify(reversi)%>;
 		var date = "<%=date%>";
 		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Потребма вома","Нема приступа","Одбијају сарадњу","Неспремно"];
@@ -160,10 +161,10 @@
 			table.setAttribute("class","naloziTable");
 			var colGroup = document.createElement("COLGROUP");
 			colGroup.innerHTML = "<col style=\"width: 30px\">   <!-- redniBroj --> " +
-  "<col style=\"width: 100px\">   <!-- brojNaloga --> " +
-  "<col style=\"width: 150px\">   <!-- radnaJedinica --> " +
-  "<col style=\"width: 220px\">  <!-- adresa --> " +  
-  "<col> ";
+			  "<col style=\"width: 100px\">   <!-- brojNaloga --> " +
+			  "<col style=\"width: 150px\">   <!-- radnaJedinica --> " +
+			  "<col style=\"width: 220px\">  <!-- adresa --> " +  
+			  "<col> ";
 			table.appendChild(colGroup);
 			var tr = document.createElement("TR");
 				var th = document.createElement("TH");
@@ -269,8 +270,31 @@
 						var td = document.createElement("TD");
 						td.setAttribute("colspan","1");
 						td.setAttribute("class","komentar");
-						var komentar = izvestaj.nalozi[i].komentarKontrole ? izvestaj.nalozi[i].komentarKontrole : "Нема коментара све одрађено како треба."
-						td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Коментар контроле:</div><div class=\"opisText\"><textarea class=\"komentarKontrole\">"+komentar+"</textarea></div></div>"
+						var komentar = izvestaj.nalozi[i].komentarKontrole ? izvestaj.nalozi[i].komentarKontrole : "";
+							var value = document.createElement("DIV");
+							value.setAttribute("class","value");
+							value.setAttribute("style","padding:10px 20px;text-align:center;");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Коментар контроле";
+								value.appendChild(title);
+
+								var opisText = document.createElement("DIV");
+								opisText.setAttribute("class","opisText");
+								opisText.innerHTML = "<textarea class=\"komentarKontrole\" placeholder=\"Opis radova, vreme provedeno nalogu, problemi oko naloga\">"+komentar+"</textarea>";
+								value.appendChild(opisText);
+								
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Износ учинка";
+								value.appendChild(title);
+
+								var ucinak = document.createElement("DIV");
+								ucinak.setAttribute("class","ucinak");
+								ucinak.innerHTML = "<input type=\"text\" class=\"ucinak\" placeholder=\"0,00 дин\" value=\""+izvestaj.nalozi[i].ucinak+"\">";
+								value.appendChild(ucinak);
+							td.appendChild(value);
+						//td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Коментар контроле:</div><div class=\"opisText\"><textarea class=\"komentarKontrole\">"+komentar+"</textarea></div></div>"
 						tr.appendChild(td);
 
 					table.appendChild(tr);
@@ -474,8 +498,34 @@
 
 				var td = document.createElement("TD");
 				td.setAttribute("colspan","1");
-				td.setAttribute("class","komentar")
-				td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Коментар контроле:</div><div class=\"opisText\"><textarea class=\"komentarKontrole\" placeholder=\"Opis radova, vreme provedeno nalogu, problemi oko naloga\"></textarea></div></div>"
+				td.setAttribute("class","komentar");
+					var value = document.createElement("DIV");
+					value.setAttribute("class","value");
+					value.setAttribute("style","padding:10px 20px;text-align:center;");
+						var title = document.createElement("DIV");
+						title.setAttribute("class","title");
+						title.innerHTML = "Коментар контроле";
+						value.appendChild(title);
+
+						var opisText = document.createElement("DIV");
+						opisText.setAttribute("class","opisText");
+						opisText.innerHTML = "<textarea class=\"komentarKontrole\" placeholder=\"Opis radova, vreme provedeno nalogu, problemi oko naloga\"></textarea>";
+						value.appendChild(opisText);
+						
+						var title = document.createElement("DIV");
+						title.setAttribute("class","title");
+						title.innerHTML = "Износ учинка";
+						value.appendChild(title);
+
+						var ucinak = document.createElement("DIV");
+						ucinak.setAttribute("class","ucinak");
+						ucinak.innerHTML = "<input type=\"text\" class=\"ucinak\" placeholder=\"0,00 дин\"></textarea>";
+						value.appendChild(ucinak);
+
+
+					td.appendChild(value);
+
+				//td.innerHTML = "<div class=\"value\" style=\"padding:10px 20px;text-align:center;\"><div class=\"title\">Коментар контроле:</div><div class=\"opisText\"><textarea class=\"komentarKontrole\" placeholder=\"Opis radova, vreme provedeno nalogu, problemi oko naloga\"></textarea></div></div>"
 				tr.appendChild(td);
 			document.getElementsByClassName("naloziTable")[0].appendChild(tr);
 			startIndex = startIndex+1;
@@ -496,6 +546,7 @@
 				json2.adresa = rowElems[i].getElementsByClassName("adresa")[0].getElementsByClassName("adresaInput")[0].value;
 				json2.opis = rowElems[i].nextElementSibling.getElementsByClassName("opis")[0].getElementsByClassName("opisText")[0].innerHTML;
 				json2.komentarKontrole = rowElems[i].nextElementSibling.getElementsByClassName("komentar")[0].getElementsByClassName("komentarKontrole")[0].value;
+				json2.ucinak = rowElems[i].nextElementSibling.getElementsByClassName("komentar")[0].getElementsByClassName("ucinak")[0].getElementsByTagName("INPUT")[0].value;
 				json2.tipoviRada = [];
 				var checkboxes = rowElems[i].getElementsByClassName("checkbox");
 				for(var j=0;j<checkboxes.length;j++){
@@ -521,7 +572,6 @@
 					json.odsustvo = checkboxes[i].value;
 				}
 			}
-			//console.log(json)
 			document.getElementById("json").value = JSON.stringify(json)
 			loadGif();
 			document.getElementById("form").submit();
