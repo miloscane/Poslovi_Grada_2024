@@ -7595,153 +7595,75 @@ server.post('/edit-nalog', async (req, res)=> {
 			      logError(error);
 			      return res.render("message",{pageTitle: "Грешка",message: "<div class=\"text\">Дошло је до грешке приликом качења слика.</div>",user: req.session.user});
 			    }
-			    var nalogJson = JSON.parse(req.body.json);
-			    //console.log(nalogJson);
-			    var izvestajJson = {};
-			    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
-			    izvestajJson.nalog		=	nalogJson.broj;
-			    izvestajJson.nalogId	=	nalogJson.nalogId;
-			    izvestajJson.datetime 	=	new Date().getTime();
-			    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
-			    izvestajJson.izvestaj	=	nalogJson.izvestaj;
-			    izvestajJson.user 		=	req.session.user;
-			    izvestajJson.photos		=	[];
-			    for(var i=0;i<req.files.length;i++){
-			    	izvestajJson.photos.push(req.files[i].transforms[0].location)
+			    try{
+			    	var nalogJson = JSON.parse(req.body.json);
+				    var izvestajJson = {};
+				    izvestajJson.uniqueId 	=	new Date().getTime() +"--"+generateId(5);
+				    izvestajJson.nalog		=	nalogJson.broj;
+				    izvestajJson.nalogId	=	nalogJson.nalogId;
+				    izvestajJson.datetime 	=	new Date().getTime();
+				    izvestajJson.datum		=	getDateAsStringForDisplay(new Date(Number(izvestajJson.datetime)));
+				    izvestajJson.izvestaj	=	nalogJson.izvestaj;
+				    izvestajJson.user 		=	req.session.user;
+				    izvestajJson.photos		=	[];
+				    for(var i=0;i<req.files.length;i++){
+				    	izvestajJson.photos.push(req.files[i].transforms[0].location)
+				    }
+				    if(izvestajJson.izvestaj!="" || izvestajJson.photos.length>0){
+				    	await izvestajiDB.insertOne(izvestajJson);
+				    }
+				    if( !eval(!nalogJson.novoStanje && nalogJson.obracunatNaPortalu==nalogJson.stariNalog.obracunatNaPortalu && nalogJson.status==nalogJson.stariNalog.statusNaloga && nalogJson.majstor==nalogJson.stariNalog.majstor && JSON.stringify(nalogJson.kategorijeRadova)==JSON.stringify(nalogJson.stariNalog.kategorijeRadova) && JSON.stringify(nalogJson.obracun)==JSON.stringify(nalogJson.stariNalog.obracun))){
+				    	//Ima izmena na nalogu
+				    	var ukupanIznos = 0;
+							for(var i=0;i<nalogJson.obracun.length;i++){
+								if(!nalogJson.obracun[i].price){
+									for(var j=0;j<cenovnik.length;j++){
+										if(nalogJson.obracun[i].code==cenovnik[j].code){
+											ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
+											break;
+										}
+									}
+								}else{
+									ukupanIznos = ukupanIznos + parseFloat(nalogJson.obracun[i].price);
+								}
+							}
+							var setObj	=	{ $set: {
+								statusNaloga: nalogJson.status,
+								majstor: nalogJson.majstor,
+								obracun: nalogJson.obracun,
+								//kategorijeRadova: nalogJson.kategorijeRadova,
+								ukupanIznos: ukupanIznos,
+								obracunatNaPortalu: nalogJson.obracunatNaPortalu,
+								izmenio: req.session.user
+							}};
+
+							if(nalogJson.novoStanje){
+								var json = {};
+								json.stanje = nalogJson.novoStanje;
+								json.datetime = new Date().getTime();
+								setObj.$push = {stanja:json}
+							}
+
+							var nalozi2024 = await nalozi2024DB.find({broj:nalogJson.broj}).toArray();
+							if(nalozi2024.length>0){
+								await nalozi2024DB.updateOne({broj:nalogJson.broj},setObj);
+							}else{
+								await naloziDB.updateOne({broj:nalogJson.broj},setObj);
+							}
+							
+							nalogJson.stariNalog.izmenio = req.session.user;
+							nalogJson.stariNalog.datetime = new Date().getTime();
+							await istorijaNalogaDB.insertOne(nalogJson.stariNalog);
+				    }
+				    res.redirect("/nalog/"+nalogJson.broj);
+			    }catch(err){
+			    	logError(err);
+						res.render("message",{
+							pageTitle: "Програмска грешка",
+							user:req.session.user,
+							message: "<div class=\"text\">Дошло је до грешке у бази податка 2634.</div>"
+						});
 			    }
-
-					if( nalogJson.obracunatNaPortalu==nalogJson.stariNalog.obracunatNaPortalu && nalogJson.status==nalogJson.stariNalog.statusNaloga && nalogJson.majstor==nalogJson.stariNalog.majstor && JSON.stringify(nalogJson.kategorijeRadova)==JSON.stringify(nalogJson.stariNalog.kategorijeRadova) && JSON.stringify(nalogJson.obracun)==JSON.stringify(nalogJson.stariNalog.obracun)){
-						//nema izmena na nalogu
-						if(izvestajJson.izvestaj!="" || izvestajJson.photos.length>0){
-							//ima izvestaja
-							try{
-								await izvestajiDB.insertOne(izvestajJson);
-								res.redirect("/nalog/"+nalogJson.broj);
-							}catch(err){
-								logError(err);
-								res.render("message",{
-									pageTitle: "Програмска грешка",
-									user:req.session.user,
-									message: "<div class=\"text\">Дошло је до грешке у бази податка 2634.</div>"
-								});
-							}
-						}else{
-							//nema izvestaja i nema izmena na nalogu
-							res.redirect("/nalog/"+nalogJson.broj);
-						}
-					}else{
-						//ima izmena na nalogu
-						if(izvestajJson.izvestaj!="" || izvestajJson.photos.length>0){
-							//ima izvestaja
-							try{
-								await izvestajiDB.insertOne(izvestajJson);
-								var ukupanIznos = 0;
-								for(var i=0;i<nalogJson.obracun.length;i++){
-									if(!nalogJson.obracun[i].price){
-										for(var j=0;j<cenovnik.length;j++){
-											if(nalogJson.obracun[i].code==cenovnik[j].code){
-												ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
-												break;
-											}
-										}
-									}else{
-										ukupanIznos = ukupanIznos + parseFloat(nalogJson.obracun[i].price);
-									}
-								}
-								var setObj	=	{ $set: {
-									statusNaloga: nalogJson.status,
-									majstor: nalogJson.majstor,
-									obracun: nalogJson.obracun,
-									//kategorijeRadova: nalogJson.kategorijeRadova,
-									ukupanIznos: ukupanIznos,
-									obracunatNaPortalu: nalogJson.obracunatNaPortalu,
-									izmenio: req.session.user
-								}};
-
-								var nalozi2024 = await nalozi2024DB.find({broj:nalogJson.broj}).toArray();
-								if(nalozi2024.length>0){
-									await nalozi2024DB.updateOne({broj:nalogJson.broj},setObj);
-								}else{
-									await naloziDB.updateOne({broj:nalogJson.broj},setObj);
-								}
-								
-								nalogJson.stariNalog.izmenio = req.session.user;
-								nalogJson.stariNalog.datetime = new Date().getTime();
-								await istorijaNalogaDB.insertOne(nalogJson.stariNalog);
-								res.redirect("/nalog/"+nalogJson.broj);
-							}catch(err){
-								logError(err);
-								res.render("message",{
-									pageTitle: "Програмска грешка",
-									user:req.session.user,
-									message: "<div class=\"text\">Дошло је до грешке у бази податка 2634.</div>"
-								});
-							}
-						}else{
-							//nema izvestaja
-							try{
-								var ukupanIznos = 0;
-								for(var i=0;i<nalogJson.obracun.length;i++){
-									if(!nalogJson.obracun[i].price){
-										for(var j=0;j<cenovnik.length;j++){
-											if(nalogJson.obracun[i].code==cenovnik[j].code){
-												ukupanIznos = ukupanIznos + cenovnik[j].price*nalogJson.obracun[i].quantity;
-												break;
-											}
-										}
-									}else{
-										ukupanIznos = ukupanIznos + parseFloat(nalogJson.obracun[i].price);
-									}
-								}
-								var setObj	=	{ $set: {
-									statusNaloga: nalogJson.status,
-									majstor: nalogJson.majstor,
-									obracun: nalogJson.obracun,
-									//kategorijeRadova: nalogJson.kategorijeRadova,
-									obracunatNaPortalu: nalogJson.obracunatNaPortalu,
-									ukupanIznos: ukupanIznos,
-									izmenio: req.session.user
-								}};
-
-								var nalozi2024 = await nalozi2024DB.find({broj:nalogJson.broj}).toArray();
-								if(nalozi2024.length>0){
-									await nalozi2024DB.updateOne({broj:nalogJson.broj},setObj);
-								}else{
-									await naloziDB.updateOne({broj:nalogJson.broj},setObj);
-								}
-								nalogJson.stariNalog.izmenio = req.session.user;
-								nalogJson.stariNalog.datetime = new Date().getTime();
-								await istorijaNalogaDB.insertOne(nalogJson.stariNalog);
-								if(nalogJson.stariNalog.status == "Vraćen" && nalogJson.status=="Završeno"){
-									var mailOptions = {
-										from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
-										to: 'marija.slijepcevic@poslovigrada.rs',
-										subject: 'Завршен враћен налог '+nalogJson.broj,
-										html: 'Ћао Марија,<br>Враћен налог подизвођача је поново завршен.<br>Број налога: <a href=\"'+process.env.siteurl+'/nalog/'+nalogJson.broj+'\">'+nalogJson.broj+'</a><br>Позз.',
-									};
-
-									transporter.sendMail(mailOptions, (error, info) => {
-										if (error) {
-											logError(error);
-											res.redirect("/nalog/"+nalogJson.broj);
-										}else{
-											res.redirect("/nalog/"+nalogJson.broj);
-										}
-									});
-								}else{
-									res.redirect("/nalog/"+nalogJson.broj);
-								}
-
-							}catch(err){
-								logError(err);
-								res.render("message",{
-									pageTitle: "Програмска грешка",
-									user:req.session.user,
-									message: "<div class=\"text\">Дошло је до грешке у бази податка 2634.</div>"
-								});
-							}
-						}
-					}
 				});
 			
 		}else{

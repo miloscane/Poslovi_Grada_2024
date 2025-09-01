@@ -101,7 +101,7 @@ function datetimeToReadable(datetime){
   var monthString = (month<10) ? "0" + month : month;
   var day     = date.getDate();
   var dayString = (day<10) ? "0" + day : day;
-  return  dayString+"."+monthString+"."+yearString + ". - "+date.getHours()+":"+date.getMinutes();
+  return  dayString+"."+monthString+"."+yearString + ". - "+date.getHours().toString().padStart(2,"0")+":"+date.getMinutes().toString().padStart(2,"0");
 }
 
 function getTimestamp(date){
