@@ -91,7 +91,7 @@
 					<div class="fill" id="plata-fill"></div>
 					<script>
 						var bodPlate = 500;
-						var bodNaloga = 10000;
+						var bodNaloga = 2000;
 						var maxPlata = 350000;
 						var maxValue = 350000/bodPlate;
 						var tickIncrement = 50000/bodPlate;
@@ -126,10 +126,12 @@
 						var ostvarenUcinak = 0;
 						for(var i=0;i<izvestaji.length;i++){
 							for(var j=0;j<izvestaji[i].nalozi.length;j++){
-								ostvarenUcinak = ostvarenUcinak + parseFloat(izvestaji[i].nalozi[j].iznosNaloga);
+								ostvarenUcinak = ostvarenUcinak + parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", "."));
 							}
 						}
-						var ostvareniBodovi = ostvarenUcinak/(bodNaloga/2);
+						//ostvarenUcinak = 2000000;
+						var ostvareniBodovi = ostvarenUcinak/(bodNaloga);
+						ostvareniBodovi = ostvareniBodovi*0.4
 						var nagrade = 0;
 						var kazne = 0;
 						var radniDani = 0;
@@ -385,14 +387,18 @@
 											nalogElem.appendChild(tipNaloga);	
 										}
 
-										if(izvestaj.nalozi[j].iznosNaloga==0){
+
+										if(!izvestaj.nalozi[j].ucinak){
 											var card = document.createElement("DIV");
 											card.setAttribute("class","card");
 											nalogElem.appendChild(card)
 										}else{
 											var card = document.createElement("DIV");
 											card.setAttribute("class","cardOpened");
-											card.innerHTML = eval(izvestaj.nalozi[j].iznosNaloga/(bodNaloga/2)).toFixed(0)
+											var value = parseFloat(izvestaj.nalozi[j].ucinak.replace(",", "."));
+											value = value * 0.4/bodNaloga;
+
+											card.innerHTML = value.toFixed(0)
 											nalogElem.appendChild(card)
 										}
 										
