@@ -4763,6 +4763,7 @@ input[type=number] {
     position:fixed;
     top:20px;
     right:20px;
+    z-index:1000;
 }
 
 #notifications .notification{
@@ -7196,6 +7197,33 @@ input[type=number] {
 
 .stanjeBox .stanjeElem{
     margin-bottom: 14px;
+}
+
+.aiSuggestion {
+  position: relative;
+  display: inline-block;
+  width:30px;
+}
+
+.tooltip {
+    position: absolute;
+    top: 100%;
+    left: -10px;
+    margin-top: 8px;
+    background: rgb(32, 51, 100);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.4;
+    max-width: 220px;
+    display: none;
+    z-index: 10;
+    width: 200px;
+}
+
+.aiSuggestion:hover .tooltip {
+  display: block;
 }
 
 @media screen and (max-width: 1100px) {

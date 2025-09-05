@@ -121,6 +121,8 @@
 								<option value="Crpljenje">Црпљење</option>
 								<option value="Dezinfekcija">Дезинфекција</option>
 								<option value="Kopanje">Копање</option>
+								<option value="Masinsko kopanje">Машинско копање</option>
+								<option value="Rucno kopanje">Ручно копање</option>
 								<option value="Finalizacija">Финализација</option>
 								<option value="Betonaža">Бетонажа</option>
 								<option value="Asfalt">Асфалт</option>
@@ -309,7 +311,7 @@
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value ikonica");
 								if(naloziToShow[i].kasni && podizvodjaci.indexOf(naloziToShow[i].majstor)<0 && naloziToShow[i].statusNaloga!="Stambeno koci" && naloziToShow[i].statusNaloga!="Stanari koče" ){
-									tr.setAttribute("style","background-color:rgb(200,0,0);color:rgb(255,255,255)")
+									//tr.setAttribute("style","background-color:rgb(200,0,0);color:rgb(255,255,255)")
 								}
 								if(naloziToShow[i].statusNaloga=="Primljen" && podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
 									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	

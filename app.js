@@ -4281,6 +4281,10 @@ schedule.scheduleJob('59 23 * * *', sendEmail);
 schedule.scheduleJob('00 23 * * *', saveStops);
 
 
+setTimeout(function (){
+	io.emit("notification","noviNalog","<div class=\"title\">NOVI NALOG</div><div class=\"text\"><a href=\"/nalog\" target=\"blank\">1814367</a> - <span class=\"adresa\">Nehruova 93</span> - <span class=\"radnaJedinica\">NOVI BEOGRAD</span></span></div>","NOVI BEOGRAD");
+},60000)
+
 server.get('/',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==5){
@@ -6298,6 +6302,11 @@ server.get('/administracija/stanjePoOpstinama',async (req,res)=>{
 				var nalozi2024 = await nalozi2024DB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom","Storniran"]}}).toArray();
 				for(var i=0;i<nalozi2024.length;i++){
 					nalozi.push(nalozi2024[i])
+				};
+				for(var i=0;i<nalozi.length;i++){
+					if(nalozi[i].datum.datum=="05.09.2025"){
+						nalozi.splice(i,1)
+					}
 				}
 				res.render("administracija/stanjePoOpstinama",{
 					pageTitle: "Стање налога по општинама",

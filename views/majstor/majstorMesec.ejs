@@ -326,7 +326,7 @@
 									var value = document.createElement("DIV");
 									value.setAttribute("class","value");
 									var bodovi = eval(parseFloat(izvestaj.kazna)/bodPlate).toFixed(0)=="1" ? " бод" : " бода";
-									value.innerHTML = izvestaj.kazna ? eval(parseFloat(izvestaj.kazna)/bodPlate).toFixed(0)+bodovi : bodovi;
+									value.innerHTML = izvestaj.kazna ? eval(parseFloat(izvestaj.kazna)/bodPlate).toFixed(1)+bodovi : bodovi;
 									box.appendChild(value);
 
 									
@@ -398,7 +398,7 @@
 											var value = parseFloat(izvestaj.nalozi[j].ucinak.replace(",", "."));
 											value = value * 0.4/bodNaloga;
 
-											card.innerHTML = value.toFixed(0)
+											card.innerHTML = value.toFixed(1)
 											nalogElem.appendChild(card)
 										}
 										

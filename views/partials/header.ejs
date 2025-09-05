@@ -134,6 +134,12 @@
 									close.setAttribute("onclick","this.parentElement.style.display=\"none\"");
 									close.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
 									notificationElem.appendChild(close);
+
+									var ai = document.createElement("DIV");
+									ai.setAttribute("class","aiSuggestion");
+									ai.innerHTML = "<div class=\"sug\"><img src=\"https://www.aidispatcher.net/favicon.png\"><span class=\"tooltip\"><b>Najbolji izbor majstora:</b> Dalibor Tripkovic<br><b>Razlozi:</b><br>Blizina, opremljenost</div>";
+
+									notificationElem.appendChild(ai);
 								document.getElementById("notifications").appendChild(notificationElem);
 							}	
 						}
