@@ -4280,11 +4280,6 @@ const saveStops = async () => {
 schedule.scheduleJob('59 23 * * *', sendEmail);
 schedule.scheduleJob('00 23 * * *', saveStops);
 
-
-setTimeout(function (){
-	io.emit("notification","noviNalog","<div class=\"title\">NOVI NALOG</div><div class=\"text\"><a href=\"/nalog\" target=\"blank\">1814367</a> - <span class=\"adresa\">Nehruova 93</span> - <span class=\"radnaJedinica\">NOVI BEOGRAD</span></span></div>","NOVI BEOGRAD");
-},60000)
-
 server.get('/',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==5){
