@@ -132,9 +132,15 @@
 					</div>
 				</div>
 				<div class="singleLineInput">
-					<div class="name">Веза са старим порталом</div>
+					<div class="name">РЕГИОН</div>
 					<div class="inputWrapper">
-						<input type="text" id="veza-sa-starim-portalom">
+						<select id="region">
+							<option value="NIJEDAN">НИЈЕДАН</option>
+							<option value="SEVER">СЕВЕР</option>
+							<option value="ISTOK">ИСТОК</option>
+							<option value="JUG">ЈУГ</option>
+							<option value="ZAPAD">ЗАПАД</option>
+						</select>
 					</div>
 				</div>
 				<div class="textareaInput">
@@ -250,8 +256,8 @@
 				document.getElementById("mesecna-plata").value = majstor.mesecnaPlata;
 			}
 
-			if(majstor.vezaSaStarimPortalom){
-				document.getElementById("veza-sa-starim-portalom").value = majstor.vezaSaStarimPortalom;
+			if(majstor.region){
+				document.getElementById("region").value = majstor.region;
 			}
 
 			if(majstor.sluzbeniBroj){
@@ -315,11 +321,11 @@
 				izmenaJson.brojLicneKarte = document.getElementById("broj-licne-karte").value;
 				izmenaJson.adresaStanovanja = document.getElementById("adresa-stanovanja").value;
 				izmenaJson.odgovornoLice = document.getElementById("odgovorno-lice").value;
+				izmenaJson.region = document.getElementById("region").value;
 				izmenaJson.beleske = document.getElementById("beleske").value;
 				izmenaJson.aktivan = document.getElementById("aktivan").checked;
 				izmenaJson.ocekivaniUcinak = document.getElementById("ocekivani-ucinak").value;
 				izmenaJson.mesecnaPlata = document.getElementById("mesecna-plata").value;
-				izmenaJson.vezaSaStarimPortalom = document.getElementById("veza-sa-starim-portalom").value;
 				izmenaJson.tipRada = [];
 				var tipovi = document.getElementsByClassName("tipRadnika");
 				for(var i=0;i<tipovi.length;i++){

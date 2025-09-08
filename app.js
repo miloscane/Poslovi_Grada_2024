@@ -367,6 +367,26 @@ var daniUNedelji 	=	["Недеља","Понедељак","Уторак","Сре�
 var istok         = ["ZVEZDARA","RAKOVICA","VOŽDOVAC","STARI GRAD","PALILULA"];
 var zapad         = ["NOVI BEOGRAD","ZEMUN","ČUKARICA","VRAČAR","SAVSKI VENAC"];
 
+var podelaOpstina = [
+	{
+		naziv:"SEVER",
+		radneJedinice: ["PALILULA","STARI GRAD"]
+	},
+	{
+		naziv:"ZAPAD",
+		radneJedinice: ["NOVI BEOGRAD","ZEMUN"]
+	},
+	{
+		naziv:"ISTOK",
+		radneJedinice: ["ZVEZDARA","VOŽDOVAC","VRAČAR"]
+	},
+	{
+		naziv:"JUG",
+		radneJedinice: ["RAKOVICA","ČUKARICA","SAVSKI VENAC"]
+	}
+]
+
+
 var phoneAccessCode = generateId(25);
 setInterval(function(){
 	phoneAccessCode = generateId(25);
@@ -8070,6 +8090,12 @@ server.post('/izmenaMajstora',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			var json = JSON.parse(req.body.json);
+			var radneJedinice = [];
+			for(var i=0;i<podelaOpstina.length;i++){
+				if(podelaOpstina[i].naziv==json.region){
+					json.radneJedinice = podelaOpstina[i].radneJedinice
+				}
+			}
 			var setObj	=	{ $set: {
 											brojKartice:json.brojKartice,
 											ime:json.ime,
@@ -8083,7 +8109,8 @@ server.post('/izmenaMajstora',async (req,res)=>{
 											odgovornoLice:json.odgovornoLice,
 											beleske:json.beleske,
 											aktivan:json.aktivan,
-											vezaSaStarimPortalom:json.vezaSaStarimPortalom,
+											radneJedinice: json.radneJedinice,
+											region: json.region,
 											tipRada:json.tipRada,
 											username:json.username,
 											password: hashString(json.actualPassword),

@@ -6,7 +6,6 @@
 		var majstor = <%-JSON.stringify(majstor)%>;
 		var vozila = <%-JSON.stringify(vozila)%>;
 		var izvestaj = <%-JSON.stringify(izvestaj)%>;
-		console.log(izvestaj)
 		var reversi = <%-JSON.stringify(reversi)%>;
 		var date = "<%=date%>";
 		var radovi = ["Замена","Одгушење","Констатација","Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Потребма вома","Нема приступа","Одбијају сарадњу","Неспремно"];
@@ -250,9 +249,11 @@
 							    	}
 							    }
 							    checkbox.id = startIndex+"radovi_" + index;
-
 							    label.htmlFor = checkbox.id;
 							    label.appendChild(checkbox);
+							    if(r=="Црпљење"){
+							    	r = "Црпљење или дезинфекција"
+							    }
 							    label.append(" " + r);
 
 							    value.appendChild(label);
