@@ -6644,7 +6644,7 @@ input[type=number] {
     width:100%;
 }
 
-.jucerasnjiUcinak .naloziTable tr:nth-child(4n),tr:nth-child(4n+1) {
+.jucerasnjiUcinak .naloziTable tr:nth-child(4n),.jucerasnjiUcinak .naloziTable tr:nth-child(4n+1) {
   background-color: rgba(31,52,100,0.1); /* light blue, change as needed */
 }
 
@@ -7251,6 +7251,104 @@ input[type=number] {
 
 .regioni table{
     margin:0 auto;
+}
+
+.stanjeNalogaPoOpstinama2 .wrap{
+
+}
+
+.stanjeNalogaPoOpstinama2 .title{
+    text-align:center;
+    font-size:20px;
+    font-weight:600;
+    color:rgb(255,255,255);
+    padding:5px;
+    background-color:rgb(32,51,100);
+}
+
+.stanjeNalogaPoOpstinama2 .komentari .title{
+    text-align:left;
+    font-size:16px;
+    font-weight:500;
+    text-decoration: underline;
+    color:rgb(100,100,100);
+    background-color: rgba(255,255,255,0);
+    padding-left:0px;
+}
+
+.stanjeNalogaPoOpstinama2 table{
+    border-collapse: collapse;
+}
+
+.stanjeNalogaPoOpstinama2 td{
+    border:1px solid rgb(100,100,100);
+    padding:3px;
+    vertical-align: top;
+}
+
+/* Highlight 2 rows, then skip 2 (starting from row 1 now) */
+.stanjeNalogaPoOpstinama2 tr:nth-child(4n+1),
+.stanjeNalogaPoOpstinama2 tr:nth-child(4n+2) {
+  background-color: rgb(230,230,230);
+}
+
+/* Border every 2nd row starting from row 2 (2,4,6,...) */
+.stanjeNalogaPoOpstinama2 tr:nth-child(2n) td {
+  border-bottom: 3px solid rgb(100,100,100);
+}
+
+.stanjeNalogaPoOpstinama2 .value .note{
+    font-weight:500;
+    text-decoration: underline;
+    text-align: center;
+    margin-bottom:5px;
+}
+
+.stanjeNalogaPoOpstinama2 .value .actualValue{
+    font-weight:400;
+    text-align: center;
+}
+
+.stanjeNalogaPoOpstinama2 .brojNaloga{
+    width:90px;
+}
+
+.stanjeNalogaPoOpstinama2 .adresa{
+    width:110px;
+}
+
+.stanjeNalogaPoOpstinama2 .status{
+    width:130px;
+}
+
+.stanjeNalogaPoOpstinama2 .datum{
+    width:120px;
+}
+
+.stanjeNalogaPoOpstinama2 .boxesWrap{
+    text-align: center;
+}
+
+.stanjeNalogaPoOpstinama2 .boxesWrap .box{
+    display:inline-block;
+    vertical-align: middle;
+    padding:10px;
+    width:20%;
+    margin:2px;
+    background-color:rgb(32,51,100);
+}
+
+.stanjeNalogaPoOpstinama2 .boxesWrap .value{
+    font-size:20px;
+    color:rgb(255,255,255);
+}
+
+.stanjeNalogaPoOpstinama2 .boxesWrap .box .title{
+    background-color: transparent;
+}
+
+.stanjeNalogaPoOpstinama2 .boxesWrap .urgencija{
+    background-color:rgb(150,0,0);
 }
 
 @media screen and (max-width: 1100px) {

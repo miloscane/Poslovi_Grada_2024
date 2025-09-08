@@ -104,6 +104,16 @@ function datetimeToReadable(datetime){
   return  dayString+"."+monthString+"."+yearString + ". - "+date.getHours().toString().padStart(2,"0")+":"+date.getMinutes().toString().padStart(2,"0");
 }
 
+function datetimeToReadable2(datetime){
+  var date = new Date(Number(datetime));
+  var yearString  = date.getFullYear();
+  var month   = eval(date.getMonth()+1);
+  var monthString = (month<10) ? "0" + month : month;
+  var day     = date.getDate();
+  var dayString = (day<10) ? "0" + day : day;
+  return  dayString+"."+monthString+"."+yearString + ".<br><i>"+date.getHours().toString().padStart(2,"0")+":"+date.getMinutes().toString().padStart(2,"0")+"</i>";
+}
+
 function getTimestamp(date){
   var currentDate = new Date(date);
   var currentHour = currentDate.getHours().toString().length==1 ? "0"+currentDate.getHours() : currentDate.getHours();

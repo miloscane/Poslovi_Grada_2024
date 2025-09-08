@@ -1,20 +1,277 @@
 <%- include ("partials/header") -%>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 	var nalozi = <%-JSON.stringify(nalozi)%>;
 	console.log(nalozi)
+	nalozi.sort((a, b) => a.datum.datetime - b.datum.datetime);
+	function exportElementAsImage(elem) {
+	    const element = elem;
+	    if (!element) return;
+
+	    // Save original style
+	    const originalHeight = element.style.height;
+	    const originalOverflow = element.style.overflow;
+
+	    // Expand to full content height
+	    element.style.height = element.scrollHeight + "px";
+	    element.style.overflow = "visible";
+
+	    html2canvas(element, {
+	        scale: 1,
+	        useCORS: true
+	    }).then(canvas => {
+	        // Revert to original style
+	        element.style.height = originalHeight;
+	        element.style.overflow = originalOverflow;
+
+	        // Trigger download
+	        const link = document.createElement("a");
+	        link.download = elem.getElementsByClassName("title")[0]?.innerHTML.replace(/\./g, '-') || "image";
+	        link.href = canvas.toDataURL();
+	        link.click();
+	    });
+	}
 </script>
 <div class="pageWidth stanjeNalogaPoOpstinama2">
 	<div id="tables-wrap"></div>
 	<script>
 		for(var i=0;i<radneJedinice.length;i++){
+			var radnaJedinica = radneJedinice[i]
 			var wrap = document.createElement("DIV");
 			wrap.setAttribute("class","wrap");
-			wrap.setAttribute("id",radneJedinice[i]);
+			wrap.setAttribute("id",radnaJedinica);
 				var title = document.createElement("DIV");
 				title.setAttribute("class","title");
-				title.innerHTML = radneJedinice[i];
+				title.setAttribute("onclick","exportElementAsImage(this.parentElement)");
+				title.innerHTML = radnaJedinica + " "+ getDateAsStringForDisplay(new Date());
 				wrap.appendChild(title);
+
+				//Finalizacije
+				//Betonaze
+				//Odgusenja // Zagusenje
+				//Zamene
+				//Kopanja
+				//Vraceni
+				//Crpljenje
+				//Betonaze
+				//Dezinfekcije
+				//Woma
+				//Nepoznat status
+				//Urgencije
+
+
+				var totals = {};
+				totals.Zamene = 0;
+				totals.Odgusenja = 0;
+				totals.Kopanja = 0;
+				totals.Crpljenje = 0;
+				totals.Dezinfekcije = 0;
+				totals.Vraceni = 0;
+				totals.Wome = 0;
+				totals.Finalizacije = 0;
+				totals.Betonaze= 0; // Asfal Bekaton
+				totals.Kamera = 0;
+				totals.Ciscenje = 0;
+				totals.Konstatacija = 0;
+				totals.Urgencije = 0;
+
+				var boxesWrap = document.createElement("DIV");
+				boxesWrap.setAttribute("class","boxesWrap");
+					for(var j=0;j<Object.keys(totals).length;j++){
+						var box = document.createElement("DIV");
+						box.setAttribute("class","box");
+							var title = document.createElement("DIV")
+							title.setAttribute("class","title");
+							title.innerHTML = Object.keys(totals)[j];
+							box.appendChild(title);
+
+							var value = document.createElement("DIV")
+							value.setAttribute("class","value");
+							value.setAttribute("id",radnaJedinica.replace(/\s+/g, "")+"-"+Object.keys(totals)[j]);
+							if(Object.keys(totals)[j].includes("Urgen")){
+								box.classList.add("urgencija")
+							}
+							value.innerHTML = 0;
+							box.appendChild(value);
+
+							
+						boxesWrap.appendChild(box);
+					}
+				wrap.appendChild(boxesWrap);
+
+
+				var tableWrap = document.createElement("DIV");
+				tableWrap.setAttribute("class","tableWrap");
+					var table = document.createElement("TABLE");
+
+						for(var j=0;j<nalozi.length;j++){
+							if(nalozi[j].radnaJedinica==radnaJedinica){
+								var nalog = nalozi[j];
+								var tr = document.createElement("TR");
+									var td = document.createElement("TD");
+									td.setAttribute("class","brojNaloga")
+									td.innerHTML = "<div class='value'><a href='/nalog/"+nalog.broj+"'>"+nalog.broj+"</div>";
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.setAttribute("class","adresa")
+									td.innerHTML = "<div class='value'>"+nalog.adresa+"</div>";
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.setAttribute("class","status")
+									td.innerHTML = "<div class='value'><div class='note'>Status naloga:</div><div class='actualValue'>"+nalog.statusNaloga+"</div></div>";
+
+									if(nalog.statusNaloga=="Zamena"){
+										totals.Zamene++;
+									}else if(nalog.statusNaloga=="Zagušenje"){
+										totals.Odgusenja++;
+									}else if(["Kopanje","Rucno kopanje","Masinsko kopanje"].indexOf(nalog.statusNaloga)>=0){
+										totals.Kopanja++;
+									}else if(nalog.statusNaloga=="Crpljenje"){
+										totals.Crpljenje++;
+									}else if(nalog.statusNaloga=="Dezinfekcija"){
+										totals.Dezinfekcije++;
+									}else if(nalog.statusNaloga=="Potrebna WOMA"){
+										totals.Wome++;
+									}else if(["Finalizacija","Zakazana finalizacija"].indexOf(nalog.statusNaloga)>=0){
+										totals.Finalizacije++;
+									}else if(["Betonaža","Asfalt","Bekaton"].indexOf(nalog.statusNaloga)>=0){
+										totals.Betonaze++;
+									}else if(nalog.statusNaloga=="Snimanje kamerom"){
+										totals.Kamera++;
+									}else if(nalog.statusNaloga=="Preventivno čišćenje"){
+										totals.Ciscenje++;
+									}else if(nalog.statusNaloga=="Vraćen"){
+										totals.Vraceni++;
+									}else{
+										totals.Konstatacija++;
+									}
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.setAttribute("class","datum");
+									var datumNaloga = new Date(nalog.digitalizacija.stambeno.datum);
+									datumNaloga.setHours(Number(nalog.digitalizacija.stambeno.vreme.split(":")[0]));
+									datumNaloga.setMinutes(Number(nalog.digitalizacija.stambeno.vreme.split(":")[1]));
+									td.innerHTML = "<div class='value'><div class='note'>Datum naloga:</div><div class='actualValue'>"+reshuffleDate(nalog.digitalizacija.stambeno.datum)+"<br><i>"+nalog.digitalizacija.stambeno.vreme+"</i></div></div>";
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.setAttribute("class","akcija")
+									var poslednjiIzvestaj = "Nema akcije";
+									var datumIzvestaja = 0;
+									if(nalog.izvestaji.length>0){
+										for(var k=nalog.izvestaji.length-1;k>0;k--){
+											var izvestaj = nalog.izvestaji[k]
+											if(izvestaj.user.email!="EBS"){
+												poslednjiIzvestaj = datetimeToReadable2(izvestaj.datetime);
+												datumIzvestaja = new Date(izvestaj.datetime);
+												break;
+											}
+										}
+									}
+									td.innerHTML = "<div class='value'><div class='note'>Datum poslednje akcije PG:</div><div class='actualValue'>"+poslednjiIzvestaj+"</div></div>";
+									if(poslednjiIzvestaj=="Nema akcije" || new Date().getTime() - datumIzvestaja.getTime() > 8.64e+7){
+										td.style.backgroundColor = "rgba(255,0,0,0.2)";
+									}
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.setAttribute("class","akcija")
+									var poslednjiIzvestaj = "Nema akcije";
+									if(nalog.izvestaji.length>0){
+										for(var k=nalog.izvestaji.length-1;k>0;k--){
+											var izvestaj = nalog.izvestaji[k]
+											if(izvestaj.user.email=="EBS"){
+												poslednjiIzvestaj = datetimeToReadable2(izvestaj.datetime);
+												break;
+											}
+										}
+									}
+									td.innerHTML = "<div class='value'><div class='note'>Datum poslednje akcije Stambeno:</div><div class='actualValue'>"+poslednjiIzvestaj+"</div></div>";
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.setAttribute("class","akcija");
+									var urgencije = 0;
+									var urgencija = false;
+									for(var k=0;k<nalog.izvestaji.length;k++){
+										var izvestaj = nalog.izvestaji[k];
+										if(izvestaj.izvestaj){
+											if(izvestaj.izvestaj.toLowerCase().includes("urg")){
+												urgencije++;
+												urgencija = true;
+											}
+										}
+									}
+									if(urgencija==true){
+										totals.Urgencije++;
+									}
+									td.innerHTML = "<div class='value'><div class='note'>Urgencije:</div><div class='actualValue'>"+urgencije+"</div></div>";
+									td.style = "background-color:rgba(255,0,0,"+urgencije/5+");color:rgb(0,0,0);font-weight:600"
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.setAttribute("class","podizvodjac");
+									td.innerHTML = "<div class='value'><div class='note'>Podizvodjac:</div><div class='actualValue'>NE</div></div>";
+									if(podizvodjaci.indexOf(nalozi[i].majstor)>=0){
+										td.innerHTML = "<div class='value'><div class='note'>Podizvodjac:</div><div class='actualValue'>DA</div></div>";
+									}
+									tr.appendChild(td);
+
+
+								table.appendChild(tr);
+
+								var tr = document.createElement("TR");
+									var td = document.createElement("TD");
+									td.setAttribute("colspan","4");
+									td.setAttribute("class","opis");
+									td.innerHTML = "<div class='value'><b style='font-weight:500;text-decoration:underline'>Opis naloga:</b><br>"+nalog.opis+"</div>"
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+									td.setAttribute("colspan","4");
+									td.setAttribute("class","komentari");
+										var value = document.createElement("DIV");
+										value.setAttribute("class","value");
+											var title = document.createElement("DIV");
+											title.setAttribute("class","title");
+											title.innerHTML = "Poslednji komentar:";
+											value.appendChild(title);
+
+											var komentar = document.createElement("DIV");
+											komentar.setAttribute("class","komentar");
+											var poslednjiKomentar = "Nema komentara";
+											for(var k=nalog.izvestaji.length-1;k>0;k--){
+												var izvestaj = nalog.izvestaji[k]
+												if(izvestaj.user.email!="EBS"){
+													poslednjiKomentar = izvestaj.izvestaj;
+													poslednjiKomentar = poslednjiKomentar=="" ? izvestaj.photos.length+" fotografija okaceno" : poslednjiKomentar;
+													break;
+												}
+											}
+											komentar.innerHTML = poslednjiKomentar;
+											if(poslednjiKomentar=="Nema komentara"){
+												td.style.backgroundColor = "rgba(255,0,0,0.2)";
+											}
+											value.appendChild(komentar);
+										td.appendChild(value);
+									tr.appendChild(td);
+								table.appendChild(tr);
+							}
+						}
+						
+						
+
+						
+					tableWrap.appendChild(table);
+				wrap.appendChild(tableWrap);
 			document.getElementById("tables-wrap").appendChild(wrap);
+			for(var j=0;j<Object.keys(totals).length;j++){
+				//console.log(radnaJedinica.replace(/\s+/g, "")+"-"+Object.keys(totals)[j])
+				document.getElementById(radnaJedinica.replace(/\s+/g, "")+"-"+Object.keys(totals)[j]).innerHTML = totals[Object.keys(totals)[j]]
+			}
 		}
 	</script>
 </div>

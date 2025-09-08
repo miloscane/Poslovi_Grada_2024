@@ -6348,7 +6348,7 @@ server.get('/administracija/stanjePoOpstinama2',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
 			try{
-				var nalozi = await naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom","Storniran"]}}).toArray();
+				var nalozi = await naloziDB.find({statusNaloga:{$nin:["Završeno","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom","Storniran"]}}).toArray();
 				var brojeviNaloga = [];
 				for(var i=0;i<nalozi.length;i++){
 					brojeviNaloga.push(nalozi[i].broj)
@@ -6363,7 +6363,7 @@ server.get('/administracija/stanjePoOpstinama2',async (req,res)=>{
 					}
 				}
 				res.render("administracija/stanjePoOpstinama2",{
-					pageTitle: "Стање налога по општинама",
+					pageTitle: "Стање налога по општинама 2",
 					user: req.session.user,
 					nalozi: nalozi 
 				})
