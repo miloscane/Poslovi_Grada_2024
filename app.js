@@ -8704,6 +8704,7 @@ server.get('/izvestajMajstoraPick/:date',async (req,res)=>{
 					user: req.session.user,
 					majstori: majstori,
 					izvestaji: izvestaji,
+					podelaOpstina: podelaOpstina,
 					date: req.params.date
 				})
 			}catch(err){

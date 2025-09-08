@@ -12,10 +12,19 @@
 
 		var majstori = <%-JSON.stringify(majstori)%>;
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
-		var radovi = ["Замена",,"Попис","Одгушење","Констатација","Црпљење или дезинфекција"];
+		for(var i=0;i<majstori.length;i++){
+			majstori[i].izvestaji = [];
+			for(var j=0;j<izvestaji.length;j++){
+				if(izvestaji[j].majstor==majstori[i].uniqueId){
+					majstori[i].izvestaji.push(izvestaji[j]);
+				}
+			}
+		}
+		var podelaOpstina = <%-JSON.stringify(podelaOpstina)%>;
+		var radovi = ["Замена","Попис","Одгушење","Констатација","Црпљење"];
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 	</script>
-	<div class="pageWidth">
+	<div class="pageWidth grupniIzvestaj">
 		<select id="majstori"></select>
 		<script>
 			for(var i=0;i<majstori.length;i++){
@@ -47,13 +56,174 @@
 					datumSpan.replaceWith(document.createTextNode(datumSpan.textContent));*/
 				</script>
 				<div id="nalozi"></div>
+				
+			</div>
+			<div class="buttonWrap"><button onclick="exportElementAsImage(document.getElementById('regioni'))">Stampaj</button></div>
+			<div id="regioni" class="regioni">
 				<div class="absoluteLogo"><img src="/favicon.png"></div>
 			</div>
-			<div class="buttonWrap"><button onclick="exportElementAsImage(this.parentElement.parentElement.getElementsByClassName('naloziWrap')[0])">Stampaj</button></div>
-			
 		</div>
 		<script>
-			var table = document.createElement("TABLE");
+			for(var i=0;i<podelaOpstina.length;i++){
+				var wrap = document.createElement("DIV");
+				wrap.setAttribute("class","wrapper");
+					var title = document.createElement("DIV");
+					title.setAttribute("class","title");
+					title.innerHTML = "PG "+podelaOpstina[i].naziv;
+					wrap.appendChild(title);
+				
+					var tableWrap = document.createElement("DIV");
+					tableWrap.setAttribute("class","tableWrap");
+						var table = document.createElement("TABLE");
+							var tr = document.createElement("TR");
+								var td = document.createElement("TD");
+								td.innerHTML = "Мајстор";
+								tr.appendChild(td)
+
+								for(var j=0;j<radovi.length;j++){
+									var td = document.createElement("TD");
+									td.innerHTML = radovi[j];
+									tr.appendChild(td)
+								}
+
+								var td = document.createElement("TD");
+								td.innerHTML = "Укупно";
+								tr.appendChild(td)
+
+								var td = document.createElement("TD");
+								td.innerHTML = "Учинак";
+								tr.appendChild(td)
+
+								var td = document.createElement("TD");
+								td.innerHTML = "Казне";
+								tr.appendChild(td)
+
+								var td = document.createElement("TD");
+								td.innerHTML = "Награде";
+								tr.appendChild(td)
+							table.appendChild(tr);
+
+							var ukupnoPoTipu = [];
+							for(var j=0;j<radovi.length;j++){
+								var json = {};
+								json.naziv = radovi[j];
+								json.nalozi = 0;
+								json.novac = 0;
+								console.log(json)
+								ukupnoPoTipu.push(json);
+							}
+							console.log("poTipu")
+							console.log(ukupnoPoTipu)
+							var ukupnoKazni = 0;
+							var ukupnoNagrada = 0;
+
+							for(var j=0;j<majstori.length;j++){
+								if(majstori[j].region==podelaOpstina[i].naziv){
+									var tr = document.createElement("TR");
+										var td = document.createElement("TD");
+										td.innerHTML = majstori[j].ime;
+										tr.appendChild(td);
+
+										var ukupnoNaloga = 0;
+										var novcaniUcinak = 0;
+										var kazne = 0;
+										var nagrade = 0;
+										for(var k=0;k<radovi.length;k++){
+											var td = document.createElement("TD");
+											var nalozi = 0;
+											for(var l=0;l<majstori[j].izvestaji.length;l++){
+												var kazna = !isNaN(parseFloat(majstori[j].izvestaji[l].kazna.replace(/,/g, "."))) ? parseFloat(majstori[j].izvestaji[l].kazna.replace(/,/g, ".")) : 0
+												var nagrada = !isNaN(parseFloat(majstori[j].izvestaji[l].nagrada.replace(/,/g, "."))) ? parseFloat(majstori[j].izvestaji[l].nagrada.replace(/,/g, ".")) : 0
+												kazne = kazne + kazna;
+												ukupnoKazni = ukupnoKazni + kazna;
+												nagrade = nagrade + nagrada
+												ukupnoNagrada = ukupnoNagrada + nagrada;
+
+												for(var q = 0;q<majstori[j].izvestaji[l].nalozi.length;q++){
+													if(majstori[j].izvestaji[l].nalozi[q].tipoviRada.indexOf(radovi[k])>=0){
+														nalozi++;
+														ukupnoNaloga++;
+														novcaniUcinak = novcaniUcinak + parseFloat(majstori[j].izvestaji[l].nalozi[q].ucinak.replace(/,/g, "."));
+														for(var w=0;w<ukupnoPoTipu.length;w++){
+															if(ukupnoPoTipu[w].naziv==radovi[k]){
+																ukupnoPoTipu[w].nalozi++;
+																ukupnoPoTipu[w].novac = ukupnoPoTipu[w].novac+parseFloat(majstori[j].izvestaji[l].nalozi[q].ucinak.replace(/,/g, "."));
+															}
+														}
+													}
+												}
+												
+											}
+											td.innerHTML = nalozi;
+											tr.appendChild(td);
+										}
+
+										var td = document.createElement("TD");
+										td.innerHTML = ukupnoNaloga;
+										tr.appendChild(td)
+
+										var td = document.createElement("TD");
+										td.innerHTML = eval(novcaniUcinak/500).toFixed(1);
+										tr.appendChild(td)
+
+										var td = document.createElement("TD");
+										td.innerHTML = eval(kazne/500).toFixed(1);
+										tr.appendChild(td)
+
+										var td = document.createElement("TD");
+										td.innerHTML = eval(nagrade/500).toFixed(1);
+										tr.appendChild(td)
+									table.appendChild(tr);
+								}
+							}
+							//ukupno
+							var tr = document.createElement("TR");
+								var td = document.createElement("TD");
+								td.innerHTML = "УКУПНО";
+								tr.appendChild(td);
+								for(var j=0;j<ukupnoPoTipu.length;j++){
+									var td = document.createElement("TD");
+									td.innerHTML = ukupnoPoTipu[j].nalozi;
+									tr.appendChild(td);
+								}
+
+								var td = document.createElement("TD");
+								var ukupnoNaloga = 0;
+								for(var j=0;j<ukupnoPoTipu.length;j++){
+									ukupnoNaloga = ukupnoNaloga + ukupnoPoTipu[j].nalozi;
+								}
+								td.innerHTML = ukupnoNaloga;
+								tr.appendChild(td)
+
+								var td = document.createElement("TD");
+								var ukupnoNovca = 0;
+								for(var j=0;j<ukupnoPoTipu.length;j++){
+									ukupnoNovca = ukupnoNovca + parseFloat(ukupnoPoTipu[j].novac);
+								}
+								td.innerHTML = eval(ukupnoNovca/500).toFixed(1);
+								tr.appendChild(td)
+
+								var td = document.createElement("TD");
+								td.innerHTML = eval(ukupnoKazni/500).toFixed(1);
+								tr.appendChild(td)
+
+								var td = document.createElement("TD");
+								td.innerHTML = eval(ukupnoNagrada/500).toFixed(1);
+								tr.appendChild(td)
+							table.appendChild(tr);
+						tableWrap.appendChild(table);
+					wrap.appendChild(tableWrap);
+
+
+
+				document.getElementById("regioni").appendChild(wrap);
+				
+
+				
+			}
+
+
+			/*var table = document.createElement("TABLE");
 				var tr = document.createElement("TR");
 					var th = document.createElement("TH");
 					th.innerHTML = "Мајстор";
@@ -165,7 +335,7 @@
 					td.innerHTML = ukupno;
 					tr.appendChild(td);
 				table.appendChild(tr);
-			document.getElementById("nalozi").appendChild(table);
+			document.getElementById("nalozi").appendChild(table);*/
 
 			function exportElementAsImage(elem) {
 			    const element = elem;

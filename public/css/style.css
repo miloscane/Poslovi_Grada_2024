@@ -6794,7 +6794,7 @@ input[type=number] {
     z-index:200;
 }
 
-.overviewForm .naloziWrap .absoluteLogo{ 
+.overviewForm  .absoluteLogo{ 
     position:absolute;
     top:50%;
     left:50%;
@@ -7224,6 +7224,33 @@ input[type=number] {
 
 .aiSuggestion:hover .tooltip {
   display: block;
+}
+
+.regioni{
+    position:relative;
+    z-index:300;
+}
+
+.regioni .title{
+    width:100%;
+    background-color:rgb(32,51,100);
+    color:rgb(255,255,255);
+    font-size:20px;
+    font-weight:600;
+    padding:10px 0px;
+    text-align: center;
+    position:relative;
+    z-index:300;
+}
+
+.regioni .wrapper{
+    position: relative;
+    z-index:300;
+}
+
+
+.regioni table{
+    margin:0 auto;
 }
 
 @media screen and (max-width: 1100px) {
