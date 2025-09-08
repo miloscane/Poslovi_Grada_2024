@@ -6318,12 +6318,51 @@ server.get('/administracija/stanjePoOpstinama',async (req,res)=>{
 				for(var i=0;i<nalozi2024.length;i++){
 					nalozi.push(nalozi2024[i])
 				};
+				
+				res.render("administracija/stanjePoOpstinama",{
+					pageTitle: "Стање налога по општинама",
+					user: req.session.user,
+					nalozi: nalozi 
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/administracija/stanjePoOpstinama2',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var nalozi = await naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom","Storniran"]}}).toArray();
+				var brojeviNaloga = [];
 				for(var i=0;i<nalozi.length;i++){
-					if(nalozi[i].datum.datum=="05.09.2025"){
-						nalozi.splice(i,1)
+					brojeviNaloga.push(nalozi[i].broj)
+				}
+				var izvestaji = await izvestajiDB.find({nalog:{$in:brojeviNaloga}}).toArray();
+				for(var i=0;i<nalozi.length;i++){
+					nalozi[i].izvestaji = [];
+					for(var j=0;j<izvestaji.length;j++){
+						if(nalozi[i].broj==izvestaji[j].nalog){
+							nalozi[i].izvestaji.push(izvestaji[j])
+						}
 					}
 				}
-				res.render("administracija/stanjePoOpstinama",{
+				res.render("administracija/stanjePoOpstinama2",{
 					pageTitle: "Стање налога по општинама",
 					user: req.session.user,
 					nalozi: nalozi 

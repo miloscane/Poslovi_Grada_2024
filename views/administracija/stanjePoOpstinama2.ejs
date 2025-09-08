@@ -1,0 +1,21 @@
+<%- include ("partials/header") -%>
+<script>
+	var nalozi = <%-JSON.stringify(nalozi)%>;
+	console.log(nalozi)
+</script>
+<div class="pageWidth stanjeNalogaPoOpstinama2">
+	<div id="tables-wrap"></div>
+	<script>
+		for(var i=0;i<radneJedinice.length;i++){
+			var wrap = document.createElement("DIV");
+			wrap.setAttribute("class","wrap");
+			wrap.setAttribute("id",radneJedinice[i]);
+				var title = document.createElement("DIV");
+				title.setAttribute("class","title");
+				title.innerHTML = radneJedinice[i];
+				wrap.appendChild(title);
+			document.getElementById("tables-wrap").appendChild(wrap);
+		}
+	</script>
+</div>
+<%- include ("partials/footer") -%>
