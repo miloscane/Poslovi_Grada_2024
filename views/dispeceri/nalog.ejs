@@ -229,7 +229,7 @@
 						<div class="title">Датум налога</div>
 						<div class="text"><span id="datum-naloga"></span></div>
 						<script>
-							document.getElementById("datum-naloga").innerHTML = nalog.datum.datum;
+							document.getElementById("datum-naloga").innerHTML = nalog.datum.datum+"<br>"+nalog.digitalizacija.stambeno.datum+"<br>"++nalog.digitalizacija.stambeno.vreme;
 						</script>
 					</div>
 				</div>

@@ -64,6 +64,8 @@
 			</div>
 		</div>
 		<script>
+			var bodPlate = 500;
+			var bodNaloga = 2000;
 			for(var i=0;i<podelaOpstina.length;i++){
 				var wrap = document.createElement("DIV");
 				wrap.setAttribute("class","wrapper");
@@ -109,15 +111,25 @@
 								json.naziv = radovi[j];
 								json.nalozi = 0;
 								json.novac = 0;
-								console.log(json)
 								ukupnoPoTipu.push(json);
 							}
-							console.log("poTipu")
-							console.log(ukupnoPoTipu)
 							var ukupnoKazni = 0;
 							var ukupnoNagrada = 0;
 
 							for(var j=0;j<majstori.length;j++){
+								var kazna = 0;
+								var nagrada = 0;
+								if(majstori[j].izvestaji.length>0){
+									kazna = !isNaN(parseFloat(majstori[j].izvestaji[0].kazna.replace(/,/g, "."))) ? parseFloat(majstori[j].izvestaji[0].kazna.replace(/,/g, ".")) : 0
+									nagrada = !isNaN(parseFloat(majstori[j].izvestaji[0].nagrada.replace(/,/g, "."))) ? parseFloat(majstori[j].izvestaji[0].nagrada.replace(/,/g, ".")) : 0	
+								}
+								
+								kazne = kazna;
+								ukupnoKazni = ukupnoKazni + kazna;
+								nagrade = nagrada
+								ukupnoNagrada = ukupnoNagrada + nagrada;
+
+
 								if(majstori[j].region==podelaOpstina[i].naziv){
 									var tr = document.createElement("TR");
 										var td = document.createElement("TD");
@@ -163,15 +175,15 @@
 										tr.appendChild(td)
 
 										var td = document.createElement("TD");
-										td.innerHTML = eval(novcaniUcinak/500).toFixed(1);
+										//td.innerHTML = eval(0.4*novcaniUcinak/bodNaloga).toFixed(1);
 										tr.appendChild(td)
 
 										var td = document.createElement("TD");
-										td.innerHTML = eval(kazne/500).toFixed(1);
+										//td.innerHTML = eval(kazne/bodPlate).toFixed(1);
 										tr.appendChild(td)
 
 										var td = document.createElement("TD");
-										td.innerHTML = eval(nagrade/500).toFixed(1);
+										//td.innerHTML = eval(nagrade/bodPlate).toFixed(1);
 										tr.appendChild(td)
 									table.appendChild(tr);
 								}
@@ -200,15 +212,15 @@
 								for(var j=0;j<ukupnoPoTipu.length;j++){
 									ukupnoNovca = ukupnoNovca + parseFloat(ukupnoPoTipu[j].novac);
 								}
-								td.innerHTML = eval(ukupnoNovca/500).toFixed(1);
+								//td.innerHTML = eval(0.4*ukupnoNovca/bodNaloga).toFixed(1);
 								tr.appendChild(td)
 
 								var td = document.createElement("TD");
-								td.innerHTML = eval(ukupnoKazni/500).toFixed(1);
+								//td.innerHTML = eval(ukupnoKazni/bodPlate).toFixed(1);
 								tr.appendChild(td)
 
 								var td = document.createElement("TD");
-								td.innerHTML = eval(ukupnoNagrada/500).toFixed(1);
+								//td.innerHTML = eval(ukupnoNagrada/bodPlate).toFixed(1);
 								tr.appendChild(td)
 							table.appendChild(tr);
 						tableWrap.appendChild(table);
