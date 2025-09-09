@@ -1,0 +1,431 @@
+<%- include ("partials/header") -%>
+	<script>
+		var izvestaji = <%-JSON.stringify(izvestaji)%>;
+		var majstori = <%-JSON.stringify(majstori)%>;
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+		var datum = "<%=datum%>";
+		var mesec = datum.split(".")[0];
+		var godina = datum.split(".")[1];
+	</script>
+	<div class="majstorMesec">
+		<div class="selectMesec">
+			<select id="odabir-majstora" oninput="majstorPick()"></select>
+			<script>
+				for(var i=0;i<majstori.length;i++){
+					var option = document.createElement("OPTION");
+					option.setAttribute("value",majstori[i].uniqueId);
+					option.innerHTML = majstori[i].ime;
+					document.getElementById("odabir-majstora").appendChild(option)
+				}
+
+				var bodPlate = 500;
+				var bodNaloga = 2000;
+				var maxPlata = 350000;
+				var maxValue = 350000/bodPlate;
+				var tickIncrement = 50000/bodPlate;
+				var steps = maxValue / tickIncrement;
+				var dayElements;
+
+				function majstorPick(){
+					var majstorId = document.getElementById("odabir-majstora").value;
+					document.getElementById("ticks").innerHTML = "";
+					for (var i = 0; i <= steps; i++) {
+						var percent = i / steps;
+						var mainTick = document.createElement("DIV");
+						mainTick.className = "mainTick";
+						mainTick.style.left = percent * 100 + "%";
+							var relative = document.createElement("DIV");
+							relative.style.cssText = "position:relative;width:100%;height:100%";
+
+								var number = document.createElement("DIV");
+								number.className = "number";
+								number.innerHTML = (maxValue * percent).toFixed(0);
+								relative.appendChild(number);
+							mainTick.appendChild(relative);
+						document.getElementById("ticks").appendChild(mainTick);
+
+						if (i < steps) {
+							var nextPercent = (i + 1) / steps;
+							for (var j = 0; j < 3; j++) {
+								var subPercent = percent + (j + 1) / 4 * (nextPercent - percent);
+								var subTick = document.createElement("DIV");
+								subTick.className = "subTick";
+								subTick.style.left = subPercent * 100 + "%";
+								document.getElementById("ticks").appendChild(subTick);
+							}
+						}	
+					} 
+					var ostvarenUcinak = 0;
+					for(var i=0;i<izvestaji.length;i++){
+						if(izvestaji[i].majstor==majstorId){
+							for(var j=0;j<izvestaji[i].nalozi.length;j++){
+								var vrednost = !isNaN(parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", "."))) ? parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", ".")) : 0;
+								ostvarenUcinak = ostvarenUcinak + vrednost;
+							}
+						}
+						
+					}
+					//ostvarenUcinak = 2000000;
+					var ostvareniBodovi = ostvarenUcinak/(bodNaloga);
+					ostvareniBodovi = ostvareniBodovi*0.4
+					var nagrade = 0;
+					var kazne = 0;
+					var radniDani = 0;
+					var nalozi = 0;
+					for(var i=0;i<izvestaji.length;i++){
+						if(izvestaji[i].majstor==majstorId){
+							if(izvestaji[i].odsustvo=="Присутан"){
+								radniDani++;
+							}
+							nalozi = nalozi + izvestaji[i].nalozi.length;
+							if(!isNaN(parseFloat(izvestaji[i].nagrada))){
+								nagrade = kazne + parseFloat(izvestaji[i].nagrada);
+							}
+							if(!isNaN(parseFloat(izvestaji[i].kazna))){
+								kazne = kazne + parseFloat(izvestaji[i].kazna);
+							}
+						}
+						
+					}
+					ostvareniBodovi = ostvareniBodovi + nagrade/bodPlate - kazne/bodPlate;
+
+					var percent = ostvareniBodovi/(maxValue) *100;
+					document.getElementById("plata-fill").style.width = percent+"%";
+					document.getElementById("plata-tick").style.left = percent+"%";
+					document.getElementById("plata-value").innerHTML = ostvareniBodovi.toFixed(0);
+
+					document.getElementById("radni-dani").innerHTML = radniDani;
+					document.getElementById("nalozi").innerHTML = nalozi;
+					document.getElementById("nagrade").innerHTML = eval(nagrade/bodPlate).toFixed(0) + " boda";
+					document.getElementById("kazne").innerHTML = eval(kazne/bodPlate).toFixed(0) + " boda";
+
+					document.getElementById("daily").innerHTML = "";
+
+					var daysInMonth = new Date(godina, mesec, 0).getDate();
+					for(var i=1;i<=daysInMonth;i++){
+						var date = new Date(godina, mesec - 1, i);
+						var day = document.createElement("DIV");
+						day.setAttribute("class","day");
+						day.setAttribute("data-date",date.getTime());
+						day.setAttribute("data-day",date.getDate());
+						if(i==1){
+							day.setAttribute("style","margin-left:0%");
+						}
+							var datum = document.createElement("DIV");
+							datum.setAttribute("class","datum");
+							datum.innerHTML = getDateAsStringForDisplay(date);
+							day.appendChild(datum);
+
+							var vremeDolaska = 0;
+							var vremeOdlaska = 0;
+							var izvestaj = {};
+							for(var j=0;j<izvestaji.length;j++){
+								if(izvestaji[j].majstor==majstorId){
+									if(istiDatum(new Date(izvestaji[j].date),date)){
+										izvestaj = izvestaji[j];
+									}
+								}
+								
+							}
+
+							if(izvestaj.odsustvo=="Присутан"){
+								vremeDolaska = izvestaj.vremeDolaska;
+								vremeOdlaska = izvestaj.vremeOdlaska;
+							}
+							
+							var vremena = document.createElement("DIV");
+							vremena.setAttribute("class","vremena boxesWrap");
+							if(vremeDolaska!=0 && vremeOdlaska!=0){
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","inline box");
+									var title = document.createElement("DIV");
+									title.setAttribute("class","title");
+									title.innerHTML = "Долазак";
+									inline.appendChild(title);
+
+									var vreme = document.createElement("DIV");
+									vreme.setAttribute("class","vreme value");
+									vreme.innerHTML = vremeDolaska;
+									inline.appendChild(vreme);
+								vremena.appendChild(inline);
+
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","inline box");
+									var title = document.createElement("DIV");
+									title.setAttribute("class","title");
+									title.innerHTML = "Одлазак";
+									inline.appendChild(title);
+
+									var vreme = document.createElement("DIV");
+									vreme.setAttribute("class","vreme value");
+									vreme.innerHTML = vremeOdlaska;
+									inline.appendChild(vreme);
+								vremena.appendChild(inline);
+
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","inline box");
+									var title = document.createElement("DIV");
+									title.setAttribute("class","title");
+									title.innerHTML = "Излазак из магацина";
+									inline.appendChild(title);
+
+									var vreme = document.createElement("DIV");
+									vreme.setAttribute("class","vreme value");
+									vreme.innerHTML = izvestaj.izlazak;
+									inline.appendChild(vreme);
+								vremena.appendChild(inline);
+
+								var inline = document.createElement("DIV");
+								inline.setAttribute("class","inline box");
+									var title = document.createElement("DIV");
+									title.setAttribute("class","title");
+									title.innerHTML = "Долазак на први налог";
+									inline.appendChild(title);
+
+									var vreme = document.createElement("DIV");
+									vreme.setAttribute("class","vreme value");
+									vreme.innerHTML = izvestaj.prviNalog;
+									inline.appendChild(vreme);
+								vremena.appendChild(inline);
+							}else{
+								var odsutanNalov = document.createElement("DIV");
+								odsutanNalov.setAttribute("class","odsutanNaslov");
+									var title = document.createElement("DIV");
+									title.setAttribute("class","title");
+									title.innerHTML = izvestaj.odsustvo ? izvestaj.odsustvo : "Нема информација";
+									odsutanNalov.appendChild(title);
+								vremena.appendChild(odsutanNalov);
+							}
+							day.appendChild(vremena);
+
+							
+							var boxesWrap = document.createElement("DIV");
+							boxesWrap.setAttribute("class","boxesWrap");
+								if(izvestaj.nagrada){
+									var box = document.createElement("DIV");
+									box.setAttribute("class","box");
+									box.setAttribute("style","background-color:#008000")
+										var title = document.createElement("DIV");
+										title.setAttribute("class","title");
+										title.innerHTML = "Стимулација";
+										box.appendChild(title);
+
+										var value = document.createElement("DIV");
+										value.setAttribute("class","value");
+										var bodovi = eval(parseFloat(izvestaj.nagrada)/bodPlate).toFixed(0)=="1" ? " бод" : " бода";
+										value.innerHTML = izvestaj.nagrada ? eval(parseFloat(izvestaj.nagrada)/bodPlate).toFixed(0)+bodovi : bodovi;
+										box.appendChild(value);
+
+										if(izvestaj.nagrada){
+											var value = document.createElement("DIV");
+											value.setAttribute("class","note");
+											value.innerHTML = izvestaj.nagradaRazlog;
+											box.appendChild(value);
+										}
+										
+									boxesWrap.appendChild(box);
+								}
+								
+
+								if(izvestaj.kazna){
+									var box = document.createElement("DIV");
+									box.setAttribute("class","box");
+									box.setAttribute("style","background-color:rgb(180,0,0)")
+										var title = document.createElement("DIV");
+										title.setAttribute("class","title");
+										title.innerHTML = "Дестимулација";
+										box.appendChild(title);
+
+										var value = document.createElement("DIV");
+										value.setAttribute("class","value");
+										var bodovi = eval(parseFloat(izvestaj.kazna)/bodPlate).toFixed(0)=="1" ? " бод" : " бода";
+										value.innerHTML = izvestaj.kazna ? eval(parseFloat(izvestaj.kazna)/bodPlate).toFixed(1)+bodovi : bodovi;
+										box.appendChild(value);
+
+										
+										var value = document.createElement("DIV");
+										value.setAttribute("class","note");
+										value.innerHTML = izvestaj.kaznaRazlog;
+										box.appendChild(value);
+
+									boxesWrap.appendChild(box);
+								}
+								
+							day.appendChild(boxesWrap);
+
+							
+
+							var title = document.createElement("DIV");
+							title.setAttribute("class","subTitle");
+							title.innerHTML = "Ваши налози:";
+							day.appendChild(title);
+
+							var naloziElem = document.createElement("DIV");
+							naloziElem.setAttribute("class","nalozi");
+								var imaNaloga = false;
+								var counter = 1;
+								console.log(izvestaj)
+								if(izvestaj.nalozi){
+									for(var j=0;j<izvestaj.nalozi.length;j++){
+										var nalogElem = document.createElement("DIV");
+										nalogElem.setAttribute("class","nalog");
+											counter++;
+											imaNaloga = true;
+											var brojNaloga = document.createElement("DIV");
+											brojNaloga.setAttribute("class","brojNaloga");
+											brojNaloga.innerHTML = izvestaj.nalozi[j].broj;
+											nalogElem.appendChild(brojNaloga);
+
+											var adresa = document.createElement("DIV");
+											adresa.setAttribute("class","adresa");
+											adresa.innerHTML = "<div class=\"radnaJedinica\">"+izvestaj.nalozi[j].radnaJedinica+"</div><div class=\"adresaNaloga\">"+izvestaj.nalozi[j].adresa+"</div>";
+											nalogElem.appendChild(adresa);
+
+											if(izvestaj.nalozi[j].tipoviRada){
+												var tipNaloga = document.createElement("DIV");
+												tipNaloga.setAttribute("class","tip");
+												tipNaloga.innerHTML = "<b>Tip naloga:</b> ";
+												for(var k=0;k<izvestaj.nalozi[j].tipoviRada.length;k++){
+													tipNaloga.innerHTML += izvestaj.nalozi[j].tipoviRada[k]+",";
+												}
+												tipNaloga.innerHTML = tipNaloga.innerHTML.toString().slice(0, -1);
+												nalogElem.appendChild(tipNaloga);	
+											}
+
+											if(izvestaj.nalozi[j].komentarKontrole){
+												var tipNaloga = document.createElement("DIV");
+												tipNaloga.setAttribute("class","komentar");
+												tipNaloga.innerHTML = "<b>Komentar kontrole:</b> ";
+												tipNaloga.innerHTML += izvestaj.nalozi[j].komentarKontrole;
+												nalogElem.appendChild(tipNaloga);	
+											}
+
+
+											if(!izvestaj.nalozi[j].ucinak){
+												var card = document.createElement("DIV");
+												card.setAttribute("class","card");
+												nalogElem.appendChild(card)
+											}else{
+												var card = document.createElement("DIV");
+												card.setAttribute("class","cardOpened");
+												var value = parseFloat(izvestaj.nalozi[j].ucinak.replace(",", "."));
+												value = value * 0.4/bodNaloga;
+
+												card.innerHTML = value.toFixed(1)
+												nalogElem.appendChild(card)
+											}
+											
+
+										naloziElem.appendChild(nalogElem);
+									}
+								}
+
+								if(!imaNaloga){
+									naloziElem.innerHTML = "<div style=\"padding-left:10px;font-size:12px;\">Немате додељених налога за овај датум.</span>";
+								}
+							day.appendChild(naloziElem);
+
+						document.getElementById("daily").appendChild(day);
+					}
+
+					dayElements = document.getElementById("daily").getElementsByClassName("day");
+
+					if(mesec==Number(new Date().getMonth()+1)){
+						toDay(new Date().getDate()-1)
+					}else{
+						toDay(0)
+						console.log("Nije trenutni mesec");
+					}
+				}
+			</script>
+		</div>
+		<div class="pageWidth majstorMesec">
+			<div class="plata">
+				<div class="plotWrap">
+					<div class="ticksWrap" id="ticks"></div>
+					<div class="plataFinal">
+						<div class="tick" id="plata-tick">
+							<div style="position:relative;width:100%;height:100%">
+								<div class="value" id="plata-value"></div>
+							</div>
+						</div>
+					</div>
+					<div class="fill" id="plata-fill"></div>
+				</div>
+				
+			</div>
+			<div class="boxesWrap" style="background-color:rgb(240,240,240);padding:20px">
+				<div class="box">
+					<div class="title">Радни дани:</div>
+					<div class="value" id="radni-dani"></div>
+				</div>
+				<div class="box">
+					<div class="title">Налози:</div>
+					<div class="value" id="nalozi"></div>
+				</div>
+				<div class="box">
+					<div class="title">Стимулације:</div>
+					<div class="value" id="nagrade"></div>
+				</div>
+				<div class="box">
+					<div class="title">Дестимулације:</div>
+					<div class="value" id="kazne"></div>
+				</div>
+			</div>
+			<div class="swipeable">
+				<div class="arrow arrowLeft" onclick="moveDay(-1)"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/chevronLeft.svg"></div>
+				<div class="daily" id="daily"></div>
+				<div class="arrow arrowRight" onclick="moveDay(1)"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/chevronRight.svg"></div>
+			</div>
+			<script>
+				var swipeArea = document.getElementById("daily");
+				detectSwipe(swipeArea, (direction) => {
+				    if (direction === "left") {
+				        // Handle left swipe
+				        // na levo
+				    	moveDay(1);
+				    } else if (direction === "right") {
+				        // Handle right swipe
+				        // na desno (leva na desno)
+				    	moveDay(-1);
+				    }
+				});
+
+
+				function moveDay(direction){
+					//get current active day
+					var currentActive = document.getElementById("daily").getElementsByClassName("day")[0].style.marginLeft;
+					currentActive = Math.abs(Number(currentActive.split("%")[0]))/100;
+					var newActive = currentActive+direction;
+					if(newActive<0){
+						//first day
+						//console.log("FIRST DAY")
+					}else if(newActive>(dayElements.length-1)){
+						//last day
+						console.log("LAST DAY")
+					}else{
+						//-1 ide sa leva na desno, znaci skrola se unazad sa danima
+						//1 ide sa desna na levo, znaci skrola se unapred sa danima
+						//console.log(newActive)
+						document.getElementById("daily").getElementsByClassName("day")[0].style.marginLeft = "-"+eval(newActive*100)+"%";
+					}
+				}
+
+				//majstorPick(majstori[0].uniqueId);
+
+				function toDay(dayNumber){
+					//0 is first
+					document.getElementById("daily").getElementsByClassName("day")[0].style.marginLeft = "-"+eval(dayNumber*100)+"%";
+				}
+
+				console.log(mesec)
+				
+
+
+			</script>
+			<div class="box danas">
+				<div class="title">Дана</div>
+			</div>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

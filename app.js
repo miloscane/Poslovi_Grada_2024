@@ -1260,7 +1260,7 @@ http.listen(process.env.PORT, async function(){
 		}
 
 		var naloziToExport = [];
-		var month = 7;
+		var month = 8;
 		for(var i=0;i<nalozi.length;i++){
 			if(nalozi[i].faktura.broj){
 				if(nalozi[i].faktura.broj.length>3){
@@ -5091,86 +5091,44 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 });
 
 server.get('/kontrola/radnici',async (req,res)=>{
-	if(req.session.user){
-		if(Number(req.session.user.role)==25){
-			var radnici = [];
-			majstoriDB.find({odgovornoLice:req.session.user.email}).toArray()
-			.then((majstori)=>{
-				for(var i=0;i<majstori.length;i++){
-					radnici.push(majstori[i])
-				}
-				pomocniciDB.find({odgovornoLice:req.session.user.email}).toArray()
-				.then((pomocnici)=>{
-					for(var i=0;i<pomocnici.length;i++){
-						radnici.push(pomocnici[i])
-					}
-					usersDB.find({odgovornoLice:req.session.user.email}).toArray()
-					.then((users)=>{
-						for(var i=0;i<users.length;i++){
-							radnici.push(users[i]);
-						}
-						var ids = [];
-						for(var i=0;i<radnici.length;i++){
-							if(radnici[i].uniqueId){
-								ids.push(radnici[i].uniqueId)
-							}else{
-								ids.push(radnici[i].email)
-							}
-						}
-						checkInMajstoraDB.find({uniqueId:{$in:ids},month:{$in:[eval(new Date().getMonth()+1).toString().padStart(2,"0"),eval(new Date().getMonth()+1)]},date:{$in:[new Date().getDate().toString().padStart(2,"0"),new Date().getDate()]},year:new Date().getFullYear()}).toArray()
-						.then((checkIns)=>{
-							res.render("kontrola/radnici",{
-								pageTitle: "Моји радници",
-								user: req.session.user,
-								radnici: radnici,
-								checkIns: checkIns
-							});
-						})
-						.catch((error)=>{
-							logError(error)
-							res.render("message",{
-								pageTitle: "Грешка",
-								user: req.session.user,
-								message: "<div class=\"text\">Грешка у бази података 2453.</div>"
-							});
-						})
-						
-					})
-					.catch((error)=>{
-						logError(error)
-						res.render("message",{
-							pageTitle: "Грешка",
-							user: req.session.user,
-							message: "<div class=\"text\">Грешка у бази података 2453.</div>"
-						});
-					})
-				})
-				.catch((error)=>{
-					logError(error)
-					res.render("message",{
-						pageTitle: "Грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Грешка у бази података 2453.</div>"
-					});
-				})
-			})
-			.catch((error)=>{
-				logError(error)
-				res.render("message",{
-					pageTitle: "Грешка",
-					user: req.session.user,
-					message: "<div class=\"text\">Грешка у бази података 2453.</div>"
-				});
-			})
-		}else{
-			res.render("message",{
-				pageTitle: "Грешка",
-				user: req.session.user,
-				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
-			});
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+	try{
+		var today = getDateAsStringForDisplay(new Date());
+		var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
+		var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:today.split(".")[2]+"-"+today.split(".")[1]}}).toArray();
+		var brojeviNaloga = [];
+		for(var i=0;i<izvestaji.length;i++){
+			for(var j=0;j<izvestaji[i].nalozi.length;j++){
+				brojeviNaloga.push(izvestaji[i].nalozi[j].broj)
+			}
 		}
-	}else{
-		res.redirect("/login?url="+encodeURIComponent(req.url));
+		var nalozi = await naloziDB.find({broj:{$in:brojeviNaloga}}).toArray();
+		for(var i=0;i<izvestaji.length;i++){
+			for(var j=0;j<izvestaji[i].nalozi.length;j++){
+				izvestaji[i].nalozi[j].iznosNaloga = 0;
+				for(var k=0;k<nalozi.length;k++){
+					if(nalozi[k].broj==izvestaji[i].nalozi[j].broj){
+						izvestaji[i].nalozi[j].iznosNaloga = parseFloat(nalozi[k].ukupanIznos)
+					}
+				}
+			}
+		}
+		res.render("kontrola/majstorMesec",{
+			user: req.session.user,
+			pageTitle: "Pregled za "+today.split(".")[1]+"."+today.split(".")[2],
+			datum: today.split(".")[1]+"."+today.split(".")[2],
+			majstori: majstori,
+			izvestaji: izvestaji
+		})
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Грешка у бази података 5104.</div>"
+		});
 	}
 });
 
