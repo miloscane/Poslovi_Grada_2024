@@ -2,6 +2,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 	var nalozi = <%-JSON.stringify(nalozi)%>;
+	var podelaOpstina = <%-JSON.stringify(podelaOpstina)%>;
 	console.log(nalozi)
 	nalozi.sort((a, b) => a.datum.datetime - b.datum.datetime);
 	function exportElementAsImage(elem) {
@@ -33,8 +34,10 @@
 	}
 </script>
 <div class="pageWidth stanjeNalogaPoOpstinama2">
+	<div id="regioni" style="padding-bottom:50px;margin-bottom:50px;border-bottom:10px solid rgb(0,0,0)"></div>
 	<div id="tables-wrap"></div>
 	<script>
+		var totalTotals = [];
 		for(var i=0;i<radneJedinice.length;i++){
 			var radnaJedinica = radneJedinice[i]
 			var wrap = document.createElement("DIV");
@@ -72,7 +75,7 @@
 				totals.Betonaze= 0; // Asfal Bekaton
 				totals.Kamera = 0;
 				totals.Ciscenje = 0;
-				totals.Konstatacija = 0;
+				totals.Nezapoceto = 0;
 				totals.Urgencije = 0;
 
 				var boxesWrap = document.createElement("DIV");
@@ -145,7 +148,7 @@
 									}else if(nalog.statusNaloga=="Vraćen"){
 										totals.Vraceni++;
 									}else{
-										totals.Konstatacija++;
+										totals.Nezapoceto++;
 									}
 									tr.appendChild(td);
 
@@ -272,7 +275,77 @@
 				//console.log(radnaJedinica.replace(/\s+/g, "")+"-"+Object.keys(totals)[j])
 				document.getElementById(radnaJedinica.replace(/\s+/g, "")+"-"+Object.keys(totals)[j]).innerHTML = totals[Object.keys(totals)[j]]
 			}
+
+			var shapedTotals = {
+				radnaJedinica: radnaJedinica,
+				totals: totals
+			}
+			totalTotals.push(shapedTotals)
 		}
+
+		console.log(totalTotals)
+
+		for (var i = 0; i < podelaOpstina.length; i++) {
+			var totals = {
+				Zamene: 0,
+				Odgusenja: 0,
+				Kopanja: 0,
+				Crpljenje: 0,
+				Dezinfekcije: 0,
+				Vraceni: 0,
+				Wome: 0,
+				Finalizacije: 0,
+				Betonaze: 0, // Asfal Bekaton
+				Kamera: 0,
+				Ciscenje: 0,
+				Nezapoceto: 0,
+				Urgencije: 0
+			};
+
+			for (var j = 0; j < totalTotals.length; j++) {
+				if (podelaOpstina[i].radneJedinice.indexOf(totalTotals[j].radnaJedinica) >= 0) {
+					var keys = Object.keys(totalTotals[j].totals);
+					for (var k = 0; k < keys.length; k++) {
+						var key = keys[k];
+						totals[key] = (totals[key] || 0) + (totalTotals[j].totals[key] || 0);
+					}
+				}
+			}
+
+			var wrap = document.createElement("DIV");
+			wrap.setAttribute("class","wrap");
+				var title = document.createElement("DIV")
+				title.setAttribute("class","title");
+				title.innerHTML = podelaOpstina[i].naziv;
+				wrap.appendChild(title);
+
+				var boxesWrap = document.createElement("DIV");
+				boxesWrap.setAttribute("class","boxesWrap");
+					for(var j=0;j<Object.keys(totals).length;j++){
+						var box = document.createElement("DIV");
+						box.setAttribute("class","box");
+							var title = document.createElement("DIV")
+							title.setAttribute("class","title");
+							title.innerHTML = Object.keys(totals)[j];
+							box.appendChild(title);
+
+							var value = document.createElement("DIV")
+							value.setAttribute("class","value");
+							if(Object.keys(totals)[j].includes("Urgen")){
+								box.classList.add("urgencija")
+							}
+							value.innerHTML = totals[Object.keys(totals)[j]];
+							box.appendChild(value);
+
+							
+						boxesWrap.appendChild(box);
+					}
+				wrap.appendChild(boxesWrap);
+			document.getElementById("regioni").appendChild(wrap);
+		}
+
+		
+
 	</script>
 </div>
 <%- include ("partials/footer") -%>

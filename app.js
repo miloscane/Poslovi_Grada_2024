@@ -6365,6 +6365,7 @@ server.get('/administracija/stanjePoOpstinama2',async (req,res)=>{
 				res.render("administracija/stanjePoOpstinama2",{
 					pageTitle: "Стање налога по општинама 2",
 					user: req.session.user,
+					podelaOpstina: podelaOpstina,
 					nalozi: nalozi 
 				})
 			}catch(err){
