@@ -1,24 +1,25 @@
 <%- include ("partials/header") -%>
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
+		console.log("AAAA")
 	</script>
 	<div class="pageWidth stanjeNalogaPoOpstinama">
-		<h1>УКУПНО:</h1>
-		<div class="stats" data-id="ukupno"></div>
-		<h1>ИСТОК:</h1>
-		<div class="stats" data-id="istok"></div>
-		<h1>ЗАПАД:</h1>
-		<div class="stats" data-id="zapad"></div>
+		<div class="wrap">
+			<h1>УКУПНО:</h1>
+			<div class="stats" data-id="ukupno"></div>	
+		</div>
+		
 		
 		<script>
 			function generateStatElems(elem){
 				var wrap = document.createElement("DIV");
+				wrap.setAttribute("class","wrapper")
 				for(var i=0;i<statusi.length;i++){
 					var inlines = document.createElement("DIV");
 					inlines.setAttribute("class","inlines");
 						var inline = document.createElement("DIV");
 						inline.setAttribute("class","inline");
-						inline.innerHTML = statusi[i];
+						inline.innerHTML = statusi[i].split(".")[1];
 						inlines.appendChild(inline);
 						
 						var inline = document.createElement("DIV");
@@ -34,16 +35,66 @@
 
 
 			for(var i=0;i<radneJedinice.length;i++){
-				var h1 = document.createElement("H1");
-				h1.innerHTML = radneJedinice[i]+": ";
-				document.getElementsByClassName("stanjeNalogaPoOpstinama")[0].appendChild(h1);
+				var wrapper = document.createElement("DIV");
+				wrapper.setAttribute("class","wrap")
+					var h1 = document.createElement("H1");
+					h1.innerHTML = radneJedinice[i]+": ";
+					wrapper.appendChild(h1);
 
-				var stats = document.createElement("DIV");
-				stats.setAttribute("class","stats");
-				stats.setAttribute("data-id",radneJedinice[i]);
-				document.getElementsByClassName("stanjeNalogaPoOpstinama")[0].appendChild(stats);
+					var stats = document.createElement("DIV");
+					stats.setAttribute("class","stats");
+					stats.setAttribute("data-id",radneJedinice[i]);
+					wrapper.appendChild(stats);
+				document.getElementsByClassName("stanjeNalogaPoOpstinama")[0].appendChild(wrapper);
+				
+
+				
 			}
-			var statusi = ["Primljen","Zakazan","Radovi u toku","Potrebna WOMA","Zagušenje","Stambeno koci","Stanari koče","Zamena","Crpljenje","Dezinfekcija","Kopanje","Finalizacija","Betonaža","Asfalt","Bekaton","Zakazana finalizacija","Preventivno čišćenje","Završeno","Vraćen"];
+			//var statusi = ["Primljen","Zakazan","Radovi u toku","Potrebna WOMA","Zagušenje","Stambeno koci","Stanari koče","Zamena","Crpljenje","Dezinfekcija","Kopanje","Finalizacija","Betonaža","Asfalt","Bekaton","Zakazana finalizacija","Preventivno čišćenje","Završeno","Vraćen"];
+
+			var statusi = [];
+			for(var i=0;i<nalozi.length;i++){
+				if(nalozi[i].statusNaloga=="" || nalozi[i].statusNaloga=="Primljen" || nalozi[i].statusNaloga=="Radovi u toku" || nalozi[i].statusNaloga=="Dodeljen majstoru"){
+					nalozi[i].statusNaloga = "10.Nezapočeto";
+				}else if(nalozi[i].statusNaloga=="Završeno"){
+					nalozi[i].statusNaloga = "4.Završen";
+				}else if(nalozi[i].statusNaloga=="Vraćen"){
+					nalozi[i].statusNaloga = "5.Vraćen";
+				}else if(nalozi[i].statusNaloga=="Zamena"){
+					nalozi[i].statusNaloga = "20.Zamena";
+				}else if(nalozi[i].statusNaloga=="Zagušenje"){
+					nalozi[i].statusNaloga = "30.Odgušenje";
+				}else if(nalozi[i].statusNaloga=="Crpljenje"){
+					nalozi[i].statusNaloga = "40.Crpljenje";
+				}else if(nalozi[i].statusNaloga=="Masinsko kopanje"){
+					nalozi[i].statusNaloga = "50.Mašinsko kopanje";
+				}else if(nalozi[i].statusNaloga=="Rucno kopanje"){
+					nalozi[i].statusNaloga = "60.Ručno kopanje";
+				}else if(nalozi[i].statusNaloga=="Kopanje"){
+					nalozi[i].statusNaloga = "70.Kopanje";
+				}else if(nalozi[i].statusNaloga=="Finalizacija"){
+					nalozi[i].statusNaloga = "80.Finalizacija";
+				}else if(nalozi[i].statusNaloga=="Betonaža"){
+					nalozi[i].statusNaloga = "90.Betonaža";
+				}else if(nalozi[i].statusNaloga=="Asfalt"){
+					nalozi[i].statusNaloga = "100.Asfalt";
+				}else if(nalozi[i].statusNaloga=="Bekaton"){
+					nalozi[i].statusNaloga = "110.Bekaton";
+				}else if(nalozi[i].statusNaloga=="Potrebna WOMA"){
+					nalozi[i].statusNaloga = "120.Woma";
+				}else if(nalozi[i].statusNaloga=="Kombinovano"){
+					nalozi[i].statusNaloga = "130.Kombinovano";
+				}else{
+					nalozi[i].statusNaloga = "999."+nalozi[i].statusNaloga;
+				}
+
+
+				if(statusi.indexOf(nalozi[i].statusNaloga)<0){
+					statusi.push(nalozi[i].statusNaloga)
+				}
+			}
+
+			statusi.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
 			var statJson = [];
 			var statElems = document.getElementsByClassName("stats");
@@ -67,26 +118,6 @@
 						for(var k=0;k<statJson[j].stats.length;k++){
 							if(statJson[j].stats[k].status==nalozi[i].statusNaloga){
 								statJson[j].stats[k].nalozi++;
-							}
-						}
-					}
-
-					if(statJson[j].name=="istok"){
-						if(istok.indexOf(nalozi[i].radnaJedinica)>=0){
-							for(var k=0;k<statJson[j].stats.length;k++){
-								if(statJson[j].stats[k].status==nalozi[i].statusNaloga){
-									statJson[j].stats[k].nalozi++;
-								}
-							}
-						}
-					}
-
-					if(statJson[j].name=="zapad"){
-						if(zapad.indexOf(nalozi[i].radnaJedinica)>=0){
-							for(var k=0;k<statJson[j].stats.length;k++){
-								if(statJson[j].stats[k].status==nalozi[i].statusNaloga){
-									statJson[j].stats[k].nalozi++;
-								}
 							}
 						}
 					}
