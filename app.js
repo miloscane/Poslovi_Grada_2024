@@ -4247,6 +4247,10 @@ const saveStops = async () => {
 
 	}
 
+	
+
+	
+
 	var assetIds = [];
 	for(var i=0;i<vozila2.vozila.Data.length;i++){
 		//console.log(vozila2.vozila.Data[i])
@@ -11025,6 +11029,64 @@ server.get('/magacioner/prekojucerasnjiReversi', async (req, res)=> {
 				var majstori = await majstoriDB.find({}).toArray();
 				res.render("magacioner/rezultatPretrage",{
 					pageTitle: "Прекојучерашњи реверси",
+					user: req.session.user,
+					reversi: reversi,
+					majstori: majstori,
+					proizvodi: proizvodi,
+					nalozi: nalozi
+				});		
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3449.</div>"
+				});
+			}
+				
+
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	} 
+});
+
+server.get('/magacioner/reversiNaDan', async (req, res)=> {
+	if(!req.session.user){
+		return res.redirect("/login")
+	}
+	res.redirect("/magacioner/reversiNaDan/"+getDateAsStringForInputObject(new Date()))
+})
+
+server.get('/magacioner/reversiNaDan/:dan', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==50){
+			var today = new Date(req.params.dan);
+			today.setDate(today.getDate()-2);
+			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
+			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
+			try{
+				var reversi = await magacinReversiDB.find({datum:{$regex:dateString+"."+monthString+"."+today.getFullYear()}}).toArray();
+				var naloziToFind = [];
+				for(var i=0;i<reversi.length;i++){
+					naloziToFind.push(reversi[i].nalog);
+				}
+				var nalozi = await naloziDB.find({broj:{$in:naloziToFind}}).toArray();
+				var nalozi2024 = await nalozi2024DB.find({broj:{$in:naloziToFind}}).toArray();
+				for(var i=0;i<nalozi2024.length;i++){
+					nalozi.push(nalozi2024[i])
+				}
+				var proizvodi = await proizvodiDB.find({}).toArray();
+				var majstori = await majstoriDB.find({}).toArray();
+				res.render("magacioner/rezultatPretrage",{
+					pageTitle: "Reversi na dan "+reshuffleDate(req.params.dan),
 					user: req.session.user,
 					reversi: reversi,
 					majstori: majstori,
