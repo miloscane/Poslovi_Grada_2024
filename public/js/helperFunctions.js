@@ -386,6 +386,33 @@ function getMonday(date = new Date()) {
   return new Date(d.setDate(diff));
 }
 
+function getWeekDay(date) {
+  let day = date.getDay();
+  return (day + 6) % 7; 
+}
+
+function isYesterdayAfter3PM(date1, date2) {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+
+  // Get date2 normalized to midnight
+  const ref = new Date(d2);
+  ref.setHours(0, 0, 0, 0);
+
+  // Get "yesterday" relative to date2
+  const yesterday = new Date(ref);
+  yesterday.setDate(ref.getDate() - 1);
+
+  // Check if date1 is that "yesterday"
+  const isYesterday =
+    d1.getFullYear() === yesterday.getFullYear() &&
+    d1.getMonth() === yesterday.getMonth() &&
+    d1.getDate() === yesterday.getDate();
+
+  // Must also be after 15:00
+  return isYesterday && d1.getHours() >= 15;
+}
+
 var definicijeProizvoda = [
                     {
                       "startCode":"01.01",

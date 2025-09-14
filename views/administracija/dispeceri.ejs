@@ -7,7 +7,14 @@
 			<div class="lightBlueBox inlines">
 				<div class="dispecerList" id="dispeceri"></div>
 				<div class="radneJedinice">
-					<div id="radne-jedinice"></div>
+					<div style="margin-bottom:15px;">
+						<div style="font-size:20px;font-weight:600;margin-bottom:8px;">Видљиве радне јединице</div>
+						<div id="radne-jedinice"></div>
+					</div>
+					<div style="margin-bottom:15px;">
+						<div style="font-size:20px;font-weight:600;margin-bottom:8px;">Задужене радне јединице</div>
+						<div id="stvarne-radne-jedinice"></div>
+					</div>
 					<div class="inputWrap">
 						<div class="button" onclick="sacuvajIzmene()">Сачувај измене</div>
 					</div>
@@ -46,6 +53,24 @@
 				label.innerHTML = radneJedinice[i];
 				checkboxWrapper.appendChild(label)
 			document.getElementById("radne-jedinice").appendChild(checkboxWrapper);
+
+			var checkboxWrapper = document.createElement("DIV");
+			checkboxWrapper.setAttribute("class","checkboxWrapper");
+				var checkboxWrap = document.createElement("DIV");
+				checkboxWrap.setAttribute("class","checkboxWrap");
+					var input = document.createElement("INPUT");
+					input.setAttribute("value",radneJedinice[i]);
+					input.setAttribute("type","checkbox");
+					input.setAttribute("class","radnaJedinicaCheckbox");
+					checkboxWrap.appendChild(input);
+				checkboxWrapper.appendChild(checkboxWrap);
+
+				var label = document.createElement("DIV");
+				label.setAttribute("class","label");
+				label.setAttribute("onclick","checkboxLabelClick(this)");
+				label.innerHTML = radneJedinice[i];
+				checkboxWrapper.appendChild(label)
+			document.getElementById("stvarne-radne-jedinice").appendChild(checkboxWrapper);
 		}
 
 		function checkboxLabelClick(elem){
@@ -77,18 +102,40 @@
 					}
 				}
 			}
+
+			var opstineBoxes = document.getElementById("stvarne-radne-jedinice").getElementsByClassName("radnaJedinicaCheckbox");
+			for(var i=0;i<opstineBoxes.length;i++){
+				opstineBoxes[i].checked = false;
+			}
+			if(dispecerJson.actualOpstine){
+				for(var i=0;i<dispecerJson.actualOpstine.length;i++){
+					for(var j=0;j<opstineBoxes.length;j++){
+						if(opstineBoxes[j].value==dispecerJson.actualOpstine[i]){
+							opstineBoxes[j].checked = true;
+						}
+					}
+				}
+			}
 		}
 
 		dispecerPick(document.getElementById("dispeceri").getElementsByClassName("name")[0]);
 
 		function sacuvajIzmene(){
 			var opstineBoxes = document.getElementById("radne-jedinice").getElementsByClassName("radnaJedinicaCheckbox");
+			var actualOpstineBoxes = document.getElementById("stvarne-radne-jedinice").getElementsByClassName("radnaJedinicaCheckbox");
 			var dispecerElems = document.getElementById("dispeceri").getElementsByClassName("name");
 			var json = {};
 			json.opstine = [];
 			for(var i=0;i<opstineBoxes.length;i++){
 				if(opstineBoxes[i].checked){
 					json.opstine.push(opstineBoxes[i].value)
+				}
+			}
+
+			json.actualOpstine = [];
+			for(var i=0;i<actualOpstineBoxes.length;i++){
+				if(actualOpstineBoxes[i].checked){
+					json.actualOpstine.push(actualOpstineBoxes[i].value)
 				}
 			}
 			for(var i=0;i<dispecerElems.length;i++){

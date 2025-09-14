@@ -1,12 +1,374 @@
 <%- include ("partials/header") -%>
-<div class="message">
-	<div class="pageWidth">
-		<div class="blueWrap">
-			<div class="pageWidth">
-				<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/programerIcon.png"></div>
-				<div class="message">Страница у изради. Имајте стрпљења :) ВиК неће стати!</div>		
+<script>
+	var checkIns = <%-JSON.stringify(checkIns)%>;
+	var opravdanja = <%-JSON.stringify(opravdanja)%>;
+	var opomene = <%-JSON.stringify(opomene)%>;
+	var nalozi = <%-JSON.stringify(nalozi)%>;
+	console.log(nalozi)
+	var datum = "<%=datum%>";
+	var dan = datum.split(".")[0];
+	var mesec = datum.split(".")[1];
+	var godina = datum.split(".")[2];
+	var destimulacije = [];
+</script>
+<div class="ucinakDispecera">
+	<div class="pageWidth majstorMesec">
+		<div class="boxesWrap" style="background-color:rgb(240,240,240);padding:20px">
+			<div class="box">
+				<div class="title">Радни дани:</div>
+				<div class="value" id="radni-dani"></div>
+			</div>
+			<div class="box">
+				<div class="title">Завршено налога:</div>
+				<div class="value" id="zavrseni-nalozi"></div>
+			</div>
+			<div class="box">
+				<div class="title">Налога у току:</div>
+				<div class="value" id="otvoreni-nalozi"></div>
+			</div>
+			<div class="box">
+				<div class="title">Ugrencije:</div>
+				<div class="value" id="urgencije"></div>
+			</div>
+			<script>
+				var zavrseni = 0;
+				var uToku = 0;
+				var urgencije = 0;
+				for(var i=0;i<nalozi.length;i++){
+					if(["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Spreman za obračun"].indexOf(nalozi[i].statusNaloga)>=0){
+						zavrseni++;
+					}else if(nalozi[i].statusNaloga!="Storniran"){
+						uToku++;
+					}
+
+					for(var j=0;j<nalozi[i].izvestaji.length;j++){
+						if(nalozi[i].izvestaji[j].izvestaj.toLowerCase().includes("urg")){
+							urgencije++;
+						}
+					}
+				}
+				document.getElementById("zavrseni-nalozi").innerHTML = zavrseni;
+				document.getElementById("otvoreni-nalozi").innerHTML = uToku;
+				document.getElementById("urgencije").innerHTML = urgencije;
+			</script>
+			<div class="box" style="display:none">
+				<div class="title">Стимулације:</div>
+				<div class="value" id="nagrade"></div>
+			</div>
+			<div class="box">
+				<div class="title">Дестимулације:</div>
+				<div class="value" id="kazne"></div>
 			</div>
 		</div>
+
+		<div class="swipeable">
+			<div class="arrow arrowLeft" onclick="moveDay(-1)"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/chevronLeft.svg"></div>
+			<div class="daily" id="daily"></div>
+			<div class="arrow arrowRight" onclick="moveDay(1)"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/chevronRight.svg"></div>
+		</div>
+
+		<script>
+			var radniDani = 0;
+
+			var daysInMonth = new Date(godina, mesec, 0).getDate();
+			for(var i=1;i<=daysInMonth;i++){
+				var counterOpomena = 0;
+				var date = new Date(godina, mesec - 1, i);
+				var day = document.createElement("DIV");
+				day.setAttribute("class","day");
+				day.setAttribute("data-date",date.getTime());
+				day.setAttribute("data-day",date.getDate());
+				if(i==1){
+					day.setAttribute("style","margin-left:0%");
+				}
+					var datum = document.createElement("DIV");
+					datum.setAttribute("class","datum");
+					datum.innerHTML = getDateAsStringForDisplay(date) + " - " + daniUNedelji[getWeekDay(date)];
+					day.appendChild(datum);
+
+					var vremeDolaska = 0;
+					var datetimeDolaska = 0;
+					var vremeOdlaska = 0;
+					var datetimeOdlaska = 0;
+					var checkInNaDan = [];
+					for(var j=0;j<checkIns.length;j++){
+						if(istiDatum(new Date(checkIns[j].datetime),date)){
+							checkIn = checkIns[j];
+							checkInNaDan.push(checkIns[j]);
+						}
+					}
+					checkInNaDan.sort((a, b) => a.datetime - b.datetime);
+					if(checkInNaDan.length>=2){
+						vremeDolaska = getTimestamp(checkInNaDan[0].datetime);
+						datetimeDolaska = checkInNaDan[0].datetime;
+						if(new Date(checkInNaDan[checkInNaDan.length-1].datetime).getHours()>=13){
+							vremeOdlaska = getTimestamp(checkInNaDan[checkInNaDan.length-1].datetime);
+							datetimeDolaska = checkInNaDan[checkInNaDan.length-1].datetime;
+						}
+					}
+
+					
+					var vremena = document.createElement("DIV");
+					vremena.setAttribute("class","vremena boxesWrap");
+					if(vremeDolaska!=0 && vremeOdlaska!=0){
+						var inline = document.createElement("DIV");
+						inline.setAttribute("class","inline box");
+							var title = document.createElement("DIV");
+							title.setAttribute("class","title");
+							title.innerHTML = "Долазак";
+							inline.appendChild(title);
+
+							var vreme = document.createElement("DIV");
+							vreme.setAttribute("class","vreme value");
+							vreme.innerHTML = vremeDolaska;
+							inline.appendChild(vreme);
+						vremena.appendChild(inline);
+
+						var inline = document.createElement("DIV");
+						inline.setAttribute("class","inline box");
+							var title = document.createElement("DIV");
+							title.setAttribute("class","title");
+							title.innerHTML = "Одлазак";
+							inline.appendChild(title);
+
+							var vreme = document.createElement("DIV");
+							vreme.setAttribute("class","vreme value");
+							vreme.innerHTML = vremeOdlaska;
+							inline.appendChild(vreme);
+						vremena.appendChild(inline);
+					}else{
+						var odsutanNalov = document.createElement("DIV");
+						odsutanNalov.setAttribute("class","odsutanNaslov");
+							var titlePrisustvo = document.createElement("DIV");
+							titlePrisustvo.setAttribute("class","title");
+							titlePrisustvo.innerHTML = "Нема информација о присуству";
+							odsutanNalov.appendChild(titlePrisustvo);
+						vremena.appendChild(odsutanNalov);
+					}
+					day.appendChild(vremena);
+
+					var title = document.createElement("DIV");
+					title.setAttribute("class","subTitle");
+					title.innerHTML = "Опомене:";
+					day.appendChild(title);
+
+					var naloziElem = document.createElement("DIV");
+					naloziElem.setAttribute("class","opomene");
+						if(vremeDolaska==0 || vremeOdlaska==0){
+							var opravdanjeIndex = -1;
+							for(var j=0;j<opravdanja.length;j++){
+								if(istiDatum(date,new Date(opravdanja[i].date))){
+									opravdanjeIndex = j;
+									break;
+								}
+							}
+							if(opravdanjeIndex>=0){
+								titlePrisustvo.innerHTML = opravdanja[opravdanjeIndex].razlog;
+							}else{
+								if( (vremeDolaska==0 || vremeOdlaska==0) && !istiDatum(new Date(),date) && date.getTime()<new Date().getTime()){
+									counterOpomena++;
+									var opomena = document.createElement("DIV");
+									opomena.setAttribute("class","opomena");
+										var title = document.createElement("DIV");
+										title.setAttribute("class","title");
+										title.innerHTML = counterOpomena+". Неправлино чекирање (1 бод)";
+										opomena.appendChild(title);
+
+										var note = document.createElement("DIV");
+										note.setAttribute("class","note");
+										napomena = "Одузет вам је 1 бод због неправилног чекирања";
+										note.innerHTML = napomena;
+										opomena.appendChild(note);
+										
+										var destimulacijaJson = {};
+										destimulacijaJson.date = getDateAsStringForInputObject(date);
+										destimulacijaJson.razlog = napomena;
+										destimulacijaJson.naslov = "Неправлино чекирање";
+										destimulacijaJson.bodovi = 1;
+										destimulacije.push(destimulacijaJson);
+
+									naloziElem.appendChild(opomena);
+								}
+
+								
+							}					
+						}
+
+						if(date.getTime()<new Date().getTime() && vremeDolaska!=0 && vremeOdlaska!=0){
+							radniDani++;
+						}
+
+						//Zakasnela reakcija na nove naloge koji su stigli do 15:00
+						for(var j=0;j<nalozi.length;j++){
+							var nalog = nalozi[j];
+							var datumOtvaranjaNaloga = new Date(nalog.digitalizacija.stambeno.datum);
+							datumOtvaranjaNaloga.setHours(Number(nalog.digitalizacija.stambeno.vreme.split(":")[0]));
+							datumOtvaranjaNaloga.setMinutes(Number(nalog.digitalizacija.stambeno.vreme.split(":")[1]));
+
+							if(istiDatum(datumOtvaranjaNaloga,date) && !istiDatum(new Date(),date)){
+								nalog.izvestaji.sort((a, b) => a.datetime - b.datetime);
+								
+								var testDate = new Date(date);
+								testDate.setHours(15)
+								testDate.setMinutes(0);
+
+								if(datumOtvaranjaNaloga.getTime()<testDate.getTime()){
+									var prvaReakcija = new Date("2050-01-01");
+									var prvaReakcijaTekst = " је непостојећи";
+									var validniIzvestaji = [];
+									for(var k=0;k<nalog.izvestaji.length;k++){
+										if(nalog.izvestaji[k].user.email!="EBS"){
+											validniIzvestaji.push(nalog.izvestaji[k])
+										}
+									}
+									if(validniIzvestaji.length>0){
+										prvaReakcija = new Date(validniIzvestaji[0].datetime);
+										prvaReakcijaTekst = " је направљен "+getDateAsStringForDisplay(prvaReakcija) + " " + getTimestamp(prvaReakcija);
+									}
+									if(prvaReakcija.getTime() - datumOtvaranjaNaloga.getTime()>3*60*60*1000){//3 sata
+										counterOpomena++;
+										var opomena = document.createElement("DIV");
+										opomena.setAttribute("class","opomena");
+											var title = document.createElement("DIV");
+											title.setAttribute("class","title");
+											title.innerHTML = counterOpomena+". Закаснела реакција на налог пристигао истог дана пре 15 часова (1 бод)";
+											opomena.appendChild(title);
+
+											var note = document.createElement("DIV");
+											note.setAttribute("class","note");
+											napomena = "Нисте реаговали на налог <a href='/nalog/"+nalog.broj+"' target='_blank'>"+nalog.broj+" / "+nalog.adresa+"</a>. Налог је отворен у "+ getDateAsStringForDisplay(datumOtvaranjaNaloga) +" " +getTimestamp(datumOtvaranjaNaloga)+" а први извештај "+prvaReakcijaTekst;
+											note.innerHTML = napomena;
+											opomena.appendChild(note);
+											
+											var destimulacijaJson = {};
+											destimulacijaJson.date = getDateAsStringForInputObject(date);
+											destimulacijaJson.razlog = napomena;
+											destimulacijaJson.naslov = "Закаснела реакција на налог до 15 часова";
+											destimulacijaJson.bodovi = 1;
+											destimulacije.push(destimulacijaJson);
+
+										naloziElem.appendChild(opomena);
+									}
+								}else{
+									console.log("Nalog stigao posle 15 casova")
+									console.log(datumOtvaranjaNaloga)
+									console.log("------------------------------")
+								}
+								
+							}
+							
+						}
+
+						//Zakasnela reakcija na nove naloge koji su stigli do 15:00
+						for(var j=0;j<nalozi.length;j++){
+							var nalog = nalozi[j];
+							var datumOtvaranjaNaloga = new Date(nalog.digitalizacija.stambeno.datum);
+							datumOtvaranjaNaloga.setHours(Number(nalog.digitalizacija.stambeno.vreme.split(":")[0]));
+							datumOtvaranjaNaloga.setMinutes(Number(nalog.digitalizacija.stambeno.vreme.split(":")[1]));
+
+							if(isYesterdayAfter3PM(datumOtvaranjaNaloga,date) && !istiDatum(new Date(),date)){
+								nalog.izvestaji.sort((a, b) => a.datetime - b.datetime);
+								var prvaReakcija = new Date("2050-01-01");
+								var prvaReakcijaTekst = " је непостојећи";
+								var validniIzvestaji = [];
+								for(var k=0;k<nalog.izvestaji.length;k++){
+									if(nalog.izvestaji[k].user.email!="EBS"){
+										validniIzvestaji.push(nalog.izvestaji[k])
+									}
+								}
+								if(validniIzvestaji.length>0){
+									prvaReakcija = new Date(validniIzvestaji[0].datetime);
+									prvaReakcijaTekst = " је направљен "+getDateAsStringForDisplay(prvaReakcija) + " " + getTimestamp(prvaReakcija);
+								}
+								var dateTest = new Date(date);
+								dateTest.setHours(10);
+								dateTest.setMinutes(0);
+								if(prvaReakcija.getTime() > dateTest.getTime()){//nije reagovano do 10 sledeveg dana
+									counterOpomena++;
+									var opomena = document.createElement("DIV");
+									opomena.setAttribute("class","opomena");
+										var title = document.createElement("DIV");
+										title.setAttribute("class","title");
+										title.innerHTML = counterOpomena+". Закаснела реакција на налог пристигао дан раније после 15 часова (1 бод)";
+										opomena.appendChild(title);
+
+										var note = document.createElement("DIV");
+										note.setAttribute("class","note");
+										napomena = "Нисте реаговали на налог <a href='/nalog/"+nalog.broj+"' target='_blank'>"+nalog.broj+" / "+nalog.adresa+"</a>. Налог је отворен у "+ getDateAsStringForDisplay(datumOtvaranjaNaloga) +" " +getTimestamp(datumOtvaranjaNaloga)+" а први извештај "+prvaReakcijaTekst;
+										note.innerHTML = napomena;
+										opomena.appendChild(note);
+										
+										var destimulacijaJson = {};
+										destimulacijaJson.date = getDateAsStringForInputObject(date);
+										destimulacijaJson.razlog = napomena;
+										destimulacijaJson.naslov = "Закаснела реакција на налог након 15 часова";
+										destimulacijaJson.bodovi = 1;
+										destimulacije.push(destimulacijaJson);
+
+									naloziElem.appendChild(opomena);
+								}
+							}
+						}
+
+
+					day.appendChild(naloziElem);
+				document.getElementById("daily").appendChild(day);
+			}
+
+			var bodovi = 0;
+			for(var i=0;i<destimulacije.length;i++){
+				bodovi = bodovi + destimulacije[i].bodovi;
+			}
+			var extra = bodovi==1 ? " бод" : " бода";
+			document.getElementById("kazne").innerHTML = bodovi + extra;
+			document.getElementById("radni-dani").innerHTML = radniDani;
+
+			var dayElements = document.getElementById("daily").getElementsByClassName("day");
+
+			var swipeArea = document.getElementById("daily");
+			detectSwipe(swipeArea, (direction) => {
+			    if (direction === "left") {
+			        // Handle left swipe
+			        // na levo
+			    	moveDay(1);
+			    } else if (direction === "right") {
+			        // Handle right swipe
+			        // na desno (leva na desno)
+			    	moveDay(-1);
+			    }
+			});
+
+			function moveDay(direction){
+				//get current active day
+				var currentActive = document.getElementById("daily").getElementsByClassName("day")[0].style.marginLeft;
+				currentActive = Math.abs(Number(currentActive.split("%")[0]))/100;
+				var newActive = currentActive+direction;
+				if(newActive<0){
+					//first day
+					//console.log("FIRST DAY")
+				}else if(newActive>(dayElements.length-1)){
+					//last day
+					console.log("LAST DAY")
+				}else{
+					//-1 ide sa leva na desno, znaci skrola se unazad sa danima
+					//1 ide sa desna na levo, znaci skrola se unapred sa danima
+					//console.log(newActive)
+					document.getElementById("daily").getElementsByClassName("day")[0].style.marginLeft = "-"+eval(newActive*100)+"%";
+				}
+			}
+
+			function toDay(dayNumber){
+				//0 is first
+				document.getElementById("daily").getElementsByClassName("day")[0].style.marginLeft = "-"+eval(dayNumber*100)+"%";
+			}
+
+			if(mesec==Number(new Date().getMonth()+1)){
+				toDay(new Date().getDate()-1)
+			}else{
+				toDay(0)
+				console.log("Nije trenutni mesec");
+			}
+		</script>
 	</div>
 </div>
 <%- include ("partials/footer") -%>

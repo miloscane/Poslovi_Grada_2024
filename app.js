@@ -880,6 +880,8 @@ var trecaLicaDB;
 var cenovniciTrecihLicaDB;
 var naloziTrecihLicaDB;
 var izvestajiTrecihLicaDB;
+var opomeneDispeceraDB;
+var opravdanjaDispeceraDB;
 var stariCenovnikJsons = [];
 var stareSpecifikacijePodizvodjacaDB;
 
@@ -927,7 +929,8 @@ http.listen(process.env.PORT, async function(){
 		cenovniciTrecihLicaDB = client.db("Poslovi_Grada_2024").collection('Cenovnici Trecih Lica')
 		naloziTrecihLicaDB 		= client.db("Poslovi_Grada_2024").collection('Nalozi Trecih Lica');
 		izvestajiTrecihLicaDB = client.db("Poslovi_Grada_2024").collection('Izvestaji Trecih Lica');
-
+		opomeneDispeceraDB 		= client.db("Poslovi_Grada_2024").collection('Opomene dispecera');
+		opravdanjaDispeceraDB	= client.db("Poslovi_Grada_2024").collection('Opravdanja dispecera');
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
 		nalozi2022DB					=	client.db("Poslovi-Grada").collection('nalozi2022');
@@ -7751,7 +7754,8 @@ server.post('/izmena-dispecera', async (req, res)=> {
 		if(Number(req.session.user.role)==10){
 			var json = JSON.parse(req.body.json);
 			var setObj	=	{ $set: {
-				opstine: json.opstine
+				opstine: json.opstine,
+				actualOpstine: json.actualOpstine
 			}};
 			usersDB.updateOne({email:json.dispecer},setObj)
 			.then((dbResponse2) => {
@@ -9936,22 +9940,53 @@ server.post('/pretragaNalogaPoAdresi', async (req, res)=> {
 });
 
 server.get('/dispecer/mojUcinak',async (req,res)=>{
-	if(req.session.user){
-			if(Number(req.session.user.role)==20){
-				res.render("dispeceri/mojUcinak",{
-					pageTitle:"Мој учинак",
-					user: req.session.user
-				})
-			
-		}else{
-			res.render("message",{
-				pageTitle: "Грешка",
-				user: req.session.user,
-				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
-			});
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+	if(Number(req.session.user.role)!=20){
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+		});
+	}
+	try{
+		var year = new Date().getFullYear();
+		var month = new Date().getMonth()+1;
+		month = month.toString().padStart(2,"0");
+		var checkIns = await checkInMajstoraDB.find({uniqueId:req.session.user.email,month:{$in:[month,Number(month)]},year:{$in:[year,Number(year)]}}).toArray();
+		var opomene = await opomeneDispeceraDB.find({uniqueId:req.session.user.email,month:{$in:[month,Number(month)]},year:{$in:[year,year.toString()]}}).toArray();
+		var opravdanja = await opravdanjaDispeceraDB.find({uniqueId:req.session.user.email,month:{$in:[month,Number(month)]},year:{$in:[year,year.toString()]}}).toArray();
+		var nalozi = await naloziDB.find({radnaJedinica:{$in:req.session.user.actualOpstine},"digitalizacija.stambeno.datum":{$regex:year+"-"+month}}).toArray();
+		var nalogIds = [];
+		for(var i=0;i<nalozi.length;i++){
+			nalogIds.push(nalozi[i].broj)
 		}
-	}else{
-		res.redirect("/login?url="+encodeURIComponent(req.url))
+		var izvestaji = await izvestajiDB.find({nalog:{$in:nalogIds}}).toArray();
+		for(var i=0;i<nalozi.length;i++){
+			nalozi[i].izvestaji = [];
+			for(var j=0;j<izvestaji.length;j++){
+				if(izvestaji[j].nalog==nalozi[i].broj){
+					nalozi[i].izvestaji.push(izvestaji[j])
+				}
+			}
+		}
+		res.render("dispeceri/mojUcinak",{
+			pageTitle:"Мој учинак",
+			user: req.session.user,
+			checkIns: checkIns,
+			datum: getDateAsStringForDisplay(new Date()),
+			opravdanja: opravdanja,
+			nalozi: nalozi,
+			opomene: opomene
+		})
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Програмска грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Дошло је до грешке у бази података 9969.</div>"
+		});
 	}
 });
 
@@ -14039,6 +14074,12 @@ setInterval(function(){
 			}
 		});*/
 },10000)
+
+
+/*setTimeout(function(){
+	io.emit("notification","noviNalog","<div class=\"title\">New work order</div><div class=\"text\"><a href=\"/nalog/1812732\" target=\"blank\">1812732</a> - <span class=\"adresa\">Nehruova 87</span> - <span class=\"radnaJedinica\">NOVI BEOGRAD</span></span></div>","NOVI BEOGRAD")
+},30000)*/
+
 
 
 io.on('connection', function(socket){

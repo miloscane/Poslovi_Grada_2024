@@ -11,6 +11,7 @@
 		<div class="selectMesec">
 			<select id="odabir-meseca" oninput="pickMesec()">
 				<option value="08.2025">Август 2025</option>
+				<option value="09.2025">Септембар 2025</option>
 			</select>
 			<script>
 				document.getElementById("odabir-meseca").value = datum;
@@ -203,7 +204,7 @@
 					}
 						var datum = document.createElement("DIV");
 						datum.setAttribute("class","datum");
-						datum.innerHTML = getDateAsStringForDisplay(date);
+						datum.innerHTML = getDateAsStringForDisplay(date) + " - " + daniUNedelji[getWeekDay(date)];
 						day.appendChild(datum);
 
 						var vremeDolaska = 0;
@@ -279,7 +280,7 @@
 							odsutanNalov.setAttribute("class","odsutanNaslov");
 								var title = document.createElement("DIV");
 								title.setAttribute("class","title");
-								title.innerHTML = izvestaj.odsustvo ? izvestaj.odsustvo : "Нема информација";
+								title.innerHTML = izvestaj.odsustvo ? izvestaj.odsustvo : "Нема информација о присуству";
 								odsutanNalov.appendChild(title);
 							vremena.appendChild(odsutanNalov);
 						}
