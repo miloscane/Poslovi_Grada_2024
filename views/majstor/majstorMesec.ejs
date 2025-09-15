@@ -2,7 +2,6 @@
 	<script>
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
 		console.log(izvestaji);
-		console.log(user.ucinakNaloga);
 		var datum = "<%=datum%>";
 		var mesec = datum.split(".")[0];
 		var godina = datum.split(".")[1];
@@ -127,7 +126,11 @@
 						var ostvarenUcinak = 0;
 						for(var i=0;i<izvestaji.length;i++){
 							for(var j=0;j<izvestaji[i].nalozi.length;j++){
-								ostvarenUcinak = ostvarenUcinak + parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", "."));
+								var ucinakTemp = isNaN(parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", "."))) ? 0 : parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", "."));
+								if(isNaN(parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", ".")))){
+									console.log(izvestaji[i].nalozi[j].ucinak)
+								}
+								ostvarenUcinak = ostvarenUcinak + ucinakTemp;
 							}
 						}
 						//ostvarenUcinak = 2000000;

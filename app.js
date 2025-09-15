@@ -2178,7 +2178,7 @@ http.listen(process.env.PORT, async function(){
 			console.log(error)
 		})*/
 
-		/*naloziDB.find({"prijemnica.datum.datum":{$regex:"02.2025"}}).toArray()
+		naloziDB.find({"prijemnica.datum.datum":{$regex:"08.2025"}}).toArray()
 		.then((nalozi)=>{
 			var brojeviNaloga = [];
 			for(var i=0;i<nalozi.length;i++){
@@ -2303,7 +2303,7 @@ http.listen(process.env.PORT, async function(){
 				for(var i=0;i<nalozi.length;i++){
 					csvString += nalozi[i].broj + ";" +nalozi[i].radnaJedinica +";"+ nalozi[i].datum.datum + ";" + nalozi[i].prijemnica.datum.datum+ ";" + nalozi[i].tipNaloga + ";"+nalozi[i].ukupanIznos+";"+nalozi[i].maxIznos+"\r\n"; 
 				}					
-				fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+				fs.writeFileSync("nalozi3.csv",csvString,{encoding:"Utf8"})
 				console.log("Wrote file")
 			})
 			.catch((error)=>{
@@ -2312,7 +2312,7 @@ http.listen(process.env.PORT, async function(){
 		})
 		.catch((error)=>{
 			console.log(error)
-		})*/
+		})
 
 
 
@@ -3621,14 +3621,15 @@ http.listen(process.env.PORT, async function(){
 		//console.log("Drugi nalog : "+nalozi[0].datum.datum);*/
 
 
-		/*var nalozi = await naloziDB.find({majstor:"3XIoPOY--1751371868923"}).toArray();
-		var cutOff = new Date("2025-08-11").getTime();
+		/*var nalozi = await naloziDB.find({"datum.datum":{$regex:"09.2025"}}).toArray();
+		var cutOff2 = new Date("2025-09-14").getTime();
+		var cutOff1 = new Date("2025-09-01").getTime();
 		for(var i=0;i<nalozi.length;i++){
 			//console.log(nalozi[i].datum.datetime + " vs "+cutOff)
-			if(nalozi[i].datum.datetime<cutOff){
-				nalozi.splice(i,1);
-				i--;
-			}
+			//if(nalozi[i].datum.datetime>cutOff1 && nalozi[i].datum.datetime<cutOff2){
+				//nalozi.splice(i,1);
+				//i--;
+			//}
 		}
 		var saIznosom = 0;
 		var ukupanIznos = 0;
@@ -3638,7 +3639,6 @@ http.listen(process.env.PORT, async function(){
 			}
 			ukupanIznos = ukupanIznos + parseFloat(nalozi[i].ukupanIznos)
 		}
-		console.log("MEGABILD");
 		console.log("Iznos naloga: "+brojSaRazmacima(ukupanIznos));
 		console.log("Ukupno naloga: "+nalozi.length);
 		console.log("Ukupno obracunatih naloga: "+saIznosom);
@@ -3719,9 +3719,8 @@ http.listen(process.env.PORT, async function(){
 		for(var i=0;i<nalozi.length;i++){
 			csvString += nalozi[i].broj + ";"+nalozi[i].mesec+";" +nalozi[i].radnaJedinica +";"+nalozi[i].tipNaloga+";"+ nalozi[i].ukupanIznos+"\r\n"; 
 		}					
-		fs.writeFileSync("nalozi.csv",csvString,{encoding:"Utf8"})
+		fs.writeFileSync("nalozi2.csv",csvString,{encoding:"Utf8"})
 		console.log("Wrote file");*/
-
 
 
 		/*var nalozi = [];
