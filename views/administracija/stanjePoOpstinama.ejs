@@ -54,10 +54,14 @@
 
 			var statusi = [];
 			for(var i=0;i<nalozi.length;i++){
-				if(nalozi[i].statusNaloga=="" || nalozi[i].statusNaloga=="Primljen" || nalozi[i].statusNaloga=="Radovi u toku" || nalozi[i].statusNaloga=="Dodeljen majstoru"){
+				/*if(nalozi[i].statusNaloga=="" || nalozi[i].statusNaloga=="Primljen" || nalozi[i].statusNaloga=="Radovi u toku" || nalozi[i].statusNaloga=="Dodeljen majstoru"){
 					nalozi[i].statusNaloga = "10.Nezapočeto";
-				}else if(nalozi[i].statusNaloga=="Završeno"){
-					nalozi[i].statusNaloga = "4.Završen";
+				}else */if(nalozi[i].statusNaloga=="Primljen"){
+					nalozi[i].statusNaloga = "1.Primljen";
+				}else if(nalozi[i].statusNaloga=="Radovi u toku"){
+					nalozi[i].statusNaloga = "2.Radovi u toku";
+				}else if(nalozi[i].statusNaloga=="Dodeljen majstoru"){
+					nalozi[i].statusNaloga = "3.Dodeljen majstoru";
 				}else if(nalozi[i].statusNaloga=="Vraćen"){
 					nalozi[i].statusNaloga = "5.Vraćen";
 				}else if(nalozi[i].statusNaloga=="Zamena"){
