@@ -1,8 +1,12 @@
 <%- include ("partials/header") -%>
 	<script>
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
+		var checkIns = <%-JSON.stringify(checkIns)%>;
+		console.log(checkIns)
 		console.log(izvestaji);
 		var datum = "<%=datum%>";
+		var danas = new Date("<%=today%>");
+		console.log(danas)
 		var mesec = datum.split(".")[0];
 		var godina = datum.split(".")[1];
 	</script>
@@ -219,10 +223,20 @@
 							}
 						}
 
-						if(izvestaj.odsustvo=="Присутан"){
-							vremeDolaska = izvestaj.vremeDolaska;
-							vremeOdlaska = izvestaj.vremeOdlaska;
+						if(istiDatum(danas,date)){
+							vremeDolaska = checkIns[0].timestamp;
+							if(checkIns[checkIns.length-1]){
+								vremeOdlaska = checkIns[checkIns.length-1].timestamp;
+							}else{
+								vremeOdlaska = "/"
+							}
+						}else{
+							if(izvestaj.odsustvo=="Присутан"){
+								vremeDolaska = izvestaj.vremeDolaska;
+								vremeOdlaska = izvestaj.vremeOdlaska;
+							}
 						}
+						
 						
 						var vremena = document.createElement("DIV");
 						vremena.setAttribute("class","vremena boxesWrap");
@@ -262,7 +276,7 @@
 
 								var vreme = document.createElement("DIV");
 								vreme.setAttribute("class","vreme value");
-								vreme.innerHTML = izvestaj.izlazak;
+								vreme.innerHTML = izvestaj.izlazak ? izvestaj.izlazak : "/";
 								inline.appendChild(vreme);
 							vremena.appendChild(inline);
 
@@ -275,7 +289,7 @@
 
 								var vreme = document.createElement("DIV");
 								vreme.setAttribute("class","vreme value");
-								vreme.innerHTML = izvestaj.prviNalog;
+								vreme.innerHTML = izvestaj.prviNalog ? izvestaj.prviNalog : "/";
 								inline.appendChild(vreme);
 							vremena.appendChild(inline);
 						}else{

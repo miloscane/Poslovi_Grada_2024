@@ -2178,7 +2178,7 @@ http.listen(process.env.PORT, async function(){
 			console.log(error)
 		})*/
 
-		naloziDB.find({"prijemnica.datum.datum":{$regex:"08.2025"}}).toArray()
+		/*naloziDB.find({"prijemnica.datum.datum":{$regex:"08.2025"}}).toArray()
 		.then((nalozi)=>{
 			var brojeviNaloga = [];
 			for(var i=0;i<nalozi.length;i++){
@@ -2312,7 +2312,7 @@ http.listen(process.env.PORT, async function(){
 		})
 		.catch((error)=>{
 			console.log(error)
-		})
+		})*/
 
 
 
@@ -12997,7 +12997,9 @@ server.get('/majstor/mesec/:datum', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==60){
 			try{
+				var today = new Date();
 				var izvestaji = await dnevniIzvestajiDB.find({majstor:req.session.user.uniqueId,date:{$regex:req.params.datum.split(".")[1]+"-"+req.params.datum.split(".")[0]}}).toArray();
+				var checkIns = await checkInMajstoraDB.find({uniqueId:req.session.user.uniqueId,month:{$in:[eval(today.getMonth()+1).toString().padStart(2,"0"),eval(today.getMonth()+1)]},date:{$in:[today.getDate().toString().padStart(2,"0"),today.getDate()]},year:today.getFullYear()}).toArray()
 				var brojeviNaloga = [];
 				for(var i=0;i<izvestaji.length;i++){
 					for(var j=0;j<izvestaji[i].nalozi.length;j++){
@@ -13019,6 +13021,8 @@ server.get('/majstor/mesec/:datum', async (req, res)=> {
 					user: req.session.user,
 					pageTitle: "Pregled za "+req.params.datum,
 					datum: req.params.datum,
+					checkIns: checkIns,
+					today: getDateAsStringForInputObject(today),
 					izvestaji: izvestaji
 				})
 			}catch(err){

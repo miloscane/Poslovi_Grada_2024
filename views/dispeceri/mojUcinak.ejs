@@ -201,9 +201,11 @@
 						//Zakasnela reakcija na nove naloge koji su stigli do 15:00
 						for(var j=0;j<nalozi.length;j++){
 							var nalog = nalozi[j];
-							var datumOtvaranjaNaloga = new Date(nalog.digitalizacija.stambeno.datum);
-							datumOtvaranjaNaloga.setHours(Number(nalog.digitalizacija.stambeno.vreme.split(":")[0]));
-							datumOtvaranjaNaloga.setMinutes(Number(nalog.digitalizacija.stambeno.vreme.split(":")[1]));
+							//var datumOtvaranjaNaloga = new Date(nalog.digitalizacija.stambeno.datum);
+							//datumOtvaranjaNaloga.setHours(Number(nalog.digitalizacija.stambeno.vreme.split(":")[0]));
+							//datumOtvaranjaNaloga.setMinutes(Number(nalog.digitalizacija.stambeno.vreme.split(":")[1]));
+							
+							var datumOtvaranjaNaloga = new Date(nalog.datum.datetime);
 
 							if(istiDatum(datumOtvaranjaNaloga,date) && !istiDatum(new Date(),date)){
 								nalog.izvestaji.sort((a, b) => a.datetime - b.datetime);
@@ -262,9 +264,10 @@
 						//Zakasnela reakcija na nove naloge koji su stigli do 15:00
 						for(var j=0;j<nalozi.length;j++){
 							var nalog = nalozi[j];
-							var datumOtvaranjaNaloga = new Date(nalog.digitalizacija.stambeno.datum);
-							datumOtvaranjaNaloga.setHours(Number(nalog.digitalizacija.stambeno.vreme.split(":")[0]));
-							datumOtvaranjaNaloga.setMinutes(Number(nalog.digitalizacija.stambeno.vreme.split(":")[1]));
+							var datumOtvaranjaNaloga = new Date(nalog.datum.datetime);
+							//var datumOtvaranjaNaloga = new Date(nalog.digitalizacija.stambeno.datum);
+							//datumOtvaranjaNaloga.setHours(Number(nalog.digitalizacija.stambeno.vreme.split(":")[0]));
+							//datumOtvaranjaNaloga.setMinutes(Number(nalog.digitalizacija.stambeno.vreme.split(":")[1]));
 
 							if(isYesterdayAfter3PM(datumOtvaranjaNaloga,date) && !istiDatum(new Date(),date)){
 								nalog.izvestaji.sort((a, b) => a.datetime - b.datetime);
