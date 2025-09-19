@@ -229,11 +229,11 @@
 							}else{
 								vremeDolaska = "/";
 							}
-							
+							vremeOdlaska = "/"
 							if(checkIns[checkIns.length-1]){
-								vremeOdlaska = checkIns[checkIns.length-1].timestamp;
-							}else{
-								vremeOdlaska = "/"
+								if(new Date(checkIns[checkIns.length-1].datetime).getHours()>13){
+									vremeOdlaska = checkIns[checkIns.length-1].timestamp;
+								}
 							}
 						}else{
 							if(izvestaj.odsustvo=="Присутан"){
