@@ -224,7 +224,12 @@
 						}
 
 						if(istiDatum(danas,date)){
-							vremeDolaska = checkIns[0].timestamp;
+							if(checkIns[0]){
+								vremeDolaska = checkIns[0].timestamp;	
+							}else{
+								vremeDolaska = "/";
+							}
+							
 							if(checkIns[checkIns.length-1]){
 								vremeOdlaska = checkIns[checkIns.length-1].timestamp;
 							}else{
