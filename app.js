@@ -6714,6 +6714,59 @@ server.get('/administracija/danasnjiUcinak',async (req,res)=>{
 	}
 });
 
+server.get('/administracija/manuelnoCekiranje',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var ovajMesec = new Date();
+				var prethodniMesec = new Date();
+				prethodniMesec.setMonth(prethodniMesec.getMonth()-1);
+
+				var monthString = eval(ovajMesec.getMonth()+1).toString().padStart(2,"0");
+				var checkIns = await checkInMajstoraDB.find({month:{$in:[monthString,Number(monthString)]},year:ovajMesec.getFullYear()}).toArray();
+
+				var monthString = eval(prethodniMesec.getMonth()+1).toString().padStart(2,"0");
+				var checkInsLastMonth = await checkInMajstoraDB.find({month:{$in:[monthString,Number(monthString)]},year:prethodniMesec.getFullYear()}).toArray();
+
+				for(var i=0;i<checkInsLastMonth.length;i++){
+					checkIns.push(checkInsLastMonth[i])
+				}
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
+				var users = await usersDB.find({role:{$nin:["30","40"]}}).toArray();
+				for(var i=0;i<users.length;i++){
+					if(users[i].email.includes("+")){
+						users.splice(i,1);
+						i--;
+					}
+				}
+				
+				res.render("administracija/manuelniCheckIn",{
+					pageTitle: "Мануелно чекирање",
+					user: req.session.user,
+					checkIns: checkIns,
+					majstori: majstori,
+					users: users
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 4582.</div>"
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.post('/strukturaNaloga',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){

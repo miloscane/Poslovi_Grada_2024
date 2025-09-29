@@ -1,7 +1,6 @@
 <%- include ("partials/header") -%>
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
-		console.log("AAAA")
 	</script>
 	<div class="pageWidth stanjeNalogaPoOpstinama">
 		<div class="wrap">
@@ -17,6 +16,9 @@
 				for(var i=0;i<statusi.length;i++){
 					var inlines = document.createElement("DIV");
 					inlines.setAttribute("class","inlines");
+					inlines.setAttribute("data-status",statusi[i]);
+					inlines.setAttribute("onclick","showNalozi(this)");
+					inlines.style.cursor = "pointer";
 						var inline = document.createElement("DIV");
 						inline.setAttribute("class","inline");
 						inline.innerHTML = statusi[i].split(".")[1];
@@ -144,6 +146,7 @@
 							for(var l=0;l<subStatElems.length;l++){
 								if(subStatElems[l].dataset.stattype==statJson[i].stats[k].status){
 									subStatElems[l].innerHTML = statJson[i].stats[k].nalozi;
+
 								}
 							}
 						}
@@ -151,10 +154,217 @@
 				}
 			}
 
+			function showNalozi(elem){
+				var statusToShow = elem.dataset.status;
+				var opstina = elem.parentElement.parentElement.dataset.id;
+				console.log(statusToShow)
+				console.log(opstina)
+				var naloziToShow = [];
+				for(var i=0;i<nalozi.length;i++){
+					if(nalozi[i].statusNaloga==statusToShow && nalozi[i].radnaJedinica==opstina){
+						naloziToShow.push(nalozi[i])
+					}else if(nalozi[i].statusNaloga==statusToShow && opstina=="ukupno"){
+						naloziToShow.push(nalozi[i])
+					}
+				}
+				document.getElementById("table").innerHTML = "";
+				var tr = document.createElement("TR");
+					var td = document.createElement("TD");
+					td.setAttribute("class","redniBroj");
+						var value = document.createElement("DIV");
+						value.setAttribute("class","value");
+						value.innerHTML = "";
+						td.appendChild(value);
+					tr.appendChild(td);
 
+					var td = document.createElement("TD");
+					td.setAttribute("class","brojNaloga");
+						var value = document.createElement("DIV");
+						value.setAttribute("class","value");
+						value.innerHTML = "Broj naloga";
+						td.appendChild(value);
+					tr.appendChild(td);
 
+					var td = document.createElement("TD");
+					td.setAttribute("class","datumNaloga");
+						var value = document.createElement("DIV");
+						value.setAttribute("class","value");
+						value.innerHTML = "Datum otvaranja";
+						td.appendChild(value);
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					td.setAttribute("class","datumPrijema");
+						var value = document.createElement("DIV");
+						value.setAttribute("class","value");
+						value.innerHTML = "Datum prijema";
+						td.appendChild(value);
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					td.setAttribute("class","radnaJedinica");
+						var value = document.createElement("DIV");
+						value.setAttribute("class","value");
+						value.innerHTML = "Radna jedinica";
+						td.appendChild(value);
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					td.setAttribute("class","adresa");
+						var value = document.createElement("DIV");
+						value.setAttribute("class","value");
+						value.innerHTML = "Adresa";
+						td.appendChild(value);
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					td.setAttribute("class","status");
+						var value = document.createElement("DIV");
+						value.setAttribute("class","value");
+						value.innerHTML = "Status";
+						td.appendChild(value);
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					td.setAttribute("class","opis");
+						var value = document.createElement("DIV");
+						value.setAttribute("class","value");
+						value.innerHTML = "Opis";
+						td.appendChild(value);
+					tr.appendChild(td);
+				document.getElementById("table").appendChild(tr);
 			
+				for(var i=0;i<naloziToShow.length;i++){
+					nalog = naloziToShow[i];
+					nalog.datumOtvaranjaNaloga = new Date(nalog.digitalizacija.datetime);
+					if(nalog.digitalizacija){
+						if(nalog.digitalizacija.stambeno){
+							nalog.datumOtvaranjaNaloga = new Date(nalog.digitalizacija.stambeno.datum);
+							nalog.datumOtvaranjaNaloga.setHours(Number(nalog.digitalizacija.stambeno.vreme.split(":")[0]));
+							nalog.datumOtvaranjaNaloga.setMinutes(Number(nalog.digitalizacija.stambeno.vreme.split(":")[1]));
+						}
+					}
+					
+					var tr = document.createElement("TR");
+					tr.setAttribute("onclick","this.style.backgroundColor='rgba(32,51,100,0.2)'")
+					tr.setAttribute("data-datumotvaranja",nalog.datumOtvaranjaNaloga);
+					tr.setAttribute("data-datumprijema",nalog.digitalizacija.datetime);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","redniBroj");
+							var value = document.createElement("DIV");
+							value.setAttribute("class","value");
+							value.innerHTML = "<div class=\"value\">"+eval(i+1)+".</div>";
+							td.appendChild(value);
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","brojNaloga");
+							var value = document.createElement("DIV");
+							value.setAttribute("class","value");
+							value.innerHTML = "<div class=\"value\"><a style=\"display:inline-block;vertical-align:middle;width:80px\" target=\"_blank\" href=\"/nalog/"+nalog.broj+"\">"+nalog.broj+"</a><div style=\"display:inline-block;vertical-align:middle;cursor:pointer;\" data-broj=\""+nalog.broj+"\" onclick='copy(this)'>📋</div></div>";
+							td.appendChild(value);
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","datumNaloga");
+							var value = document.createElement("DIV");
+							value.setAttribute("class","value");
+							value.innerHTML = getDateAsStringForDisplay(nalog.datumOtvaranjaNaloga) + " <i>"+getTimestamp(nalog.datumOtvaranjaNaloga)+"</i>";
+							td.appendChild(value);
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","datumNaloga");
+							var value = document.createElement("DIV");
+							value.setAttribute("class","value");
+							value.innerHTML = getDateAsStringForDisplay(new Date(nalog.digitalizacija.datetime)) + " <i>"+getTimestamp(new Date(nalog.digitalizacija.datetime))+"</i>";
+							td.appendChild(value);
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","radnaJedinica");
+							var value = document.createElement("DIV");
+							value.setAttribute("class","value");
+							value.innerHTML = nalog.radnaJedinica;
+							td.appendChild(value);
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","adresa");
+							var value = document.createElement("DIV");
+							value.setAttribute("class","value");
+							value.innerHTML = nalog.adresa;
+							td.appendChild(value);
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","status");
+							var value = document.createElement("DIV");
+							value.setAttribute("class","value");
+							value.innerHTML = nalog.statusNaloga.split(".")[1];
+							td.appendChild(value);
+						tr.appendChild(td);
+
+						var td = document.createElement("TD");
+						td.setAttribute("class","opis");
+							var value = document.createElement("DIV");
+							value.setAttribute("class","value");
+							value.innerHTML = nalog.opis;
+							td.appendChild(value);
+						tr.appendChild(td);
+					document.getElementById("table").appendChild(tr);
+				}
+				document.getElementById("nalozi-lightbox").style.display = "block"
+			}
+
+			function copy(el) {
+				const broj = el.getAttribute("data-broj");
+
+				// Use Clipboard API
+				navigator.clipboard.writeText(broj).then(() => {
+					console.log("Copied:", broj);
+					// Optional: give feedback
+					el.innerText = "✅";
+					setTimeout(() => el.innerText = "📋", 1500);
+				}).catch(err => {
+					console.error("Failed to copy:", err);
+				});
+			}
+
+			function filterTable(){
+				if(document.getElementById("od").value && document.getElementById("do").value){
+					var odDatuma = new Date(document.getElementById("od").value);
+					odDatuma.setHours(0)
+					odDatuma.setMinutes(1)
+					var doDatuma = new Date(document.getElementById("do").value);
+					doDatuma.setHours(23)
+					doDatuma.setMinutes(59)
+
+					var tableRows = document.getElementById("table").getElementsByTagName("TR");
+					for(var i=1;i<tableRows.length;i++){
+						tableRows[i].style.display="none";
+						console.log(odDatuma.getTime())
+						if(Number(tableRows[i].dataset.datumprijema)>=odDatuma.getTime() && Number(tableRows[i].dataset.datumprijema)<=doDatuma.getTime()){
+							tableRows[i].style.display="table-row"
+						}
+					}
+				}
+			}
 
 		</script>
+		<div class="naloziTableLightbox" id="nalozi-lightbox" style="display:none" onclick="this.style.display='none'">
+			<div class="tableWrap" onclick="event.stopPropagation()">
+				<div class="filters">
+					<div class="filter">
+						Od datuma prijema <input type="date" id="od" oninput="filterTable()"> do <input type="date" id="do" oninput="filterTable()">
+					</div>
+				</div>
+				<div class="table">
+					<table id="table"></table>
+				</div>
+			</div>
+		</div>
 	</div>
+	
 <%- include ("partials/footer") -%>

@@ -1,0 +1,101 @@
+<%- include ("partials/header") -%>
+<script>
+	var checkIns = <%-JSON.stringify(checkIns)%>;
+	checkIns.sort((a, b) => a.datetime - b.datetime);
+
+
+	var majstori = <%-JSON.stringify(majstori)%>;
+	majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+	var users = <%-JSON.stringify(users)%>;
+	console.log(users)
+	users.sort((a, b) => a.name.localeCompare(b.name));
+	console.log(majstori);
+	console.log(users)
+</script>
+<div class="manuelniCheckIn">
+	<div class="pageWidth">
+		<div class="previewForm">
+			<div class="filters">
+				<div class="filter">
+					<select id="zaposleni">
+						<optgroup label="Majstori" id="majstori"></optgroup>
+						<optgroup label="Kancelarija" id="kancelarija"></optgroup>
+					</select>
+					<script>
+						for(var i=0;i<majstori.length;i++){
+							var option = document.createElement("OPTION");
+							option.setAttribute("value",majstori[i].uniqueId)
+							option.innerHTML = majstori[i].ime;
+							document.getElementById("majstori").appendChild(option);
+						}
+
+						for(var i=0;i<users.length;i++){
+							var option = document.createElement("OPTION");
+							option.setAttribute("value",users[i].email)
+							option.innerHTML = users[i].name;
+							document.getElementById("kancelarija").appendChild(option);
+						}
+					</script>
+				</div>
+				<div class="filter">
+					<input type="date" id="date">
+					<script>
+						document.getElementById("date").value = getDateAsStringForInputObject(new Date());
+					</script>
+				</div>
+				<div class="filter">
+					<button onclick="prikaziCekiranja()">Прикажи чекирања</button>
+				</div>
+			</div>
+			<div class="checkInList" id="lista" style="border:1px solid rgb(100,100,100);"></div>
+			<script>
+				function getSelected() {
+					let select = document.getElementById("zaposleni");
+					let selectedOption = select.options[select.selectedIndex];
+					return selectedOption.innerHTML; // logs "Apple", "Banana", or "Cherry"
+				}
+				function prikaziCekiranja(){
+					document.getElementById("lista").innerHTML = "";
+					var checkInsZaPrikaz = [];
+					for(var i=0;i<checkIns.length;i++){
+						if(checkIns[i].uniqueId==document.getElementById("zaposleni").value && istiDatum(new Date(checkIns[i].datetime),new Date(document.getElementById("date").value)) ){
+							checkInsZaPrikaz.push(checkIns[i]);
+						}
+					}
+					checkInsZaPrikaz.sort((a, b) => a.datetime - b.datetime);
+					for(var i=0;i<checkInsZaPrikaz.length;i++){
+						var checkInRow = document.createElement("DIV");
+						checkInRow.setAttribute("class","checkInRow");
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+							inline.innerHTML = eval(i+1)+".";
+							checkInRow.appendChild(inline)
+
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+							inline.innerHTML = checkInsZaPrikaz[i].timestamp;
+							checkInRow.appendChild(inline)
+						document.getElementById("lista").appendChild(checkInRow);
+					}
+
+					document.getElementById("checkin-title").innerHTML = "Чекирај "+getSelected()+" za dan "+reshuffleDate(document.getElementById("date").value);
+					document.getElementById("checkin-title").dataset.id = document.getElementById("zaposleni").value ;
+				}
+			</script>
+		</div>
+		<div class="checkInForm">
+			<div id="checkin-title"></div>
+			<input type="number" min="0" max="24"> : <input type="number" min="0" max="60">
+			<button onclick="submitForm()">Чекирај</button>
+			<form style="display:none" method="POST" action="/manuelniCheckIn" id="form">
+				<input type="text" name="json" id="json">
+			</form>
+			<script>
+				function submitForm(){
+					
+				}
+			</script>
+		</div>		
+	</div>
+</div>
+<%- include ("partials/footer") -%>

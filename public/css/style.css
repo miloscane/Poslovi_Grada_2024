@@ -7375,6 +7375,118 @@ input[type=number] {
     font-size:18px;
 }
 
+.manuelniCheckIn .checkInList .checkInRow{
+    padding:5px;
+}
+
+.manuelniCheckIn .checkInList .checkInRow:nth-child(even){
+    background-color: rgb(240,240,240);
+}
+
+.manuelniCheckIn .checkInList .checkInRow .inline{
+    display:inline-block;
+    vertical-align: middle;
+    margin-right:15px;
+}
+
+.manuelniCheckIn .previewForm{
+    display: inline-block;
+    vertical-align: top;
+    width:300px;
+    margin-right:50px;
+}
+
+.manuelniCheckIn .checkInForm{
+    display: inline-block;
+    vertical-align: top;
+    width:300px;
+    margin-left:50px;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background-color: rgba(0,0,0,0.5);
+    z-index:20000000;
+    cursor:pointer;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap{
+    background-color:rgb(255,255,255);
+    border:1px solid rgb(0,0,0);
+    width:90%;
+    margin:0 auto;
+    margin-top:100px;
+    padding:20px;
+    border-radius:10px;
+    cursor: default;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap table{
+    border-collapse: collapse;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap td{
+    text-align: left;
+    vertical-align: top;
+    border:1px solid rgb(100,100,100);
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap .value{
+    padding:3px;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap .redniBroj{
+    font-weight:600;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap .brojNaloga .value{
+    width:110px;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap .datumNaloga .value{
+    width:120px;
+    text-align:center;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap .radnaJedinica .value{
+    width:70px;
+    word-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap .adresa .value{
+    width:150px;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap .status .value{
+    width:150px;
+    word-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap tr:nth-child(odd){
+    background-color:rgb(0,0,0,0.05);
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap tr:first-child{
+    font-weight:500;
+    color:rgb(255,255,255);
+    background-color:rgb(32,51,100);
+}
+
+.stanjeNalogaPoOpstinama .naloziTableLightbox .tableWrap{
+    height:800px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+
 @media screen and (max-width: 1100px) {
     .pageWidth{
         padding-left:10px;
