@@ -4037,9 +4037,23 @@ http.listen(process.env.PORT, async function(){
 			}
 		}*/
 		
+		/*var izvestaji = await dnevniIzvestajiDB.find({}).toArray();
+		console.log(izvestaji.length)
+		var datum = new Date("2025-09-21");
+		var ideviIzvestaja = [];
+		for(var i=0;i<izvestaji.length;i++){
+			if(new Date(izvestaji[i].date).getTime()<datum.getTime()){
+				ideviIzvestaja.push(izvestaji[i].uniqueId);
+			}
+		}
 
-
-
+		console.log(ideviIzvestaja.length)
+		var setObj = {$set:{
+			kazna:"",
+			kaznaRazlog:"",
+		}}
+		var response = await dnevniIzvestajiDB.updateMany({uniqueId:{$in:ideviIzvestaja}},setObj)
+		console.log(response)*/
 	})
 	.catch(error => {
 		logError(error);
