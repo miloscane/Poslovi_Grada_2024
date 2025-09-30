@@ -151,10 +151,14 @@
 							}
 							nalozi = nalozi + izvestaji[i].nalozi.length;
 							if(!isNaN(parseFloat(izvestaji[i].nagrada))){
-								nagrade = kazne + parseFloat(izvestaji[i].nagrada);
+								nagrade = nagrade + parseFloat(izvestaji[i].nagrada);
 							}
 							if(!isNaN(parseFloat(izvestaji[i].kazna))){
 								kazne = kazne + parseFloat(izvestaji[i].kazna);
+								console.log(izvestaji[i].date)
+								console.log(izvestaji[i].kazna)
+								console.log(izvestaji[i].kaznaRazlog)
+
 							}
 						}
 						ostvareniBodovi = ostvareniBodovi + nagrade/bodPlate - kazne/bodPlate;

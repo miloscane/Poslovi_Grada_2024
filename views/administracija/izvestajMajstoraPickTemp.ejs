@@ -126,6 +126,8 @@
 							for(var j=0;j<majstori.length;j++){
 								var kazna = 0;
 								var nagrada = 0;
+								var kazne = 0;
+								var nagrade = 0;
 								if(majstori[j].izvestaji.length>0){
 									kazna = !isNaN(parseFloat(majstori[j].izvestaji[0].kazna.replace(/,/g, "."))) ? parseFloat(majstori[j].izvestaji[0].kazna.replace(/,/g, ".")) : 0	
 									
@@ -136,11 +138,18 @@
 								ukupnoKazni = ukupnoKazni + kazna;
 								nagrade = nagrada
 								ukupnoNagrada = ukupnoNagrada + nagrada;
+										
 								var radniDani = 0;
 								for(var l=0;l<majstori[j].izvestaji.length;l++){
 									if(majstori[j].izvestaji[l].odsustvo=="Присутан"){
 										radniDani++;
 									}
+									var kazna = !isNaN(parseFloat(majstori[j].izvestaji[l].kazna.replace(/,/g, "."))) ? parseFloat(majstori[j].izvestaji[l].kazna.replace(/,/g, ".")) : 0
+									var nagrada = !isNaN(parseFloat(majstori[j].izvestaji[l].nagrada.replace(/,/g, "."))) ? parseFloat(majstori[j].izvestaji[l].nagrada.replace(/,/g, ".")) : 0;
+									kazne = kazne + kazna;
+									ukupnoKazni = ukupnoKazni + kazna;
+									nagrade = nagrade + nagrada
+									ukupnoNagrada = ukupnoNagrada + nagrada;
 								}
 
 
@@ -152,21 +161,10 @@
 
 										var ukupnoNaloga = 0;
 										var novcaniUcinak = 0;
-										var kazne = 0;
-										var nagrade = 0;
 										for(var k=0;k<radovi.length;k++){
 											var td = document.createElement("TD");
 											var nalozi = 0;
 											for(var l=0;l<majstori[j].izvestaji.length;l++){
-												var kazna = !isNaN(parseFloat(majstori[j].izvestaji[l].kazna.replace(/,/g, "."))) ? parseFloat(majstori[j].izvestaji[l].kazna.replace(/,/g, ".")) : 0
-												var nagrada = !isNaN(parseFloat(majstori[j].izvestaji[l].nagrada.replace(/,/g, "."))) ? parseFloat(majstori[j].izvestaji[l].nagrada.replace(/,/g, ".")) : 0;
-												
-												kazne = kazne + kazna;
-												ukupnoKazni = ukupnoKazni + kazna;
-												nagrade = nagrade + nagrada
-												ukupnoNagrada = ukupnoNagrada + nagrada;
-												
-
 												for(var q = 0;q<majstori[j].izvestaji[l].nalozi.length;q++){
 													if(majstori[j].izvestaji[l].nalozi[q].tipoviRada.indexOf(radovi[k])>=0){
 														nalozi++;
