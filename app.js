@@ -4054,12 +4054,76 @@ http.listen(process.env.PORT, async function(){
 		}}
 		var response = await dnevniIzvestajiDB.updateMany({uniqueId:{$in:ideviIzvestaja}},setObj)
 		console.log(response)*/
+
+
+		/*var nalozi = await naloziDB.find({"coordinates.lat": { $exists: false }}).toArray()
+		//console.log(nalozi)
+		for(var i=0;i<nalozi.length;i++){
+			try{
+				var nalogJson = nalozi[i];
+				const query = encodeURIComponent((nalogJson.adresa || "").trim() + ", Beograd");
+				const url = "https://nominatim.openstreetmap.org/search?format=json&q="+query;
+
+				const response = await axios.get(url, {
+				  headers: { "User-Agent": "MyApp/1.0 (miloscane@gmail.com)" } // Nominatim requires UA
+				});
+
+				if (response.data.length > 0) {
+				  const result = response.data[0]; // take best match
+				  console.log("Lat:", result.lat, "Lon:", result.lon);
+				  var setObj = {$set:{
+				  	coordinates:{lat:parseFloat(result.lat),lng: parseFloat(result.lon)},
+				  	mapaTest: "1"
+				  }};
+				  var response2 = await naloziDB.updateOne({broj:nalogJson.broj.toString()},setObj);
+				  console.log(response2)
+				  console.log("Updated "+eval(i+1) + " out of "+nalozi.length+". "+nalogJson.broj)
+				} else {
+				  console.log("No results found for "+nalogJson.adresa);
+				}
+				console.log("--------------------")
+				await sleep(2000);
+			}catch(err){
+				const status = err?.response?.status;
+   			 console.error(`Error for "${nalogJson.adresa}":`, status || err.message);
+			}
+			
+			
+		}*/
+
+
+		/*const config = {
+        url: 'https://maps.googleapis.com/maps/api/geocode/json?address='+encodeURIComponent(nalogJson.adresa + ', Beograd')+'&key='+process.env.googlegeocoding,
+        method: 'GET', // If necessary
+        headers: { 
+            'accept': 'text/plain',
+		    		'Content-Type': 'application/json'
+        }
+    };
+
+    var response = await axios(config);
+    var json = response.data;
+		nalogJson.coordinates = {}; 
+		if(json.hasOwnProperty("results")){
+			if(json.results.length>0){
+				if(json.results[0].hasOwnProperty("geometry")){
+					nalogJson.coordinates = json.results[0].geometry.location; 
+				}
+			}
+		}*/
+
+
+
 	})
 	.catch(error => {
 		logError(error);
 		console.log('Failed to connect to database');
 	});
 });
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 var daysInWeek = ["PONEDELJAK","UTORAK","SREDU","ČETVRTAK","PETAK","SUBOTU","NEDELJU"];
 
@@ -13091,7 +13155,8 @@ server.get('/majstor/mesec/:datum', async (req, res)=> {
 					checkIns: checkIns,
 					today: getDateAsStringForInputObject(today),
 					izvestaji: izvestaji
-				})
+				});
+
 			}catch(err){
 				logError(err)
 				res.render("message",{
@@ -13110,6 +13175,12 @@ server.get('/majstor/mesec/:datum', async (req, res)=> {
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
+});
+
+server.get('/simulator', async (req, res)=> {
+	res.render("simulator",{
+		pageTitle: "Simulator"
+	});
 });
 
 server.post('/izvestaj-majstora', async (req, res)=> {

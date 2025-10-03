@@ -1,0 +1,281 @@
+<%- include ("partials/header-nl") -%>
+	<div class="majstorMesec">
+		<div class="pageWidth majstorMesec">
+
+			<div style="max-width:900px;margin:0 auto">
+				<h3 style="margin:8px 0">Podešavanje tačaka</h3>
+				<div>
+					<div>
+						<div style="font-weight:600;margin-bottom:6px">Bodovi učinka (Skala 1)</div>
+						<div style="display:flex;gap:6px;flex-wrap:wrap">
+							<input id="s1p1" type="number" value="1000" style="width:90px">
+							<input id="s1p2" type="number" value="2000" style="width:90px">
+							<input id="s1p3" type="number" value="3000" style="width:90px">
+							<input id="s1p4" type="number" value="4000" style="width:90px">
+						</div>
+					</div>
+					<div style="margin-top:20px">
+						<div style="font-weight:600;margin-bottom:6px">Bodovi plate (Skala 2)</div>
+						<div style="display:flex;gap:6px;flex-wrap:wrap">
+							<input id="s2p1" type="number" value="200" style="width:90px">
+							<input id="s2p2" type="number" value="320" style="width:90px">
+							<input id="s2p3" type="number" value="440" style="width:90px">
+							<input id="s2p4" type="number" value="560" style="width:90px">
+						</div>
+					</div>
+				</div>
+
+				<div style="margin-top:10px;display:flex;gap:10px;align-items:center">
+					<button onclick="applyScales()" style="padding:6px 12px">Primeni tačke</button>
+				</div>
+			</div>
+
+			<div class="plata" style="margin-top:18px">
+				<div class="plotWrap">
+					<div class="ticksWrap" id="ticks"></div>
+					<div class="plataFinal">
+						<div class="tick" id="plata-tick">
+							<div style="position:relative;width:100%;height:100%">
+								<div class="value" id="plata-value"></div>
+							</div>
+						</div>
+					</div>
+					<div class="fill" id="plata-fill"></div>
+				</div>
+
+				<div class="plotWrap" style="margin-top:90px">
+					<div class="ticksWrap" id="ticks2"></div>
+					<div class="plataFinal">
+						<div class="tick" id="plata-tick2">
+							<div style="position:relative;width:100%;height:100%">
+								<div class="value" id="plata-value2"></div>
+							</div>
+						</div>
+					</div>
+					<div class="fill" id="plata-fill2"></div>
+				</div>
+			</div>
+
+			<script>
+				// Global current points (4 non-zero ticks; zero is implicit)
+				var currentS1 = [1000, 2000, 3000, 4000];
+				var currentS2 = [200, 320, 440, 560];
+
+				// Build both scales with given points (arrays of length 4, non-zero ticks)
+				function renderScales(s1Points, s2Points){
+					currentS1 = s1Points.slice(0,4);
+					currentS2 = s2Points.slice(0,4);
+
+					// Clear previous ticks
+					var t1 = document.getElementById("ticks");
+					var t2 = document.getElementById("ticks2");
+					if (t1) t1.innerHTML = "";
+					if (t2) t2.innerHTML = "";
+
+					// SCALE 1 (Bod učinka)
+					var steps = 4; // 0%,25%,50%,75%,100%
+					var tickValues1 = [0, currentS1[0], currentS1[1], currentS1[2], currentS1[3]];
+
+					for (var i = 0; i <= steps; i++) {
+						var percent = i / steps; // 0..1
+						var mainTick = document.createElement("DIV");
+						mainTick.className = "mainTick";
+						mainTick.style.left = percent * 100 + "%";
+							var relative = document.createElement("DIV");
+							relative.style.cssText = "position:relative;width:100%;height:100%";
+
+								var number = document.createElement("DIV");
+								number.className = "number";
+								number.innerHTML = tickValues1[i].toFixed(0);
+								relative.appendChild(number);
+							mainTick.appendChild(relative);
+						document.getElementById("ticks").appendChild(mainTick);
+
+						if (i < steps) {
+							var nextPercent = (i + 1) / steps;
+							for (var j = 0; j < 3; j++) {
+								var subPercent = percent + (j + 1) / 4 * (nextPercent - percent);
+								var subTick = document.createElement("DIV");
+								subTick.className = "subTick";
+								subTick.style.left = subPercent * 100 + "%";
+								document.getElementById("ticks").appendChild(subTick);
+							}
+						}
+					}
+
+					// SCALE 2 (Bod plate)
+					var tickValues2 = [0, currentS2[0], currentS2[1], currentS2[2], currentS2[3]];
+
+					for (var k = 0; k <= steps; k++) {
+						var percent2 = k / steps; // aligned with scale 1
+						var mainTick2 = document.createElement("DIV");
+						mainTick2.className = "mainTick";
+						mainTick2.style.left = percent2 * 100 + "%";
+							var relative2 = document.createElement("DIV");
+							relative2.style.cssText = "position:relative;width:100%;height:100%";
+
+								var number2 = document.createElement("DIV");
+								number2.className = "number";
+								number2.innerHTML = tickValues2[k].toFixed(0);
+								relative2.appendChild(number2);
+							mainTick2.appendChild(relative2);
+						document.getElementById("ticks2").appendChild(mainTick2);
+
+						if (k < steps) {
+							var nextPercent2 = (k + 1) / steps;
+							for (var j2 = 0; j2 < 3; j2++) {
+								var subPercent2 = percent2 + (j2 + 1) / 4 * (nextPercent2 - percent2);
+								var subTick2 = document.createElement("DIV");
+								subTick2.className = "subTick";
+								subTick2.style.left = subPercent2 * 100 + "%";
+								document.getElementById("ticks2").appendChild(subTick2);
+							}
+						}
+					}
+				}
+
+				// Read inputs and rebuild
+				function applyScales(){
+					var s1 = [
+						parseFloat(document.getElementById("s1p1").value) || 0,
+						parseFloat(document.getElementById("s1p2").value) || 0,
+						parseFloat(document.getElementById("s1p3").value) || 0,
+						parseFloat(document.getElementById("s1p4").value) || 0
+					];
+					var s2 = [
+						parseFloat(document.getElementById("s2p1").value) || 0,
+						parseFloat(document.getElementById("s2p2").value) || 0,
+						parseFloat(document.getElementById("s2p3").value) || 0,
+						parseFloat(document.getElementById("s2p4").value) || 0
+					];
+
+					// Basic ascending guard (optional)
+					for (var i = 1; i < 4; i++){
+						if (s1[i] < s1[i-1]) s1[i] = s1[i-1];
+						if (s2[i] < s2[i-1]) s2[i] = s2[i-1];
+					}
+
+					renderScales(s1, s2);
+
+					// Reset fills and labels
+					document.getElementById("plata-fill").style.width = "0%";
+					document.getElementById("plata-fill2").style.width = "0%";
+					document.getElementById("plata-tick").style.left = "0%";
+					document.getElementById("plata-tick2").style.left = "0%";
+					document.getElementById("plata-value").innerHTML = "";
+					document.getElementById("plata-value2").innerHTML = "";
+					generateScale();
+				}
+
+				function generateScale(){
+					setFromScale1()
+				}
+
+				function setFromScale1(){
+					// Read #numInput (may contain thousand dots)
+					var raw = document.getElementById("numInput") ? document.getElementById("numInput").value : "0";
+					var clean = (raw || "").toString().replace(/\./g, "").replace(/\D/g, "");
+					var din = parseFloat(clean) || 0;
+
+					// Scale 1 value = din / 1000
+					var value1 = din / 1000;
+
+					// Guard max from scale 1 (last tick)
+					var max1 = currentS1[3];
+					if (!max1 || max1 <= 0) max1 = 1;
+
+					// Percent along scale 1 drives TOP bar
+					var percentTop = value1 / max1;
+					if (percentTop < 0) percentTop = 0;
+					if (percentTop > 1) percentTop = 1;
+
+					// Forward map TOP percent -> raw bottom value (piecewise on scale 2 ticks)
+					var tickValues2 = [0, currentS2[0], currentS2[1], currentS2[2], currentS2[3]];
+					var segments = 4;
+					var seg = Math.floor(percentTop * segments);
+					if (seg >= segments) seg = segments - 1;
+
+					var startP = seg / segments;
+					var endP = (seg + 1) / segments;
+					var t = (percentTop - startP) / (endP - startP);
+					var value2Raw = tickValues2[seg] + t * (tickValues2[seg + 1] - tickValues2[seg]);
+
+					// Apply penalty from #bodovi: penalty = bodovi / 500
+					var bodoviEl = document.getElementById("bodovi");
+					var bodovi = bodoviEl ? (parseFloat(bodoviEl.value) || 0) : 0;
+					var penalty = bodovi / 500;
+
+					var value2Adjusted = value2Raw - penalty;
+					if (value2Adjusted < 0) value2Adjusted = 0;
+					if (value2Adjusted > tickValues2[4]) value2Adjusted = tickValues2[4];
+
+					// Inverse map: bottom value -> percent along scale 2 (for BOTTOM bar)
+					var percentBottom = 0;
+					(function(){
+						// find segment where adjusted value lies
+						for (var s = 0; s < 4; s++){
+							var a = tickValues2[s];
+							var b = tickValues2[s+1];
+							if (value2Adjusted <= b || s == 3) {
+								var denom = (b - a);
+								var tt = denom != 0 ? (value2Adjusted - a) / denom : 0;
+								if (tt < 0) tt = 0;
+								if (tt > 1) tt = 1;
+								percentBottom = (s + tt) / 4;
+								break;
+							}
+						}
+					})();
+
+					// Set fills (TOP uses percentTop, BOTTOM adapts to percentBottom)
+					document.getElementById("plata-fill").style.width = (percentTop * 100).toFixed(2) + "%";
+					document.getElementById("plata-fill2").style.width = (percentBottom * 100).toFixed(2) + "%";
+					document.getElementById("plata-tick").style.left = (percentTop * 100).toFixed(2) + "%";
+					document.getElementById("plata-tick2").style.left = (percentBottom * 100).toFixed(2) + "%";
+
+					// Labels
+					var v1El = document.getElementById("plata-value");
+					if (v1El) v1El.innerHTML = value1.toFixed(0);
+
+					var v2El = document.getElementById("plata-value2");
+					if (v2El) v2El.innerHTML = value2Adjusted.toFixed(0);
+
+					return { value1: value1, value2: value2Adjusted, percentTop: percentTop, percentBottom: percentBottom };
+				}
+
+				// Initial render with defaults
+				renderScales(currentS1, currentS2);
+			</script>
+
+			<div class="boxesWrap" style="background-color:rgb(240,240,240);padding:20px">
+				<div class="box">
+					<div class="title">Учинак [дин.]:</div>
+					<div class="value">
+						<input id="numInput" type="text" inputmode="numeric" style="color:black">
+						<script>
+							const input = document.getElementById("numInput");
+
+							input.addEventListener("input", (e) => {
+							  // Remove non-digits
+							  let value = e.target.value.replace(/\D/g, "");
+
+							  // Add dot every 3 digits
+							  value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+							  e.target.value = value;
+							  generateScale();
+							});
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="title">Kazneni bodovi [дин.]:</div>
+					<div class="value">
+						<input id="bodovi" value="0" type="number" style="color:black" oninput="generateScale()">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>
+	
