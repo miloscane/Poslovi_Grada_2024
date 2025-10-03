@@ -247,31 +247,17 @@
 				renderScales(currentS1, currentS2);
 			</script>
 
-			<div class="boxesWrap" style="background-color:rgb(240,240,240);padding:20px">
-				<div class="box">
+			<div class="boxesWrap" style="background-color:rgb(240,240,240);padding:20px;display: block;">
+				<div class="box" style="width:100%">
 					<div class="title">Учинак [дин.]:</div>
 					<div class="value">
-						<input id="numInput" type="text" inputmode="numeric" style="color:black">
-						<script>
-							const input = document.getElementById("numInput");
-
-							input.addEventListener("input", (e) => {
-							  // Remove non-digits
-							  let value = e.target.value.replace(/\D/g, "");
-
-							  // Add dot every 3 digits
-							  value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-
-							  e.target.value = value;
-							  generateScale();
-							});
-						</script>
+						<input id="numInput" type="number" style="color:black;width:100%;max-width:100%;text-align: center;padding:5px;" oninput="generateScale()">
 					</div>
 				</div>
-				<div class="box">
+				<div class="box" style="width:100%">
 					<div class="title">Kazneni bodovi [дин.]:</div>
 					<div class="value">
-						<input id="bodovi" value="0" type="number" style="color:black" oninput="generateScale()">
+						<input id="bodovi" value="0" type="number"  style="width:100%;text-align: center;color:black;padding:5px"  oninput="generateScale()">
 					</div>
 				</div>
 			</div>
