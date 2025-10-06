@@ -7,10 +7,7 @@
 	var majstori = <%-JSON.stringify(majstori)%>;
 	majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 	var users = <%-JSON.stringify(users)%>;
-	console.log(users)
 	users.sort((a, b) => a.name.localeCompare(b.name));
-	console.log(majstori);
-	console.log(users)
 </script>
 <div class="manuelniCheckIn">
 	<div class="pageWidth">
@@ -38,9 +35,12 @@
 					</script>
 				</div>
 				<div class="filter">
-					<input type="date" id="date">
+					<input type="date" id="date" oninput="datePicked()">
 					<script>
 						document.getElementById("date").value = getDateAsStringForInputObject(new Date());
+						function datePicked(){
+							document.getElementById("check-in-date").value = document.getElementById("date").value 
+						}
 					</script>
 				</div>
 				<div class="filter">
@@ -78,21 +78,61 @@
 						document.getElementById("lista").appendChild(checkInRow);
 					}
 
-					document.getElementById("checkin-title").innerHTML = "Чекирај "+getSelected()+" za dan "+reshuffleDate(document.getElementById("date").value);
+					//document.getElementById("checkin-title").innerHTML = "Чекирај "+getSelected()+" za dan "+reshuffleDate(document.getElementById("date").value);
 					document.getElementById("checkin-title").dataset.id = document.getElementById("zaposleni").value ;
 				}
 			</script>
 		</div>
 		<div class="checkInForm">
 			<div id="checkin-title"></div>
-			<input type="number" min="0" max="24"> : <input type="number" min="0" max="60">
+			<input type="date" id="check-in-date"> <select id="hours"></select> : <select id="minutes"></select>
 			<button onclick="submitForm()">Чекирај</button>
 			<form style="display:none" method="POST" action="/manuelniCheckIn" id="form">
 				<input type="text" name="json" id="json">
 			</form>
 			<script>
+				const now = new Date();
+				const currentHour = now.getHours();
+				const currentMinute = now.getMinutes();
+
+				const hoursSelect = document.getElementById("hours");
+				const minutesSelect = document.getElementById("minutes");
+
+				// Populate hours (0–23)
+				for (let h = 0; h < 24; h++) {
+					const option = document.createElement("option");
+					option.value = h.toString().padStart(2, "0");
+					option.textContent = h.toString().padStart(2, "0");
+					if (h === currentHour) option.selected = true;
+					hoursSelect.appendChild(option);
+				}
+
+				// Populate minutes (0–59)
+				for (let m = 0; m < 60; m++) {
+					const option = document.createElement("option");
+					option.value = m.toString().padStart(2, "0");
+					option.textContent = m.toString().padStart(2, "0");
+					if (m === currentMinute) option.selected = true;
+					minutesSelect.appendChild(option);
+				}
 				function submitForm(){
-					
+					var potvrda = confirm("Да ли сте сигурни да желите да чекирате "+document.getElementById("zaposleni").options[document.getElementById("zaposleni").selectedIndex].innerHTML+" за датум "+reshuffleDate(document.getElementById("check-in-date").value)+" у "+document.getElementById("hours").value+":"+document.getElementById("minutes").value);
+					if(potvrda){
+						var dateCheckin = new Date(document.getElementById("check-in-date").value);
+						dateCheckin.setHours(Number(document.getElementById("hours").value));
+						dateCheckin.setMinutes(Number(document.getElementById("minutes").value));
+						var json = {};
+						json.uniqueId = document.getElementById("zaposleni").value;
+						json.brojKartice = "auto";
+						json.datetime = dateCheckin.getTime();
+						json.month = dateCheckin.getMonth()+1;
+						json.date = dateCheckin.getDate();
+						json.year = dateCheckin.getFullYear();
+						json.timestamp = document.getElementById("hours").value+":"+document.getElementById("minutes").value;
+						document.getElementById("json").value = JSON.stringify(json);
+						loadGif();
+						document.getElementById("form").submit();
+					}
 				}
 			</script>
 		</div>		

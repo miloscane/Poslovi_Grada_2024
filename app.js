@@ -13994,6 +13994,36 @@ server.get('/majstorCheckIn/:servertoken/:tagId',async (req,res)=>{
 	}
 });
 
+server.post('/manuelniCheckIn',async (req,res)=>{
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+	if(Number(req.session.user.role)!=10){
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен за ову акцију.</div>"
+		});
+	}
+
+	try{
+		var json = JSON.parse(req.body.json);
+		json.datetime = Number(json.datetime);
+		json.month = json.month.toString().padStart(2,"0");
+		json.date = json.date.toString().padStart(2,"0");
+		json.year = Number(json.year);
+		await checkInMajstoraDB.insertOne(json);
+		res.redirect("/administracija/manuelnoCekiranje")
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Програмска грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Грешка у бази података 12368.</div>"
+		});
+	}
+});
+
 server.get('/appLogIn/:servertoken/:deviceid',async (req,res)=>{
 	if(req.params.servertoken==process.env.servertoken){
 		if(!req.session.user){
