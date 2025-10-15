@@ -6782,7 +6782,6 @@ input[type=number] {
 
 .overviewForm table tr:last-child{
     font-weight:700;
-    font-size:20px;
 }
 
 .overviewForm table tr:nth-child(odd){
@@ -7486,6 +7485,66 @@ input[type=number] {
     overflow-y: scroll;
 }
 
+.aiMap{
+    width:50vw !important;
+    display:inline-block !important;
+    vertical-align: top !important;
+    transform: none !important;
+    left:auto !important; 
+}
+
+.aiReasoning{
+    width:40vw !important;
+    display:inline-block !important;
+    vertical-align: top !important;
+    height: 100vh;
+    overflow-y: scroll;
+    padding:20px;
+
+}
+
+
+.aiReasoning table{
+    border-collapse: collapse;
+}
+.aiReasoning table td{
+    border: 1px solid rgb(100,100,100);
+    padding:5px;
+    text-align: center;
+}
+.aiReasoning table td:first-child{
+    text-align: left;
+}
+
+
+.aiReasoning table tr:nth-child(odd) td{
+    border-bottom:3px solid rgb(100,100,100);
+}
+
+.aiReasoning table tr:first-child{
+    background-color:rgb(32,51,100);
+    color:rgb(255,255,255);
+}
+
+.aiReasoning .dot{
+    width:25px;
+    height:25px;
+    margin:0 auto;
+    border-radius:25px;
+    border:2px solid rgb(100,100,100);
+}
+
+.aiReasoning .greenDot{
+    background-color: rgb(20,255,20);
+}
+
+.aiReasoning .yellowDot{
+    background-color: rgb(255,255,20);
+}
+
+.aiReasoning .redDot{
+    background-color: rgb(255,20,20);
+}
 
 @media screen and (max-width: 1100px) {
     .pageWidth{

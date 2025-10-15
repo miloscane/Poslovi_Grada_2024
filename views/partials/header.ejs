@@ -27,6 +27,8 @@
 		  <script>var socket  = io({});</script>
 	</head>
 	<body>
+		<button onclick="aiTest(1)">Ai test Leak</button>
+		<button onclick="aiTest(0)">Ai test Clog</button>
 		<div id="load-lightbox" class="lightbox">
 			<div class="lightboxContent">
 				<img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/loadGif.gif">
@@ -110,6 +112,44 @@
 				
 			});
 
+			function aiTest(num){
+				if(num==0){
+					var nalogAi =  1140703;
+					var htmlString = '<div class=\"title\">New work order</div><div class=\"text\"><a href=\"/nalog/1140703\" target=\"blank\">1140703</a> - <span class=\"adresa\">Nehruova 93</span> - <span class=\"radnaJedinica\">NOVI BEOGRAD</span></span></div>';
+				}else{
+					var htmlString = '<div class=\"title\">New work order</div><div class=\"text\"><a href=\"/nalog/1140704\" target=\"blank\">1140704</a> - <span class=\"adresa\">Vukasoviceva 37</span> - <span class=\"radnaJedinica\">RAKOVICA</span></span></div>';
+					var nalogAi =  1140704;
+				}
+				var notificationElem = document.createElement("DIV");
+				notificationElem.setAttribute("class","notification");
+					var contents = document.createElement("DIV");
+					contents.setAttribute("class","contents");
+					contents.innerHTML = htmlString;
+					notificationElem.appendChild(contents);
+
+					var close = document.createElement("DIV");
+					close.setAttribute("class","close");
+					close.setAttribute("onclick","this.parentElement.style.display=\"none\"");
+					close.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nevalidiranIcon.png\">";
+					notificationElem.appendChild(close);
+
+					var ai = document.createElement("DIV");
+					ai.setAttribute("class","aiSuggestion");
+					ai.setAttribute("onclick", "window.open('/ai/" + nalogAi + "', '_blank')");
+
+					if(htmlString.includes("NOVI BEOGRAD")){
+						
+						ai.innerHTML = "<div class=\"sug\"><img src=\"https://www.aidispatcher.net/favicon.png\"><span class=\"tooltip\"><b>Best technician choice:</b> Dalibor Tripkovic<br><b>Reasoning:</b><br>Brzo zavrsava, najblizi, ima motornu sajlu</div>";	
+					}else{
+						ai.innerHTML = "<div class=\"sug\"><img src=\"https://www.aidispatcher.net/favicon.png\"><span class=\"tooltip\"><b>Best technician choice:</b> Uros Janjic<br><b>Reasoning:</b><br>Dobro mu je poznata zgrada</div>";	
+					}
+					notificationElem.appendChild(ai);
+					
+
+					
+				document.getElementById("notifications").appendChild(notificationElem);
+			}
+
 			socket.on("notification",function(type,htmlString,condition){
 				var currentNotificationElems = document.getElementById("notifications").getElementsByClassName("notification");
 				var notificationExists = false;
@@ -137,9 +177,16 @@
 
 									var ai = document.createElement("DIV");
 									ai.setAttribute("class","aiSuggestion");
-									ai.innerHTML = "<div class=\"sug\"><img src=\"https://www.aidispatcher.net/favicon.png\"><span class=\"tooltip\"><b>Best technician choice:</b> Dalibor Tripkovic<br><b>Reasoning:</b><br>Close by, well equiped</div>";
-
+									if(htmlString.includes("NOVI BEOGRAD")){
+										
+										ai.innerHTML = "<div class=\"sug\"><img src=\"https://www.aidispatcher.net/favicon.png\"><span class=\"tooltip\"><b>Best technician choice:</b> Dalibor Tripkovic<br><b>Reasoning:</b><br>Close by, well equiped</div>";	
+									}else{
+										ai.innerHTML = "<div class=\"sug\"><img src=\"https://www.aidispatcher.net/favicon.png\"><span class=\"tooltip\"><b>Best technician choice:</b> Uros Janjic<br><b>Reasoning:</b><br>Quickest for 2 main stream unclog</div>";	
+									}
 									notificationElem.appendChild(ai);
+									
+
+									
 								document.getElementById("notifications").appendChild(notificationElem);
 							}	
 						}

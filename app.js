@@ -1263,7 +1263,7 @@ http.listen(process.env.PORT, async function(){
 		}
 
 		var naloziToExport = [];
-		var month = 8;
+		var month = 9;
 		for(var i=0;i<nalozi.length;i++){
 			if(nalozi[i].faktura.broj){
 				if(nalozi[i].faktura.broj.length>3){
@@ -7343,6 +7343,144 @@ server.get('/nalog/:broj',async (req,res)=>{
 	}
 });
 
+server.get('/ai/:broj',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20 || Number(req.session.user.role)==25 || Number(req.session.user.role)==30){
+			//administracija, dispeceri, podizvodjaci
+			try{
+				var nalozi = await naloziDB.find({broj:req.params.broj.toString()}).toArray();
+				if(nalozi.length==0 && nalozi2024.length==0){
+					return res.render("message",{
+						pageTitle: "Непостојећи налог",
+						message: "<div class=\"text\">Налог број "+req.params.broj+" не постоји у бази података.</div>",
+						user: req.session.user
+					});
+				}
+				var majstori = await majstoriDB.find({}).toArray();
+				for(var i=0;i<majstori.length;i++){
+					if(!majstori[i].aktivan){
+						if(podizvodjaci.indexOf(majstori[i].uniqueId)<0){
+							majstori.splice(i,1);
+							i--;
+						}
+					}
+				}
+				var config = {
+					method: 'post',
+					url: baseUrl+'/token', // Replace with your actual URL
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					data: data
+				};
+				axios(config)
+				.then(async response => {
+				  token = response.data.access_token;
+				  var json = {};
+
+					config = {
+				      url: baseUrl + '/api/Client/GetClient',
+				      method: 'POST', // If necessary
+				      headers: { 
+				          'Content-Type': 'application/json',
+				          'Authorization': `Bearer ${token}`
+				      },
+				      data: { 'ClientId': telematicsId }
+				  };
+
+				  //Client data
+				  var response = await axios(config);
+				  //console.log(response.data)
+				  json.clientInfo = response.data.client[0];
+
+				  
+				  config = {
+				      url: baseUrl + '/api/Asset/GetDevicesCurrentData',
+				      method: 'POST', // If necessary
+				      headers: { 
+				          'Content-Type': 'application/json',
+				          'Authorization': `Bearer ${token}`
+				      },
+				      data: { 'ClientId': telematicsId }
+				  };
+				  var response = await axios(config);
+				  json.vozila = response.data;
+				  res.render("ainalog",{
+						pageTitle:"AI Match za налог број " + req.params.broj,
+						nalog: nalozi[0],
+						majstori: majstori,
+						navigacija: json,
+						googlegeocoding: process.env.googlegeocoding,
+						user: req.session.user
+					});
+				})
+				.catch(async err=>{
+					logError(err);
+					res.render("message",{
+						pageTitle: "Грешка",
+						message: "<div class=\"text\">Дошло је до грешке у бази податка 3376.</div>",
+						user: req.session.user
+					});
+				})
+				
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3376.</div>",
+					user: req.session.user
+				});
+			}
+		}else if(Number(req.session.user.role)==40){
+			//premijus
+			try{
+				var nalozi = await naloziDB.find({broj:req.params.broj.toString()}).toArray();
+				var nalozi2024 = await nalozi2024DB.find({broj:req.params.broj.toString()}).toArray();
+				if(nalozi.length==0 && nalozi2024.length==0){
+					return res.render("message",{
+						pageTitle: "Грешка",
+						message: "<div class=\"text\">Непостојећи налог.</div>",
+						user: req.session.user
+					});
+				}
+				if(nalozi.length==0){
+					nalozi[0] = nalozi2024[0];
+				}
+				var allowed = ["Spreman za fakturisanje","Fakturisan","Storniran"];
+				if(allowed.indexOf(nalozi[0].statusNaloga)>=0){
+					res.render("premijus/nalog",{
+						pageTitle:"Налог број " + req.params.broj,
+						nalog: nalozi[0],
+						user: req.session.user
+					});
+				}else{
+					res.render("message",{
+						pageTitle: "Грешка",
+						message: "<div class=\"text\">Налог није спреман за Премијус.</div>",
+						user: req.session.user
+					});
+				}
+
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Грешка",
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 710.</div>",
+					user: req.session.user
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Није дефинисан ниво корисника.</div>",
+				user: req.session.user
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.post('/majstorNaNalogu',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
@@ -8869,7 +9007,7 @@ server.get('/izvestajMajstoraPickTemp',async (req,res)=>{
 			try{
 				//req.params.date je za izvestaje koji postoje
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
-				var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:"2025-09"}}).toArray();
+				var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:"2025-10"}}).toArray();
 				res.render("administracija/izvestajMajstoraPickTemp",{
 					pageTitle:"Одабери мајстора и датум",
 					user: req.session.user,
@@ -14283,8 +14421,12 @@ setInterval(function(){
 
 
 /*setTimeout(function(){
-	io.emit("notification","noviNalog","<div class=\"title\">New work order</div><div class=\"text\"><a href=\"/nalog/1812732\" target=\"blank\">1812732</a> - <span class=\"adresa\">Nehruova 87</span> - <span class=\"radnaJedinica\">NOVI BEOGRAD</span></span></div>","NOVI BEOGRAD")
-},30000)*/
+	io.emit("notification","noviNalog","<div class=\"title\">New work order</div><div class=\"text\"><a href=\"/nalog/1140703\" target=\"blank\">1140703</a> - <span class=\"adresa\">Nehruova 93</span> - <span class=\"radnaJedinica\">NOVI BEOGRAD</span></span></div>","NOVI BEOGRAD")
+},30000)
+
+setTimeout(function(){
+	io.emit("notification","noviNalog","<div class=\"title\">New work order</div><div class=\"text\"><a href=\"/nalog/1140704\" target=\"blank\">1140704</a> - <span class=\"adresa\">Vukasoviceva 37</span> - <span class=\"radnaJedinica\">RAKOVICA</span></span></div>","RAKOVICA")
+},40000)*/
 
 
 

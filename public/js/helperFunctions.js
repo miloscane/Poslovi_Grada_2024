@@ -413,6 +413,22 @@ function isYesterdayAfter3PM(date1, date2) {
   return isYesterday && d1.getHours() >= 15;
 }
 
+function bodoviFromUcinak(ucinak) {
+  ucinak = ucinak /1000
+  const s1 = [0, 1000, 2000, 3000, 4000];
+  const s2 = [0, 200, 320, 440, 560];
+
+  // Find segment
+  for (let i = 0; i < 4; i++) {
+    const u1 = s1[i];
+    const u2 = s1[i + 1];
+    if (ucinak <= u2 || i === 3) {
+      const ratio = (ucinak - u1) / (u2 - u1);
+      return s2[i] + ratio * (s2[i + 1] - s2[i]);
+    }
+  }
+}
+
 var definicijeProizvoda = [
                     {
                       "startCode":"01.01",
