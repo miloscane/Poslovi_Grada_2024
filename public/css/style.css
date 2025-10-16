@@ -6168,6 +6168,7 @@ input[type=number] {
 
 .majstorMesec .plata .plotWrap .plataFinal #plata-tick2 .value{
     left:0;
+    width:200px;
 }
 
 
