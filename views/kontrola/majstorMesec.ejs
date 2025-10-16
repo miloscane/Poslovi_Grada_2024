@@ -467,7 +467,7 @@
 					if (v1El) v1El.innerHTML = value1.toFixed(0);
 
 					var v2El = document.getElementById("plata-value2");
-					if (v2El) v2El.innerHTML = value2Adjusted.toFixed(0);
+					if (v2El) v2El.innerHTML = value2Adjusted.toFixed(0) + " бодова / " + eval(value2Adjusted.toFixed(0)*500).toFixed(0) + " поена";
 
 					return { value1: value1, value2: value2Adjusted, percentTop: percentTop, percentBottom: percentBottom };
 				}
