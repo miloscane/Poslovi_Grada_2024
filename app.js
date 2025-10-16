@@ -13267,7 +13267,8 @@ server.get('/majstor/mesec/:datum', async (req, res)=> {
 		if(Number(req.session.user.role)==60){
 			try{
 				var today = new Date();
-				var izvestaji = await dnevniIzvestajiDB.find({majstor:req.session.user.uniqueId,date:{$regex:req.params.datum.split(".")[1]+"-"+req.params.datum.split(".")[0]}}).toArray();
+				//var izvestaji = await dnevniIzvestajiDB.find({majstor:req.session.user.uniqueId,date:{$regex:req.params.datum.split(".")[1]+"-"+req.params.datum.split(".")[0]}}).toArray();
+				var izvestaji = await dnevniIzvestajiDB.find({majstor:req.session.user.uniqueId,date: { $gt: "2025-10-14" }}).toArray();
 				var checkIns = await checkInMajstoraDB.find({uniqueId:req.session.user.uniqueId,month:{$in:[eval(today.getMonth()+1).toString().padStart(2,"0"),eval(today.getMonth()+1)]},date:{$in:[today.getDate().toString().padStart(2,"0"),today.getDate()]},year:today.getFullYear()}).toArray()
 				var brojeviNaloga = [];
 				for(var i=0;i<izvestaji.length;i++){
