@@ -25,6 +25,7 @@
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 	</script>
 	<div class="pageWidth grupniIzvestaj">
+		<div id="nalozi-popover" class="nalozi-popover" style="display:none"></div>
 		<div class="overviewForm">
 			<div class="naloziWrap">
 				<div id="nalozi"></div>
@@ -190,16 +191,22 @@
 											var td = document.createElement("TD");
 											var nalozi = 0;
 											var novac2 = 0;
+											var naloziForElem = [];
 											for(var l=0;l<majstori[j].izvestaji.length;l++){
 												for(var q = 0;q<majstori[j].izvestaji[l].nalozi.length;q++){
 													if(majstori[j].izvestaji[l].nalozi[q].tipoviRada.indexOf(radovi[k])>=0){
 														nalozi++;
+														console.log(majstori[j].izvestaji[l].nalozi)
 														var ucinakNaloga = isNaN(parseFloat(majstori[j].izvestaji[l].nalozi[q].ucinak.replace(/,/g, "."))) ?  0 : parseFloat(majstori[j].izvestaji[l].nalozi[q].ucinak.replace(/,/g, "."));
 														novac2 = novac2 + ucinakNaloga;
+														naloziForElem.push(majstori[j].izvestaji[l].nalozi[q]);
 													}
 												}
 												
 											}
+											td.dataset.nalozi = JSON.stringify(naloziForElem);
+											td.setAttribute("onmouseenter","showNalozi(this)");
+											td.setAttribute("onmouseleave","hideNalozi(this)");
 											td.innerHTML = nalozi +" naloga <br> "+brojSaRazmacima(novac2/nalozi)+" RSD/nalog";
 											tr.appendChild(td);
 										}
@@ -207,12 +214,6 @@
 										var td = document.createElement("TD");
 										td.innerHTML = ukupnoNaloga +" naloga";
 										tr.appendChild(td)
-
-										
-
-										
-
-										
 									table.appendChild(tr);
 								}
 							}
@@ -311,6 +312,62 @@
 			        link.click();
 			    });
 			}
+
+
+			// Singleton
+const popover = document.getElementById('nalozi-popover');
+let currentAnchor = null;
+let hideTimeout = null;
+
+function buildNaloziTable(nalozi){
+  const rows = nalozi.map(n => `
+    <tr>
+      <td class="broj"><div class="value"><a href="" target="_blank">${n.broj ?? ''}</a></div></td>
+      <td class="adresa"><div class="value">${n.adresa ?? ''}</div></td>
+      <td class="opis"><div class="value">${n.opis ?? ''}</div></td>
+      <td class="komentar"><div class="value">${n.komentarKontrole ?? ''}</div></td>
+      <td class="iznos"><div class="value">${brojSaRazmacima(n.ucinak.replace(/,/g, ".")) ?? ''}</div></td>
+    </tr>
+  `).join('');
+  return `<table class="table">${rows}</table>`;
+}
+
+function positionPopover(anchor, placement = 'below'){
+  const r = anchor.getBoundingClientRect();
+  if (placement === 'below') {
+    popover.style.left = (r.left + r.width / 2) + 'px';
+    popover.style.top  = (r.bottom) + 'px'; // a little gap below the cell
+    popover.style.transform = 'translateX(-50%)';
+  } else if (placement === 'middle') {
+    popover.style.left = (r.left + r.width / 2) + 'px';
+    popover.style.top  = (r.top + r.height / 2) + 'px';
+    popover.style.transform = 'translate(-50%, -50%)';
+  }
+}
+
+function showNalozi(anchorTd){
+  clearTimeout(hideTimeout);
+  const nalozi = JSON.parse(anchorTd.dataset.nalozi || '[]');
+  if (!Array.isArray(nalozi) || nalozi.length === 0) return;
+  popover.innerHTML = buildNaloziTable(nalozi);
+  currentAnchor = anchorTd;
+  popover.style.display = 'block';
+  positionPopover(anchorTd, 'below'); // or 'middle'
+}
+
+function hideNalozi(){
+  hideTimeout = setTimeout(() => {
+    if (!popover.matches(':hover')) {
+      popover.style.display = 'none';
+      currentAnchor = null;
+    }
+  }, 150); // 150ms delay so mouse can travel into the popover
+}
+
+popover.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+popover.addEventListener('mouseleave', () => hideNalozi());
+window.addEventListener('scroll', () => { if (currentAnchor) positionPopover(currentAnchor); }, { passive:true });
+window.addEventListener('resize', () => { if (currentAnchor) positionPopover(currentAnchor); });
 
 
 
