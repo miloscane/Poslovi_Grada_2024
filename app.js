@@ -6323,7 +6323,7 @@ server.get('/administracija/strukturaJucerasnjihNaloga/:datum',async (req,res)=>
 		if(Number(req.session.user.role)==10){
 			var date = req.params.datum;
 			var datum = new Date(date);
-			naloziDB.find({"datum.datum":getDateAsStringForDisplay(datum)}).toArray()
+			naloziDB.find({"digitalizacija.stambeno.datum":req.params.datum}).toArray()
 			.then((nalozi)=>{
 				res.render("administracija/strukturaJucerasnjihNaloga",{
 					pageTitle: "Структура радних налога за " + getDateAsStringForDisplay(datum),
