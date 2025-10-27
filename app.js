@@ -9074,6 +9074,42 @@ server.get('/izvestajMajstoraPickTemp/:date',async (req,res)=>{
 	}
 });
 
+server.get('/izvestajMajstoraPickTemp/:date/:date2',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				//req.params.date je za izvestaje koji postoje
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
+				var izvestaji = await dnevniIzvestajiDB.find({date: {$gte: req.params.date,$lte: req.params.date2}}).toArray();
+				//var izvestaji = await dnevniIzvestajiDB.find({date: { $gt: "2025-10-14" }}).toArray();
+				res.render("administracija/izvestajMajstoraPickTemp",{
+					pageTitle:"Одабери мајстора и датум",
+					user: req.session.user,
+					majstori: majstori,
+					izvestaji: izvestaji,
+					podelaOpstina: podelaOpstina,
+					date: req.params.date
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 7345.</div>"
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 
 
 server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
