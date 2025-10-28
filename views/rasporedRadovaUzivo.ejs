@@ -72,8 +72,8 @@
 			return height;
 		}
 
-		function adjustLeftPositionsTight() {
-		  const container = document.getElementById("dodele");
+		function adjustLeftPositionsTight(elem) {
+		  const container = elem;
 		  if (!container) return;
 
 		  const wraps = Array.from(container.querySelectorAll(".dodelaWrap"));
@@ -201,6 +201,33 @@ function ensureBrojNalogaVisible({
 }
 
 
+function layoutNoOverlap(container) {
+  // Uveri se da “container” ima prave elemente
+  const cards = Array.from(container.querySelectorAll('.dodelaWrap'));
+  console.log('found cards in this container:', cards.length);
+
+  // Ako očekuješ više a dobijaš 1, proveri: da li si stvarno dodao više elemenata?
+  // Brzi sanity check:
+  // console.log('childElementCount:', container.childElementCount);
+
+  // Osnovni no-overlap (primer: guraj sledeće ulevo/desno po potrebi)
+  cards.sort((a, b) => a.offsetTop - b.offsetTop || a.offsetLeft - b.offsetLeft);
+
+  for (let i = 1; i < cards.length; i++) {
+    const prev = cards[i - 1].getBoundingClientRect();
+    const curEl = cards[i];
+    const cur = curEl.getBoundingClientRect();
+
+    const sameRow = Math.abs(cur.top - prev.top) < 1; // ili prag po tvojoj mreži
+    if (sameRow && cur.left < prev.right) {
+      // pomeri trenutni odmah pored prethodnog
+      const shift = (prev.right - cur.left) + 1;
+      const currentLeft = parseFloat(getComputedStyle(curEl).left || '0');
+      curEl.style.left = (currentLeft + shift) + 'px';
+    }
+  }
+}
+
 
 
 
@@ -285,6 +312,11 @@ function ensureBrojNalogaVisible({
 								dodelaWrap.appendChild(adresaNaloga);*/
 							dodele.appendChild(dodelaWrap);
 						}
+						//adjustLeftPositionsTight(dodele)
+
+						//requestAnimationFrame(() => {
+						  layoutNoOverlap(dodele); // or dodeleElem if you rename it
+						//});
 						const now = new Date();
 						const nowMin = now.getHours() * 60 + now.getMinutes();
 
@@ -304,15 +336,9 @@ function ensureBrojNalogaVisible({
 					}
 				}
 
-				/*requestAnimationFrame(() => {
-  scrollWrappersToNow();
-  ensureBrojNalogaVisible({ extraY: 0 }); // adjust here if you want more base height
-});
-
-// keep it reactive on scroll
-document.querySelectorAll('.rasporedRadovaUzivo .wrapper').forEach(wrap => {
-  wrap.addEventListener('scroll', () => ensureBrojNalogaVisible({ extraY: 0 }), { passive:true });
-});*/
+				setTimeout(function(){
+					window.location.reload();
+				},120000)
 			</script>
 		</div>
 <%- include ("partials/footer") -%>

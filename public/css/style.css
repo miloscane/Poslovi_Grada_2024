@@ -5994,7 +5994,7 @@ input[type=number] {
     width:100px;
     font-size:10px;
     z-index:200;
-    overflow-y: scroll;
+    overflow-y: hidden;
     overflow-x:hidden;
 
 }
