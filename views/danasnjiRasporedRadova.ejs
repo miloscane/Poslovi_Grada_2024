@@ -122,6 +122,11 @@
 							statusNaloga.innerHTML = dodelaJson.nalogInfo.statusNaloga;
 							dodelaWrap.appendChild(statusNaloga);
 
+							var adresaNaloga = document.createElement("DIV");
+							adresaNaloga.setAttribute("class","adresaNaloga");
+							adresaNaloga.innerHTML = dodelaJson.nalogInfo.adresa;
+							dodelaWrap.appendChild(adresaNaloga);
+
 							var opisNaloga = document.createElement("DIV");
 							opisNaloga.setAttribute("class","opisNaloga");
 							opisNaloga.innerHTML = dodelaJson.nalogInfo.opis;

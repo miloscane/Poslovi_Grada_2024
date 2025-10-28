@@ -5892,6 +5892,13 @@ input[type=number] {
 .rasporedRadovaNovo #dodele .statusNaloga{
     text-align: center;
     color:rgb(216,69,77);
+    margin-bottom:5px;
+}
+
+.rasporedRadovaNovo #dodele .adresaNaloga{
+    text-align: center;
+    color:rgb(20,255,20);
+    margin-bottom:5px;
 }
 
 .majstorMesec{
