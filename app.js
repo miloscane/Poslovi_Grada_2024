@@ -9809,6 +9809,42 @@ server.get('/dispecer/rasporedRadova', async(req,res)=>{
 	}
 })
 
+server.get('/rasporedRadovaUzivo', async (req,res)=>{
+	try{
+		var today = new Date();
+		//today.setDate(today.getDate()-1);
+		var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
+		var dodele = await dodeljivaniNaloziDB.find({datumRadova:getDateAsStringForInputObject(today)}).toArray();
+		var brojeviNaloga = [];
+		for(var i=0;i<dodele.length;i++){
+			brojeviNaloga.push(dodele[i].nalog);
+		}
+		var nalozi = await naloziDB.find({broj:{$in:brojeviNaloga}}).toArray();
+		for(var i=0;i<dodele.length;i++){
+			for(var j=0;j<nalozi.length;j++){
+				if(dodele[i].nalog==nalozi[j].broj){
+					dodele[i].nalogInfo = nalozi[j];
+					break;
+				}
+			}
+		}
+
+		res.render("rasporedRadovaUzivo",{
+			pageTitle: "Данашњи распоред",
+			user: req.session.user,
+			majstori: majstori,
+			dodele: dodele
+		})
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Грешка у бази података 9780.</div>"
+		});
+	}
+})
+
 server.get('/danasnjiRasporedRadova', async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==20 || Number(req.session.user.role)==25){

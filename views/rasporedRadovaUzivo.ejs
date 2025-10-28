@@ -1,0 +1,312 @@
+<%- include ("partials/header") -%>
+	<script>
+		var majstori = <%-JSON.stringify(majstori)%>;
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+		var dodele = <%-JSON.stringify(dodele)%>;
+		for(var i=0;i<majstori.length;i++){
+			majstori[i].dodele = [];
+			for(var j=0;j<dodele.length;j++){
+				if(majstori[i].uniqueId==dodele[j].majstor){
+					majstori[i].dodele.push(dodele[j])
+				}
+			}
+		}
+
+		
+
+		var START_H = 7
+		var START_M = 0;   // 07:00
+		var END_H   = 21;
+		var END_M   = 0;  // 20:00
+		var STEP_MIN = 30; 
+		var hour = START_H;
+		var minute = START_M;
+		var times = [];
+		while (hour < END_H || (hour === END_H && minute === END_M)) {
+		    const h = String(hour).padStart(2,'0');
+		    const m = String(minute).padStart(2,'0');
+		    times.push(`${h}:${m}`);
+		    minute += STEP_MIN;
+		    if (minute >= 60) { minute = 0; hour++; }
+		}
+
+		function getTopForTime(timeStr) {
+			// ---- Config (same as your generation logic) ----
+			const START_H = 7;
+			const START_M = 0;
+			const STEP_MIN = 30; // half-hour per row
+			const timeline = document.querySelector('.rasporedRadovaUzivo');
+			const sample = document.querySelector('.timestamp');
+			if (!timeline || !sample) return 0;
+
+			// ---- Convert "HH:MM" into total minutes ----
+			const [h, m] = timeStr.split(':').map(Number);
+			const targetMin = h * 60 + m;
+			const startMin = START_H * 60 + START_M;
+			const diffMin = targetMin - startMin;
+			if (diffMin < 0) return 0; // before start
+
+			// ---- Compute position ----
+			const slotH = sample.offsetHeight; // height of each timestamp row
+			const padTop = parseFloat(getComputedStyle(timeline).paddingTop) || 0;
+			const slots = diffMin / STEP_MIN;
+			const topPx = padTop + slots * slotH;
+
+			return topPx;
+		}
+
+		function getHeightForDuration(durationStr) {
+			const STEP_MIN = 30; // one .timestamp = 30 minutes
+			const sample = document.querySelector('.timestamp');
+			if (!sample) return 0;
+
+			const slotH = sample.offsetHeight;
+
+			// Parse duration "HH:MM"
+			const [h, m] = durationStr.split(':').map(Number);
+			const totalMin = h * 60 + m;
+
+			// Convert minutes to pixels
+			const height = (totalMin / STEP_MIN) * slotH;
+
+			return height;
+		}
+
+		function adjustLeftPositionsTight() {
+		  const container = document.getElementById("dodele");
+		  if (!container) return;
+
+		  const wraps = Array.from(container.querySelectorAll(".dodelaWrap"));
+		  if (!wraps.length) return;
+
+		  // Make sure container is positioning context
+		  if (getComputedStyle(container).position === "static") {
+		    container.style.position = "relative";
+		  }
+
+		  // Sort by vertical position so earlier items become anchors
+		  wraps.sort((a, b) => {
+		    const ta = parseFloat(a.style.top) || 0;
+		    const tb = parseFloat(b.style.top) || 0;
+		    return ta - tb || a.offsetHeight - b.offsetHeight;
+		  });
+
+		  // Reset any previous left
+		  wraps.forEach(el => { el.style.left = "0px"; });
+
+		  const GAP = 4; // px space between neighbors
+
+		  for (let i = 0; i < wraps.length; i++) {
+		    const a = wraps[i];
+		    const aTop = parseFloat(a.style.top) || 0;
+		    const aBottom = aTop + a.offsetHeight;
+
+		    // Find the rightmost edge among *previous* overlapping elements
+		    let left = 0;
+		    for (let j = 0; j < i; j++) {
+		      const b = wraps[j];
+		      const bTop = parseFloat(b.style.top) || 0;
+		      const bBottom = bTop + b.offsetHeight;
+
+		      const overlapsVertically = aTop < bBottom && aBottom > bTop;
+		      if (overlapsVertically) {
+		        const bLeft = parseFloat(b.style.left) || 0;
+		        const bRight = bLeft + b.offsetWidth;
+		        if (bRight > left) left = bRight; // park right after the farthest-right overlap
+		      }
+		    }
+
+		    // Small gap so edges don’t touch
+		    if (left > 0) left += GAP;
+
+		    // Optional: keep inside container
+		    const maxLeft = Math.max(0, container.clientWidth - a.offsetWidth);
+		    if (left > maxLeft) left = maxLeft;
+
+		    a.style.left = left + "px";
+		    a.style.position = "absolute"; // make sure it’s absolutely positioned
+		  }
+		}
+
+		 function getNowTopPx() {
+    const sample = document.querySelector('.timestamp');
+    if (!sample) return 0;
+    const slotH = sample.offsetHeight;               // px per 30min
+    const now = new Date();
+    let h = now.getHours(), m = now.getMinutes();
+
+    // clamp to schedule window
+    const startMin = START_H*60 + START_M;
+    const endMin   = END_H*60   + END_M;
+    const nowMin   = Math.min(Math.max(h*60 + m, startMin), endMin);
+
+    // allow smooth, fractional position (not just on 30-min grid)
+    const slots = (nowMin - startMin) / STEP_MIN;   // e.g., 09:15 -> 4.5 slots from 07:00
+    return slots * slotH;
+  }
+
+		function scrollWrappersToNow({align = 'center', extraOffset = 0, contentOffsetY = 0} = {}) {
+  const topPx = getNowTopPx();
+  const wrappers = document.querySelectorAll('.rasporedRadovaUzivo .wrapper');
+
+  wrappers.forEach(wrap => {
+    const header = wrap.querySelector('.ime');
+    const headerH = header ? header.offsetHeight : 0;
+
+    let target = topPx;
+    if (align === 'center') {
+      target = topPx - (wrap.clientHeight - headerH) / 2;
+    } else if (align === 'start') {
+      target = Math.max(0, topPx - headerH);
+    } else if (align === 'end') {
+      target = topPx - (wrap.clientHeight - headerH);
+    }
+    target = Math.max(0, target + extraOffset);
+
+    // 1) scroll
+    wrap.scrollTo({ top: target, behavior: 'smooth' });
+    
+  });
+}
+
+function ensureBrojNalogaVisible({basePad = 0, extraY = 20, maxPad = 120} = {}) {
+  // For each card (dodelaWrap)…
+  document.querySelectorAll('.dodelaWrap').forEach(box => {
+    const broj = box.querySelector('.brojNaloga');
+    if (!broj) return;
+
+    // Make sure the card itself can scroll inside
+    if (getComputedStyle(box).overflowY === 'visible') {
+      box.style.overflowY = 'auto';
+    }
+
+    const scrollTop  = box.scrollTop;
+    const viewTop    = scrollTop;                    // top of visible area (inside the card)
+    const viewBottom = scrollTop + box.clientHeight; // bottom of visible area
+
+    // Position of brojNaloga relative to the card’s content
+    const itemTop    = broj.offsetTop;
+    const itemBottom = itemTop + broj.offsetHeight;
+
+    let pad = basePad + extraY;
+
+    // If brojNaloga is clipped above, push it down by exactly how much it's hidden
+    if (itemTop < viewTop) {
+      const hidden = viewTop - itemTop;              // px hidden above
+      pad = Math.min(maxPad, basePad + extraY + hidden);
+    }
+    // (Optional) if it’s clipped at the bottom, you can reduce pad or do nothing:
+    // else if (itemBottom > viewBottom) {
+    //   const hiddenBottom = itemBottom - viewBottom;
+    //   pad = Math.max(basePad, basePad + extraY - hiddenBottom * 0.5);
+    // }
+
+    broj.style.paddingTop = pad + 'px';
+  });
+}
+
+
+
+
+		  window.requestAnimationFrame(() => scrollWrappersToNow());
+		  requestAnimationFrame(() => ensureBrojNalogaVisible({ extraY: 0 }));
+
+  // Keep them updated every minute on the minute
+  function scheduleTick() {
+    const msToNextMinute = (60 - new Date().getSeconds()) * 1000 + 50;
+    setTimeout(() => {
+      scrollWrappersToNow();
+      setInterval(scrollWrappersToNow, 300*1000);
+    }, msToNextMinute);
+  }
+  scheduleTick();
+
+	</script>
+		<div class="rasporedRadovaUzivo">
+			<div id="majstori">
+				
+			</div>
+			<script>
+				for(var i=0;i<majstori.length;i++){
+					
+
+					if(majstori[i].dodele.length>0){
+						var wrap = document.createElement("DIV");
+						wrap.setAttribute("class","wrapper");
+							var ime = document.createElement("DIV");
+							ime.setAttribute("class","ime");
+							ime.innerHTML = majstori[i].ime;
+							wrap.appendChild(ime)
+
+							var timesElem = document.createElement("DIV");
+							timesElem.setAttribute("class","times");
+							for(var j=0;j<times.length;j++){
+								var timestamp = document.createElement("DIV");
+								timestamp.setAttribute("class","timestamp");
+								timestamp.innerHTML = times[j];
+								timesElem.appendChild(timestamp);
+							}
+							wrap.appendChild(timesElem);
+
+							var rtimesElem = document.createElement("DIV");
+							rtimesElem.setAttribute("class","times relativeTimes");
+							for(var j=0;j<times.length;j++){
+								var timestamp = document.createElement("DIV");
+								timestamp.setAttribute("class","timestamp");
+								timestamp.innerHTML = times[i];
+								rtimesElem.appendChild(timestamp);
+							}
+							wrap.appendChild(rtimesElem);
+
+							var dodele = document.createElement("DIV");
+							dodele.setAttribute("class","dodele");
+							wrap.appendChild(dodele);
+
+							var laser = document.createElement("DIV");
+							laser.setAttribute("class","laser");
+							wrap.appendChild(laser)
+						document.getElementById("majstori").appendChild(wrap);
+						dodele.style.height = rtimesElem.getBoundingClientRect().height+"px";
+
+						for(var j=0;j<majstori[i].dodele.length;j++){
+							var dodelaJson = majstori[i].dodele[j];
+							var dodelaWrap = document.createElement("DIV");
+							dodelaWrap.setAttribute("class","dodelaWrap");
+							dodelaWrap.style.top = getTopForTime(dodelaJson.vremeDolaska)+"px"
+							dodelaWrap.style.height = getHeightForDuration(dodelaJson.vremeRadova)+"px"
+								var brojNaloga = document.createElement("DIV");
+								brojNaloga.setAttribute("class","brojNaloga");
+								brojNaloga.innerHTML = "<a href=\"/nalog/"+dodelaJson.nalog+"\" target=\"_blank\">"+dodelaJson.nalog+"</a>";
+								dodelaWrap.appendChild(brojNaloga);
+
+								var statusNaloga = document.createElement("DIV");
+								statusNaloga.setAttribute("class","statusNaloga");
+								statusNaloga.innerHTML = dodelaJson.nalogInfo.statusNaloga;
+								dodelaWrap.appendChild(statusNaloga);
+
+								var adresaNaloga = document.createElement("DIV");
+								adresaNaloga.setAttribute("class","adresaNaloga");
+								adresaNaloga.innerHTML = dodelaJson.nalogInfo.radnaJedinica+"<br>"+dodelaJson.nalogInfo.adresa;
+								dodelaWrap.appendChild(adresaNaloga);
+							dodele.appendChild(dodelaWrap);
+						}
+						const now = new Date();
+						const nowMin = now.getHours() * 60 + now.getMinutes();
+
+						
+						const startMin = START_H * 60 + START_M;
+						const endMin = END_H * 60 + END_M;
+						const slotH = timestamp.offsetHeight;
+						const elapsed = nowMin - startMin;
+						const wholeSlots = Math.floor(elapsed / STEP_MIN);
+						const minutesIntoSlot = elapsed % STEP_MIN;
+						const insideSlotOffset = (minutesIntoSlot / STEP_MIN) * slotH;
+
+						const padTop = parseFloat(getComputedStyle(wrap).paddingTop) || 0;
+						const topPx = padTop + wholeSlots * slotH + insideSlotOffset;
+						laser.style.top = `${topPx}px`;
+					}
+				}
+			</script>
+		</div>
+<%- include ("partials/footer") -%>

@@ -5901,6 +5901,139 @@ input[type=number] {
     margin-bottom:5px;
 }
 
+
+
+
+
+
+.rasporedRadovaUzivo{
+    position:relative;
+    overflow-x:hidden;
+}
+
+.rasporedRadovaUzivo .wrapper{
+    height:400px;
+    overflow-y:scroll;
+    overflow-x:hidden; /* and turn off x */
+    border:1px solid rgb(0,0,0);
+}
+
+
+.rasporedRadovaUzivo .wrapper .ime{
+    position:sticky;
+    top:0px;
+    z-index:300;
+    width:100%;
+    text-align: center;
+    padding:3px;
+    background-color:rgb(216,69,77);
+    color:rgb(255,255,255);
+}
+
+.rasporedRadovaUzivo .times{
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+.rasporedRadovaUzivo .relativeTimes{
+    position:relative;
+    display:inline-block;
+    vertical-align: top;
+}
+
+.rasporedRadovaUzivo .dodele{
+    position:relative;
+    display:inline-block;
+    vertical-align: top;
+    width:calc(100% - 60px);
+    overflow-x: scroll;
+    z-index:200;
+}
+
+.rasporedRadovaUzivo .lines{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+}
+
+.rasporedRadovaUzivo .lines .relative{
+    position:relative;
+    width:100%;
+    height:100%;
+}
+
+.rasporedRadovaUzivo .lines .relative .line{
+    width:100%;
+    height:1px;
+    background-color:rgb(100,100,100);
+    position:absolute;
+}
+
+.rasporedRadovaUzivo .timestamp{
+    text-align: center;
+    padding:30px 5px;
+    border:1px solid rgb(100,100,100);
+    width:60px;
+}
+
+.rasporedRadovaUzivo .relativeTimes .timestamp{
+    opacity:0;
+}
+
+.rasporedRadovaUzivo .dodele .dodelaWrap{
+    position:absolute;
+    background-color:rgb(32,51,100);
+    color:rgb(255,255,255);
+    border:2px solid rgb(255,255,255);
+    padding:10px;
+    width:100px;
+    font-size:14px;
+    z-index:200;
+    overflow-y: scroll;
+
+}
+
+.rasporedRadovaUzivo .wrapper{
+    display:inline-block;
+    vertical-align: top;
+    width:300px;
+    position:relative;
+}
+
+.rasporedRadovaUzivo .dodele .brojNaloga{
+    text-align: center;
+}
+
+.rasporedRadovaUzivo .dodele .brojNaloga a{
+    color:rgb(255,255,255);
+}
+
+.rasporedRadovaUzivo .dodele .statusNaloga{
+    text-align: center;
+    color:rgb(216,69,77);
+    margin-bottom:5px;
+}
+
+.rasporedRadovaUzivo .dodele .adresaNaloga{
+    text-align: center;
+    color:rgb(20,255,20);
+    margin-bottom:5px;
+}
+
+.rasporedRadovaUzivo .laser{
+    position: absolute;
+    top:100px;
+    left: 0; 
+    right: 0;
+    height: 2px;
+    background: red;           /* your “laser” style */
+    box-shadow: 0 0 6px red;   /* optional glow */
+    pointer-events: none;
+}
+
 .majstorMesec{
     position:relative;
 }
