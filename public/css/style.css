@@ -5993,6 +5993,7 @@ input[type=number] {
     font-size:14px;
     z-index:200;
     overflow-y: scroll;
+    overflow-x:hidden;
 
 }
 
