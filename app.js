@@ -7506,10 +7506,22 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 							}};
 						naloziDB.updateOne({broj:json.nalog},setObj)
 						.then((dbResponse) => {
-							res.render("message",{
-								pageTitle: "Мајстор послат на налог",
-								message: "<div class=\"text\">Успешно сте заказали <b>"+majstori[0].ime+"</b> на налог број "+json.nalog+" - <b>"+json.adresa+"</b>, "+json.radnaJedinica+".<br>&nbsp;<b>Датум</b>"+json.datumRadova+"<br><b>Време:</b> "+json.vremeRadova+"</div><br><a href=\"/nalog/"+json.nalog+"\">Повратак на налог</a></div>",
-								user: req.session.user
+							var mailOptions = {
+								from: '"ViK Portal" <admin@poslovigrada.rs>',
+								to: "momir.lutovac@poslovigrada.rs,nenad.papes@poslovigrada.rs,miloscane@gmail.com",
+								subject: majstori[0].ime+' zakazan novi nalog',
+								html: majstori[0].ime + ' zakazan novi nalog za '+json.radnaJedinica+' / '+json.adresa+'<br>Pocetak radova '+reshuffleDate(json.datumRadova)+' '+json.vremeDolaska+'<br>Trajanje radova '+json.vremeRadova
+							};
+								
+							transporter.sendMail(mailOptions, (error, info) => {
+								if (error) {
+									logError(error);
+								}
+								res.render("message",{
+									pageTitle: "Мајстор послат на налог",
+									message: "<div class=\"text\">Успешно сте заказали <b>"+majstori[0].ime+"</b> на налог број "+json.nalog+" - <b>"+json.adresa+"</b>, "+json.radnaJedinica+".<br>&nbsp;<b>Датум</b>"+json.datumRadova+"<br><b>Време:</b> "+json.vremeRadova+"</div><br><a href=\"/nalog/"+json.nalog+"\">Повратак на налог</a></div>",
+									user: req.session.user
+								});
 							});
 						})
 						.catch((error)=>{
@@ -7555,17 +7567,32 @@ server.post('/deleteMajstorNaNalogu',async (req,res)=>{
 		if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
 			dodeljivaniNaloziDB.find({uniqueId:req.body.id}).toArray()
 			.then((dodele)=>{
-				if(dodele[0].user.email == req.session.user.email){
+				//if(dodele[0].user.email == req.session.user.email){
 					var setObj	=	{ $set: {
 								deleted: 1
 							}};
 					dodeljivaniNaloziDB.updateOne({uniqueId:req.body.id},setObj)
-					.then((dbResponse) => {
-						res.render("message",{
-							pageTitle: "Порука",
-							message: "<div class=\"text\">Успешно сте <b>обрисали</b> доделу.<br><a href=\"/nalog/"+dodele[0].nalog+"\">Повратак на налог</a></div>",
-							user: req.session.user
+					.then(async (dbResponse) => {
+						var majstori = await majstoriDB.find({uniqueId:dodele[0].majstor}).toArray();
+						var mailOptions = {
+							from: '"ViK Portal" <admin@poslovigrada.rs>',
+							to: "momir.lutovac@poslovigrada.rs,nenad.papes@poslovigrada.rs,miloscane@gmail.com",
+							subject: majstori[0].ime+' otkazan nalog',
+							html: majstori[0].ime + ' otkazan nalog za '+dodele[0].radnaJedinica+' / '+dodele[0].adresa+'<br>Otkazani radovi bili planirani za '+reshuffleDate(dodele[0].datumRadova)+' '+dodele[0].vremeDolaska
+						};
+
+						transporter.sendMail(mailOptions, (error, info) => {
+							if (error) {
+								logError(error);
+							}
+							res.render("message",{
+								pageTitle: "Порука",
+								message: "<div class=\"text\">Успешно сте <b>обрисали</b> доделу.<br><a href=\"/nalog/"+dodele[0].nalog+"\">Повратак на налог</a></div>",
+								user: req.session.user
+							});
 						});
+
+						
 					})
 					.catch((error)=>{
 						logError(error);
@@ -7575,13 +7602,13 @@ server.post('/deleteMajstorNaNalogu',async (req,res)=>{
 							user: req.session.user
 						});
 					})
-				}else{
+				/*}else{
 					res.render("message",{
 						pageTitle: "Грешка",
 						message: "<div class=\"text\">Не можете мењати туђу доделу.</div>",
 						user: req.session.user
 					});
-				}
+				}*/
 			})
 			.catch((error)=>{
 				logError(error);
@@ -7619,12 +7646,27 @@ server.post('/editMajstorNaNalogu',async (req,res)=>{
 								zavrsetak: zavrsetak
 							}};
 					dodeljivaniNaloziDB.updateOne({uniqueId:json.uniqueId},setObj)
-					.then((dbResponse) => {
-						res.render("message",{
-							pageTitle: "Порука",
-							message: "<div class=\"text\">Успешно сте <b>изменили</b> доделу. <a href=\"/nalog/"+json.brojNaloga+"\">Повратак на налог</a></div>",
-							user: req.session.user
+					.then(async (dbResponse) => {
+						var majstori = await majstoriDB.find({uniqueId:dodele[0].majstor}).toArray();
+						var mailOptions = {
+							from: '"ViK Portal" <admin@poslovigrada.rs>',
+							to: "momir.lutovac@poslovigrada.rs,nenad.papes@poslovigrada.rs,miloscane@gmail.com",
+							subject: majstori[0].ime+' izmena zakazanog naloga',
+							html: majstori[0].ime + ' izmena zakazanog nalog na '+dodele[0].radnaJedinica+' / '+dodele[0].adresa+'<br>Pocetak radova '+reshuffleDate(json.datumRadova)+' '+json.vremeDolaska+'<br>Trajanje radova '+json.vremeRadova
+						};
+
+						transporter.sendMail(mailOptions, (error, info) => {
+							if (error) {
+								logError(error);
+							}
+							res.render("message",{
+								pageTitle: "Порука",
+								message: "<div class=\"text\">Успешно сте <b>изменили</b> доделу. <a href=\"/nalog/"+json.brojNaloga+"\">Повратак на налог</a></div>",
+								user: req.session.user
+							});
 						});
+
+						
 					})
 					.catch((error)=>{
 						logError(error);
