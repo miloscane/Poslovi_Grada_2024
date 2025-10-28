@@ -133,7 +133,7 @@
 							dodelaWrap.appendChild(opisNaloga);
 						document.getElementById("dodele").appendChild(dodelaWrap);
 					}
-					adjustLeftPositions();
+					adjustLeftPositionsTight();
 				}
 				prikaziDodele();
 
@@ -183,35 +183,89 @@
 				  const wraps = Array.from(document.querySelectorAll(".dodelaWrap"));
 				  if (!wraps.length) return;
 
-				  // Reset left before calculating
 				  wraps.forEach(w => { w.style.left = "0px"; });
 
 				  for (let i = 0; i < wraps.length; i++) {
 				    const a = wraps[i];
 				    const aTop = parseFloat(a.style.top);
-				    const aHeight = parseFloat(a.style.height);
-				    const aBottom = aTop + aHeight;
+				    const aBottom = aTop + a.offsetHeight;
 
-				    let offset = 0; // how many overlaps already found
+				    let offset = 0;
 
 				    for (let j = 0; j < i; j++) {
 				      const b = wraps[j];
 				      const bTop = parseFloat(b.style.top);
-				      const bHeight = parseFloat(b.style.height);
-				      const bBottom = bTop + bHeight;
+				      const bBottom = bTop + b.offsetHeight;
 
-				      // check vertical overlap
-				      const overlap = aTop < bBottom && aBottom > bTop;
-				      if (overlap) offset++;
+				      if (aTop < bBottom && aBottom > bTop) {
+				        offset++;
+				      }
 				    }
 
-				    // Shift horizontally for each overlap
 				    if (offset > 0) {
-				      const width = 200; // horizontal offset per overlap in px (adjust as needed)
-				      a.style.left = offset * width + "px";
+				      const shift = 200; // px or percentage, adjust
+				      a.style.left = offset * shift + "px";
 				    }
 				  }
 				}
+
+				function adjustLeftPositionsTight() {
+				  const container = document.getElementById("dodele");
+				  if (!container) return;
+
+				  const wraps = Array.from(container.querySelectorAll(".dodelaWrap"));
+				  if (!wraps.length) return;
+
+				  // Make sure container is positioning context
+				  if (getComputedStyle(container).position === "static") {
+				    container.style.position = "relative";
+				  }
+
+				  // Sort by vertical position so earlier items become anchors
+				  wraps.sort((a, b) => {
+				    const ta = parseFloat(a.style.top) || 0;
+				    const tb = parseFloat(b.style.top) || 0;
+				    return ta - tb || a.offsetHeight - b.offsetHeight;
+				  });
+
+				  // Reset any previous left
+				  wraps.forEach(el => { el.style.left = "0px"; });
+
+				  const GAP = 4; // px space between neighbors
+
+				  for (let i = 0; i < wraps.length; i++) {
+				    const a = wraps[i];
+				    const aTop = parseFloat(a.style.top) || 0;
+				    const aBottom = aTop + a.offsetHeight;
+
+				    // Find the rightmost edge among *previous* overlapping elements
+				    let left = 0;
+				    for (let j = 0; j < i; j++) {
+				      const b = wraps[j];
+				      const bTop = parseFloat(b.style.top) || 0;
+				      const bBottom = bTop + b.offsetHeight;
+
+				      const overlapsVertically = aTop < bBottom && aBottom > bTop;
+				      if (overlapsVertically) {
+				        const bLeft = parseFloat(b.style.left) || 0;
+				        const bRight = bLeft + b.offsetWidth;
+				        if (bRight > left) left = bRight; // park right after the farthest-right overlap
+				      }
+				    }
+
+				    // Small gap so edges don’t touch
+				    if (left > 0) left += GAP;
+
+				    // Optional: keep inside container
+				    const maxLeft = Math.max(0, container.clientWidth - a.offsetWidth);
+				    if (left > maxLeft) left = maxLeft;
+
+				    a.style.left = left + "px";
+				    a.style.position = "absolute"; // make sure it’s absolutely positioned
+				  }
+				}
+
+
 
 				
 			</script>
