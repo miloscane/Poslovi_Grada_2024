@@ -133,8 +133,13 @@
 									<div class="subMenuItem"><a href="/wome" onclick="loadGif()">Mapa Woma</a></div>
 								</div>
 							</div>
+							<div class="menuItem"><a href="/dispecer/rasporedRadova">Распоред радова <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/danasnjiRasporedRadova" onclick="loadGif()">Данас</a><div class="bottomBorder"></div></div>
+								</div>
+							</div>
 							<div class="menuItem"><a href="/dispecer/pretragaNaloga" onclick="loadGif()">Претрага налога</a><div class="rightBorder"></div></div>
-							<div class="menuItem"><a href="/dispecer/rasporedRadova" onclick="loadGif()">Распоред радова</a><div class="rightBorder"></div></div>
+							
 							<div class="menuItem"><a href="#">Мајстори <span class="carret">&or;</span></a><div class="rightBorder"></div>
 								<div class="subMenu">
 									<div class="subMenuItem"><a href="/administracijaMajstora" onclick="loadGif()">Администрација</a><div class="bottomBorder"></div></div>
@@ -148,6 +153,11 @@
 						<% }else if(Number(user.role)==25){ %>
 							<div class="menuItem"><a href="/kontrola/naslovna">Неизвршени налози</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/kontrola/radnici">Моји радници</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/dispecer/rasporedRadova">Распоред радова <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/danasnjiRasporedRadova" onclick="loadGif()">Данас</a><div class="bottomBorder"></div></div>
+								</div>
+							</div>
 							<div class="menuItem"><a href="/proveraLokacijeMajstora">Локације мајстора</a><div class="rightBorder"></div></div>
 							<!--<div class="menuItem"><a href="/proveraLokacijeMajstora">Контрола локације</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/mapa" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
