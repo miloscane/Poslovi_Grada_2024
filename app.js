@@ -9772,7 +9772,7 @@ server.get('/danasnjiRasporedRadova', async (req,res)=>{
 		if(Number(req.session.user.role)==20 || Number(req.session.user.role)==25){
 			try{
 				var today = new Date();
-				today.setDate(today.getDate()-1);
+				//today.setDate(today.getDate()-1);
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				var dodele = await dodeljivaniNaloziDB.find({datumRadova:getDateAsStringForInputObject(today)}).toArray();
 				var brojeviNaloga = [];
