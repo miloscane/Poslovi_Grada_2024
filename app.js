@@ -9291,55 +9291,45 @@ server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
 
 
 server.post('/dnevniIzvestaj',async (req,res)=>{
-	if(req.session.user){
-		if(Number(req.session.user.role)==10){
-			var json = JSON.parse(req.body.json);
-			if(json.uniqueId=="new"){
-				json.uniqueId = generateId(5)+"--"+new Date().getTime();
-				dnevniIzvestajiDB.insertOne(json)
-				.then((dbResponse)=>{
-					res.render("message",{
-						pageTitle: "Извештај унет",
-						user: req.session.user,
-						message: "<div class=\"text\">Извештај унет.</div>"
-					});
-				})
-				.catch((error)=>{
-					logError(error);
-					res.render("message",{
-						pageTitle: "Програмска грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Грешка у бази података 7522.</div>"
-					});
-				})
-			}else{
-				dnevniIzvestajiDB.replaceOne({uniqueId:json.uniqueId},json)
-				.then((dbResponse)=>{
-					res.render("message",{
-						pageTitle: "Извештај измењен",
-						user: req.session.user,
-						message: "<div class=\"text\">Извештај измењен.</div>"
-					});
-				})
-				.catch((error)=>{
-					logError(error);
-					res.render("message",{
-						pageTitle: "Програмска грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Грешка у бази података 7522.</div>"
-					});
-				})
-			}
-		}else{
+	
+	var json = JSON.parse(req.body.json);
+	if(json.uniqueId=="new"){
+		json.uniqueId = generateId(5)+"--"+new Date().getTime();
+		dnevniIzvestajiDB.insertOne(json)
+		.then((dbResponse)=>{
 			res.render("message",{
-				pageTitle: "Грешка",
+				pageTitle: "Извештај унет",
 				user: req.session.user,
-				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+				message: "<div class=\"text\">Извештај унет.</div>"
 			});
-		}
+		})
+		.catch((error)=>{
+			logError(error);
+			res.render("message",{
+				pageTitle: "Програмска грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Грешка у бази података 7522.</div>"
+			});
+		})
 	}else{
-		res.redirect("/login?url="+encodeURIComponent(req.url));
+		dnevniIzvestajiDB.replaceOne({uniqueId:json.uniqueId},json)
+		.then((dbResponse)=>{
+			res.render("message",{
+				pageTitle: "Извештај измењен",
+				user: req.session.user,
+				message: "<div class=\"text\">Извештај измењен.</div>"
+			});
+		})
+		.catch((error)=>{
+			logError(error);
+			res.render("message",{
+				pageTitle: "Програмска грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Грешка у бази података 7522.</div>"
+			});
+		})
 	}
+		
 });
 
 server.get('/ucinakMajstora',async (req,res)=>{

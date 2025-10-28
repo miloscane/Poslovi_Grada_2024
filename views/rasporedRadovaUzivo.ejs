@@ -171,7 +171,7 @@
 
 function ensureBrojNalogaVisible({
   basePad = 0,
-  extraY  = 20,
+  extraY  = 0,
   maxPad  = 200
 } = {}) {
   document.querySelectorAll('.dodelaWrap').forEach(box => {
@@ -214,7 +214,7 @@ function ensureBrojNalogaVisible({
       setInterval(scrollWrappersToNow, 300*1000);
     }, msToNextMinute);
   }
-  scheduleTick();
+  //scheduleTick();
 
 	</script>
 		<div class="rasporedRadovaUzivo">
@@ -279,10 +279,10 @@ function ensureBrojNalogaVisible({
 								statusNaloga.innerHTML = dodelaJson.nalogInfo.statusNaloga;
 								dodelaWrap.appendChild(statusNaloga);
 
-								var adresaNaloga = document.createElement("DIV");
+								/*var adresaNaloga = document.createElement("DIV");
 								adresaNaloga.setAttribute("class","adresaNaloga");
 								adresaNaloga.innerHTML = dodelaJson.nalogInfo.radnaJedinica+"<br>"+dodelaJson.nalogInfo.adresa;
-								dodelaWrap.appendChild(adresaNaloga);
+								dodelaWrap.appendChild(adresaNaloga);*/
 							dodele.appendChild(dodelaWrap);
 						}
 						const now = new Date();
@@ -304,15 +304,15 @@ function ensureBrojNalogaVisible({
 					}
 				}
 
-				requestAnimationFrame(() => {
+				/*requestAnimationFrame(() => {
   scrollWrappersToNow();
-  ensureBrojNalogaVisible({ extraY: 20 }); // adjust here if you want more base height
+  ensureBrojNalogaVisible({ extraY: 0 }); // adjust here if you want more base height
 });
 
 // keep it reactive on scroll
 document.querySelectorAll('.rasporedRadovaUzivo .wrapper').forEach(wrap => {
-  wrap.addEventListener('scroll', () => ensureBrojNalogaVisible({ extraY: 20 }), { passive:true });
-});
+  wrap.addEventListener('scroll', () => ensureBrojNalogaVisible({ extraY: 0 }), { passive:true });
+});*/
 			</script>
 		</div>
 <%- include ("partials/footer") -%>
