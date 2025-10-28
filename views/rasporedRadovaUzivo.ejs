@@ -169,38 +169,33 @@
   });
 }
 
-function ensureBrojNalogaVisible({basePad = 0, extraY = 20, maxPad = 120} = {}) {
-  // For each card (dodelaWrap)…
+function ensureBrojNalogaVisible({
+  basePad = 0,
+  extraY  = 20,
+  maxPad  = 200
+} = {}) {
   document.querySelectorAll('.dodelaWrap').forEach(box => {
-    const broj = box.querySelector('.brojNaloga');
+    const broj  = box.querySelector('.brojNaloga');
     if (!broj) return;
 
-    // Make sure the card itself can scroll inside
-    if (getComputedStyle(box).overflowY === 'visible') {
-      box.style.overflowY = 'auto';
-    }
+    const wrap  = box.closest('.wrapper');
+    if (!wrap) return;
 
-    const scrollTop  = box.scrollTop;
-    const viewTop    = scrollTop;                    // top of visible area (inside the card)
-    const viewBottom = scrollTop + box.clientHeight; // bottom of visible area
+    const header = wrap.querySelector('.ime');
+    const headerH = header ? header.offsetHeight : 0;
 
-    // Position of brojNaloga relative to the card’s content
-    const itemTop    = broj.offsetTop;
-    const itemBottom = itemTop + broj.offsetHeight;
+    // viewport of the wrapper (account for header)
+    const wrapRect = wrap.getBoundingClientRect();
+    const viewportTop = wrapRect.top + headerH;
 
-    let pad = basePad + extraY;
+    // box rect relative to viewport
+    const boxRect = box.getBoundingClientRect();
 
-    // If brojNaloga is clipped above, push it down by exactly how much it's hidden
-    if (itemTop < viewTop) {
-      const hidden = viewTop - itemTop;              // px hidden above
-      pad = Math.min(maxPad, basePad + extraY + hidden);
-    }
-    // (Optional) if it’s clipped at the bottom, you can reduce pad or do nothing:
-    // else if (itemBottom > viewBottom) {
-    //   const hiddenBottom = itemBottom - viewBottom;
-    //   pad = Math.max(basePad, basePad + extraY - hiddenBottom * 0.5);
-    // }
+    // how much of the box's top is hidden above the visible area of the wrapper
+    const hiddenTop = Math.max(0, viewportTop - boxRect.top);
 
+    // pad = base + your adjustable offset + exactly how much is hidden
+    const pad = Math.min(maxPad, basePad + extraY + hiddenTop);
     broj.style.paddingTop = pad + 'px';
   });
 }
@@ -208,8 +203,8 @@ function ensureBrojNalogaVisible({basePad = 0, extraY = 20, maxPad = 120} = {}) 
 
 
 
-		  window.requestAnimationFrame(() => scrollWrappersToNow());
-		  requestAnimationFrame(() => ensureBrojNalogaVisible({ extraY: 0 }));
+
+		  
 
   // Keep them updated every minute on the minute
   function scheduleTick() {
@@ -253,7 +248,7 @@ function ensureBrojNalogaVisible({basePad = 0, extraY = 20, maxPad = 120} = {}) 
 							for(var j=0;j<times.length;j++){
 								var timestamp = document.createElement("DIV");
 								timestamp.setAttribute("class","timestamp");
-								timestamp.innerHTML = times[i];
+								timestamp.innerHTML = times[j];
 								rtimesElem.appendChild(timestamp);
 							}
 							wrap.appendChild(rtimesElem);
@@ -296,7 +291,8 @@ function ensureBrojNalogaVisible({basePad = 0, extraY = 20, maxPad = 120} = {}) 
 						
 						const startMin = START_H * 60 + START_M;
 						const endMin = END_H * 60 + END_M;
-						const slotH = timestamp.offsetHeight;
+						const sample = wrap.querySelector('.times .timestamp');
+						const slotH  = sample ? sample.offsetHeight : 0;
 						const elapsed = nowMin - startMin;
 						const wholeSlots = Math.floor(elapsed / STEP_MIN);
 						const minutesIntoSlot = elapsed % STEP_MIN;
@@ -307,6 +303,16 @@ function ensureBrojNalogaVisible({basePad = 0, extraY = 20, maxPad = 120} = {}) 
 						laser.style.top = `${topPx}px`;
 					}
 				}
+
+				requestAnimationFrame(() => {
+  scrollWrappersToNow();
+  ensureBrojNalogaVisible({ extraY: 20 }); // adjust here if you want more base height
+});
+
+// keep it reactive on scroll
+document.querySelectorAll('.rasporedRadovaUzivo .wrapper').forEach(wrap => {
+  wrap.addEventListener('scroll', () => ensureBrojNalogaVisible({ extraY: 20 }), { passive:true });
+});
 			</script>
 		</div>
 <%- include ("partials/footer") -%>
