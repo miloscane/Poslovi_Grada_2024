@@ -223,7 +223,7 @@
 					}
 					if(izvestaji[i].odsustvo=="Присутан"){
 						var ostvarenaStruktura = zamene*vrednostZamene + odgusenja*vrednostOdgusenja + konstatacije*vrednostKonstatacije;
-						penaliStrukture = penaliStrukture + Math.max(0,potrebnaVrednost - ostvarenaStruktura)*penalPoPoenu;	
+						penaliStrukture = penaliStrukture + (potrebnaVrednost - ostvarenaStruktura)*penalPoPoenu;	
 					}
 					
 				}
@@ -442,62 +442,68 @@
 							
 						day.appendChild(boxesWrap);
 
-						var title = document.createElement("DIV");
-						title.setAttribute("class","subTitle");
-						title.innerHTML = "Захтевано:";
-						day.appendChild(title);
-						var skala = document.createElement("DIV");
-						skala.setAttribute("class","skala");
-							var skalaItem = document.createElement("DIV");
-							skalaItem.setAttribute("class","skalaItem zamena");
-							skalaItem.innerHTML = "Z";
-							skala.appendChild(skalaItem);
+						var planiranoOdradjeno = document.createElement("DIV");
+							var title = document.createElement("DIV");
+							title.setAttribute("class","subTitle");
+							title.innerHTML = "Планирано:";
+							planiranoOdradjeno.appendChild(title);
+							var skala = document.createElement("DIV");
+							skala.setAttribute("class","skala");
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem zamena");
+								skalaItem.innerHTML = "Z";
+								skala.appendChild(skalaItem);
 
-							var skalaItem = document.createElement("DIV");
-							skalaItem.setAttribute("class","skalaItem zamena");
-							skalaItem.innerHTML = "Z";
-							skala.appendChild(skalaItem);
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem zamena");
+								skalaItem.innerHTML = "Z";
+								skala.appendChild(skalaItem);
 
-							var skalaItem = document.createElement("DIV");
-							skalaItem.setAttribute("class","skalaItem odgusenje");
-							skalaItem.innerHTML = "O";
-							skala.appendChild(skalaItem);
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem odgusenje");
+								skalaItem.innerHTML = "O";
+								skala.appendChild(skalaItem);
 
-							var skalaItem = document.createElement("DIV");
-							skalaItem.setAttribute("class","skalaItem odgusenje");
-							skalaItem.innerHTML = "O";
-							skala.appendChild(skalaItem);
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem odgusenje");
+								skalaItem.innerHTML = "O";
+								skala.appendChild(skalaItem);
 
-							var skalaItem = document.createElement("DIV");
-							skalaItem.setAttribute("class","skalaItem konstatacija");
-							skalaItem.innerHTML = "K";
-							skala.appendChild(skalaItem);
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem konstatacija");
+								skalaItem.innerHTML = "K";
+								skala.appendChild(skalaItem);
 
-							var skalaItem = document.createElement("DIV");
-							skalaItem.setAttribute("class","skalaItem konstatacija");
-							skalaItem.innerHTML = "K";
-							skala.appendChild(skalaItem);
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem konstatacija");
+								skalaItem.innerHTML = "K";
+								skala.appendChild(skalaItem);
 
-						day.appendChild(skala);
+							planiranoOdradjeno.appendChild(skala);
 
 
-						var title = document.createElement("DIV");
-						title.setAttribute("class","subTitle");
-						title.style.marginTop = "0px"
-						title.innerHTML = "Одрађено:";
-						day.appendChild(title);
-						var skalaOdradjeno = document.createElement("DIV");
-						skalaOdradjeno.setAttribute("class","skala skalaOdradjeno");
-						day.appendChild(skalaOdradjeno);
+							var title = document.createElement("DIV");
+							title.setAttribute("class","subTitle");
+							title.style.marginTop = "0px"
+							title.innerHTML = "Одрађено:";
+							planiranoOdradjeno.appendChild(title);
+							var skalaOdradjeno = document.createElement("DIV");
+							skalaOdradjeno.setAttribute("class","skala skalaOdradjeno");
+							planiranoOdradjeno.appendChild(skalaOdradjeno);
 
-						var title = document.createElement("DIV");
-						title.setAttribute("class","subTitle");
-						title.style.marginTop = "0px"
-						title.innerHTML = "Пенал: ";
-						day.appendChild(title)
-						var penalStrukture = document.createElement("DIV");
-						penalStrukture.setAttribute("class","subSubTitle");
-						day.appendChild(penalStrukture);
+							var title = document.createElement("DIV");
+							title.setAttribute("class","subTitle");
+							title.style.marginTop = "0px"
+							title.innerHTML = "Умањење / Повећање: ";
+							planiranoOdradjeno.appendChild(title)
+							var penalStrukture = document.createElement("DIV");
+							penalStrukture.setAttribute("class","subSubTitle");
+							planiranoOdradjeno.appendChild(penalStrukture);	
+						day.appendChild(planiranoOdradjeno);
+						if(izvestaj.odsustvo!="Присутан"){
+							planiranoOdradjeno.style.display = "none"
+						}
+						
 						
 
 						
@@ -591,7 +597,7 @@
 							if(izvestaj.nalozi.length>0){
 								
 								var ostvarenaVrednost = zamene*vrednostZamene + odgusenja*vrednostOdgusenja + konstatacije*vrednostKonstatacije;
-								penalStrukture.innerHTML = Math.max(potrebnaVrednost-ostvarenaVrednost,0)*penalPoPoenu + " поена";
+								penalStrukture.innerHTML = (potrebnaVrednost-ostvarenaVrednost)*penalPoPoenu*(-1) + " поена";
 							}
 						}
 						
