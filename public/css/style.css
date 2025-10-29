@@ -6410,6 +6410,36 @@ input[type=number] {
     width:200px;
 }
 
+.majstorMesec .skala{
+    font-size:0;
+}
+
+.majstorMesec .skala .skalaItem{
+    display:inline-block;
+    vertical-align: middle;
+    font-size:14px;
+    padding:4px;
+    border-radius:2px;
+    color:rgb(255,255,255);
+    border:1px solid rgb(255,255,255);
+    text-align:center;
+}
+
+.majstorMesec .skala .zamena{
+    background-color:rgb(32,51,100);
+    width:80px;
+}
+
+.majstorMesec .skala .odgusenje{
+    background-color:rgba(32,51,100,0.8);
+    width:40px;
+}
+
+.majstorMesec .skala .konstatacija{
+    background-color:rgba(32,51,100,0.6);
+    width:20px;
+}
+
 
 #page-title .refreshButton{
     position:absolute;

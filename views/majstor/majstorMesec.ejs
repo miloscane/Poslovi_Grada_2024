@@ -1,13 +1,9 @@
 <%- include ("partials/header") -%>
 	<script>
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
-		console.log(izvestaji)
 		var checkIns = <%-JSON.stringify(checkIns)%>;
-		console.log(checkIns)
-		console.log(izvestaji);
 		var datum = "<%=datum%>";
 		var danas = new Date("<%=today%>");
-		console.log(danas)
 		var mesec = datum.split(".")[0];
 		var godina = datum.split(".")[1];
 	</script>
@@ -26,62 +22,7 @@
 			</script>
 		</div>
 		<div class="pageWidth majstorMesec">
-			<!--<div class="slobodnaSubota">
-				<div class="title">Преостало до слободне суботе!</div>
-				<div class="fillWrap">
-					<div class="fill" id="subota-fill"></div>
-				</div>
-				<div class="extra" id="subota-extra"></div>
-				<script>
-					for(var i=0;i<user.ucinakNaloga.length;i++){
-						user.ucinakNaloga[i].odradjeno = 0;
-					}
-					var monday = getMonday(new Date());
-					monday.setHours(0)
-					monday.setMinutes(0)
-					for(var i=0;i<izvestaji.length;i++){
-						var datumIzvestaja = new Date(izvestaji[i].date);
-						if(datumIzvestaja.getTime()>=monday.getTime()){
-							for(var j=0;j<izvestaji[i].nalozi.length;j++){
-								for(var k=0;k<user.ucinakNaloga.length;k++){
-									if(izvestaji[i].nalozi[j].tipoviRada.indexOf(user.ucinakNaloga[k].tipNaloga)>=0){
-										user.ucinakNaloga[k].odradjeno++;
-									}
-								}
-							}
-						}
-					}
-
-					function getTotalPercentage(arr) {
-						const totalNaloga = arr.reduce((sum, item) => sum + item.brojNaloga, 0);
-						const totalOdradjeno = arr.reduce((sum, item) => sum + item.odradjeno, 0);
-
-						if (totalNaloga === 0) return 0;
-						return (totalOdradjeno / totalNaloga) * 100;
-					}
-					document.getElementById("subota-fill").style.width = getTotalPercentage(user.ucinakNaloga)+"%";
-
-					for(var i=0;i<user.ucinakNaloga.length;i++){
-						var inlineWrap = document.createElement("DIV");
-						inlineWrap.setAttribute("class","inlineWrap");
-							var inline = document.createElement("DIV");
-							inline.setAttribute("class","inline");
-							inline.innerHTML = user.ucinakNaloga[i].tipNaloga+": ";
-							inlineWrap.appendChild(inline);
-							
-							var inline = document.createElement("DIV");
-							inline.setAttribute("class","inline");
-							inline.innerHTML = user.ucinakNaloga[i].odradjeno+" / "+user.ucinakNaloga[i].brojNaloga;
-							inlineWrap.appendChild(inline);
-						document.getElementById("subota-extra").appendChild(inlineWrap);
-						
-
-						
-					}
-
-
-				</script>
-			</div>-->
+			
 			<div class="plata" style="margin-top:18px">
 				<div class="plotWrap">
 					<div class="ticksWrap" id="ticks"></div>
@@ -100,7 +41,7 @@
 					<div class="plataFinal">
 						<div class="tick" id="plata-tick2">
 							<div style="position:relative;width:100%;height:100%">
-								<div class="value"  style="width:200px" id="plata-value2"></div>
+								<div class="value"  style="width:125px" id="plata-value2"></div>
 							</div>
 						</div>
 					</div>
@@ -243,25 +184,47 @@
 					if (v1El) v1El.innerHTML = value1.toFixed(0);
 
 					var v2El = document.getElementById("plata-value2");
-					if (v2El) v2El.innerHTML = value2Adjusted.toFixed(0) + " бодова / " + eval(value2Adjusted.toFixed(0)*500).toFixed(0) + " поена";
+					if (v2El) v2El.innerHTML = value2Adjusted.toFixed(0) + " бодова <br> " + eval(value2Adjusted.toFixed(0)*500).toFixed(0) + " поена";
 
 					return { value1: value1, value2: value2Adjusted, percentTop: percentTop, percentBottom: percentBottom };
 				}
 			</script>
 			<script>
+				var vrednostZamene = 4;
+				var vrednostOdgusenja = 2;
+				var vrednostKonstatacije = 1;
+				var penalPoPoenu = 250;//1000 dinara = 1 zamena
+				var potrebnaVrednost = 2*vrednostZamene + 2*vrednostOdgusenja + 2*vrednostKonstatacije;
 				
 				var ostvarenUcinak = 0;
+				var penaliStrukture = 0;
 				for(var i=0;i<izvestaji.length;i++){
+					var zamene = 0;
+					var odgusenja = 0;
+					var konstatacije = 0;
+					var izvestaj = izvestaji[i];
 					for(var j=0;j<izvestaji[i].nalozi.length;j++){
-						var ucinakTemp = isNaN(parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", "."))) ? 0 : parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", "."));
-						if(isNaN(parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", ".")))){
-							console.log(izvestaji[i].nalozi[j].ucinak)
+						for(var k=0;k<izvestaj.nalozi[j].tipoviRada.length;k++){
+							if(izvestaj.nalozi[j].tipoviRada[k]=="Замена"){
+								zamene++;
+							}else if(izvestaj.nalozi[j].tipoviRada[k]=="Одгушење"){
+								odgusenja++;
+							}else if(["Попис","Констатација"].indexOf(izvestaj.nalozi[j].tipoviRada[k])>=0){
+								konstatacije++;
+							}
 						}
+						var ucinakTemp = isNaN(parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", "."))) ? 0 : parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", "."));
+						
 						if((izvestaji[i].nalozi[j].tipoviRada.indexOf("Одгушење")>=0 || izvestaji[i].nalozi[j].tipoviRada.indexOf("Црпљење")>=0) && izvestaji[i].nalozi[j].tipoviRada.indexOf("Замена")<0){
 							ucinakTemp = ucinakTemp*0.74;
 						}
 						ostvarenUcinak = ostvarenUcinak + ucinakTemp;
 					}
+					if(izvestaji[i].odsustvo=="Присутан"){
+						var ostvarenaStruktura = zamene*vrednostZamene + odgusenja*vrednostOdgusenja + konstatacije*vrednostKonstatacije;
+						penaliStrukture = penaliStrukture + Math.max(0,potrebnaVrednost - ostvarenaStruktura)*penalPoPoenu;	
+					}
+					
 				}
 				var nagrade = 0;
 				var kazne = 0;
@@ -277,13 +240,10 @@
 					}
 					if(!isNaN(parseFloat(izvestaji[i].kazna))){
 						kazne = kazne + parseFloat(izvestaji[i].kazna);
-						console.log(izvestaji[i].date)
-						console.log(izvestaji[i].kazna)
-						console.log(izvestaji[i].kaznaRazlog)
 
 					}
 				}
-				setScales(ostvarenUcinak,kazne + nagrade)
+				setScales(ostvarenUcinak,kazne - nagrade+penaliStrukture)
 				//setScales(1800000*0.74,nagrade - kazne)
 
 			</script>
@@ -306,8 +266,6 @@
 				</div>
 			</div>
 			<script>
-				
-				
 				document.getElementById("radni-dani").innerHTML = radniDani;
 				document.getElementById("nalozi").innerHTML = nalozi;
 				document.getElementById("nagrade").innerHTML = eval(nagrade/500).toFixed(0) + " boda";
@@ -483,6 +441,64 @@
 							
 						day.appendChild(boxesWrap);
 
+						var title = document.createElement("DIV");
+						title.setAttribute("class","subTitle");
+						title.innerHTML = "Захтевано:";
+						day.appendChild(title);
+						var skala = document.createElement("DIV");
+						skala.setAttribute("class","skala");
+							var skalaItem = document.createElement("DIV");
+							skalaItem.setAttribute("class","skalaItem zamena");
+							skalaItem.innerHTML = "Z";
+							skala.appendChild(skalaItem);
+
+							var skalaItem = document.createElement("DIV");
+							skalaItem.setAttribute("class","skalaItem zamena");
+							skalaItem.innerHTML = "Z";
+							skala.appendChild(skalaItem);
+
+							var skalaItem = document.createElement("DIV");
+							skalaItem.setAttribute("class","skalaItem odgusenje");
+							skalaItem.innerHTML = "O";
+							skala.appendChild(skalaItem);
+
+							var skalaItem = document.createElement("DIV");
+							skalaItem.setAttribute("class","skalaItem odgusenje");
+							skalaItem.innerHTML = "O";
+							skala.appendChild(skalaItem);
+
+							var skalaItem = document.createElement("DIV");
+							skalaItem.setAttribute("class","skalaItem konstatacija");
+							skalaItem.innerHTML = "K";
+							skala.appendChild(skalaItem);
+
+							var skalaItem = document.createElement("DIV");
+							skalaItem.setAttribute("class","skalaItem konstatacija");
+							skalaItem.innerHTML = "K";
+							skala.appendChild(skalaItem);
+
+						day.appendChild(skala);
+
+
+						var title = document.createElement("DIV");
+						title.setAttribute("class","subTitle");
+						title.style.marginTop = "0px"
+						title.innerHTML = "Одрађено:";
+						day.appendChild(title);
+						var skalaOdradjeno = document.createElement("DIV");
+						skalaOdradjeno.setAttribute("class","skala skalaOdradjeno");
+						day.appendChild(skalaOdradjeno);
+
+						var title = document.createElement("DIV");
+						title.setAttribute("class","subTitle");
+						title.style.marginTop = "0px"
+						title.innerHTML = "Пенал: ";
+						day.appendChild(title)
+						var penalStrukture = document.createElement("DIV");
+						penalStrukture.setAttribute("class","subSubTitle");
+						day.appendChild(penalStrukture);
+						
+
 						
 
 						var title = document.createElement("DIV");
@@ -490,6 +506,9 @@
 						title.innerHTML = "Ваши налози:";
 						day.appendChild(title);
 
+						var zamene = 0;
+						var odgusenja = 0;
+						var konstatacije = 0;
 						var naloziElem = document.createElement("DIV");
 						naloziElem.setAttribute("class","nalozi");
 							var imaNaloga = false;
@@ -516,6 +535,13 @@
 											tipNaloga.setAttribute("class","tip");
 											tipNaloga.innerHTML = "<b>Tip naloga:</b> ";
 											for(var k=0;k<izvestaj.nalozi[j].tipoviRada.length;k++){
+												if(izvestaj.nalozi[j].tipoviRada[k]=="Замена"){
+													zamene++;
+												}else if(izvestaj.nalozi[j].tipoviRada[k]=="Одгушење"){
+													odgusenja++;
+												}else if(["Попис","Констатација"].indexOf(izvestaj.nalozi[j].tipoviRada[k])>=0){
+													konstatacije++;
+												}
 												tipNaloga.innerHTML += izvestaj.nalozi[j].tipoviRada[k]+",";
 											}
 											tipNaloga.innerHTML = tipNaloga.innerHTML.toString().slice(0, -1);
@@ -557,6 +583,39 @@
 								naloziElem.innerHTML = "<div style=\"padding-left:10px;font-size:12px;\">Немате додељених налога за овај датум.</span>";
 							}
 						day.appendChild(naloziElem);
+						
+
+
+						if(izvestaj.nalozi){
+							if(izvestaj.nalozi.length>0){
+								
+								var ostvarenaVrednost = zamene*vrednostZamene + odgusenja*vrednostOdgusenja + konstatacije*vrednostKonstatacije;
+								penalStrukture.innerHTML = Math.max(potrebnaVrednost-ostvarenaVrednost,0)*penalPoPoenu + " поена";
+							}
+						}
+						
+						
+						
+						for(var j=0;j<zamene;j++){
+							var skalaItem = document.createElement("DIV");
+							skalaItem.setAttribute("class","skalaItem zamena");
+							skalaItem.innerHTML = "Z";
+							skalaOdradjeno.appendChild(skalaItem);
+						}
+
+						for(var j=0;j<odgusenja;j++){
+							var skalaItem = document.createElement("DIV");
+							skalaItem.setAttribute("class","skalaItem odgusenje");
+							skalaItem.innerHTML = "O";
+							skalaOdradjeno.appendChild(skalaItem);
+						}
+
+						for(var j=0;j<konstatacije;j++){
+							var skalaItem = document.createElement("DIV");
+							skalaItem.setAttribute("class","skalaItem konstatacija");
+							skalaItem.innerHTML = "K";
+							skalaOdradjeno.appendChild(skalaItem);
+						}
 
 					document.getElementById("daily").appendChild(day);
 				}
@@ -607,9 +666,9 @@
 					console.log("Nije trenutni mesec");
 				}
 			</script>
-			<div class="box danas">
+			<!--<div class="box danas">
 				<div class="title">Дана</div>
-			</div>
+			</div>-->
 		</div>
 	</div>
 <%- include ("partials/appfooter") -%>

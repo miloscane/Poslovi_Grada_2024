@@ -18,24 +18,49 @@
 					document.getElementById("odabir-majstora").appendChild(option)
 				}
 
+				var vrednostZamene = 4;
+				var vrednostOdgusenja = 2;
+				var vrednostKonstatacije = 1;
+				var penalPoPoenu = 250;//1000 dinara = 1 zamena
+				var potrebnaVrednost = 2*vrednostZamene + 2*vrednostOdgusenja + 2*vrednostKonstatacije;
 				
 
 				function majstorPick(){
 					var majstorId = document.getElementById("odabir-majstora").value;
 					renderScales()
 					var ostvarenUcinak = 0;
+					var penaliStrukture = 0;
 					for(var i=0;i<izvestaji.length;i++){
+						var zamene = 0;
+						var odgusenja = 0;
+						var konstatacije = 0;
+						var izvestaj = izvestaji[i];
+
 						if(izvestaji[i].majstor==majstorId){
 							for(var j=0;j<izvestaji[i].nalozi.length;j++){
+								for(var k=0;k<izvestaj.nalozi[j].tipoviRada.length;k++){
+									if(izvestaj.nalozi[j].tipoviRada[k]=="Замена"){
+										zamene++;
+									}else if(izvestaj.nalozi[j].tipoviRada[k]=="Одгушење"){
+										odgusenja++;
+									}else if(["Попис","Констатација"].indexOf(izvestaj.nalozi[j].tipoviRada[k])>=0){
+										konstatacije++;
+									}
+								}
 								var vrednost = !isNaN(parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", "."))) ? parseFloat(izvestaji[i].nalozi[j].ucinak.replace(",", ".")) : 0;
+								console.log(vrednost)
 								if((izvestaji[i].nalozi[j].tipoviRada.indexOf("Одгушење")>=0 || izvestaji[i].nalozi[j].tipoviRada.indexOf("Црпљење")>=0) && izvestaji[i].nalozi[j].tipoviRada.indexOf("Замена")<0){
 									vrednost = vrednost*0.74;
 								}
 								ostvarenUcinak = ostvarenUcinak + vrednost;
-
 							}
+							if(izvestaji[i].odsustvo=="Присутан"){
+								var ostvarenaStruktura = zamene*vrednostZamene + odgusenja*vrednostOdgusenja + konstatacije*vrednostKonstatacije;
+								penaliStrukture = penaliStrukture + Math.max(0,potrebnaVrednost - ostvarenaStruktura)*penalPoPoenu;
+							}
+							
+							
 						}
-						
 					}
 					var nagrade = 0;
 					var kazne = 0;
@@ -54,10 +79,9 @@
 								kazne = kazne + parseFloat(izvestaji[i].kazna);
 							}
 						}
-						
 					}
 
-					setScales(ostvarenUcinak,kazne + nagrade)
+					setScales(ostvarenUcinak,kazne - nagrade + penaliStrukture)
 					document.getElementById("radni-dani").innerHTML = radniDani;
 					document.getElementById("nalozi").innerHTML = nalozi;
 					document.getElementById("nagrade").innerHTML = eval(nagrade/500).toFixed(0) + " boda";
@@ -217,6 +241,61 @@
 								
 							day.appendChild(boxesWrap);
 
+							var title = document.createElement("DIV");
+							title.setAttribute("class","subTitle");
+							title.innerHTML = "Захтевано:";
+							day.appendChild(title);
+							var skala = document.createElement("DIV");
+							skala.setAttribute("class","skala");
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem zamena");
+								skalaItem.innerHTML = "Z";
+								skala.appendChild(skalaItem);
+
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem zamena");
+								skalaItem.innerHTML = "Z";
+								skala.appendChild(skalaItem);
+
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem odgusenje");
+								skalaItem.innerHTML = "O";
+								skala.appendChild(skalaItem);
+
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem odgusenje");
+								skalaItem.innerHTML = "O";
+								skala.appendChild(skalaItem);
+
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem konstatacija");
+								skalaItem.innerHTML = "K";
+								skala.appendChild(skalaItem);
+
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem konstatacija");
+								skalaItem.innerHTML = "K";
+								skala.appendChild(skalaItem);
+
+							day.appendChild(skala);
+
+
+							var title = document.createElement("DIV");
+							title.setAttribute("class","subTitle");
+							title.style.marginTop = "0px"
+							title.innerHTML = "Одрађено:";
+							day.appendChild(title);
+							var skalaOdradjeno = document.createElement("DIV");
+							skalaOdradjeno.setAttribute("class","skala skalaOdradjeno");
+							day.appendChild(skalaOdradjeno);
+							var title = document.createElement("DIV");
+							title.setAttribute("class","subTitle");
+							title.style.marginTop = "0px"
+							title.innerHTML = "Пенал: ";
+							day.appendChild(title)
+							var penalStrukture = document.createElement("DIV");
+							penalStrukture.setAttribute("class","subSubTitle");
+							day.appendChild(penalStrukture);
 							
 
 							var title = document.createElement("DIV");
@@ -224,6 +303,9 @@
 							title.innerHTML = "Ваши налози:";
 							day.appendChild(title);
 
+							var zamene = 0;
+							var odgusenja = 0;
+							var konstatacije = 0;
 							var naloziElem = document.createElement("DIV");
 							naloziElem.setAttribute("class","nalozi");
 								var imaNaloga = false;
@@ -249,6 +331,13 @@
 												tipNaloga.setAttribute("class","tip");
 												tipNaloga.innerHTML = "<b>Tip naloga:</b> ";
 												for(var k=0;k<izvestaj.nalozi[j].tipoviRada.length;k++){
+													if(izvestaj.nalozi[j].tipoviRada[k]=="Замена"){
+														zamene++;
+													}else if(izvestaj.nalozi[j].tipoviRada[k]=="Одгушење"){
+														odgusenja++;
+													}else if(["Попис","Констатација"].indexOf(izvestaj.nalozi[j].tipoviRada[k])>=0){
+														konstatacije++;
+													}
 													tipNaloga.innerHTML += izvestaj.nalozi[j].tipoviRada[k]+",";
 												}
 												tipNaloga.innerHTML = tipNaloga.innerHTML.toString().slice(0, -1);
@@ -290,6 +379,37 @@
 									naloziElem.innerHTML = "<div style=\"padding-left:10px;font-size:12px;\">Немате додељених налога за овај датум.</span>";
 								}
 							day.appendChild(naloziElem);
+
+
+
+							if(izvestaj.nalozi){
+								if(izvestaj.nalozi.length>0){
+									
+									var ostvarenaVrednost = zamene*vrednostZamene + odgusenja*vrednostOdgusenja + konstatacije*vrednostKonstatacije;
+									penalStrukture.innerHTML = Math.max(potrebnaVrednost-ostvarenaVrednost,0)*penalPoPoenu + " поена";
+								}
+							}
+							
+							for(var j=0;j<zamene;j++){
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem zamena");
+								skalaItem.innerHTML = "Z";
+								skalaOdradjeno.appendChild(skalaItem);
+							}
+
+							for(var j=0;j<odgusenja;j++){
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem odgusenje");
+								skalaItem.innerHTML = "O";
+								skalaOdradjeno.appendChild(skalaItem);
+							}
+
+							for(var j=0;j<konstatacije;j++){
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem konstatacija");
+								skalaItem.innerHTML = "K";
+								skalaOdradjeno.appendChild(skalaItem);
+							}
 
 						document.getElementById("daily").appendChild(day);
 					}
