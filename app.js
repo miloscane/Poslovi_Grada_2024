@@ -7508,7 +7508,7 @@ server.post('/majstorNaNalogu',async (req,res)=>{
 						.then((dbResponse) => {
 							var mailOptions = {
 								from: '"ViK Portal" <admin@poslovigrada.rs>',
-								to: "momir.lutovac@poslovigrada.rs,nenad.papes@poslovigrada.rs,miloscane@gmail.com",
+								to: "momir.lutovac@poslovigrada.rs,nenad.papes@poslovigrada.rs",
 								subject: majstori[0].ime+' zakazan novi nalog',
 								html: majstori[0].ime + ' zakazan novi nalog za '+json.radnaJedinica+' / '+json.adresa+'<br>Pocetak radova '+reshuffleDate(json.datumRadova)+' '+json.vremeDolaska+'<br>Trajanje radova '+json.vremeRadova
 							};
@@ -7576,7 +7576,7 @@ server.post('/deleteMajstorNaNalogu',async (req,res)=>{
 						var majstori = await majstoriDB.find({uniqueId:dodele[0].majstor}).toArray();
 						var mailOptions = {
 							from: '"ViK Portal" <admin@poslovigrada.rs>',
-							to: "momir.lutovac@poslovigrada.rs,nenad.papes@poslovigrada.rs,miloscane@gmail.com",
+							to: "momir.lutovac@poslovigrada.rs,nenad.papes@poslovigrada.rs",
 							subject: majstori[0].ime+' otkazan nalog',
 							html: majstori[0].ime + ' otkazan nalog za '+dodele[0].radnaJedinica+' / '+dodele[0].adresa+'<br>Otkazani radovi bili planirani za '+reshuffleDate(dodele[0].datumRadova)+' '+dodele[0].vremeDolaska
 						};
@@ -7650,7 +7650,7 @@ server.post('/editMajstorNaNalogu',async (req,res)=>{
 						var majstori = await majstoriDB.find({uniqueId:dodele[0].majstor}).toArray();
 						var mailOptions = {
 							from: '"ViK Portal" <admin@poslovigrada.rs>',
-							to: "momir.lutovac@poslovigrada.rs,nenad.papes@poslovigrada.rs,miloscane@gmail.com",
+							to: "momir.lutovac@poslovigrada.rs,nenad.papes@poslovigrada.rs",
 							subject: majstori[0].ime+' izmena zakazanog naloga',
 							html: majstori[0].ime + ' izmena zakazanog nalog na '+dodele[0].radnaJedinica+' / '+dodele[0].adresa+'<br>Pocetak radova '+reshuffleDate(json.datumRadova)+' '+json.vremeDolaska+'<br>Trajanje radova '+json.vremeRadova
 						};
@@ -10300,6 +10300,162 @@ server.get('/dispecer/pretragaNaloga',async (req,res)=>{
 server.get('/dispecer/mapaUzivo', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==20){
+			naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
+			.then((nalozi)=>{
+				var brojeviNaloga = [];
+				for(var i=0;i<nalozi.length;i++){
+					brojeviNaloga.push(nalozi[i].broj)
+				}
+				dodeljivaniNaloziDB.find({nalog:{$in:brojeviNaloga}}).toArray()
+				.then((dodele)=>{
+					for(var i=0;i<nalozi.length;i++){
+						nalozi[i].dodele = [];
+						for(var j=0;j<dodele.length;j++){
+							if(dodele[j].nalog==nalozi[i].broj){
+								nalozi[i].dodele.push(dodele[j]);
+							}
+						}
+					}
+					majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray()
+					.then((majstori)=>{
+						ekipeDB.find({}).sort({ _id: -1 }).limit(1).toArray()
+						.then((ekipe)=>{
+							for(var i=0;i<majstori.length;i++){
+								for(var j=0;j<ekipe[0].prisustvo.ekipe.length;j++){
+									if(majstori[i].uniqueId==ekipe[0].prisustvo.ekipe[j].idMajstora){
+										majstori[i].vozilo = ekipe[0].prisustvo.ekipe[j].vozilo;
+									}
+								}
+							}
+
+
+							var config = {
+								method: 'post',
+								url: baseUrl+'/token', // Replace with your actual URL
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded'
+								},
+								data: data
+							};
+							axios(config)
+							.then(async response => {
+							  token = response.data.access_token;
+							  var json = {};
+
+								config = {
+							      url: baseUrl + '/api/Client/GetClient',
+							      method: 'POST', // If necessary
+							      headers: { 
+							          'Content-Type': 'application/json',
+							          'Authorization': `Bearer ${token}`
+							      },
+							      data: { 'ClientId': telematicsId }
+							  };
+
+							  //Client data
+							  var response = await axios(config);
+							  //console.log(response.data)
+							  json.clientInfo = response.data.client[0];
+
+							  
+							  config = {
+							      url: baseUrl + '/api/Asset/GetDevicesCurrentData',
+							      method: 'POST', // If necessary
+							      headers: { 
+							          'Content-Type': 'application/json',
+							          'Authorization': `Bearer ${token}`
+							      },
+							      data: { 'ClientId': telematicsId }
+							  };
+							  var response = await axios(config);
+							  json.vozila = response.data;
+
+								res.render("dispeceri/mapaUzivoDispecer",{
+									pageTitle: "Мапа радова",
+									nalozi: nalozi,
+									user: req.session.user,
+									majstori: majstori,
+									navigacija: json,
+									googlegeocoding: process.env.googlegeocoding
+								})
+							})
+							.catch((error)=>{
+								console.log(error)
+								res.send("Greska")
+							})
+
+
+
+
+							
+						})
+						.catch((error)=>{
+							console.log(error);
+							res.render("message",{
+								pageTitle: "Грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">Грешка у налогу.</div>"
+							});
+						})
+					})
+					.catch((error)=>{
+						console.log(error);
+						res.render("message",{
+							pageTitle: "Грешка",
+							user: req.session.user,
+							message: "<div class=\"text\">Грешка у налогу.</div>"
+						});
+					})
+				})
+				.catch((error)=>{
+					console.log(error);
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Грешка у налогу.</div>"
+					});
+				})
+			})
+			.catch((error)=>{
+				console.log(error)
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у налогу.</div>"
+				});
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
+
+server.get('/dispecer/mapaUzivo2', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==20){
+			try{
+				var today = new Date();
+				var nalozi = await naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
+				var brojeviNaloga = [];
+				for(var i=0;i<nalozi.length;i++){
+					brojeviNaloga.push(nalozi[i].broj)
+				}
+			//	var dodele = 
+
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Грешка у бази података 10454.</div>"
+				});
+			}
 			naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
 			.then((nalozi)=>{
 				var brojeviNaloga = [];

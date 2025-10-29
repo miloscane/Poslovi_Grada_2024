@@ -43,7 +43,11 @@
 
 						var typeRadioBoxesWrap = document.createElement("DIV");
 						typeRadioBoxesWrap.setAttribute("class","typeRadioBoxesWrap");
-						var opisCheck = nalozi[i].opis.toLowerCase();
+						var opisCheck = "A";
+						if(nalozi[i].opis){
+							var opisCheck = nalozi[i].opis.toLowerCase();
+						}
+						
 							for(var j=0;j<radioTypes.length;j++){
 								var inline = document.createElement("DIV");
 								inline.setAttribute("class","inline");
