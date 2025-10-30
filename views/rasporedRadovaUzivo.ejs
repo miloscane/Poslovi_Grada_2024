@@ -437,7 +437,7 @@ function layoutNoOverlap(container) {
 										for(var j=0;j<otvoreniNalozi.length;j++){
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
 												var today = new Date();
-												today.setDate(today.getDate() - 1);
+												//today.setDate(today.getDate() - 1);
 												if(istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													generateNalogRow(table,otvoreniNalozi[j]);
 												}
@@ -461,7 +461,7 @@ function layoutNoOverlap(container) {
 										for(var j=0;j<otvoreniNalozi.length;j++){
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
 												var today = new Date();
-												today.setDate(today.getDate() - 1);
+												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(otvoreniNalozi[j].statusNaloga=="Zamena"){
 														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
@@ -488,7 +488,7 @@ function layoutNoOverlap(container) {
 										for(var j=0;j<otvoreniNalozi.length;j++){
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
 												var today = new Date();
-												today.setDate(today.getDate() - 1);
+												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(otvoreniNalozi[j].statusNaloga=="Konstatacija" || otvoreniNalozi[j].statusNaloga=="Radovu u toku"){
 														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
@@ -515,7 +515,7 @@ function layoutNoOverlap(container) {
 										for(var j=0;j<otvoreniNalozi.length;j++){
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
 												var today = new Date();
-												today.setDate(today.getDate() - 1);
+												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(otvoreniNalozi[j].statusNaloga=="Zagušenje"){
 														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
@@ -546,7 +546,7 @@ function layoutNoOverlap(container) {
 										for(var j=0;j<otvoreniNalozi.length;j++){
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
 												var today = new Date();
-												today.setDate(today.getDate() - 1);
+												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(["Konstatacija","Radovi u toku","Zamena","Zagušenje"].indexOf(otvoreniNalozi[j].statusNaloga)<0){
 														generateNalogRow(table,otvoreniNalozi[j]);
