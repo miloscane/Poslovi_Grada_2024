@@ -676,8 +676,21 @@
 									<select id="danasnji-tip-radova">
 										<option value="Zamena">Zamena</option>
 										<option value="Odgusenje">Odgusenje</option>
-										<option value="Konstatacija">Konstaticja</option>
+										<option value="Konstatacija">Konstatacija</option>
 										<option value="Popis">Popis</option>
+										<option value="WOMA">ВОМА</option>
+										<option value="Kombinovano">Комбиновано</option>
+										<option value="Zagušenje">Загушење</option>
+										<option value="Crpljenje">Црпљење</option>
+										<option value="Dezinfekcija">Дезинфекција</option>
+										<option value="Masinsko kopanje">Машинско копање</option>
+										<option value="Rucno kopanje">Ручно копање</option>
+										<option value="Finalizacija">Финализација</option>
+										<option value="Betonaža">Бетонажа</option>
+										<option value="Asfalt">Асфалт</option>
+										<option value="Bekaton">Бекатон</option>
+										<option value="Preventivno čišćenje">Превентивно чишћење</option>
+										<option value="Snimanje kamerom">Снимање камером</option>
 									</select>
 								</div>
 							</div>
@@ -702,6 +715,7 @@
 									submitJson.radnaJedinica = nalog.radnaJedinica;
 									submitJson.punaAdresa = nalog.punaAdresa;
 									submitJson.coordinates = nalog.coordinates;
+									submitJson.tipRada = document.getElementById("danasnji-tip-radova").value;
 									if(!submitJson.majstor || submitJson.majstor=="Nijedan"){
 										alert("Нисте одабрали мајстора.")
 									}else if(podizvodjaci.indexOf(submitJson.majstor)>=0){

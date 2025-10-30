@@ -429,6 +429,26 @@ function bodoviFromUcinak(ucinak) {
   }
 }
 
+function tipNalogaPoOpisu(opis){
+  if(opis.includes("voma") || opis.includes("woma") || opis.includes("womo") || opis.includes("vomo") ){
+    return "Voma";
+  }else if(opis.includes("crplj") || opis.includes("scrp")){
+    return "Crpljenje"
+  }else if(opis.includes("zam")){
+    return "Zamena"
+  }else if(opis.includes("dezinf")){
+    return "Dezinfekcija"
+  }else if(opis.includes("cure") || opis.includes("curi") || opis.includes("cur")){
+    return "Curenje"
+  }else if(opis.includes("final") || opis.includes("saht") || opis.includes("šaht")){
+    return "Finalizacija"
+  }else if(opis.includes("zagu") || opis.includes("odgu") ){
+    return "Zagušenje"
+  }
+  return " / "
+}
+
+
 var definicijeProizvoda = [
                     {
                       "startCode":"01.01",

@@ -6037,6 +6037,91 @@ input[type=number] {
     pointer-events: none;
 }
 
+
+.otvoreniNaloziUzivo{
+    font-size: 0;
+}
+
+.otvoreniNaloziUzivo .radnaJedinica{
+    font-size:10px;
+    height:50vh;
+    width:20vw;
+    display:inline-block;
+    vertical-align: top;
+    position:relative;
+    overflow:hidden;
+
+}
+
+.otvoreniNaloziUzivo .radnaJedinica .border{
+    width:100%;
+    height:100%;
+    border:2px solid rgb(32,51,100);
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:100;
+}
+
+.otvoreniNaloziUzivo .radnaJedinica .relative{
+    position:relative;
+    z-index:200;
+    padding-top:30px;
+}
+
+.otvoreniNaloziUzivo .radnaJedinica .title{
+    width:100%;
+    text-align:center;
+    color:rgb(255,255,255);
+    background-color: rgb(21,51,100);
+    padding:4px;
+    font-size:16px;
+    font-weight:600;
+    position:absolute;
+    top:0;
+}
+
+.otvoreniNaloziUzivo .radnaJedinica .inlines{
+    font-size:0;
+    padding:3px;
+}
+
+.otvoreniNaloziUzivo .radnaJedinica .inlines .inline{
+    font-size:10px;
+    display:inline-block;
+    vertical-align: top;
+    width:50%;
+    height:100%;
+    overflow:hidden;
+}
+
+.otvoreniNaloziUzivo .radnaJedinica .inlines .inline .subTitle{
+    color:rgb(255,255,255);
+    text-align: center;
+    padding:3px;
+    background-color: rgb(217,70,80);
+    border:1px solid rgb(200,200,200);
+}
+
+.otvoreniNaloziUzivo .radnaJedinica .inlines .inline table{
+    border-collapse: collapse;
+    width:100%;
+}
+
+.otvoreniNaloziUzivo .radnaJedinica .inlines .inline td{
+    text-align: center;
+    padding:2px;
+    border:1px solid rgb(200,200,200);
+}
+
+.otvoreniNaloziUzivo .radnaJedinica .inlines .inline td:nth-child(2){
+    font-weight: bold;
+}
+
+.otvoreniNaloziUzivo .radnaJedinica .inlines .inline tr:nth-child(even){
+    background-color: rgba(0,0,0,0.1);
+}
+
 .majstorMesec{
     position:relative;
 }

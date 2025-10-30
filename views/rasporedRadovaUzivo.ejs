@@ -244,7 +244,7 @@ function layoutNoOverlap(container) {
   //scheduleTick();
 
 	</script>
-		<div class="rasporedRadovaUzivo">
+		<div class="rasporedRadovaUzivo" id="raspored">
 			<div id="majstori">
 				
 			</div>
@@ -312,10 +312,10 @@ function layoutNoOverlap(container) {
 								dodelaWrap.appendChild(adresaNaloga);*/
 							dodele.appendChild(dodelaWrap);
 						}
-						//adjustLeftPositionsTight(dodele)
+						adjustLeftPositionsTight(dodele)
 
 						//requestAnimationFrame(() => {
-						  layoutNoOverlap(dodele); // or dodeleElem if you rename it
+						  //layoutNoOverlap(dodele); // or dodeleElem if you rename it
 						//});
 						const now = new Date();
 						const nowMin = now.getHours() * 60 + now.getMinutes();
@@ -336,9 +336,248 @@ function layoutNoOverlap(container) {
 					}
 				}
 
-				setTimeout(function(){
-					window.location.reload();
-				},120000)
+				
 			</script>
 		</div>
+		<div class="otvoreniNaloziUzivo" id="otvoreni-nalozi" style="display:none">
+
+		</div>
+		<script>
+			function generateNalogRow(elem,nalog,tip){
+				var tr = document.createElement("TR");
+					var td = document.createElement("TD");
+					td.setAttribute("class","brojNaloga");
+					td.innerHTML = "<div class=\"value\">"+nalog.broj+"</div>";
+					tr.appendChild(td);
+					if(!tip){
+						var td = document.createElement("TD");
+						td.setAttribute("class","tipNaloga");
+						
+							var tipNaloga = tipNalogaPoOpisu(nalog.opis);
+							var printOut = "?";
+							if(tipNaloga=="Voma"){
+								printOut = "V"
+							}else if(tipNaloga=="Crpljenje"){
+								printOut = "C"
+							}else if(tipNaloga=="Zamena"){
+								printOut = "Z"
+							}else if(tipNaloga=="Dezinfekcija"){
+								printOut = "D"
+							}else if(tipNaloga=="Curenje"){
+								printOut = "K"
+							}else if(tipNaloga=="Finalizacija"){
+								printOut = "F"
+							}else if(tipNaloga=="Zagušenje"){
+								printOut = "O"
+							}
+							
+
+							if(printOut=="?"){
+								if(nalog.statusNaloga=="Potrebna WOMA"){
+									printOut = "V"
+								}else if(nalog.statusNaloga=="Zagušenje"){
+									printOut = "O"
+								}else if(nalog.statusNaloga=="Zamena"){
+									printOut = "Z"
+								}else if(nalog.statusNaloga=="Crpljenje"){
+									printOut = "C"
+								}else if(nalog.statusNaloga=="Dezinfekcija"){
+									printOut = "D"
+								}else if(nalog.statusNaloga=="Masinsko kopanje" || nalog.statusNaloga=="Rucno kopanje"){
+									printOut = "R"
+								}else if(nalog.statusNaloga=="Finalizacija" || nalog.statusNaloga=="Zakazana finalizacija"){
+									printOut = "F"
+								}else if(nalog.statusNaloga=="Betonaža" || nalog.statusNaloga=="Asfalt" || nalog.statusNaloga=="Bekaton"){
+									printOut = "B"
+								}else if(nalog.statusNaloga=="Preventivno čišćenje"){
+									printOut = "Č"
+								}
+							}
+							td.innerHTML = printOut;
+					}
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					td.setAttribute("class","planiran");
+					td.innerHTML = nalog.planiran==0 ? "❌" : "✅"; //nalog.planiran==1 ? ✅ : ;
+					tr.appendChild(td);
+
+				elem.appendChild(tr);
+			}
+
+			var otvoreniNalozi = <%-JSON.stringify(otvoreniNalozi)%>;
+			for(var i=0;i<radneJedinice.length;i++){
+				var radnaJedinica = document.createElement("DIV");
+				radnaJedinica.setAttribute("class","radnaJedinica");
+					var border = document.createElement("DIV");
+					border.setAttribute("class","border");
+					radnaJedinica.appendChild(border)
+					var relative = document.createElement("DIV");
+					relative.setAttribute("class","relative");
+
+						var title = document.createElement("DIV");
+						title.setAttribute("class","title");
+						title.innerHTML = radneJedinice[i];
+						relative.appendChild(title);
+
+						var inlines = document.createElement("DIV");
+						inlines.setAttribute("class","inlines");
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+								var group = document.createElement("DIV");
+								group.setAttribute("class","group");
+									var subTitle = document.createElement("DIV");
+									subTitle.setAttribute("class","subTitle");
+									subTitle.innerHTML = "Današnji:";
+									group.appendChild(subTitle);
+
+									var nalozi = document.createElement("DIV");
+									nalozi.setAttribute("class","nalozi");
+										var table = document.createElement("TABLE")
+										for(var j=0;j<otvoreniNalozi.length;j++){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
+												var today = new Date();
+												today.setDate(today.getDate() - 1);
+												if(istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+													generateNalogRow(table,otvoreniNalozi[j]);
+												}
+												
+											}
+										}
+										nalozi.appendChild(table);
+									group.appendChild(nalozi);
+								inline.appendChild(group);
+
+								var group = document.createElement("DIV");
+								group.setAttribute("class","group");
+									var subTitle = document.createElement("DIV");
+									subTitle.setAttribute("class","subTitle");
+									subTitle.innerHTML = "Zamene:";
+									group.appendChild(subTitle);
+
+									var nalozi = document.createElement("DIV");
+									nalozi.setAttribute("class","nalozi");
+										var table = document.createElement("TABLE")
+										for(var j=0;j<otvoreniNalozi.length;j++){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
+												var today = new Date();
+												today.setDate(today.getDate() - 1);
+												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+													if(otvoreniNalozi[j].statusNaloga=="Zamena"){
+														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
+													}
+													
+												}
+												
+											}
+										}
+										nalozi.appendChild(table);
+									group.appendChild(nalozi);
+								inline.appendChild(group);
+
+								var group = document.createElement("DIV");
+								group.setAttribute("class","group");
+									var subTitle = document.createElement("DIV");
+									subTitle.setAttribute("class","subTitle");
+									subTitle.innerHTML = "Konstatacije:";
+									group.appendChild(subTitle);
+
+									var nalozi = document.createElement("DIV");
+									nalozi.setAttribute("class","nalozi");
+										var table = document.createElement("TABLE")
+										for(var j=0;j<otvoreniNalozi.length;j++){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
+												var today = new Date();
+												today.setDate(today.getDate() - 1);
+												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+													if(otvoreniNalozi[j].statusNaloga=="Konstatacija" || otvoreniNalozi[j].statusNaloga=="Radovu u toku"){
+														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
+													}
+													
+												}
+												
+											}
+										}
+										nalozi.appendChild(table);
+									group.appendChild(nalozi);
+								inline.appendChild(group);
+
+								var group = document.createElement("DIV");
+								group.setAttribute("class","group");
+									var subTitle = document.createElement("DIV");
+									subTitle.setAttribute("class","subTitle");
+									subTitle.innerHTML = "Odgušenja:";
+									group.appendChild(subTitle);
+
+									var nalozi = document.createElement("DIV");
+									nalozi.setAttribute("class","nalozi");
+										var table = document.createElement("TABLE")
+										for(var j=0;j<otvoreniNalozi.length;j++){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
+												var today = new Date();
+												today.setDate(today.getDate() - 1);
+												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+													if(otvoreniNalozi[j].statusNaloga=="Zagušenje"){
+														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
+													}
+													
+												}
+												
+											}
+										}
+										nalozi.appendChild(table);
+									group.appendChild(nalozi);
+								inline.appendChild(group);
+							inlines.appendChild(inline);
+
+							var inline = document.createElement("DIV");
+							inline.setAttribute("class","inline");
+
+								var group = document.createElement("DIV");
+								group.setAttribute("class","group");
+									var subTitle = document.createElement("DIV");
+									subTitle.setAttribute("class","subTitle");
+									subTitle.innerHTML = "Ostalo:";
+									group.appendChild(subTitle);
+
+									var nalozi = document.createElement("DIV");
+									nalozi.setAttribute("class","nalozi");
+										var table = document.createElement("TABLE")
+										for(var j=0;j<otvoreniNalozi.length;j++){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
+												var today = new Date();
+												today.setDate(today.getDate() - 1);
+												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+													if(["Konstatacija","Radovi u toku","Zamena","Zagušenje"].indexOf(otvoreniNalozi[j].statusNaloga)<0){
+														generateNalogRow(table,otvoreniNalozi[j]);
+													}
+													
+												}
+												
+											}
+										}
+										nalozi.appendChild(table);
+									group.appendChild(nalozi);
+								inline.appendChild(group);
+
+
+							inlines.appendChild(inline);
+						relative.appendChild(inlines);
+
+						
+
+					radnaJedinica.appendChild(relative)
+				document.getElementById("otvoreni-nalozi").appendChild(radnaJedinica);
+			}
+
+			setTimeout(function(){
+				window.location.reload();
+			},240000)
+
+			setTimeout(function(){
+				console.log("Hidden")
+				document.getElementById("raspored").style.display = "none"
+				document.getElementById("otvoreni-nalozi").style.display = "block"
+			},120000)
+		</script>
 <%- include ("partials/footer") -%>

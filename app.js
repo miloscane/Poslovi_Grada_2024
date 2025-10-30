@@ -9819,11 +9819,31 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 			}
 		}
 
+		var otvoreniNalozi = await naloziDB.find({statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
+		var brojeviNaloga = [];
+		for(var i=0;i<otvoreniNalozi.length;i++){
+			brojeviNaloga.push(otvoreniNalozi[i].broj)
+		}
+		var zakazaneDodele = await dodeljivaniNaloziDB.find({deleted: {$ne:1},nalog:{$in:brojeviNaloga}}).toArray();
+		for(var i=0;i<otvoreniNalozi.length;i++){
+			otvoreniNalozi[i].planiran = 0;
+			for(var j=0;j<zakazaneDodele.length;j++){
+				if(otvoreniNalozi[i].broj==zakazaneDodele[j].nalog){
+					if(istiDatum(new Date(zakazaneDodele[j].datumRadova),today)){
+						otvoreniNalozi[i].planiran = 1;
+					}else if(new Date(zakazaneDodele[j].datumRadova).getTime()>today.getTime()){
+						otvoreniNalozi[i].planiran = 2;
+					}
+				}
+			}
+		}
+
 		res.render("rasporedRadovaUzivo",{
 			pageTitle: "Данашњи распоред",
 			user: req.session.user,
 			majstori: majstori,
-			dodele: dodele
+			dodele: dodele,
+			otvoreniNalozi: otvoreniNalozi
 		})
 	}catch(err){
 		logError(err);
