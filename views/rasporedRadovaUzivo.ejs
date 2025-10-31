@@ -406,12 +406,47 @@ function layoutNoOverlap(container) {
 				elem.appendChild(tr);
 			}
 
-			var otvoreniNalozi = <%-JSON.stringify(otvoreniNalozi)%>;
-			for(var i=0;i<otvoreniNalozi.length;i++){
-				if(otvoreniNalozi[i].broj=="1839976"){
-					console.log(otvoreniNalozi[i])
-				}
+			function generateNalogRowOstalo(elem,nalog){
+				var tr = document.createElement("TR");
+					var td = document.createElement("TD");
+					td.setAttribute("class","brojNaloga");
+					td.innerHTML = "<div class=\"value\">"+nalog.broj+"</div>";
+					tr.appendChild(td);
+						var td = document.createElement("TD");
+						td.setAttribute("class","tipNaloga");
+						var printOut = "?"
+							if(nalog.statusNaloga=="Potrebna WOMA"){
+								printOut = "V"
+							}else if(nalog.statusNaloga=="Zagušenje"){
+								printOut = "O"
+							}else if(nalog.statusNaloga=="Zamena"){
+								printOut = "Z"
+							}else if(nalog.statusNaloga=="Crpljenje"){
+								printOut = "C"
+							}else if(nalog.statusNaloga=="Dezinfekcija"){
+								printOut = "D"
+							}else if(nalog.statusNaloga=="Masinsko kopanje" || nalog.statusNaloga=="Rucno kopanje"){
+								printOut = "R"
+							}else if(nalog.statusNaloga=="Finalizacija" || nalog.statusNaloga=="Zakazana finalizacija"){
+								printOut = "F"
+							}else if(nalog.statusNaloga=="Betonaža" || nalog.statusNaloga=="Asfalt" || nalog.statusNaloga=="Bekaton"){
+								printOut = "B"
+							}else if(nalog.statusNaloga=="Preventivno čišćenje"){
+								printOut = "Č"
+							}
+							td.innerHTML = printOut;
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					td.setAttribute("class","planiran");
+					td.innerHTML = nalog.planiran==0 ? "❌" : nalog.planiran==1 ? "✅" : nalog.planiran==2 ? "📅" : "❓";
+					tr.appendChild(td);
+
+				elem.appendChild(tr);
 			}
+
+			var otvoreniNalozi = <%-JSON.stringify(otvoreniNalozi)%>;
+			
 			for(var i=0;i<radneJedinice.length;i++){
 				var radnaJedinica = document.createElement("DIV");
 				radnaJedinica.setAttribute("class","radnaJedinica");
@@ -441,7 +476,7 @@ function layoutNoOverlap(container) {
 									nalozi.setAttribute("class","nalozi");
 										var table = document.createElement("TABLE")
 										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
@@ -465,38 +500,11 @@ function layoutNoOverlap(container) {
 									nalozi.setAttribute("class","nalozi");
 										var table = document.createElement("TABLE")
 										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(otvoreniNalozi[j].statusNaloga=="Zamena"){
-														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
-													}
-													
-												}
-												
-											}
-										}
-										nalozi.appendChild(table);
-									group.appendChild(nalozi);
-								inline.appendChild(group);
-
-								var group = document.createElement("DIV");
-								group.setAttribute("class","group");
-									var subTitle = document.createElement("DIV");
-									subTitle.setAttribute("class","subTitle");
-									subTitle.innerHTML = "Konstatacije:";
-									group.appendChild(subTitle);
-
-									var nalozi = document.createElement("DIV");
-									nalozi.setAttribute("class","nalozi");
-										var table = document.createElement("TABLE")
-										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
-												var today = new Date();
-												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
-													if(otvoreniNalozi[j].statusNaloga=="Konstatacija" || otvoreniNalozi[j].statusNaloga=="Radovu u toku"){
 														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
 													}
 													
@@ -519,11 +527,38 @@ function layoutNoOverlap(container) {
 									nalozi.setAttribute("class","nalozi");
 										var table = document.createElement("TABLE")
 										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(otvoreniNalozi[j].statusNaloga=="Zagušenje"){
+														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
+													}
+													
+												}
+												
+											}
+										}
+										nalozi.appendChild(table);
+									group.appendChild(nalozi);
+								inline.appendChild(group);
+
+								var group = document.createElement("DIV");
+								group.setAttribute("class","group");
+									var subTitle = document.createElement("DIV");
+									subTitle.setAttribute("class","subTitle");
+									subTitle.innerHTML = "Konstatacije:";
+									group.appendChild(subTitle);
+
+									var nalozi = document.createElement("DIV");
+									nalozi.setAttribute("class","nalozi");
+										var table = document.createElement("TABLE")
+										for(var j=0;j<otvoreniNalozi.length;j++){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
+												var today = new Date();
+												//today.setDate(today.getDate() - 1);
+												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+													if(otvoreniNalozi[j].statusNaloga=="Konstatacija" || otvoreniNalozi[j].statusNaloga=="Radovu u toku"){
 														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
 													}
 													
@@ -550,12 +585,12 @@ function layoutNoOverlap(container) {
 									nalozi.setAttribute("class","nalozi");
 										var table = document.createElement("TABLE")
 										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(["Konstatacija","Radovi u toku","Zamena","Zagušenje"].indexOf(otvoreniNalozi[j].statusNaloga)<0){
-														generateNalogRow(table,otvoreniNalozi[j]);
+														generateNalogRowOstalo(table,otvoreniNalozi[j]);
 													}
 													
 												}
@@ -577,7 +612,7 @@ function layoutNoOverlap(container) {
 									nalozi.setAttribute("class","nalozi");
 										var table = document.createElement("TABLE")
 										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)>=0){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)>=0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												generateNalogRow(table,otvoreniNalozi[j]);
