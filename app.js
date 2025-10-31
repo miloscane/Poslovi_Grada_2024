@@ -9855,6 +9855,8 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 	}
 })
 
+
+
 server.get('/danasnjiRasporedRadova', async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==20 || Number(req.session.user.role)==25){
