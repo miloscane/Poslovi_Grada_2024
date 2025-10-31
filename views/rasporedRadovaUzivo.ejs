@@ -1,5 +1,6 @@
 <%- include ("partials/header") -%>
 	<script>
+		var podizvodjaci  = ["mile--1672650353244","SeHQZ--1672650353244","IIwY4--1672650358507","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","ylSnq--1672041756318"];
 		var majstori = <%-JSON.stringify(majstori)%>;
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 		var dodele = <%-JSON.stringify(dodele)%>;
@@ -406,6 +407,11 @@ function layoutNoOverlap(container) {
 			}
 
 			var otvoreniNalozi = <%-JSON.stringify(otvoreniNalozi)%>;
+			for(var i=0;i<otvoreniNalozi.length;i++){
+				if(otvoreniNalozi[i].broj=="1839976"){
+					console.log(otvoreniNalozi[i])
+				}
+			}
 			for(var i=0;i<radneJedinice.length;i++){
 				var radnaJedinica = document.createElement("DIV");
 				radnaJedinica.setAttribute("class","radnaJedinica");
@@ -435,7 +441,7 @@ function layoutNoOverlap(container) {
 									nalozi.setAttribute("class","nalozi");
 										var table = document.createElement("TABLE")
 										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
@@ -459,7 +465,7 @@ function layoutNoOverlap(container) {
 									nalozi.setAttribute("class","nalozi");
 										var table = document.createElement("TABLE")
 										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
@@ -486,7 +492,7 @@ function layoutNoOverlap(container) {
 									nalozi.setAttribute("class","nalozi");
 										var table = document.createElement("TABLE")
 										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
@@ -513,7 +519,7 @@ function layoutNoOverlap(container) {
 									nalozi.setAttribute("class","nalozi");
 										var table = document.createElement("TABLE")
 										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
@@ -544,7 +550,7 @@ function layoutNoOverlap(container) {
 									nalozi.setAttribute("class","nalozi");
 										var table = document.createElement("TABLE")
 										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i]){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
@@ -553,6 +559,29 @@ function layoutNoOverlap(container) {
 													}
 													
 												}
+												
+											}
+										}
+										nalozi.appendChild(table);
+									group.appendChild(nalozi);
+								inline.appendChild(group);
+
+								var group = document.createElement("DIV");
+								group.setAttribute("class","group");
+									var subTitle = document.createElement("DIV");
+									subTitle.setAttribute("class","subTitle");
+									subTitle.innerHTML = "Podizvodjaci:";
+									group.appendChild(subTitle);
+
+									var nalozi = document.createElement("DIV");
+									nalozi.setAttribute("class","nalozi");
+										var table = document.createElement("TABLE")
+										for(var j=0;j<otvoreniNalozi.length;j++){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[i].majstor)>=0){
+												var today = new Date();
+												//today.setDate(today.getDate() - 1);
+												generateNalogRow(table,otvoreniNalozi[j]);
+													
 												
 											}
 										}
