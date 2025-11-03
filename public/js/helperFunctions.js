@@ -416,7 +416,7 @@ function isYesterdayAfter3PM(date1, date2) {
 function bodoviFromUcinak(ucinak) {
   ucinak = ucinak /1000
   const s1 = [0, 1000, 2000, 3000, 4000];
-  const s2 = [0, 200, 320, 440, 560];
+  const s2 = [0, 200, 300, 400, 500];
 
   // Find segment
   for (let i = 0; i < 4; i++) {

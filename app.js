@@ -10463,145 +10463,81 @@ server.get('/dispecer/mapaUzivo2', async (req, res)=> {
 		if(Number(req.session.user.role)==20){
 			try{
 				var today = new Date();
-				var nalozi = await naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
-				var brojeviNaloga = [];
+				var nalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
+				var dodele = await dodeljivaniNaloziDB.find({deleted: {$ne:1},datumRadova:{ $gte: getDateAsStringForInputObject(today) }}).toArray();
 				for(var i=0;i<nalozi.length;i++){
-					brojeviNaloga.push(nalozi[i].broj)
+					nalozi[i].planiran = 0;
+					nalozi[i].dodela = {};
+					for(var j=0;j<dodele.length;j++){
+						if(nalozi[i].broj==dodele[j].nalog){
+							if(istiDatum(new Date(dodele[j].datumRadova),today)){
+								nalozi[i].planiran = 1;
+							}else if(new Date(dodele[j].datumRadova).getTime()>today.getTime()){
+								nalozi[i].planiran = 2;
+							}
+							nalozi[i].dodela = dodele[j];
+						}
+						
+					}
 				}
-			//	var dodele = 
+
+				var config = {
+					method: 'post',
+					url: baseUrl+'/token', // Replace with your actual URL
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					data: data
+				};
+
+				var response = await axios(config);
+				var token = response.data.access_token;
+			  var json = {};
+
+				config = {
+			      url: baseUrl + '/api/Client/GetClient',
+			      method: 'POST', // If necessary
+			      headers: { 
+			          'Content-Type': 'application/json',
+			          'Authorization': `Bearer ${token}`
+			      },
+			      data: { 'ClientId': telematicsId }
+			  };
+
+			  var response = await axios(config);
+			  json.clientInfo = response.data.client[0];
+
+			  config = {
+			      url: baseUrl + '/api/Asset/GetDevicesCurrentData',
+			      method: 'POST', // If necessary
+			      headers: { 
+			          'Content-Type': 'application/json',
+			          'Authorization': `Bearer ${token}`
+			      },
+			      data: { 'ClientId': telematicsId }
+			  };
+			  var response = await axios(config);
+			  json.vozila = response.data;
+
+				res.render("dispeceri/mapaUzivoDispecer2",{
+					pageTitle: "Мапа радова",
+					nalozi: nalozi,
+					user: req.session.user,
+					majstori: majstori,
+					navigacija: json,
+					googlegeocoding: process.env.googlegeocoding,
+					nalozi: nalozi
+				});
 
 			}catch(err){
 				logError(err);
 				res.render("message",{
 					pageTitle: "Грешка",
 					user: req.session.user,
-					message: "<div class=\"text\">Грешка у бази података 10454.</div>"
+					message: "<div class=\"text\">Грешка у бази података 10535.</div>"
 				});
 			}
-			naloziDB.find({radnaJedinica:{$in:req.session.user.opstine},statusNaloga:{$nin:["Završeno","Storniran","Vraćen","Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray()
-			.then((nalozi)=>{
-				var brojeviNaloga = [];
-				for(var i=0;i<nalozi.length;i++){
-					brojeviNaloga.push(nalozi[i].broj)
-				}
-				dodeljivaniNaloziDB.find({nalog:{$in:brojeviNaloga}}).toArray()
-				.then((dodele)=>{
-					for(var i=0;i<nalozi.length;i++){
-						nalozi[i].dodele = [];
-						for(var j=0;j<dodele.length;j++){
-							if(dodele[j].nalog==nalozi[i].broj){
-								nalozi[i].dodele.push(dodele[j]);
-							}
-						}
-					}
-					majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray()
-					.then((majstori)=>{
-						ekipeDB.find({}).sort({ _id: -1 }).limit(1).toArray()
-						.then((ekipe)=>{
-							for(var i=0;i<majstori.length;i++){
-								for(var j=0;j<ekipe[0].prisustvo.ekipe.length;j++){
-									if(majstori[i].uniqueId==ekipe[0].prisustvo.ekipe[j].idMajstora){
-										majstori[i].vozilo = ekipe[0].prisustvo.ekipe[j].vozilo;
-									}
-								}
-							}
-
-
-							var config = {
-								method: 'post',
-								url: baseUrl+'/token', // Replace with your actual URL
-								headers: {
-									'Content-Type': 'application/x-www-form-urlencoded'
-								},
-								data: data
-							};
-							axios(config)
-							.then(async response => {
-							  token = response.data.access_token;
-							  var json = {};
-
-								config = {
-							      url: baseUrl + '/api/Client/GetClient',
-							      method: 'POST', // If necessary
-							      headers: { 
-							          'Content-Type': 'application/json',
-							          'Authorization': `Bearer ${token}`
-							      },
-							      data: { 'ClientId': telematicsId }
-							  };
-
-							  //Client data
-							  var response = await axios(config);
-							  //console.log(response.data)
-							  json.clientInfo = response.data.client[0];
-
-							  
-							  config = {
-							      url: baseUrl + '/api/Asset/GetDevicesCurrentData',
-							      method: 'POST', // If necessary
-							      headers: { 
-							          'Content-Type': 'application/json',
-							          'Authorization': `Bearer ${token}`
-							      },
-							      data: { 'ClientId': telematicsId }
-							  };
-							  var response = await axios(config);
-							  json.vozila = response.data;
-
-								res.render("dispeceri/mapaUzivoDispecer",{
-									pageTitle: "Мапа радова",
-									nalozi: nalozi,
-									user: req.session.user,
-									majstori: majstori,
-									navigacija: json,
-									googlegeocoding: process.env.googlegeocoding
-								})
-							})
-							.catch((error)=>{
-								console.log(error)
-								res.send("Greska")
-							})
-
-
-
-
-							
-						})
-						.catch((error)=>{
-							console.log(error);
-							res.render("message",{
-								pageTitle: "Грешка",
-								user: req.session.user,
-								message: "<div class=\"text\">Грешка у налогу.</div>"
-							});
-						})
-					})
-					.catch((error)=>{
-						console.log(error);
-						res.render("message",{
-							pageTitle: "Грешка",
-							user: req.session.user,
-							message: "<div class=\"text\">Грешка у налогу.</div>"
-						});
-					})
-				})
-				.catch((error)=>{
-					console.log(error);
-					res.render("message",{
-						pageTitle: "Грешка",
-						user: req.session.user,
-						message: "<div class=\"text\">Грешка у налогу.</div>"
-					});
-				})
-			})
-			.catch((error)=>{
-				console.log(error)
-				res.render("message",{
-					pageTitle: "Грешка",
-					user: req.session.user,
-					message: "<div class=\"text\">Грешка у налогу.</div>"
-				});
-			})
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",

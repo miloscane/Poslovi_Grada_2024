@@ -1,0 +1,368 @@
+<%- include ("partials/header") -%>
+	<style>
+		.gm-style-iw{
+			padding:2px !important;
+			touch-action: none; /* Disables pinch-zoom and scrolling */
+  			overflow: auto;
+		}
+
+		.gm-style .gm-style-iw-d{
+			padding:0px !important;
+			margin-bottom:-10px;
+			margin-right:-12px;
+		}
+
+		.gm-ui-hover-effect{
+			display:none !important; 
+		}
+
+		.gm-style-iw-chr{
+			display:none !important;
+		}
+	</style>
+	<div class="mapHeader">
+		<div class="inline">
+			<div style="text-align: left;font-weight:500;">Filter Majstora</div>
+			<div class="checkboxWrap">
+				<select id="majstor" oninput="filterMapa(this)">
+					<optgroup label="Мајстори" id="majstori-pg">
+						<option value="Svi" default="default">Svi</option>
+					</optgroup>
+					<optgroup label="Финализери" id="finalizeri"></optgroup>
+					<optgroup label="Воме" id="vome"></optgroup>
+				</select>
+				<script>
+					var majstori = <%-JSON.stringify(majstori)%>;
+					majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+					for(var i=0;i<majstori.length;i++){
+						if(!majstori[i].inactive){
+							var option = document.createElement("OPTION");
+							option.setAttribute("value",majstori[i].uniqueId);
+							option.innerHTML	=	majstori[i].ime;	
+							
+							if(majstori[i].tipRada.indexOf("Finalizacija")>=0){
+								document.getElementById("finalizeri").appendChild(option);
+							}else if(majstori[i].tipRada.indexOf("Voma")>=0){
+								document.getElementById("vome").appendChild(option);
+							}else{
+								document.getElementById("majstori-pg").appendChild(option);
+							}
+						}
+					}
+				</script>
+			</div>
+		</div>
+		<div class="inline">
+			<div style="text-align: left;font-weight:500;">Filter Statusa</div>
+			<div class="checkboxWrap">
+				<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+				<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+				<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+				<select id="status" oninput="filterMapa(this)" class="js-example-basic-multiple" multiple="multiple" style="width: 200px;">
+					<option value="Primljen" default="default">Примљен</option>
+					<option value="Dodeljen majstoru">Додељен мајстору</option>
+					<option value="Zakazan">Заказан</option>
+					<option value="Radovi u toku">Радови у току</option>
+					<option value="Konstatacija">Констатација</option>
+					<option value="Popisan">Пописан</option>
+					<option value="Kombinovano">Комбиновано</option>
+					<option value="Zagušenje">Загушење</option>
+					<option value="Zamena">Замена</option>
+					<option value="Crpljenje">Црпљење</option>
+					<option value="Dezinfekcija">Дезинфекција</option>
+				</select>
+
+				<script>
+				$(document).ready(function() {
+				  $('#status').select2({
+				    placeholder: "Odaberi statuse...",
+				    allowClear: true
+				  });
+				});
+				</script>
+			</div>
+		</div>
+		<div></div>
+		<div class="inline">
+			<div class="iconWrap"><img src="https://maps.google.com/mapfiles/ms/icons/green-dot.png"></div>
+			<div class="noteWrap">Заказан данас</div>
+		</div>
+		<div class="inline">
+			<div class="iconWrap"><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png"></div>
+			<div class="noteWrap">Планиран</div>
+		</div>
+		<div class="inline">
+			<div class="iconWrap"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/mapaUzvik2.png"></div>
+			<div class="noteWrap">Непланиран</div>
+		</div>
+	</div>
+	<div class="mapaUzivo" id="map" style="height:100vh"></div>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+		var majstori = <%-JSON.stringify(majstori)%>;
+		var navigacija = <%-JSON.stringify(navigacija)%>;
+		var map;
+		var myLatLng;
+		var marker;
+		var markers;
+		var circles;
+		var originalCenter;
+		var radius = 300;
+
+		function filterMapa(elem){
+			var majstor = document.getElementById("majstor").value;
+			var statusi = $('#status').val();
+			
+			/*if(elem.getElementsByClassName("checkbox")[0].checked){
+				elem.getElementsByClassName("checkbox")[0].checked = false;
+			}else{
+				elem.getElementsByClassName("checkbox")[0].checked = true;
+			}
+			var checkboxes = document.getElementsByClassName("checkbox");
+			var statusiZaPrikaz = [];
+			for(var i=0;i<checkboxes.length;i++){
+				if(checkboxes[i].checked){
+					statusiZaPrikaz.push(checkboxes[i].value)
+				}
+			}*/
+
+			
+			for(var i=0;i<markers.length;i++){
+				markers[i].setMap(map);
+				if(markers[i].nalog){
+					if(markers[i].nalog.dodela){
+						if(markers[i].nalog.dodela.majstor){
+							markers[i].dodeljen = 1;
+							if(majstor!="Svi"){
+								if(markers[i].nalog.dodela.majstor!=majstor){
+									markers[i].setMap(null);
+								}	
+							}
+						}
+
+					}	
+				}
+				
+				
+
+				if(statusi.length>0){
+					if(markers[i].nalog){
+						if(statusi.indexOf(markers[i].nalog.statusNaloga)<0 && markers[i].dodeljen!=1 ){
+							markers[i].setMap(null);
+						}
+					}
+					
+				}
+			}
+		}
+
+		function initMap() {
+			myLatLng = {lat: 44.800003, lng: 20.45006};//51.896468, 4.419172
+			map = new google.maps.Map(document.getElementById('map'), {
+				center: myLatLng,
+				zoom: 13,
+				gestureHandling: "cooperative",
+				styles: [{"elementType":"geometry","stylers":[{"color":"#f5f5f5"}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"elementType":"labels.text.stroke","stylers":[{"color":"#f5f5f5"}]},{"featureType":"administrative.land_parcel","elementType":"labels.text.fill","stylers":[{"color":"#bdbdbd"}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#eeeeee"}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#e5e5e5"}]},{"featureType":"poi.park","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"road","elementType":"geometry","stylers":[{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"labels.text.fill","stylers":[{"color":"#757575"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#dadada"}]},{"featureType":"road.highway","elementType":"labels.text.fill","stylers":[{"color":"#616161"}]},{"featureType":"road.local","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]},{"featureType":"transit.line","elementType":"geometry","stylers":[{"color":"#e5e5e5"}]},{"featureType":"transit.station","elementType":"geometry","stylers":[{"color":"#eeeeee"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#c9c9c9"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#9e9e9e"}]}]
+			});
+
+
+		    for (let i = 0; i < nalozi.length; i++) {
+		    	if(["Finalizacija","Zakazana finalizacija","Betonaža", "Asfalt", "Bekaton","Masinsko kopanje","Rucno kopanje","Preventivno čišćenje","Snimanje kamerom","Dezinfekcija","Crpljenje","Potrebna WOMA","Stambeno koci","Stanari koče"].indexOf(nalozi[i].statusNaloga)>=0){
+		    		continue;
+		    	}
+				if (nalozi[i].coordinates && nalozi[i].coordinates.lat) {
+					let iconUrl = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+					let opacity = 1;
+					var status = "??";
+					if (nalozi[i].statusNaloga === "Finalizacija" || nalozi[i].statusNaloga === "Zakazana finalizacija") {
+						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/finalizacija.png";
+						status = "Finalizacija";
+					} else if (["Betonaža", "Asfalt", "Bekaton"].includes(nalozi[i].statusNaloga)) {
+						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/betonaza.png";
+						status = "Beton";
+					}else if(nalozi[i].statusNaloga=="Kopanje"){
+						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/bager.png";
+						status = "Bager";
+					}
+					var neplaniran = true;
+					
+					var infoWindowContent = `${nalozi[i].adresa}<br><b>${nalozi[i].statusNaloga}</b>`;
+					if(nalozi[i].planiran == 1){
+						//Danas planiran nalog
+						infoWindowContent = infoWindowContent + "<br><b>Почетак радова:</b> "+nalozi[i].dodela.vremeDolaska;
+						infoWindowContent = infoWindowContent + "<br><b>Трајање радова:</b> "+nalozi[i].dodela.vremeRadova;
+						infoWindowContent = infoWindowContent + "<br><b>Majstor:</b> "+getMajstorByCode(nalozi[i].dodela.majstor).ime;
+						status = "Danasnji";
+						iconUrl = "https://maps.google.com/mapfiles/ms/icons/green-dot.png";
+					}else if(nalozi[i].planiran == 2){
+						infoWindowContent = infoWindowContent + "<br>Планиран: "+reshuffleDate(nalozi[i].dodele[j].datumRadova)
+						status = "Planiran";
+						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/plannedIcon.png";
+					}else{
+						status="Neplaniran";
+						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/mapaUzvik2.png";
+					}
+
+					let marker = new google.maps.Marker({
+					    position: {
+					        lat: nalozi[i].coordinates.lat,
+					        lng: nalozi[i].coordinates.lng
+					    },
+					    nalog: nalozi[i],
+					    status: status,
+					    map: map,
+					    icon: { url: iconUrl },
+					    opacity: opacity
+					});
+
+					marker.infowindow = new google.maps.InfoWindow({
+					    content: infoWindowContent + "<br><div style='max-width:300px'>" + nalozi[i].opis+"</div>"
+					});
+
+					// Prevent scroll inside InfoWindow from zooming map
+					google.maps.event.addListener(marker.infowindow, "domready", function () {
+					    const infoWindowElement = document.querySelector(".gm-style");
+					    if (infoWindowElement) {
+					        infoWindowElement.addEventListener("wheel", function (event) {
+					            event.preventDefault();
+					            event.stopPropagation();
+					        }, { passive: false });
+					    }
+					});
+
+					const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+					if (isTouchDevice) {
+					    // On mobile: tap toggles the InfoWindow
+					    marker.addListener("click", () => {
+					        if (marker.infowindow.getMap()) {
+					            marker.infowindow.close();
+					        } else {
+					            marker.infowindow.open(map, marker);
+					        }
+					    });
+
+					    // Optional: close InfoWindow when tapping elsewhere
+					    map.addListener("click", (e) => {
+					        if (marker.infowindow.getMap()) {
+					            marker.infowindow.close();
+					        }
+					    });
+					} else {
+					    // On desktop: hover to open, mouseout to close
+					    marker.addListener("mouseover", () => {
+					        marker.infowindow.open(map, marker);
+					    });
+
+					    marker.addListener("mouseout", () => {
+					        marker.infowindow.close();
+					    });
+
+					    marker.addListener("click", (e) => {
+					    	if(marker.nalog){
+					    		window.open('/nalog/'+marker.nalog, '_blank');
+					    	}
+					       
+					    });
+					}
+
+					markers.push(marker);
+
+
+					
+
+					
+					
+				}
+			}
+			for(var i=0;i<navigacija.vozila.Data.length;i++){
+		    	let marker = new google.maps.Marker({
+				    position: { lat: parseFloat(navigacija.vozila.Data[i].Lat), lng: parseFloat(navigacija.vozila.Data[i].Lon) },
+				    map: map,
+				    vozilo: navigacija.vozila.Data[i].DeviceName,
+				    icon: {
+				        url: "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstor.png"
+				    }
+				});
+
+				// Store the infowindow in the marker itself
+				marker.infowindow = new google.maps.InfoWindow({
+				    content: navigacija.vozila.Data[i].DeviceName
+				});
+
+				// Prevent scroll inside InfoWindow from zooming map
+				google.maps.event.addListener(marker.infowindow, "domready", function () {
+				    const infoWindowElement = document.querySelector(".gm-style");
+				    if (infoWindowElement) {
+				        infoWindowElement.addEventListener("wheel", function (event) {
+				            event.preventDefault();
+				            event.stopPropagation();
+				        }, { passive: false });
+				    }
+				});
+
+				const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+				if (isTouchDevice) {
+				    // On mobile: tap toggles the InfoWindow
+				    marker.addListener("click", () => {
+				        if (marker.infowindow.getMap()) {
+				            marker.infowindow.close();
+				        } else {
+				            marker.infowindow.open(map, marker);
+				        }
+				    });
+
+				    // Optional: tap elsewhere on map closes it
+				    map.addListener("click", (e) => {
+				        // Close only if open
+				        if (marker.infowindow.getMap()) {
+				            marker.infowindow.close();
+				        }
+				    });
+				} else {
+				    // On desktop: hover to open, mouseout to close
+				    marker.addListener("mouseover", () => {
+				        marker.infowindow.open(map, marker);
+				    });
+
+				    marker.addListener("mouseout", () => {
+				        marker.infowindow.close();
+				    });
+				}
+
+				markers.push(marker);
+
+		    }
+
+		}
+
+		markers = [];
+		circles = [];
+		
+		socket.on("lokacijaMajstoraOdgovor",function(states){
+			if(states=="Greska"){
+				console.log("Greska u update")
+			}
+			console.log("Update received")
+			//Update Pozicije majstora
+			for (var i = 0; i < states.vozila.Data.length; i++) {
+				const state = states.vozila.Data[i];
+
+				const marker = markers.find(m => m.vozilo == state.DeviceName);
+				
+				if(state.IsIgnitionOn=="False"){
+					marker.setIcon("https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstor.png");
+				}else{
+					marker.setIcon("https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstorUpaljen.png");
+				}
+				console.log("position updated")
+				marker.setPosition({ lat: parseFloat(state.Lat), lng: parseFloat(state.Lon) });
+
+				
+			}
+		})
+	</script>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3&key=<%=googlegeocoding%>&amp;callback=initMap" async="" defer=""></script>
+<%- include ("partials/footer") -%>
