@@ -196,9 +196,9 @@
 						status = "Danasnji";
 						iconUrl = "https://maps.google.com/mapfiles/ms/icons/green-dot.png";
 					}else if(nalozi[i].planiran == 2){
-						infoWindowContent = infoWindowContent + "<br>Планиран: "+reshuffleDate(nalozi[i].dodele[j].datumRadova)
+						infoWindowContent = infoWindowContent + "<br>Планиран: "+reshuffleDate(nalozi[i].dodela.datumRadova)
 						status = "Planiran";
-						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/plannedIcon.png";
+						iconUrl = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
 					}else{
 						status="Neplaniran";
 						iconUrl = "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/mapaUzvik2.png";
@@ -212,7 +212,7 @@
 					    nalog: nalozi[i],
 					    status: status,
 					    map: map,
-					    icon: { url: iconUrl },
+					    icon: { url: iconUrl},
 					    opacity: opacity
 					});
 
