@@ -346,6 +346,9 @@ function layoutNoOverlap(container) {
 		<script>
 			function generateNalogRow(elem,nalog,tip){
 				var tr = document.createElement("TR");
+				if(nalog.vrstaRada=="TEKUCE"){
+					tr.style.backgroundColor = "#FFCE1B"
+				}
 					var td = document.createElement("TD");
 					td.setAttribute("class","brojNaloga");
 					td.innerHTML = "<div class=\"value\">"+nalog.broj+"</div>";
@@ -528,7 +531,7 @@ function layoutNoOverlap(container) {
 								group.setAttribute("class","group");
 									var subTitle = document.createElement("DIV");
 									subTitle.setAttribute("class","subTitle");
-									subTitle.innerHTML = "Zamene:";
+									subTitle.innerHTML = "Spremne zamene:";
 									group.appendChild(subTitle);
 
 									var nalozi = document.createElement("DIV");
@@ -722,7 +725,7 @@ function layoutNoOverlap(container) {
 								group.setAttribute("class","group");
 									var subTitle = document.createElement("DIV");
 									subTitle.setAttribute("class","subTitle");
-									subTitle.innerHTML = "Specijalni:";
+									subTitle.innerHTML = "Specifični:";
 									group.appendChild(subTitle);
 
 									var nalozi = document.createElement("DIV");

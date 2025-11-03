@@ -355,6 +355,7 @@ function generatePremijusBezPenala(info){
 }
 
 function generatePremijusPrekoPolaMilBezPenala(info){
+	console.log(info)
 	var dateNow			=	new Date();
 	var yearString 		=	dateNow.getFullYear();
 	var monthString		=	Number(eval(dateNow.getMonth()+1));
@@ -388,9 +389,9 @@ function generatePremijusPrekoPolaMilBezPenala(info){
 	  '<cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>'+
 	  '<cbc:DocumentCurrencyCode>RSD</cbc:DocumentCurrencyCode>'+
 	  '<cbc:BuyerReference>PORTAL</cbc:BuyerReference>'+
-	  '<cac:InvoicePeriod>'+
-	    '<cbc:DescriptionCode>'+pdv+'</cbc:DescriptionCode>'+
-	  '</cac:InvoicePeriod>'+
+	  //'<cac:InvoicePeriod>'+
+	    //'<cbc:DescriptionCode>'+pdv+'</cbc:DescriptionCode>'+
+	  //'</cac:InvoicePeriod>'+
 	  '<cac:OrderReference>'+
 	    '<cbc:ID>'+info.brojNaloga+'</cbc:ID>'+
 	  '</cac:OrderReference>'+
