@@ -354,45 +354,31 @@ function layoutNoOverlap(container) {
 						var td = document.createElement("TD");
 						td.setAttribute("class","tipNaloga");
 						
-							var tipNaloga = tipNalogaPoOpisu(nalog.opis);
 							var printOut = "?";
-							if(tipNaloga=="Voma"){
-								printOut = "V"
-							}else if(tipNaloga=="Crpljenje"){
-								printOut = "C"
-							}else if(tipNaloga=="Zamena"){
-								printOut = "Z"
-							}else if(tipNaloga=="Dezinfekcija"){
-								printOut = "D"
-							}else if(tipNaloga=="Curenje"){
-								printOut = "K"
-							}else if(tipNaloga=="Finalizacija"){
-								printOut = "F"
-							}else if(tipNaloga=="Zagušenje"){
-								printOut = "O"
-							}
-							
-
-							if(printOut=="?"){
-								if(nalog.statusNaloga=="Potrebna WOMA"){
-									printOut = "V"
-								}else if(nalog.statusNaloga=="Zagušenje"){
-									printOut = "O"
-								}else if(nalog.statusNaloga=="Zamena"){
-									printOut = "Z"
-								}else if(nalog.statusNaloga=="Crpljenje"){
-									printOut = "C"
-								}else if(nalog.statusNaloga=="Dezinfekcija"){
-									printOut = "D"
-								}else if(nalog.statusNaloga=="Masinsko kopanje" || nalog.statusNaloga=="Rucno kopanje"){
-									printOut = "R"
-								}else if(nalog.statusNaloga=="Finalizacija" || nalog.statusNaloga=="Zakazana finalizacija"){
-									printOut = "F"
-								}else if(nalog.statusNaloga=="Betonaža" || nalog.statusNaloga=="Asfalt" || nalog.statusNaloga=="Bekaton"){
-									printOut = "B"
-								}else if(nalog.statusNaloga=="Preventivno čišćenje"){
-									printOut = "Č"
-								}
+							if(nalog.statusNaloga=="Potrebna WOMA"){
+								printOut = "🚚"
+							}else if(nalog.statusNaloga=="Zagušenje"){
+								printOut = "OG"
+							}else if(nalog.statusNaloga=="Konstatacija"){
+								printOut = "KN"
+							}else if(nalog.statusNaloga=="Zamena"){
+								printOut = "ZM"
+							}else if(nalog.statusNaloga=="Crpljenje"){
+								printOut = "CR"
+							}else if(nalog.statusNaloga=="Dezinfekcija"){
+								printOut = "DZ"
+							}else if(nalog.statusNaloga=="Masinsko kopanje"){
+								printOut = "🚜"
+							}else if(nalog.statusNaloga=="Rucno kopanje"){
+								printOut = "⛏️"
+							}else if(nalog.statusNaloga=="Finalizacija" || nalog.statusNaloga=="Zakazana finalizacija"){
+								printOut = "FN"
+							}else if(nalog.statusNaloga=="Betonaža" || nalog.statusNaloga=="Asfalt" || nalog.statusNaloga=="Bekaton"){
+								printOut = "🚧"
+							}else if(nalog.statusNaloga=="Preventivno čišćenje"){
+								printOut = "PČ"
+							}else if(nalog.statusNaloga=="Snimanje kamerom"){
+								printOut = "🎥"
 							}
 							td.innerHTML = printOut;
 					}
@@ -400,7 +386,7 @@ function layoutNoOverlap(container) {
 
 					var td = document.createElement("TD");
 					td.setAttribute("class","planiran");
-					td.innerHTML = nalog.planiran==0 ? "❌" : "✅"; //nalog.planiran==1 ? ✅ : ;
+					td.innerHTML = nalog.planiran==0 ? "❌" : nalog.planiran==1 ? "✅" : nalog.planiran==2 ? "📅" : "❓";
 					tr.appendChild(td);
 
 				elem.appendChild(tr);
@@ -569,6 +555,34 @@ function layoutNoOverlap(container) {
 										nalozi.appendChild(table);
 									group.appendChild(nalozi);
 								inline.appendChild(group);
+
+								var group = document.createElement("DIV");
+								group.setAttribute("class","group");
+									var subTitle = document.createElement("DIV");
+									subTitle.setAttribute("class","subTitle");
+									subTitle.innerHTML = "Kopanja:";
+									group.appendChild(subTitle);
+
+									var nalozi = document.createElement("DIV");
+									nalozi.setAttribute("class","nalozi");
+										var table = document.createElement("TABLE")
+										for(var j=0;j<otvoreniNalozi.length;j++){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
+												var today = new Date();
+												//today.setDate(today.getDate() - 1);
+												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+													if(otvoreniNalozi[j].statusNaloga=="Masinsko kopanje" || otvoreniNalozi[j].statusNaloga=="Rucno kopanje"){
+														generateNalogRow(table,otvoreniNalozi[j]);
+													}
+													
+												}
+												
+											}
+										}
+										nalozi.appendChild(table);
+									group.appendChild(nalozi);
+								inline.appendChild(group);
+								
 							inlines.appendChild(inline);
 
 							var inline = document.createElement("DIV");
@@ -589,8 +603,8 @@ function layoutNoOverlap(container) {
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
-													if(["Konstatacija","Radovi u toku","Zamena","Zagušenje"].indexOf(otvoreniNalozi[j].statusNaloga)<0){
-														generateNalogRowOstalo(table,otvoreniNalozi[j]);
+													if(["Konstatacija","Zamena","Zagušenje","Masinsko kopanje","Rucno kopanje"].indexOf(otvoreniNalozi[j].statusNaloga)<0){
+														generateNalogRow(table,otvoreniNalozi[j],);
 													}
 													
 												}

@@ -4112,6 +4112,8 @@ http.listen(process.env.PORT, async function(){
 			}
 		}*/
 
+		//var nalozi = await naloziDB.find({statusNaloga:"Stanari koče"}).toArray();
+
 
 
 	})
