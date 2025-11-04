@@ -384,6 +384,8 @@ function layoutNoOverlap(container) {
 								printOut = "🎥"
 							}else if(nalog.statusNaloga=="Kombinovano"){
 								printOut = "🚛"
+							}else if(nalog.statusNaloga=="Potreban pristup"){
+								printOut = "PP"
 							}
 							td.innerHTML = printOut;
 					}
@@ -443,45 +445,6 @@ function layoutNoOverlap(container) {
 					td.setAttribute("class","planiran");
 					td.innerHTML = nalog.planiran==0 ? "❌" : nalog.planiran==1 ? "✅" : nalog.planiran==2 ? "📅" : "❓";
 					tr.appendChild(td);*/
-
-				elem.appendChild(tr);
-			}
-
-			function generateNalogRowOstalo(elem,nalog){
-				var tr = document.createElement("TR");
-					var td = document.createElement("TD");
-					td.setAttribute("class","brojNaloga");
-					td.innerHTML = "<div class=\"value\">"+nalog.broj+"</div>";
-					tr.appendChild(td);
-						var td = document.createElement("TD");
-						td.setAttribute("class","tipNaloga");
-						var printOut = "?"
-							if(nalog.statusNaloga=="Potrebna WOMA"){
-								printOut = "V"
-							}else if(nalog.statusNaloga=="Zagušenje"){
-								printOut = "O"
-							}else if(nalog.statusNaloga=="Zamena"){
-								printOut = "Z"
-							}else if(nalog.statusNaloga=="Crpljenje"){
-								printOut = "C"
-							}else if(nalog.statusNaloga=="Dezinfekcija"){
-								printOut = "D"
-							}else if(nalog.statusNaloga=="Masinsko kopanje" || nalog.statusNaloga=="Rucno kopanje"){
-								printOut = "R"
-							}else if(nalog.statusNaloga=="Finalizacija" || nalog.statusNaloga=="Zakazana finalizacija"){
-								printOut = "F"
-							}else if(nalog.statusNaloga=="Betonaža" || nalog.statusNaloga=="Asfalt" || nalog.statusNaloga=="Bekaton"){
-								printOut = "B"
-							}else if(nalog.statusNaloga=="Preventivno čišćenje"){
-								printOut = "Č"
-							}
-							td.innerHTML = printOut;
-					tr.appendChild(td);
-
-					var td = document.createElement("TD");
-					td.setAttribute("class","planiran");
-					td.innerHTML = nalog.planiran==0 ? "❌" : nalog.planiran==1 ? "✅" : nalog.planiran==2 ? "📅" : "❓";
-					tr.appendChild(td);
 
 				elem.appendChild(tr);
 			}
