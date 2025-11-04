@@ -9805,7 +9805,7 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 	try{
 		var today = new Date();
 		//today.setDate(today.getDate()-1);
-		var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
+		var majstori = await majstoriDB.find({}).toArray();
 		var dodele = await dodeljivaniNaloziDB.find({deleted: {$ne:1},datumRadova:getDateAsStringForInputObject(today)}).toArray();
 		var brojeviNaloga = [];
 		for(var i=0;i<dodele.length;i++){
@@ -9839,6 +9839,7 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 				}
 			}
 		}
+
 
 		res.render("rasporedRadovaUzivo",{
 			pageTitle: "Данашњи распоред",
