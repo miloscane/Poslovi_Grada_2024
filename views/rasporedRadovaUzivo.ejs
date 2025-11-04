@@ -382,6 +382,8 @@ function layoutNoOverlap(container) {
 								printOut = "PČ"
 							}else if(nalog.statusNaloga=="Snimanje kamerom"){
 								printOut = "🎥"
+							}else if(nalog.statusNaloga=="Kombinovano"){
+								printOut = "🚛"
 							}
 							td.innerHTML = printOut;
 					}
@@ -520,6 +522,33 @@ function layoutNoOverlap(container) {
 												//today.setDate(today.getDate() - 1);
 												if(istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													generateNalogRow(table,otvoreniNalozi[j]);
+												}
+												
+											}
+										}
+										nalozi.appendChild(table);
+									group.appendChild(nalozi);
+								inline.appendChild(group);
+
+								var group = document.createElement("DIV");
+								group.setAttribute("class","group");
+									var subTitle = document.createElement("DIV");
+									subTitle.setAttribute("class","subTitle");
+									subTitle.innerHTML = "Dodeljen majstoru:";
+									group.appendChild(subTitle);
+
+									var nalozi = document.createElement("DIV");
+									nalozi.setAttribute("class","nalozi");
+										var table = document.createElement("TABLE")
+										for(var j=0;j<otvoreniNalozi.length;j++){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
+												var today = new Date();
+												//today.setDate(today.getDate() - 1);
+												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+													if(otvoreniNalozi[j].statusNaloga=="Dodeljen majstoru"){
+														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
+													}
+													
 												}
 												
 											}
@@ -791,7 +820,7 @@ function layoutNoOverlap(container) {
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
 												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
-													if(["Konstatacija","Zamena","Zagušenje","Masinsko kopanje","Rucno kopanje","Crpljenje","Dezinfekcija","Finalizacija","Zakazana finalizacija","Betonaža","Asfalt","Bekaton","Preventivno čišćenje","Snimanje kamerom","Potrebna WOMA","Kombinovano"].indexOf(otvoreniNalozi[j].statusNaloga)<0){
+													if(["Dodeljen majstoru","Konstatacija","Zamena","Zagušenje","Masinsko kopanje","Rucno kopanje","Crpljenje","Dezinfekcija","Finalizacija","Zakazana finalizacija","Betonaža","Asfalt","Bekaton","Preventivno čišćenje","Snimanje kamerom","Potrebna WOMA","Kombinovano"].indexOf(otvoreniNalozi[j].statusNaloga)<0){
 														generateNalogRow(table,otvoreniNalozi[j]);
 													}
 													

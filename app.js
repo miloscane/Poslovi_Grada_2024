@@ -5183,8 +5183,8 @@ server.get('/kontrola/radnici',async (req,res)=>{
 	try{
 		var today = getDateAsStringForDisplay(new Date());
 		var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
-		//var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:today.split(".")[2]+"-"+today.split(".")[1]}}).toArray();
-		var izvestaji = await dnevniIzvestajiDB.find({date: { $gt: "2025-10-14" }}).toArray();
+		var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:today.split(".")[2]+"-"+today.split(".")[1]}}).toArray();
+		//var izvestaji = await dnevniIzvestajiDB.find({date: { $gt: "2025-10-14" }}).toArray();
 		var brojeviNaloga = [];
 		for(var i=0;i<izvestaji.length;i++){
 			for(var j=0;j<izvestaji[i].nalozi.length;j++){
@@ -9052,8 +9052,8 @@ server.get('/izvestajMajstoraPickTemp',async (req,res)=>{
 			try{
 				//req.params.date je za izvestaje koji postoje
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
-				//var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:"2025-10"}}).toArray();
-				var izvestaji = await dnevniIzvestajiDB.find({date: { $gt: "2025-10-14" }}).toArray();
+				var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:"2025-11"}}).toArray();
+				//var izvestaji = await dnevniIzvestajiDB.find({date: { $gt: "2025-10-14" }}).toArray();
 				res.render("administracija/izvestajMajstoraPickTemp",{
 					pageTitle:"Одабери мајстора и датум",
 					user: req.session.user,
