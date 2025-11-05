@@ -9804,7 +9804,7 @@ server.get('/dispecer/rasporedRadova', async(req,res)=>{
 server.get('/rasporedRadovaUzivo', async (req,res)=>{
 	try{
 		var today = new Date();
-		today.setDate(today.getDate()-1);
+		//today.setDate(today.getDate()-1);
 		var majstori = await majstoriDB.find({}).toArray();
 		var dodele = await dodeljivaniNaloziDB.find({deleted: {$ne:1},datumRadova:getDateAsStringForInputObject(today)}).toArray();
 		var brojeviNaloga = [];
