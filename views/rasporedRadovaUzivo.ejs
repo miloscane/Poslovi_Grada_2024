@@ -361,21 +361,19 @@ function layoutNoOverlap(container) {
 							if(nalog.statusNaloga=="Potrebna WOMA"){
 								printOut = "🚚"
 							}else if(nalog.statusNaloga=="Zagušenje"){
-								printOut = "OG"
-							}else if(nalog.statusNaloga=="Konstatacija"){
-								printOut = "KN"
+								printOut = "🪠"
 							}else if(nalog.statusNaloga=="Zamena"){
 								printOut = "ZM"
 							}else if(nalog.statusNaloga=="Crpljenje"){
 								printOut = "CR"
 							}else if(nalog.statusNaloga=="Dezinfekcija"){
-								printOut = "DZ"
+								printOut = "🪣"
 							}else if(nalog.statusNaloga=="Masinsko kopanje"){
 								printOut = "🚜"
 							}else if(nalog.statusNaloga=="Rucno kopanje"){
 								printOut = "⛏️"
 							}else if(nalog.statusNaloga=="Finalizacija" || nalog.statusNaloga=="Zakazana finalizacija"){
-								printOut = "FN"
+								printOut = "🧱"
 							}else if(nalog.statusNaloga=="Betonaža" || nalog.statusNaloga=="Asfalt" || nalog.statusNaloga=="Bekaton"){
 								printOut = "🚧"
 							}else if(nalog.statusNaloga=="Preventivno čišćenje"){
@@ -887,12 +885,12 @@ function layoutNoOverlap(container) {
 			<div class="title">ПРЕГЛЕД НАЛОГА</div>
 			<div class="bubbles">
 				<div class="bubble" id="ukupno-zamena"><div class="title">Замене 🧰</div><div class="number"></div></div>
-				<div class="bubble" id="ukupno-odgusenja"><div class="title">Одгушења</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-odgusenja"><div class="title">Одгушења 🪠</div><div class="number"></div></div>
 				<div class="bubble" id="ukupno-konstatacija"><div class="title">Додељени</div><div class="number"></div></div>
-				<div class="bubble" id="ukupno-finalizacija"><div class="title">Финализација 🧑‍🎨</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-finalizacija"><div class="title">Финализација 🧱</div><div class="number"></div></div>
 				<div class="bubble" id="ukupno-voma"><div class="title">Воме 🚚</div><div class="number"></div></div>
 				<div class="bubble" id="ukupno-kopanja"><div class="title">Копање 🚜⛏️</div><div class="number"></div></div>
-				<div class="bubble" id="ukupno-crpljenja"><div class="title">Црп. и Дез.</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-crpljenja"><div class="title">Црп. и Дез. 🪣</div><div class="number"></div></div>
 				<div class="bubble" id="ukupno-betonaza"><div class="title">Бетонаже 🚧</div><div class="number"></div></div>
 				<div class="bubble" id="ukupno-pristup"><div class="title">Потребан приступ</div><div class="number"></div></div>
 				<div class="bubble" id="ukupno-specificnih"><div class="title">Специфични 🎥🚛🧼</div><div class="number"></div></div>
