@@ -131,6 +131,7 @@
 							</select>
 						</div>
 					</div>
+
 					<div class="filter">
 						<div class="label">Приказани мајстори:</div>
 						<div class="checkboxes">
@@ -167,6 +168,15 @@
 							</script>
 						</div>
 					</div>
+
+					<div class="filter">
+						<div class="label">Приказuj подизвоћачe:</div>
+						<div class="checkboxes">
+							<input type="checkbox" id="podizvodjaci-checkbox" checked="checked" oninput="generateTable()">
+						</div>
+					</div>
+					
+
 					<div class="filter">
 						<div class="label">Филтер Адресе:</div>
 						<div class="checkboxes">
@@ -228,6 +238,7 @@
 						if(opstineToShow.indexOf(nalozi[i].radnaJedinica)>=0){
 							
 							var filterMajstora = document.getElementById("majstor-naloga").value;
+							var prikazujPodizvodjace = document.getElementById("podizvodjaci-checkbox").checked;
 
 							var nalogToPush = {};
 							nalogToPush.broj = nalozi[i].broj;
@@ -244,16 +255,37 @@
 										naloziToShow.push(nalogToPush);
 									}else{
 										if(nalozi[i].statusNaloga==statusToShow){
-											naloziToShow.push(nalogToPush);
+											if(prikazujPodizvodjace){
+												naloziToShow.push(nalogToPush);
+											}else{
+												if(podizvodjaci.indexOf(nalozi[i].majstor)<0){
+													naloziToShow.push(nalogToPush);
+												}
+											}
+											
 										}
 									}
 								}
 							}else{
 								if(statusToShow=="Svi"){
-									naloziToShow.push(nalogToPush);
+									
+									if(prikazujPodizvodjace){
+										naloziToShow.push(nalogToPush);
+									}else{
+										if(podizvodjaci.indexOf(nalozi[i].majstor)<0){
+											naloziToShow.push(nalogToPush);
+										}
+									}
 								}else{
 									if(nalozi[i].statusNaloga==statusToShow){
-										naloziToShow.push(nalogToPush);
+
+										if(prikazujPodizvodjace){
+											naloziToShow.push(nalogToPush);
+										}else{
+											if(podizvodjaci.indexOf(nalozi[i].majstor)<0){
+												naloziToShow.push(nalogToPush);
+											}
+										}
 									}
 								}
 							}
