@@ -9804,7 +9804,7 @@ server.get('/dispecer/rasporedRadova', async(req,res)=>{
 server.get('/rasporedRadovaUzivo', async (req,res)=>{
 	try{
 		var today = new Date();
-		//today.setDate(today.getDate()-1);
+		today.setDate(today.getDate()-1);
 		var majstori = await majstoriDB.find({}).toArray();
 		var dodele = await dodeljivaniNaloziDB.find({deleted: {$ne:1},datumRadova:getDateAsStringForInputObject(today)}).toArray();
 		var brojeviNaloga = [];
@@ -9840,13 +9840,27 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 			}
 		}
 
-
+		var danasnjeDodele = await dodeljivaniNaloziDB.find({deleted: {$ne:1},datumRadova:getDateAsStringForInputObject(today)}).toArray();
+		var brojeviNaloga = [];
+		for(var i=0;i<danasnjeDodele.length;i++){
+			brojeviNaloga.push(danasnjeDodele[i].nalog);
+		}
+		var zavrseniNalozi = await naloziDB.find({statusNaloga:"Završeno",broj:{$in:brojeviNaloga}}).toArray();
+		for(var i=0;i<zavrseniNalozi.length;i++){
+			zavrseniNalozi[i].danasnjiTipRada = "?";
+			for(var j=0;j<danasnjeDodele.length;j++){
+				if(zavrseniNalozi[i].broj==danasnjeDodele[j].nalog){
+					zavrseniNalozi[i].danasnjiTipRada = danasnjeDodele[j].tipRada;
+				}
+			}
+		}
 		res.render("rasporedRadovaUzivo",{
 			pageTitle: "Данашњи распоред",
 			user: req.session.user,
 			majstori: majstori,
 			dodele: dodele,
-			otvoreniNalozi: otvoreniNalozi
+			otvoreniNalozi: otvoreniNalozi,
+			zavrseniNalozi: zavrseniNalozi
 		})
 	}catch(err){
 		logError(err);
@@ -9857,6 +9871,8 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 		});
 	}
 })
+
+
 
 
 

@@ -399,57 +399,37 @@ function layoutNoOverlap(container) {
 				elem.appendChild(tr);
 			}
 
+			function generateNalogRowGotovo(elem,nalog,tip){
+				var tr = document.createElement("TR");
+				if(nalog.vrstaRada=="TEKUCE"){
+					tr.style.backgroundColor = "#FFCE1B"
+				}
+				tr.style.backgroundColor = "rgba(20,255,20,0.6)"
+					var td = document.createElement("TD");
+					td.setAttribute("class","brojNaloga");
+					td.innerHTML = "<div class=\"value\">"+nalog.broj+"</div>";
+					tr.appendChild(td);
+
+					var td = document.createElement("TD");
+					td.setAttribute("class","planiran");
+					td.innerHTML = "🏁";
+					tr.appendChild(td);
+
+				elem.appendChild(tr);
+			}
+
 			function generateNalogRowPodizvodjac(elem,nalog,tip){
-				console.log(nalog)
 				var tr = document.createElement("TR");
 					var td = document.createElement("TD");
 					td.setAttribute("class","brojNaloga");
 					td.innerHTML = "<div class=\"value\" style='position:relative'>"+nalog.broj+" / "+getMajstorByCode(nalog.majstor).ime+"</div>";
 					tr.appendChild(td);
-					
-					/*if(!tip){
-						var td = document.createElement("TD");
-						td.setAttribute("class","tipNaloga");
-						
-							var printOut = "?";
-							if(nalog.statusNaloga=="Potrebna WOMA"){
-								printOut = "🚚"
-							}else if(nalog.statusNaloga=="Zagušenje"){
-								printOut = "OG"
-							}else if(nalog.statusNaloga=="Konstatacija"){
-								printOut = "KN"
-							}else if(nalog.statusNaloga=="Zamena"){
-								printOut = "ZM"
-							}else if(nalog.statusNaloga=="Crpljenje"){
-								printOut = "CR"
-							}else if(nalog.statusNaloga=="Dezinfekcija"){
-								printOut = "DZ"
-							}else if(nalog.statusNaloga=="Masinsko kopanje"){
-								printOut = "🚜"
-							}else if(nalog.statusNaloga=="Rucno kopanje"){
-								printOut = "⛏️"
-							}else if(nalog.statusNaloga=="Finalizacija" || nalog.statusNaloga=="Zakazana finalizacija"){
-								printOut = "FN"
-							}else if(nalog.statusNaloga=="Betonaža" || nalog.statusNaloga=="Asfalt" || nalog.statusNaloga=="Bekaton"){
-								printOut = "🚧"
-							}else if(nalog.statusNaloga=="Preventivno čišćenje"){
-								printOut = "PČ"
-							}else if(nalog.statusNaloga=="Snimanje kamerom"){
-								printOut = "🎥"
-							}
-							td.innerHTML = printOut;
-					}
-					tr.appendChild(td);*/
-
-					/*var td = document.createElement("TD");
-					td.setAttribute("class","planiran");
-					td.innerHTML = nalog.planiran==0 ? "❌" : nalog.planiran==1 ? "✅" : nalog.planiran==2 ? "📅" : "❓";
-					tr.appendChild(td);*/
 
 				elem.appendChild(tr);
 			}
 
 			var otvoreniNalozi = <%-JSON.stringify(otvoreniNalozi)%>;
+			var zavrseniNalozi = <%-JSON.stringify(zavrseniNalozi)%>;
 			
 			for(var i=0;i<radneJedinice.length;i++){
 				var radnaJedinica = document.createElement("DIV");
@@ -473,20 +453,19 @@ function layoutNoOverlap(container) {
 								group.setAttribute("class","group");
 									var subTitle = document.createElement("DIV");
 									subTitle.setAttribute("class","subTitle");
-									subTitle.innerHTML = "Današnji:";
+									subTitle.innerHTML = "Novi radni nalozi:";
 									group.appendChild(subTitle);
 
 									var nalozi = document.createElement("DIV");
 									nalozi.setAttribute("class","nalozi");
-										var table = document.createElement("TABLE")
+										var table = document.createElement("TABLE");
 										for(var j=0;j<otvoreniNalozi.length;j++){
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+												if(istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum)) && otvoreniNalozi[j].statusNaloga=="Primljen"){
 													generateNalogRow(table,otvoreniNalozi[j]);
 												}
-												
 											}
 										}
 										nalozi.appendChild(table);
@@ -507,13 +486,21 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(otvoreniNalozi[j].statusNaloga=="Dodeljen majstoru"){
 														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
 													}
 													
-												}
+												//}
 												
+											}
+										}
+
+										for(var j=0;j<zavrseniNalozi.length;j++){
+											if(zavrseniNalozi[j].radnaJedinica==radneJedinice[i]){
+												if(zavrseniNalozi[j].danasnjiTipRada=="Popis"){
+													generateNalogRowGotovo(table,zavrseniNalozi[j],zavrseniNalozi[j].statusNaloga);
+												}
 											}
 										}
 										nalozi.appendChild(table);
@@ -534,13 +521,21 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(otvoreniNalozi[j].statusNaloga=="Zamena"){
 														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
 													}
 													
-												}
+												//}
 												
+											}
+										}
+
+										for(var j=0;j<zavrseniNalozi.length;j++){
+											if(zavrseniNalozi[j].radnaJedinica==radneJedinice[i]){
+												if(zavrseniNalozi[j].danasnjiTipRada=="Zamena"){
+													generateNalogRowGotovo(table,zavrseniNalozi[j],zavrseniNalozi[j].statusNaloga);
+												}
 											}
 										}
 										nalozi.appendChild(table);
@@ -561,13 +556,21 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(otvoreniNalozi[j].statusNaloga=="Zagušenje"){
 														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
 													}
 													
-												}
+												//}
 												
+											}
+										}
+
+										for(var j=0;j<zavrseniNalozi.length;j++){
+											if(zavrseniNalozi[j].radnaJedinica==radneJedinice[i]){
+												if(zavrseniNalozi[j].danasnjiTipRada=="Odgusenje"){
+													generateNalogRowGotovo(table,zavrseniNalozi[j],zavrseniNalozi[j].statusNaloga);
+												}
 											}
 										}
 										nalozi.appendChild(table);
@@ -588,40 +591,21 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(otvoreniNalozi[j].statusNaloga=="Potrebna WOMA"){
 														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
 													}
 													
-												}
+												//}
 												
 											}
 										}
-										nalozi.appendChild(table);
-									group.appendChild(nalozi);
-								inline.appendChild(group);
 
-								var group = document.createElement("DIV");
-								group.setAttribute("class","group");
-									var subTitle = document.createElement("DIV");
-									subTitle.setAttribute("class","subTitle");
-									subTitle.innerHTML = "Konstatacije:";
-									group.appendChild(subTitle);
-
-									var nalozi = document.createElement("DIV");
-									nalozi.setAttribute("class","nalozi");
-										var table = document.createElement("TABLE")
-										for(var j=0;j<otvoreniNalozi.length;j++){
-											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
-												var today = new Date();
-												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
-													if(otvoreniNalozi[j].statusNaloga=="Konstatacija" || otvoreniNalozi[j].statusNaloga=="Radovu u toku"){
-														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
-													}
-													
+										for(var j=0;j<zavrseniNalozi.length;j++){
+											if(zavrseniNalozi[j].radnaJedinica==radneJedinice[i]){
+												if(zavrseniNalozi[j].danasnjiTipRada=="WOMA"){
+													generateNalogRowGotovo(table,zavrseniNalozi[j],zavrseniNalozi[j].statusNaloga);
 												}
-												
 											}
 										}
 										nalozi.appendChild(table);
@@ -642,13 +626,20 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(otvoreniNalozi[j].statusNaloga=="Masinsko kopanje" || otvoreniNalozi[j].statusNaloga=="Rucno kopanje"){
 														generateNalogRow(table,otvoreniNalozi[j]);
 													}
 													
-												}
+												//}
 												
+											}
+										}
+										for(var j=0;j<zavrseniNalozi.length;j++){
+											if(zavrseniNalozi[j].radnaJedinica==radneJedinice[i]){
+												if(zavrseniNalozi[j].danasnjiTipRada=="Masinsko kopanje" || zavrseniNalozi[j].danasnjiTipRada=="Rucno kopanje"){
+													generateNalogRowGotovo(table,zavrseniNalozi[j],zavrseniNalozi[j].statusNaloga);
+												}
 											}
 										}
 										nalozi.appendChild(table);
@@ -674,13 +665,21 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(["Crpljenje","Dezinfekcija"].indexOf(otvoreniNalozi[j].statusNaloga)>=0){
 														generateNalogRow(table,otvoreniNalozi[j],);
 													}
 													
-												}
+												//}
 												
+											}
+										}
+
+										for(var j=0;j<zavrseniNalozi.length;j++){
+											if(zavrseniNalozi[j].radnaJedinica==radneJedinice[i]){
+												if(zavrseniNalozi[j].danasnjiTipRada=="Crpljenje" || zavrseniNalozi[j].danasnjiTipRada=="Dezinfekcija"){
+													generateNalogRowGotovo(table,zavrseniNalozi[j],zavrseniNalozi[j].statusNaloga);
+												}
 											}
 										}
 										nalozi.appendChild(table);
@@ -701,13 +700,21 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(["Zakazana finalizacija","Finalizacija"].indexOf(otvoreniNalozi[j].statusNaloga)>=0){
 														generateNalogRow(table,otvoreniNalozi[j],);
 													}
 													
-												}
+												//}
 												
+											}
+										}
+
+										for(var j=0;j<zavrseniNalozi.length;j++){
+											if(zavrseniNalozi[j].radnaJedinica==radneJedinice[i]){
+												if(zavrseniNalozi[j].danasnjiTipRada=="Finalizacija"){
+													generateNalogRowGotovo(table,zavrseniNalozi[j],zavrseniNalozi[j].statusNaloga);
+												}
 											}
 										}
 										nalozi.appendChild(table);
@@ -728,15 +735,52 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(["Betonaža","Asfalt","Bekaton"].indexOf(otvoreniNalozi[j].statusNaloga)>=0){
 														generateNalogRow(table,otvoreniNalozi[j],);
 													}
 													
-												}
+												//}
 												
 											}
 										}
+
+										for(var j=0;j<zavrseniNalozi.length;j++){
+											if(zavrseniNalozi[j].radnaJedinica==radneJedinice[i]){
+												if(zavrseniNalozi[j].danasnjiTipRada=="Betonaža" || zavrseniNalozi[j].danasnjiTipRada=="Asfalt" || zavrseniNalozi[j].danasnjiTipRada=="Bekaton"){
+													generateNalogRowGotovo(table,zavrseniNalozi[j],zavrseniNalozi[j].statusNaloga);
+												}
+											}
+										}
+										nalozi.appendChild(table);
+									group.appendChild(nalozi);
+								inline.appendChild(group);
+
+								var group = document.createElement("DIV");
+								group.setAttribute("class","group");
+									var subTitle = document.createElement("DIV");
+									subTitle.setAttribute("class","subTitle");
+									subTitle.innerHTML = "Potreban pristup:";
+									group.appendChild(subTitle);
+
+									var nalozi = document.createElement("DIV");
+									nalozi.setAttribute("class","nalozi");
+										var table = document.createElement("TABLE")
+										for(var j=0;j<otvoreniNalozi.length;j++){
+											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
+												var today = new Date();
+												//today.setDate(today.getDate() - 1);
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+													if(["Potreban pristup"].indexOf(otvoreniNalozi[j].statusNaloga)>=0){
+														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
+													}
+													
+												//}
+												
+											}
+										}
+
+
 										nalozi.appendChild(table);
 									group.appendChild(nalozi);
 								inline.appendChild(group);
@@ -755,13 +799,21 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(["Preventivno čišćenje","Snimanje kamerom","Kombinovano"].indexOf(otvoreniNalozi[j].statusNaloga)>=0){
-														generateNalogRow(table,otvoreniNalozi[j],);
+														generateNalogRow(table,otvoreniNalozi[j]);
 													}
 													
-												}
+												//}
 												
+											}
+										}
+
+										for(var j=0;j<zavrseniNalozi.length;j++){
+											if(zavrseniNalozi[j].radnaJedinica==radneJedinice[i]){
+												if(zavrseniNalozi[j].danasnjiTipRada=="Preventivno čišćenje" || zavrseniNalozi[j].danasnjiTipRada=="Snimanje kamerom" || zavrseniNalozi[j].danasnjiTipRada=="Kombinovano"){
+													generateNalogRowGotovo(table,zavrseniNalozi[j],zavrseniNalozi[j].statusNaloga);
+												}
 											}
 										}
 										nalozi.appendChild(table);
@@ -782,12 +834,12 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
-													if(["Dodeljen majstoru","Konstatacija","Zamena","Zagušenje","Masinsko kopanje","Rucno kopanje","Crpljenje","Dezinfekcija","Finalizacija","Zakazana finalizacija","Betonaža","Asfalt","Bekaton","Preventivno čišćenje","Snimanje kamerom","Potrebna WOMA","Kombinovano"].indexOf(otvoreniNalozi[j].statusNaloga)<0){
+												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
+													if(["Dodeljen majstoru","Konstatacija","Zamena","Zagušenje","Masinsko kopanje","Rucno kopanje","Crpljenje","Dezinfekcija","Finalizacija","Zakazana finalizacija","Betonaža","Asfalt","Bekaton","Preventivno čišćenje","Snimanje kamerom","Potrebna WOMA","Kombinovano","Potreban pristup"].indexOf(otvoreniNalozi[j].statusNaloga)<0){
 														generateNalogRow(table,otvoreniNalozi[j]);
 													}
 													
-												}
+												//}
 												
 											}
 										}
@@ -833,7 +885,6 @@ function layoutNoOverlap(container) {
 			},240000)
 
 			setTimeout(function(){
-				console.log("Hidden")
 				document.getElementById("raspored").style.display = "none"
 				document.getElementById("otvoreni-nalozi").style.display = "block"
 			//},120000)
