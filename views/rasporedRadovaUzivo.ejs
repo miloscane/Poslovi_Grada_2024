@@ -883,19 +883,94 @@ function layoutNoOverlap(container) {
 			
 		</script>
 
-		<div class="ukupnoNalozi" id="ukupno-nalozi" style="display:none">
-
+		<div class="ukupnoNaloziUzivo" id="ukupno-nalozi" style="display:none">
+			<div class="title">УКУПНО НАЛОГА</div>
+			<div class="bubbles">
+				<div class="bubble" id="ukupno-zamena"><div class="title">Замене 🧰</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-odgusenja"><div class="title">Одгушења</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-konstatacija"><div class="title">Додељени</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-finalizacija"><div class="title">Финализација 🧑‍🎨</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-voma"><div class="title">Воме 🚚</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-kopanja"><div class="title">Копање 🚜⛏️</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-crpljenja"><div class="title">Црп. и Дез.</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-betonaza"><div class="title">Бетонаже 🚧</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-pristup"><div class="title">Потребан приступ</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-specificnih"><div class="title">Специфични 🎥🚛</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-podizvodjaci"><div class="title">Подизвођачи</div><div class="number"></div></div>
+				<div class="bubble" id="ukupno-nepokriveno"><div class="title">Непокривено</div><div class="number"></div></div>
+			</div>
+			<!--<div class="title">ДАНАС РЕШЕНО</div>-->
 		</div>
+		<script>
+			var zamene = 0;
+			var odgusenja = 0;
+			var konstatacije = 0;
+			var finalizacije = 0;
+			var vome = 0;
+			var kopanje = 0;
+			var crpljenja = 0;
+			var betonaze = 0;
+			var pristup = 0;
+			var specificni = 0;
+			var podizvodjaciNalozi = 0;
+			var nepokriveno = 0;
+			for(var i=0;i<otvoreniNalozi.length;i++){
+				if(podizvodjaci.indexOf(otvoreniNalozi[i].majstor)<0){
+					if(["Zamena"].indexOf(otvoreniNalozi[i].statusNaloga)>=0){
+						zamene++;
+					}else if(["Zagušenje"].indexOf(otvoreniNalozi[i].statusNaloga)>=0){
+						odgusenja++;
+					}else if(["Dodeljen majstoru"].indexOf(otvoreniNalozi[i].statusNaloga)>=0){
+						konstatacije++;
+					}else if(["Finalizacija"].indexOf(otvoreniNalozi[i].statusNaloga)>=0){
+						finalizacije++;
+					}else if(["Potrebna WOMA"].indexOf(otvoreniNalozi[i].statusNaloga)>=0){
+						vome++;
+					}else if(["Masinsko kopanje","Rucno kopanje"].indexOf(otvoreniNalozi[i].statusNaloga)>=0){
+						kopanje++;
+					}else if(["Crpljenje","Dezinfekcija"].indexOf(otvoreniNalozi[i].statusNaloga)>=0){
+						crpljenja++;
+					}else if(["Betonaža","Asfalt","Bekaton"].indexOf(otvoreniNalozi[i].statusNaloga)>=0){
+						betonaze++;
+					}else if(["Potreban pristup"].indexOf(otvoreniNalozi[i].statusNaloga)>=0){
+						pristup++;
+					}else if(["Preventivno čišćenje","Snimanje kamerom","Kombinovano"].indexOf(otvoreniNalozi[i].statusNaloga)>=0){
+						specificni++;
+					}else{
+						nepokriveno++;
+					}
+				}else{
+					podizvodjaciNalozi++;
+				}
+			}
+			document.getElementById("ukupno-zamena").getElementsByClassName("number")[0].innerHTML = zamene;
+			document.getElementById("ukupno-odgusenja").getElementsByClassName("number")[0].innerHTML = odgusenja;
+			document.getElementById("ukupno-konstatacija").getElementsByClassName("number")[0].innerHTML = konstatacije;
+			document.getElementById("ukupno-finalizacija").getElementsByClassName("number")[0].innerHTML = finalizacije;
+			document.getElementById("ukupno-voma").getElementsByClassName("number")[0].innerHTML = vome;
+			document.getElementById("ukupno-kopanja").getElementsByClassName("number")[0].innerHTML = kopanje;
+			document.getElementById("ukupno-crpljenja").getElementsByClassName("number")[0].innerHTML = crpljenja;
+			document.getElementById("ukupno-betonaza").getElementsByClassName("number")[0].innerHTML = betonaze;
+			document.getElementById("ukupno-pristup").getElementsByClassName("number")[0].innerHTML = pristup;
+			document.getElementById("ukupno-specificnih").getElementsByClassName("number")[0].innerHTML = specificni;
+			document.getElementById("ukupno-podizvodjaci").getElementsByClassName("number")[0].innerHTML = podizvodjaciNalozi;
+			document.getElementById("ukupno-nepokriveno").getElementsByClassName("number")[0].innerHTML = nepokriveno;
+		</script>
 
 		<script>
 			setTimeout(function(){
 				window.location.reload();
 			},240000)
 
+			document.getElementById("raspored").style.display = "none"
+			document.getElementById("otvoreni-nalozi").style.display = "none"
+			document.getElementById("ukupno-nalozi").style.display = "block"
+
 			setTimeout(function(){
 				document.getElementById("raspored").style.display = "none"
 				document.getElementById("otvoreni-nalozi").style.display = "block"
+				document.getElementById("ukupno-nalozi").style.display = "none"
 			//},120000)
-			},1000)
+			},20000)
 		</script>
 <%- include ("partials/footer") -%>

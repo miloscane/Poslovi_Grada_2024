@@ -6122,6 +6122,37 @@ input[type=number] {
     background-color: rgba(0,0,0,0.1);
 }
 
+.ukupnoNaloziUzivo .title{
+    width:100%;
+    text-align:center;
+    color:rgb(255,255,255);
+    background-color: rgb(21,51,100);
+    padding:4px;
+    font-size:22px;
+    font-weight:800;
+}
+
+.ukupnoNaloziUzivo .bubbles{
+    text-align: center;
+    margin-top:40px;
+}
+
+.ukupnoNaloziUzivo .bubbles .bubble{
+    margin:30px;
+    font-size:18px;
+    font-weight:600;
+    background-color: rgb(21,51,100);
+    border-radius:20px;
+    padding:20px;
+    color:rgb(255,255,255);
+    display:inline-block;
+    vertical-align: middle;
+}
+
+.ukupnoNaloziUzivo .bubbles .bubble .number{
+    font-size:30px;
+}
+
 .majstorMesec{
     position:relative;
 }
