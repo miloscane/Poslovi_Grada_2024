@@ -365,9 +365,9 @@ function layoutNoOverlap(container) {
 							}else if(nalog.statusNaloga=="Zamena"){
 								printOut = "ZM"
 							}else if(nalog.statusNaloga=="Crpljenje"){
-								printOut = "CR"
-							}else if(nalog.statusNaloga=="Dezinfekcija"){
 								printOut = "🪣"
+							}else if(nalog.statusNaloga=="Dezinfekcija"){
+								printOut = "🦠"
 							}else if(nalog.statusNaloga=="Masinsko kopanje"){
 								printOut = "🚜"
 							}else if(nalog.statusNaloga=="Rucno kopanje"){
@@ -383,7 +383,7 @@ function layoutNoOverlap(container) {
 							}else if(nalog.statusNaloga=="Kombinovano"){
 								printOut = "🚛"
 							}else if(nalog.statusNaloga=="Potreban pristup"){
-								printOut = "PP"
+								printOut = "⛔"
 							}
 							td.innerHTML = printOut;
 					}
@@ -770,7 +770,7 @@ function layoutNoOverlap(container) {
 												//today.setDate(today.getDate() - 1);
 												//if(!istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum))){
 													if(["Potreban pristup"].indexOf(otvoreniNalozi[j].statusNaloga)>=0){
-														generateNalogRow(table,otvoreniNalozi[j],otvoreniNalozi[j].statusNaloga);
+														generateNalogRow(table,otvoreniNalozi[j]);
 													}
 													
 												//}
