@@ -116,6 +116,129 @@
 		var originalCenter;
 		var radius = 300;
 
+		var pumpe = [
+			{
+				koordinate: "44.638359087144366, 20.551756203709473",
+				naziv: "BS Avala",
+			},
+			{
+				koordinate: "44.314199239379896, 20.23872155033676",
+				naziv: "BS Čibutkovica",
+			},
+			{
+				koordinate: "44.666011023612185, 20.163718037888508",
+				naziv: "BS Obrenovac",
+			},
+			{
+				koordinate: "45.04884011859157, 20.392625863820122",
+				naziv: "BS Japanski cvet",
+			},
+			{
+				koordinate: "44.289485445424944, 19.951704684378097",
+				naziv: "BS Valjevo 1",
+			},
+			{
+				koordinate: "44.669465581628714, 20.595274308273922",
+				naziv: "BS Vrčin",
+			},
+			{
+				koordinate: "44.789572691075584, 20.516434402511596",
+				naziv: "BS Franjo Kluz",
+			},
+			{
+				koordinate: "44.81286934994799, 20.48213487500608",
+				naziv: "BS Zdravka Čelara",
+			},
+			{
+				koordinate: "44.72262585158907, 20.216168871999635",
+				naziv: "BS Boljevci",
+			},
+			{
+				koordinate: "44.824276475889704, 20.46297196327758",
+				naziv: "BS Visoki Stevan",
+			},
+			{
+				koordinate: "44.84014793007864, 20.39543081385399",
+				naziv: "BS Zemun",
+			},
+			{
+				koordinate: "44.831310556920926, 20.232795353015316",
+				naziv: "BS Dobanovci",
+			},
+			{
+				koordinate: "44.74784946341828, 20.3551586215505",
+				naziv: "BS Makiš",
+			},
+			{
+				koordinate: "44.875688020666004, 20.11621350841208",
+				naziv: "BS Šimanovci",
+			},
+			{
+				koordinate: "44.572837798735236, 20.558346352877486",
+				naziv: "BS Ralja",
+			},
+			{
+				koordinate: "44.74543584164279, 20.499824001833577",
+				naziv: "BS Kumodraž",
+			},
+			{
+				koordinate: "44.6461854415977, 20.128686280308187",
+				naziv: "BS Obrenovac 2",
+			},
+			{
+				koordinate: "44.79988243429769, 20.503268430716304",
+				naziv: "BS Gradska Bolnica",
+			},
+			{
+				koordinate: "44.652481919567066, 20.220040059693343",
+				naziv: "BS Obrenovac 3",
+			},
+			{
+				koordinate: "44.8758324721528, 20.116241671502596",
+				naziv: "BS Šimanovci 2",
+			},
+			{
+				koordinate: "44.76133693500916, 19.682940127855122",
+				naziv: "BS Šabac",
+			},
+			{
+				koordinate: "44.46724495274327, 20.275144378824123",
+				naziv: "BS Lazarevac",
+			},
+			{
+				koordinate: "44.36519138053656, 19.611130814131023",
+				naziv: "BS Osečina",
+			},
+			{
+				koordinate: "44.27786184893692, 19.879373930588276",
+				naziv: "BS Valjevo 2",
+			},
+			{
+				koordinate: "44.79423196556961, 20.442345697188973",
+				naziv: "BS Senjak",
+			},
+			{
+				koordinate: "44.687451300896115, 20.95789594452005",
+				naziv: "BS Smederevo",
+			},
+			{
+				koordinate: "43.321161882655865, 21.900429430336665",
+				naziv: "BS Niš",
+			},
+			{
+				koordinate: "42.978302243969566, 21.977911663920047",
+				naziv: "BS Leskovac",
+			},
+			{
+				koordinate: "44.30862569707227, 19.881891823751907",
+				naziv: "BS Valjevo 3",
+			},
+			{
+				koordinate: "44.65537020559455, 20.216980882965533",
+				naziv: "BS Obrenovac 4",
+			}
+		]
+
 		function filterMapa(elem){
 			var majstor = document.getElementById("majstor").value;
 			var statusi = $('#status').val();
@@ -219,6 +342,7 @@
 					    status: status,
 					    map: map,
 					    icon: { url: iconUrl},
+					    //label: "A",
 					    opacity: opacity
 					});
 
@@ -342,7 +466,70 @@
 
 		    }
 
+		    for(var i=0;i<pumpe.length;i++){
+		    	let marker = new google.maps.Marker({
+				    position: { lat: parseFloat(pumpe[i].koordinate.split(",")[0]), lng: parseFloat(pumpe[i].koordinate.split(",")[1]) },
+				    map: map,
+				    pumpa: 1,
+				    icon: {
+				        url: "https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/pumpa.svg",
+				        scaledSize: new google.maps.Size(30, 30)
+				    }
+				});
+
+				// Store the infowindow in the marker itself
+				marker.infowindow = new google.maps.InfoWindow({
+				    content: pumpe[i].naziv
+				});
+
+				// Prevent scroll inside InfoWindow from zooming map
+				google.maps.event.addListener(marker.infowindow, "domready", function () {
+				    const infoWindowElement = document.querySelector(".gm-style");
+				    if (infoWindowElement) {
+				        infoWindowElement.addEventListener("wheel", function (event) {
+				            event.preventDefault();
+				            event.stopPropagation();
+				        }, { passive: false });
+				    }
+				});
+
+				const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+				if (isTouchDevice) {
+				    // On mobile: tap toggles the InfoWindow
+				    marker.addListener("click", () => {
+				        if (marker.infowindow.getMap()) {
+				            marker.infowindow.close();
+				        } else {
+				            marker.infowindow.open(map, marker);
+				        }
+				    });
+
+				    // Optional: tap elsewhere on map closes it
+				    map.addListener("click", (e) => {
+				        // Close only if open
+				        if (marker.infowindow.getMap()) {
+				            marker.infowindow.close();
+				        }
+				    });
+				} else {
+				    // On desktop: hover to open, mouseout to close
+				    marker.addListener("mouseover", () => {
+				        marker.infowindow.open(map, marker);
+				    });
+
+				    marker.addListener("mouseout", () => {
+				        marker.infowindow.close();
+				    });
+				}
+
+				markers.push(marker);
+
+		    }
+
 		}
+
+
 
 		markers = [];
 		circles = [];
