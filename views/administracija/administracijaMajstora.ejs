@@ -76,7 +76,10 @@
 							imeMajstora.setAttribute("onclick","window.location.href='/administracijaAdministracije/"+encodeURIComponent(users[i].email)+"'");
 							imeMajstora.innerHTML = users[i].name;
 							majstorBlok.appendChild(imeMajstora);
-						document.getElementById("lista-administracije").appendChild(majstorBlok);
+						if(!users[i].email.includes("+")){
+							document.getElementById("lista-administracije").appendChild(majstorBlok);
+						}
+						
 					}	
 				}
 			</script>

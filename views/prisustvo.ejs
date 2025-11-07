@@ -84,8 +84,11 @@
 						var item = document.createElement("DIV");
 						item.setAttribute("class","item");
 						item.setAttribute("data-id",users[i].uniqueId);
-						item.innerHTML = "<div class=\"ime\">"+users[i].ime+"</div><div class=\"timestamp\"><span class=\"arrival\"></span> - <span class=\"departure\"></span></div><div class=\"totalHours\"></div>";;
-						document.getElementById("administracija").appendChild(item);
+						item.innerHTML = "<div class=\"ime\">"+users[i].ime+"</div><div class=\"timestamp\"><span class=\"arrival\"></span> - <span class=\"departure\"></span></div><div class=\"totalHours\"></div>";
+						if(!users[i].email.includes("+")){
+							document.getElementById("administracija").appendChild(item);
+						}
+						
 					}
 					
 				}
