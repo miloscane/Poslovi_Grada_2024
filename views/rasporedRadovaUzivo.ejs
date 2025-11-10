@@ -351,7 +351,8 @@ function layoutNoOverlap(container) {
 				}
 					var td = document.createElement("TD");
 					td.setAttribute("class","brojNaloga");
-					td.innerHTML = "<div class=\"value\">"+nalog.broj+"</div>";
+					var extraInfo = Number(nalog.zatvorenaVoda == 1) ? "‼️‼️" : ""
+					td.innerHTML = "<div class=\"value\">"+nalog.broj+extraInfo+"</div>";
 					tr.appendChild(td);
 					if(!tip){
 						var td = document.createElement("TD");

@@ -21,7 +21,7 @@
 
 						var reversDate = new Date(Number(reversi[i].datetime));
 						var td = document.createElement("TD");
-						td.innerHTML = "<div class=\"value\">"+reversi[i].datum+" "+reversDate.getHours()+":"+reversDate.getMinutes()+"</div>";
+						td.innerHTML = "<div class=\"value\">"+reversi[i].datum+" "+reversDate.getHours().toString().padStart(2,'0')+":"+reversDate.getMinutes().toString().padStart(2,'0')+"</div>";
 						tr.appendChild(td);
 
 						var td = document.createElement("TD");

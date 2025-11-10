@@ -7954,6 +7954,11 @@ server.post('/edit-nalog', async (req, res)=> {
 				    if(izvestajJson.izvestaj!="" || izvestajJson.photos.length>0){
 				    	await izvestajiDB.insertOne(izvestajJson);
 				    }
+				    var setObj = {$set:{
+				    	zatvorenaVoda: nalogJson.zatvorenaVoda
+				    }}
+				    await naloziDB.updateOne({broj:nalogJson.broj},setObj);
+				    
 				    if( !eval(!nalogJson.novoStanje && nalogJson.obracunatNaPortalu==nalogJson.stariNalog.obracunatNaPortalu && nalogJson.status==nalogJson.stariNalog.statusNaloga && nalogJson.majstor==nalogJson.stariNalog.majstor && JSON.stringify(nalogJson.kategorijeRadova)==JSON.stringify(nalogJson.stariNalog.kategorijeRadova) && JSON.stringify(nalogJson.obracun)==JSON.stringify(nalogJson.stariNalog.obracun))){
 				    	//Ima izmena na nalogu
 				    	var ukupanIznos = 0;
@@ -11872,6 +11877,75 @@ server.get('/magacioner/reversiNaDan/:dan', async (req, res)=> {
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	} 
+});
+
+server.get('/magacioner/majstori', async (req, res)=> {
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+
+	if(Number(req.session.user.role)!=50){
+		return res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+	}
+
+	try{
+		var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
+		var config = {
+			method: 'post',
+			url: baseUrl+'/token', // Replace with your actual URL
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			data: data
+		};
+
+		var response = await axios(config);
+		var token = response.data.access_token;
+	  var json = {};
+
+		config = {
+	      url: baseUrl + '/api/Client/GetClient',
+	      method: 'POST', // If necessary
+	      headers: { 
+	          'Content-Type': 'application/json',
+	          'Authorization': `Bearer ${token}`
+	      },
+	      data: { 'ClientId': telematicsId }
+	  };
+
+	  var response = await axios(config);
+	  json.clientInfo = response.data.client[0];
+
+	  config = {
+	      url: baseUrl + '/api/Asset/GetDevicesCurrentData',
+	      method: 'POST', // If necessary
+	      headers: { 
+	          'Content-Type': 'application/json',
+	          'Authorization': `Bearer ${token}`
+	      },
+	      data: { 'ClientId': telematicsId }
+	  };
+	  var response = await axios(config);
+	  json.vozila = response.data;
+		//Povuci danasnje i jucerasnje reverse
+		res.render("magacioner/majstori",{
+			pageTitle:"Администрација мајстора",
+			user: req.session.user,
+			majstori: majstori,
+			vozila: json.vozila.Data
+		})
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Програмска грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Дошло је до грешке у бази податка 11897.</div>"
+		});
+	}
 });
 
 server.get('/magacioner/utroseniMaterijal',async (req,res)=>{

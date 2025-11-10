@@ -1,0 +1,79 @@
+<%- include ("partials/header") -%>
+	<script>
+		var majstori = <%-JSON.stringify(majstori)%>;
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+		var vozila = <%-JSON.stringify(vozila)%>;
+		
+	</script>
+	<div class="pageWidth">
+		<div class="opreljmenostMajstora">
+			<div class="majstorPick">
+				<select id="majstor-pick" oninput="majstorPick()">
+					<optgroup label="Мајстори" id="majstori-pg"></optgroup>
+					<optgroup label="Финализери" id="finalizeri"></optgroup>
+					<optgroup label="Воме" id="vome"></optgroup>
+				</select>
+				<script>
+					for(var i=0;i<majstori.length;i++){
+						if(!majstori[i].inactive){
+							var option = document.createElement("OPTION");
+							option.setAttribute("value",majstori[i].uniqueId);
+							option.innerHTML	=	majstori[i].ime;	
+							
+							if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
+								document.getElementById("majstori-podizvodjaci").appendChild(option);
+							}else{
+								if(majstori[i].tipRada.indexOf("Finalizacija")>=0){
+									document.getElementById("finalizeri").appendChild(option);
+								}else if(majstori[i].tipRada.indexOf("Voma")>=0){
+									document.getElementById("vome").appendChild(option);
+								}else{
+									document.getElementById("majstori-pg").appendChild(option);
+								}
+								
+							}
+						}
+					}
+				</script>
+			</div>
+			<div class="tabbedMenu">
+				<div class="menuItem menuItemActive" onclick="tabPick(this)">Опремљеност</div>
+				<div class="menuItem" onclick="tabPick(this)">Данашњи реверси</div>
+				<div class="menuItem" onclick="tabPick(this)">Јучерашњи реверси</div>
+			</div>
+			<div class="pages" id="pages">
+				<div class="page">
+					<h1>Opremljenost</h1>
+				</div>
+				<div class="page">
+					<h1>Danasnji reversi</h1>
+				</div>
+				<div class="page">
+					<h1>Jucerasnji reversi</h1>
+				</div>
+			</div>
+			<script>
+				function tabPick(elem){
+					var tabIndex = -1;
+					var menuItems = elem.parentElement.getElementsByClassName("menuItem");
+					for(var i=0;i<menuItems.length;i++){
+						menuItems[i].classList.remove("menuItemActive");
+						if(menuItems[i]==elem){
+							tabIndex = i;
+							menuItems[i].classList.add("menuItemActive");
+						}
+					}
+					if(tabIndex!=-1){
+						var pages = document.getElementById("pages").getElementsByClassName("page");
+						for(var i=0;i<pages.length;i++){
+							pages[i].style.display = "none"
+						}
+						pages[tabIndex].style.display = "block";
+					}else{
+						console.log("Couldnt figure out page index")
+					}
+				}
+			</script>
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

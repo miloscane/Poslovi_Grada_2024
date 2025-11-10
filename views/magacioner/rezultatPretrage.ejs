@@ -3,7 +3,10 @@
 		var nalozi = <%-JSON.stringify(nalozi)%>;
 		var reversi = <%-JSON.stringify(reversi)%>;
 		var majstori = <%-JSON.stringify(majstori)%>;
-		reversi.sort((a, b) => a.majstor.localeCompare(b.majstor));
+		for(var i=0;i<reversi.length;i++){
+			reversi[i].majstorJson = getMajstorByCode(reversi[i].majstor)
+		}
+		reversi.sort((a, b) => a.majstorJson.ime.localeCompare(b.majstorJson.ime));
 		var proizvodi = <%-JSON.stringify(proizvodi)%>;
 	</script>
 	<div class="pageWidth">
@@ -25,7 +28,7 @@
 						var reversDate = new Date(Number(reversi[i].datetime));
 						var datum = reversi[i].datum ?  reversi[i].datum : reshuffleDate(reversi[i].date);//.date je za stare reverse
 						var td = document.createElement("TD");
-						td.innerHTML = "<div class=\"value\">"+datum+" "+reversDate.getHours()+":"+reversDate.getMinutes()+"</div>";
+						td.innerHTML = "<div class=\"value\">"+datum+" "+reversDate.getHours().toString().padStart(2,'0')+":"+reversDate.getMinutes().toString().padStart(2,'0')+"</div>";
 						tr.appendChild(td);
 
 						var td = document.createElement("TD");

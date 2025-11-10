@@ -691,3 +691,138 @@ var definicijeProizvoda = [
                       "name":"Građevinski materijal 3"
                     }
                   ]
+
+var alati = [
+  {
+    naziv: "Nareznica"
+  },
+  {
+    naziv: "HILTI - Veliki"
+  },
+  {
+    naziv: "Bušilica"
+  },
+  {
+    naziv: "Pegla"
+  },
+  {
+    naziv: "Makaze"
+  },
+  {
+    naziv: "Brusilica - Velika"
+  },
+  {
+    naziv: "Brusilica - Mala"
+  },
+  {
+    naziv: "Šrafilica"
+  },
+  {
+    naziv: "Mašina za odgušenje"
+  },
+  {
+    naziv: "Brener"
+  },
+  {
+    naziv: "Štek lampa"
+  },
+  {
+    naziv: "Čeona lampa"
+  },
+  {
+    naziv: "Sajla 16''"
+  },
+  {
+    naziv: "Sajla 22''"
+  },
+  {
+    naziv: "Nastavci za sajle"
+  },
+  {
+    naziv: "Nastavci za sajle"
+  },
+  {
+    naziv: "Pumpa"
+  },
+  {
+    naziv: "Creva za pumpu"
+  },
+  {
+    naziv: "Motalica"
+  },
+  {
+    naziv: "Čekić"
+  },
+  {
+    naziv: "Pištolj za silikon"
+  },
+  {
+    naziv: "Merdevine"
+  },
+  {
+    naziv: "Klešta ravna 1''"
+  },
+  {
+    naziv: "Klešta ravna 6/4''"
+  },
+  {
+    naziv: "Klešta ravna 2''"
+  },
+  {
+    naziv: "Klešta ravna 3''"
+  },
+  {
+    naziv: "Klešta ravna 4''"
+  },
+  {
+    naziv: "Klešta kosa 1''"
+  },
+  {
+    naziv: "Klešta kosa 6/4''"
+  },
+  {
+    naziv: "Klešta kosa 2''"
+  },
+  {
+    naziv: "Klešta kosa 3''"
+  },
+  {
+    naziv: "Klešta kosa 4''"
+  },
+  {
+    naziv: "Klešta ravna 1''"
+  },
+  {
+    naziv: "Klešta ravna 6/4''"
+  },
+  {
+    naziv: "Klešta ravna 2''"
+  },
+  {
+    naziv: "Klešta ravna 3''"
+  },
+  {
+    naziv: "Klešta S 2''"
+  },
+  {
+    naziv: "Ključ 13"
+  },
+  {
+    naziv: "Ključ 17"
+  },
+  {
+    naziv: "Ključ 19"
+  },
+  {
+    naziv: "Ključ 22"
+  },
+  {
+    naziv: "Klešta ravna 2''"
+  },
+  {
+    naziv: "Klešta ravna 3''"
+  },
+  {
+    naziv: "Klešta S 2''"
+  }
+]
