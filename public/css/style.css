@@ -6191,13 +6191,13 @@ input[type=number] {
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem{
     padding:5px;
     text-align: left;
-    font-size:14px;
+    font-size:20px;
 }
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ime{
     display:inline-block;
     vertical-align: middle;
-    width:150px;
+    width:240px;
 }
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak{
@@ -6208,14 +6208,14 @@ input[type=number] {
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .boxes{
     display:block;
-    height:19px;
+    height:31px;
 }
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .box{
     display:inline-block;
     vertical-align: middle;
     border:1px solid rgb(255,255,255);
-    font-size:10px;
+    font-size:20px;
     text-align:center;
     padding:2px 0px;
     color:rgb(255,255,255);
@@ -6223,23 +6223,23 @@ input[type=number] {
 
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .zamena{
-    width:40px;
+    width:80px;
     background-color:rgb(32,51,100);
 }
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .odgusenje{
-    width:20px;
+    width:40px;
     background-color:rgba(32,51,100,0.8);
 }
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .crpljenje{
-    width:20px;
+    width:40px;
     background-color:rgba(32,51,100,0.6);
 }
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .popis{
-    width:10px;
+    width:20px;
     background-color:rgba(32,51,100,0.6);
 }
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .konstatacija{
-    width:10px;
+    width:20px;
     background-color:rgba(32,51,100,0.6);
 }
 
