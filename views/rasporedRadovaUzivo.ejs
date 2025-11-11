@@ -1,8 +1,31 @@
 <%- include ("partials/header") -%>
 	<script>
 		var podizvodjaci  = ["mile--1672650353244","SeHQZ--1672650353244","IIwY4--1672650358507","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","ylSnq--1672041756318"];
+
+		var crni = ["Momir Lutovac","Nenad Papeš","Branko Milosevic"];
+		var crveni = ["Goran Stoiljković","Dalibor Tripković","Zoran Veselinović","Uros Janjic","Sasa Jovanoski","Zoran Mihajlović"];
+		var narandzasti = ["Tomislav Maksimovic","Igor Bakić","Kumar Mahendra","Aleksandar  Ramanović"];
+		var zuti = ["Goran Stojanović","Aleksandar Pavlović","Duško Spasović","Anđelo Vasić"];
+
 		var majstori = <%-JSON.stringify(majstori)%>;
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+		for(var i=0;i<majstori.length;i++){
+			majstori[i].raspored = 100;
+			if(crni.indexOf(majstori[i].ime)>=0){
+				majstori[i].raspored = 10;
+			}else if(crveni.indexOf(majstori[i].ime)>=0){
+				majstori[i].raspored = 20;
+			}else if(narandzasti.indexOf(majstori[i].ime)>=0){
+				
+				majstori[i].raspored = 30;
+			}else if(zuti.indexOf(majstori[i].ime)>=0){
+				majstori[i].raspored = 40;
+			}
+			console.log(majstori[i].ime + "--"+majstori[i].raspored)
+		}
+
+		majstori.sort((a, b) => a.raspored - b.raspored);
+
 		var danasnjeDodele = <%-JSON.stringify(danasnjeDodele)%>;
 
 		var dodele = <%-JSON.stringify(dodele)%>;
@@ -312,6 +335,18 @@ function layoutNoOverlap(container) {
 							var ime = document.createElement("DIV");
 							ime.setAttribute("class","ime");
 							ime.innerHTML = majstori[i].ime;
+							if(majstori[i].raspored==10){
+								ime.style = "background-color:rgb(0,0,0);color:rgb(255,255,255)"
+							}else if(majstori[i].raspored==20){
+								ime.style = "background-color:rgb(200,0,0);color:rgb(255,255,255)"
+							}else if(majstori[i].raspored==30){
+								console.log(majstori[i].ime)
+								ime.style = "background-color:#ffa500;color:rgb(0,0,0)"
+							}else if(majstori[i].raspored==40){
+								ime.style = "background-color:#fff500;color:rgb(0,0,0)"
+							}else{
+								ime.style = "background-color:#cc8899;color:rgb(255,255,255)"
+							}
 							wrap.appendChild(ime)
 
 							var timesElem = document.createElement("DIV");
@@ -482,6 +517,7 @@ function layoutNoOverlap(container) {
 
 			var otvoreniNalozi = <%-JSON.stringify(otvoreniNalozi)%>;
 			var zavrseniNalozi = <%-JSON.stringify(zavrseniNalozi)%>;
+			var radneJedinice = ["NOVI BEOGRAD","ZEMUN","ČUKARICA","RAKOVICA","SAVSKI VENAC","ZVEZDARA","VOŽDOVAC","STARI GRAD","VRAČAR","PALILULA"];
 			
 			for(var i=0;i<radneJedinice.length;i++){
 				var radnaJedinica = document.createElement("DIV");
