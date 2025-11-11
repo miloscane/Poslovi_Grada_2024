@@ -9058,7 +9058,6 @@ server.get('/izvestajMajstoraPickTemp',async (req,res)=>{
 				//req.params.date je za izvestaje koji postoje
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
 				var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:"2025-11"}}).toArray();
-				//var izvestaji = await dnevniIzvestajiDB.find({date: { $gt: "2025-10-14" }}).toArray();
 				res.render("administracija/izvestajMajstoraPickTemp",{
 					pageTitle:"Одабери мајстора и датум",
 					user: req.session.user,
@@ -9865,6 +9864,7 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 			majstori: majstori,
 			dodele: dodele,
 			otvoreniNalozi: otvoreniNalozi,
+			podelaOpstina: podelaOpstina,
 			zavrseniNalozi: zavrseniNalozi
 		})
 	}catch(err){

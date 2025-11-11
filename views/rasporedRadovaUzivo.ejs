@@ -955,21 +955,211 @@ function layoutNoOverlap(container) {
 			document.getElementById("ukupno-podizvodjaci").getElementsByClassName("number")[0].innerHTML = podizvodjaciNalozi;
 			document.getElementById("ukupno-nepokriveno").getElementsByClassName("number")[0].innerHTML = nepokriveno;
 		</script>
+		<div class="jucerasnjiUcinakUzivo">
+			<div class="title">ЈУЧЕРАШЊИ УЧИНАК</div>
+			<div class="majstoriWrap" id="ucinak"></div>
+		</div>
+		
+		<script>
+			var podelaOpstina = <%-JSON.stringify(podelaOpstina)%>;
+			var majstoriZaExport = [];
 
+			var majstori2 = [
+    {
+        "ime": "Goran Stojanović",
+        "region": "SEVER",
+        "zpokc":[1,2,0,2,0]
+    },
+    {
+        "ime": "Igor Bakić",
+        "region": "SEVER",
+        "zpokc":[1,1,0,0,0]
+    },
+    {
+        "ime": "Kumar Mahendra",
+        "region": "SEVER",
+        "zpokc":[1,1,1,1,0]
+    },
+    {
+        "ime": "Živoslav Stančić",
+        "region": "SEVER",
+        "zpokc":[0,0,0,0,0]
+    },
+    {
+        "ime": "Dalibor Tripković",
+        "region": "ZAPAD",
+        "zpokc":[0,0,0,0,0]
+    },
+    {
+        "ime": "Tomislav Maksimovic",
+        "region": "ZAPAD",
+        "zpokc":[3,0,1,2,0]
+    },
+    {
+        "ime": "Vojin Civrić",
+        "region": "ZAPAD",
+        "zpokc":[0,0,0,0,0]
+    },
+    {
+        "ime": "Zoran Mihajlović",
+        "region": "ZAPAD",
+        "zpokc":[0,0,0,0,0]
+    },
+    {
+        "ime": "Zoran Veselinović",
+        "region": "ZAPAD",
+        "zpokc":[0,0,0,0,0]
+    },
+    {
+        "ime": "Aleksandar Pavlović",
+        "region": "ISTOK",
+        "zpokc":[0,0,0,4,0]
+    },
+    {
+        "ime": "Duško Spasović",
+        "region": "ISTOK",
+        "zpokc":[1,0,0,5,0]
+    },
+    {
+        "ime": "Sasa Jovanoski",
+        "region": "ISTOK",
+        "zpokc":[0,0,0,3,0]
+    },
+    {
+        "ime": "Uros Janjic",
+        "region": "ISTOK",
+        "zpokc":[0,2,0,4,0]
+    },
+    {
+        "ime": "Zoran Ostojić",
+        "region": "ISTOK",
+        "zpokc":[0,0,0,0,0]
+    },
+    {
+        "ime": "Aleksandar  Ramanović",
+        "region": "JUG",
+        "zpokc":[1,1,0,2,0]
+    },
+    {
+        "ime": "Anđelo Vasić",
+        "region": "JUG",
+        "zpokc":[2,0,0,2,0]
+    },
+    {
+        "ime": "Goran Stoiljković",
+        "region": "JUG",
+        "zpokc":[2,2,0,2,0]
+    }
+]
+			for(var i=0;i<podelaOpstina.length;i++){
+				var opstina = document.createElement("DIV")
+				opstina.setAttribute("class","opstina");
+					var title = document.createElement("DIV");
+					title.setAttribute("class","title");
+					title.innerHTML = podelaOpstina[i].naziv;
+					opstina.appendChild(title);
+
+					var majstoriElem = document.createElement("DIV");
+					majstoriElem.setAttribute("class","majstori");
+						for(var j=0;j<majstori2.length;j++){
+							if(majstori2[j].region==podelaOpstina[i].naziv){
+								majstoriZaExport.push(majstori2[j])
+								var majstorElem = document.createElement("DIV");
+								majstorElem.setAttribute("class","majstorElem");
+									var ime = document.createElement("DIV");
+									ime.setAttribute("class","ime");
+									ime.innerHTML = majstori2[j].ime;
+									majstorElem.appendChild(ime);
+
+									var ucinak = document.createElement("DIV");
+									ucinak.setAttribute("class","ucinak");
+										var boxes = document.createElement("DIV");
+										boxes.setAttribute("class","boxes");
+
+											for(var l=0;l<2;l++){
+												var box = document.createElement("DIV");
+												box.setAttribute("class","box zamena");
+												box.innerHTML = "Z";
+												boxes.appendChild(box)
+											}
+
+											for(var l=0;l<2;l++){
+												var box = document.createElement("DIV");
+												box.setAttribute("class","box odgusenje");
+												box.innerHTML = "O";
+												boxes.appendChild(box)
+											}
+
+											for(var l=0;l<2;l++){
+												var box = document.createElement("DIV");
+												box.setAttribute("class","box konstatacija");
+												box.innerHTML = "K";
+												boxes.appendChild(box)
+											}
+										ucinak.appendChild(boxes);
+
+										var boxes = document.createElement("DIV");
+										boxes.setAttribute("class","boxes");
+
+											for(var l=0;l<majstori2[j].zpokc[0];l++){
+												var box = document.createElement("DIV");
+												box.setAttribute("class","box zamena");
+												box.innerHTML = "Z";
+												boxes.appendChild(box)
+											}
+
+											for(var l=0;l<majstori2[j].zpokc[1];l++){
+												var box = document.createElement("DIV");
+												box.setAttribute("class","box popis");
+												box.innerHTML = "P";
+												boxes.appendChild(box)
+											}
+
+											for(var l=0;l<majstori2[j].zpokc[2];l++){
+												var box = document.createElement("DIV");
+												box.setAttribute("class","box odgusenje");
+												box.innerHTML = "O";
+												boxes.appendChild(box)
+											}
+
+											for(var l=0;l<majstori2[j].zpokc[3];l++){
+												var box = document.createElement("DIV");
+												box.setAttribute("class","box konstatacija");
+												box.innerHTML = "K";
+												boxes.appendChild(box)
+											}
+
+											for(var l=0;l<majstori2[j].zpokc[4];l++){
+												var box = document.createElement("DIV");
+												box.setAttribute("class","box crpljenje");
+												box.innerHTML = "C";
+												boxes.appendChild(box)
+											}
+										ucinak.appendChild(boxes);
+
+									majstorElem.appendChild(ucinak);
+								majstoriElem.appendChild(majstorElem)
+								opstina.appendChild(majstoriElem)
+							}
+						}
+				document.getElementById("ucinak").appendChild(opstina);
+			}
+			console.log(majstoriZaExport)
+		</script>
 		<script>
 			setTimeout(function(){
 				window.location.reload();
-			},240000)
+			},360000)
 
 			document.getElementById("raspored").style.display = "none"
 			document.getElementById("otvoreni-nalozi").style.display = "none"
 			document.getElementById("ukupno-nalozi").style.display = "block"
 
-			setTimeout(function(){
+			var pocetna = setTimeout(function(){
 				document.getElementById("raspored").style.display = "none"
 				document.getElementById("otvoreni-nalozi").style.display = "block"
 				document.getElementById("ukupno-nalozi").style.display = "none"
 			//},120000)
-			},20000)
+			},120000);
 		</script>
 <%- include ("partials/footer") -%>

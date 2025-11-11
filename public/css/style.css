@@ -6153,6 +6153,96 @@ input[type=number] {
     font-size:30px;
 }
 
+.ukupnoNaloziUzivo .title{
+    width:100%;
+    text-align:center;
+    color:rgb(255,255,255);
+    background-color: rgb(21,51,100);
+    padding:4px;
+    font-size:22px;
+    font-weight:800;
+}
+
+.jucerasnjiUcinakUzivo{
+    font-size: 0;
+    text-align: center;
+}
+
+.jucerasnjiUcinakUzivo .title{
+    width:100%;
+    text-align:center;
+    color:rgb(255,255,255);
+    background-color: rgb(21,51,100);
+    padding:4px;
+    font-size:22px;
+    font-weight:800;
+}
+
+.jucerasnjiUcinakUzivo .opstina{
+    display:inline-block;
+    vertical-align: top;
+    font-size:18px;
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem:nth-child(even){
+    background-color: rgba(0,0,0,0.1);
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem{
+    padding:5px;
+    text-align: left;
+    font-size:14px;
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ime{
+    display:inline-block;
+    vertical-align: middle;
+    width:120px;
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak{
+    display:inline-block;
+    vertical-align: middle;
+    padding-left:20px;
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .boxes{
+    display:block;
+    height:19px;
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .box{
+    display:inline-block;
+    vertical-align: middle;
+    border:1px solid rgb(255,255,255);
+    font-size:10px;
+    text-align:center;
+    padding:2px 0px;
+    color:rgb(255,255,255);
+}
+
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .zamena{
+    width:40px;
+    background-color:rgb(32,51,100);
+}
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .odgusenje{
+    width:20px;
+    background-color:rgba(32,51,100,0.8);
+}
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .crpljenje{
+    width:20px;
+    background-color:rgba(32,51,100,0.6);
+}
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .popis{
+    width:10px;
+    background-color:rgba(32,51,100,0.6);
+}
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .konstatacija{
+    width:10px;
+    background-color:rgba(32,51,100,0.6);
+}
+
 .majstorMesec{
     position:relative;
 }
