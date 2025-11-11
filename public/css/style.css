@@ -6192,6 +6192,7 @@ input[type=number] {
     padding:5px;
     text-align: left;
     font-size:20px;
+    margin-bottom:15px;
 }
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ime{
@@ -6241,6 +6242,12 @@ input[type=number] {
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .konstatacija{
     width:20px;
     background-color:rgba(32,51,100,0.6);
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .nerad{
+    width:200px;
+    border:1px solid rgb(100,100,100);
+    color:rgb(100,100,100);
 }
 
 .majstorMesec{

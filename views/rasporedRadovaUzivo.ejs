@@ -245,6 +245,31 @@ function layoutNoOverlap(container) {
   //scheduleTick();
 
 	</script>
+		<div id="pause" onclick="" style="position:fixed;top:5px;right:5px;font-size:26px" onclick="pause(this)" data-state="1">⏸️</div>
+		<script>
+			function pause(elem){
+				if(Number(elem.dataset.state)==1){
+					//playing, so pause it
+					clearTimeout(pocetna)
+					clearTimeout(refresh)
+				}else{
+					refresh = setTimeout(function(){
+						window.location.reload();
+					},360000)
+
+					document.getElementById("raspored").style.display = "none"
+					document.getElementById("otvoreni-nalozi").style.display = "none"
+					document.getElementById("ukupno-nalozi").style.display = "block"
+
+					pocetna = setTimeout(function(){
+						document.getElementById("raspored").style.display = "none"
+						document.getElementById("otvoreni-nalozi").style.display = "block"
+						document.getElementById("ukupno-nalozi").style.display = "none"
+					//},120000)
+					},120000);
+				}
+			}
+		</script>
 		<div class="rasporedRadovaUzivo" id="raspored">
 			<div id="majstori">
 				
@@ -1099,7 +1124,7 @@ function layoutNoOverlap(container) {
 										ucinak.appendChild(boxes);
 
 										var boxes = document.createElement("DIV");
-										boxes.setAttribute("class","boxes");
+										boxes.setAttribute("class","boxes odradjeno");
 
 											for(var l=0;l<majstori2[j].zpokc[0];l++){
 												var box = document.createElement("DIV");
@@ -1144,10 +1169,22 @@ function layoutNoOverlap(container) {
 						}
 				document.getElementById("ucinak").appendChild(opstina);
 			}
-			console.log(majstoriZaExport)
+			
+			var odradjeno = document.getElementsByClassName("odradjeno");
+			for(var i=0;i<odradjeno.length;i++){
+				if(odradjeno[i].getElementsByClassName("box").length==0){
+					var box = document.createElement("DIV");
+					box.setAttribute("class","box nerad");
+					box.innerHTML = "ODSUTAN";
+					odradjeno[i].appendChild(box)
+				}
+				
+
+			}
+
 		</script>
 		<script>
-			setTimeout(function(){
+			var refresh = setTimeout(function(){
 				window.location.reload();
 			},360000)
 
