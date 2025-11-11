@@ -248,21 +248,26 @@ function layoutNoOverlap(container) {
 
 	</script>
 		<div id="pause" style="position:fixed;bottom:5px;left:5px;font-size:46px;cursor:pointer;z-index:2000000" onclick="pause(this)" data-state="1">⏸️</div>
-		<div id="raspored-dugme" style="position:fixed;bottom:5px;left:55px;font-size:46px;cursor:pointer;z-index:2000000" onclick="showNalozi()">📋</div>
-		<div id="total" style="position:fixed;bottom:5px;left:105px;font-size:46px;cursor:pointer;z-index:2000000" onclick="total()">📊</div>
+		<div id="vremena-dugme" style="position:fixed;bottom:5px;left:55px;font-size:46px;cursor:pointer;z-index:2000000" onclick="showTable()">🕓</div>
+		<div id="raspored-dugme" style="position:fixed;bottom:5px;left:105px;font-size:46px;cursor:pointer;z-index:2000000" onclick="showNalozi()">📋</div>
+		<div id="total" style="position:fixed;bottom:5px;left:155px;font-size:46px;cursor:pointer;z-index:2000000" onclick="total()">📊</div>
 		<script>
 			function showNalozi(){
-				console.log("showNalozi")
 				document.getElementById("raspored").style.display = "none"
 				document.getElementById("otvoreni-nalozi").style.display = "block"
 				document.getElementById("ukupno-nalozi").style.display = "none"
 			}
 
 			function total(){
-				console.log("total")
 				document.getElementById("raspored").style.display = "none"
 				document.getElementById("otvoreni-nalozi").style.display = "none"
 				document.getElementById("ukupno-nalozi").style.display = "block"
+			}
+
+			function showTable(){
+				document.getElementById("raspored").style.display = "block"
+				document.getElementById("otvoreni-nalozi").style.display = "none"
+				document.getElementById("ukupno-nalozi").style.display = "none"
 			}
 
 			function pause(elem){
@@ -1217,7 +1222,7 @@ function layoutNoOverlap(container) {
 														if(majstori[j].dodele[k].majstorZavrsio==1){
 															box.style.color = "rgb(20,255,20)"
 														}else if(majstori[j].dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
+															box.style.color = "#ffd343";
 														}
 														box.innerHTML = printOut;
 														boxes.appendChild(box)
