@@ -23,6 +23,8 @@
 				majstori[i].raspored = 40;
 			}else if(svetloPlavi.indexOf(majstori[i].ime)>=0){
 				majstori[i].raspored = 50;
+			}else if(tamnoPlavi.indexOf(majstori[i].ime)>=0){
+				majstori[i].raspored = 60;
 			}
 			console.log(majstori[i].ime + "--"+majstori[i].raspored)
 		}
@@ -349,6 +351,8 @@ function layoutNoOverlap(container) {
 								ime.style = "background-color:#fff500;color:rgb(0,0,0)"
 							}else if(majstori[i].raspored==50){
 								ime.style = "background-color:#00cdfe;color:rgb(0,0,0)"
+							}else if(majstori[i].raspored==60){
+								ime.style = "background-color:rgb(32,51,100);color:rgb(0,0,0)"
 							}else{
 								ime.style = "background-color:#cc8899;color:rgb(255,255,255)"
 							}
