@@ -3,6 +3,8 @@
 		var podizvodjaci  = ["mile--1672650353244","SeHQZ--1672650353244","IIwY4--1672650358507","e3MHS--1675759749849","eupy8--1676039178890","S5mdP--1677669290493","0ztkS--1672041761145","ylSnq--1672041756318"];
 		var majstori = <%-JSON.stringify(majstori)%>;
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+		var danasnjeDodele = <%-JSON.stringify(danasnjeDodele)%>;
+
 		var dodele = <%-JSON.stringify(dodele)%>;
 		for(var i=0;i<majstori.length;i++){
 			majstori[i].dodele = [];
@@ -1108,14 +1110,17 @@ function layoutNoOverlap(container) {
 
 					var majstoriElem = document.createElement("DIV");
 					majstoriElem.setAttribute("class","majstori");
-						for(var j=0;j<majstori2.length;j++){
-							if(majstori2[j].region==podelaOpstina[i].naziv){
-								majstoriZaExport.push(majstori2[j])
+						for(var j=0;j<majstori.length;j++){
+							if(majstori[j].region==podelaOpstina[i].naziv){
+								majstoriZaExport.push(majstori[j])
 								var majstorElem = document.createElement("DIV");
 								majstorElem.setAttribute("class","majstorElem");
 									var ime = document.createElement("DIV");
 									ime.setAttribute("class","ime");
-									ime.innerHTML = majstori2[j].ime;
+									ime.innerHTML = majstori[j].ime;
+									if(majstori[j].checkIns.length>0){
+										ime.style.color = "rgb(20,200,20)"
+									}
 									majstorElem.appendChild(ime);
 
 									var ucinak = document.createElement("DIV");
@@ -1147,41 +1152,63 @@ function layoutNoOverlap(container) {
 
 										var boxes = document.createElement("DIV");
 										boxes.setAttribute("class","boxes odradjeno");
-
-											for(var l=0;l<majstori2[j].zpokc[0];l++){
+											if(majstori[j].checkIns.length==0){
 												var box = document.createElement("DIV");
-												box.setAttribute("class","box zamena");
-												box.innerHTML = "Z";
+												box.setAttribute("class","box nerad");
+												box.innerHTML = "ODSUTAN";
 												boxes.appendChild(box)
+											}else{
+												//Prodji kroz dodele
+												/*
+												<option value="Zamena">Zamena</option>
+												<option value="Odgusenje">Odgusenje</option>
+												<option value="Popis">Popis</option>
+												<option value="Popis">Konstatacija</option>
+												<option value="WOMA">ВОМА</option>
+												<option value="Kombinovano">Комбиновано</option>
+												<option value="Zagušenje">Загушење</option>
+												<option value="Crpljenje">Црпљење</option>
+												<option value="Dezinfekcija">Дезинфекција</option>
+												<option value="Masinsko kopanje">Машинско копање</option>
+												<option value="Rucno kopanje">Ручно копање</option>
+												<option value="Finalizacija">Финализација</option>
+												<option value="Betonaža">Бетонажа</option>
+												<option value="Asfalt">Асфалт</option>
+												<option value="Bekaton">Бекатон</option>
+												<option value="Kombinovano">Комбиновано</option>
+												<option value="Preventivno čišćenje">Превентивно чишћење</option>
+												<option value="Snimanje kamerom">Снимање камером</option>
+												*/
+												for(var k=0;k<majstori[j].dodele.length;k++){
+													if(majstori[j].dodele[k].tipRada=="Zamena"){
+														var box = document.createElement("DIV");
+														box.setAttribute("class","box zamena");
+														box.innerHTML = "Z";
+														boxes.appendChild(box)
+													}else if(majstori[j].dodele[k].tipRada=="Odgusenje"){
+														var box = document.createElement("DIV");
+														box.setAttribute("class","box odgusenje");
+														box.innerHTML = "O";
+														boxes.appendChild(box)
+													}else if(majstori[j].dodele[k].tipRada=="Popis"){
+														var box = document.createElement("DIV");
+														box.setAttribute("class","box popis");
+														box.innerHTML = "P";
+														boxes.appendChild(box)
+													}else if(majstori[j].dodele[k].tipRada=="Konstatacija"){
+														var box = document.createElement("DIV");
+														box.setAttribute("class","box konstatacija");
+														box.innerHTML = "K";
+														boxes.appendChild(box)
+													}else if(majstori[j].dodele[k].tipRada=="Crpljenje"){
+														var box = document.createElement("DIV");
+														box.setAttribute("class","box crpljenje");
+														box.innerHTML = "C";
+														boxes.appendChild(box)
+													}
+												}
 											}
-
-											for(var l=0;l<majstori2[j].zpokc[1];l++){
-												var box = document.createElement("DIV");
-												box.setAttribute("class","box popis");
-												box.innerHTML = "P";
-												boxes.appendChild(box)
-											}
-
-											for(var l=0;l<majstori2[j].zpokc[2];l++){
-												var box = document.createElement("DIV");
-												box.setAttribute("class","box odgusenje");
-												box.innerHTML = "O";
-												boxes.appendChild(box)
-											}
-
-											for(var l=0;l<majstori2[j].zpokc[3];l++){
-												var box = document.createElement("DIV");
-												box.setAttribute("class","box konstatacija");
-												box.innerHTML = "K";
-												boxes.appendChild(box)
-											}
-
-											for(var l=0;l<majstori2[j].zpokc[4];l++){
-												var box = document.createElement("DIV");
-												box.setAttribute("class","box crpljenje");
-												box.innerHTML = "C";
-												boxes.appendChild(box)
-											}
+											
 										ucinak.appendChild(boxes);
 
 									majstorElem.appendChild(ucinak);
@@ -1193,16 +1220,7 @@ function layoutNoOverlap(container) {
 			}
 			
 			var odradjeno = document.getElementsByClassName("odradjeno");
-			for(var i=0;i<odradjeno.length;i++){
-				if(odradjeno[i].getElementsByClassName("box").length==0){
-					var box = document.createElement("DIV");
-					box.setAttribute("class","box nerad");
-					box.innerHTML = "ODSUTAN";
-					odradjeno[i].appendChild(box)
-				}
-				
-
-			}
+			
 
 		</script>
 		<script>

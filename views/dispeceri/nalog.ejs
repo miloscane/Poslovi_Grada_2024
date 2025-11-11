@@ -354,7 +354,7 @@
 													inline.setAttribute("class","inline");
 														var majstor = document.createElement("DIV");
 														majstor.setAttribute("class","majstor");
-														majstor.innerHTML = "<span style=\"font-weight:500\">"+getMajstorByCode(dodele[i].majstor).ime+"</span><br><span style=\"font-weight:200;font-size:10px\">"+dodele[i].datum.datum +" "+dodele[i].datum.timestamp+" "+dodele[i].user.name+"</span>";
+														majstor.innerHTML = "<span style=\"font-weight:500\">"+getMajstorByCode(dodele[i].majstor).ime+"</span><br><span style=\"font-weight:200;font-size:10px\">"+dodele[i].datum.datum +" "+dodele[i].datum.timestamp+" "+dodele[i].user.name+"</span><br><span>"+dodele[i].tipRada+"</span>";
 														inline.appendChild(majstor);  
 													dodela.appendChild(inline);
 
@@ -445,7 +445,7 @@
 												inline.setAttribute("class","inline");
 													var majstor = document.createElement("DIV");
 													majstor.setAttribute("class","majstor");
-													majstor.innerHTML = "<span style=\"font-weight:500\">"+getMajstorByCode(dodele[i].majstor).ime+"</span><br><span style=\"font-weight:200;font-size:10px\">"+dodele[i].datum.datum +" "+dodele[i].datum.timestamp+" "+dodele[i].user.name+"</span>";
+													majstor.innerHTML = "<span style=\"font-weight:500\">"+getMajstorByCode(dodele[i].majstor).ime+"</span><br><span style=\"font-weight:200;font-size:10px\">"+dodele[i].datum.datum +" "+dodele[i].datum.timestamp+" "+dodele[i].user.name+"</span><br><span>"+dodele[i].tipRada+"</span>";
 													inline.appendChild(majstor);  
 												dodela.appendChild(inline);
 
@@ -679,6 +679,7 @@
 										<option value="Zamena">Zamena</option>
 										<option value="Odgusenje">Odgusenje</option>
 										<option value="Popis">Popis</option>
+										<option value="Konstatacija">Konstatacija</option>
 										<option value="WOMA">ВОМА</option>
 										<option value="Kombinovano">Комбиновано</option>
 										<option value="Zagušenje">Загушење</option>

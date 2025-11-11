@@ -9858,6 +9858,26 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 				}
 			}
 		}
+
+		var date = new Date();
+		//date.setDate(date.getDate()-2);
+		var year = new Date().getFullYear();
+		var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
+		var dateStr = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
+		var checkIns = await checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray();
+		for(var i=0;i<majstori.length;i++){
+			majstori[i].checkIns = [];
+			for(var j=0;j<checkIns.length;j++){
+				if(majstori[i].brojKartice && checkIns[j].brojKartice){
+					if(majstori[i].brojKartice.toString()==checkIns[j].brojKartice.toString()){
+						majstori[i].checkIns.push(checkIns[j])
+					}
+				}
+				
+			}
+		}
+
+
 		res.render("rasporedRadovaUzivo",{
 			pageTitle: "Данашњи распоред",
 			user: req.session.user,
@@ -9865,6 +9885,7 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 			dodele: dodele,
 			otvoreniNalozi: otvoreniNalozi,
 			podelaOpstina: podelaOpstina,
+			danasnjeDodele: danasnjeDodele,
 			zavrseniNalozi: zavrseniNalozi
 		})
 	}catch(err){
@@ -13290,7 +13311,7 @@ server.get('/prisustvo', async (req, res)=> {
 						users[i].ime = users[i].name;
 						users[i].uniqueId = users[i].email;
 					}
-					checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()
+					checkInMajstoraDB.find({year:{$in:[year,year.toString()]},month:{$in:[month,Number(month)]},date:{$in:[dateStr,Number(dateStr)]}}).toArray()
 					.then((checkIns)=>{
 
 						res.render("prisustvo",{
