@@ -245,13 +245,14 @@ function layoutNoOverlap(container) {
   //scheduleTick();
 
 	</script>
-		<div id="pause" onclick="" style="position:fixed;top:5px;right:5px;font-size:26px" onclick="pause(this)" data-state="1">⏸️</div>
+		<div id="pause" style="position:fixed;top:5px;right:5px;font-size:26px;cursor:pointer;z-index:2000000" onclick="pause(this)" data-state="1">⏸️</div>
 		<script>
 			function pause(elem){
 				if(Number(elem.dataset.state)==1){
 					//playing, so pause it
 					clearTimeout(pocetna)
 					clearTimeout(refresh)
+					elem.innerHTML = "▶️"
 				}else{
 					refresh = setTimeout(function(){
 						window.location.reload();
@@ -267,6 +268,8 @@ function layoutNoOverlap(container) {
 						document.getElementById("ukupno-nalozi").style.display = "none"
 					//},120000)
 					},120000);
+
+					elem.innerHTML = "⏸️"
 				}
 			}
 		</script>

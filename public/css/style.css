@@ -6182,6 +6182,7 @@ input[type=number] {
     display:inline-block;
     vertical-align: top;
     font-size:18px;
+    border-right:2px solid rgb(100,100,100);
 }
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem:nth-child(even){
@@ -6198,13 +6199,14 @@ input[type=number] {
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ime{
     display:inline-block;
     vertical-align: middle;
-    width:240px;
+    width:260px;
+    padding-left:20px;
 }
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak{
     display:inline-block;
     vertical-align: middle;
-    padding-left:20px;
+    padding:0 20px;
 }
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .boxes{
