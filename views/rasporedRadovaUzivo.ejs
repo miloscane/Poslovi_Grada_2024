@@ -245,14 +245,31 @@ function layoutNoOverlap(container) {
   //scheduleTick();
 
 	</script>
-		<div id="pause" style="position:fixed;top:5px;right:5px;font-size:26px;cursor:pointer;z-index:2000000" onclick="pause(this)" data-state="1">⏸️</div>
+		<div id="pause" style="position:fixed;bottom:5px;left:5px;font-size:46px;cursor:pointer;z-index:2000000" onclick="pause(this)" data-state="1">⏸️</div>
+		<div id="raspored-dugme" style="position:fixed;bottom:5px;left:55px;font-size:46px;cursor:pointer;z-index:2000000" onclick="showNalozi()">📋</div>
+		<div id="total" style="position:fixed;bottom:5px;left:105px;font-size:46px;cursor:pointer;z-index:2000000" onclick="total()">📊</div>
 		<script>
+			function showNalozi(){
+				console.log("showNalozi")
+				document.getElementById("raspored").style.display = "none"
+				document.getElementById("otvoreni-nalozi").style.display = "block"
+				document.getElementById("ukupno-nalozi").style.display = "none"
+			}
+
+			function total(){
+				console.log("total")
+				document.getElementById("raspored").style.display = "none"
+				document.getElementById("otvoreni-nalozi").style.display = "none"
+				document.getElementById("ukupno-nalozi").style.display = "block"
+			}
+
 			function pause(elem){
 				if(Number(elem.dataset.state)==1){
 					//playing, so pause it
 					clearTimeout(pocetna)
 					clearTimeout(refresh)
-					elem.innerHTML = "▶️"
+					elem.innerHTML = "▶️";
+					elem.dataset.state = 0;
 				}else{
 					refresh = setTimeout(function(){
 						window.location.reload();
@@ -270,6 +287,7 @@ function layoutNoOverlap(container) {
 					},120000);
 
 					elem.innerHTML = "⏸️"
+					elem.dataset.state = 1
 				}
 			}
 		</script>
@@ -927,6 +945,10 @@ function layoutNoOverlap(container) {
 				<div class="bubble" id="ukupno-nepokriveno"><div class="title">Непокривено ⛔</div><div class="number"></div></div>
 			</div>
 			<!--<div class="title">ДАНАС РЕШЕНО</div>-->
+			<div class="jucerasnjiUcinakUzivo">
+				<div class="title">ЈУЧЕРАШЊИ УЧИНАК</div>
+				<div class="majstoriWrap" id="ucinak"></div>
+			</div>
 		</div>
 		<script>
 			var zamene = 0;
@@ -983,10 +1005,7 @@ function layoutNoOverlap(container) {
 			document.getElementById("ukupno-podizvodjaci").getElementsByClassName("number")[0].innerHTML = podizvodjaciNalozi;
 			document.getElementById("ukupno-nepokriveno").getElementsByClassName("number")[0].innerHTML = nepokriveno;
 		</script>
-		<div class="jucerasnjiUcinakUzivo">
-			<div class="title">ЈУЧЕРАШЊИ УЧИНАК</div>
-			<div class="majstoriWrap" id="ucinak"></div>
-		</div>
+		
 		
 		<script>
 			var podelaOpstina = <%-JSON.stringify(podelaOpstina)%>;
@@ -1191,9 +1210,9 @@ function layoutNoOverlap(container) {
 				window.location.reload();
 			},360000)
 
-			document.getElementById("raspored").style.display = "none"
-			document.getElementById("otvoreni-nalozi").style.display = "none"
-			document.getElementById("ukupno-nalozi").style.display = "block"
+			document.getElementById("raspored").style.display = "none";
+			document.getElementById("otvoreni-nalozi").style.display = "none";
+			document.getElementById("ukupno-nalozi").style.display = "block";
 
 			var pocetna = setTimeout(function(){
 				document.getElementById("raspored").style.display = "none"
