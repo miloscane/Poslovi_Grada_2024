@@ -329,7 +329,11 @@
 									<div class="inputTitle">Адреса:</div>
 									<input type="text" id="adresa-naloga">
 									<script>
-										document.getElementById("adresa-naloga").value = nalog.adresa ? nalog.adresa : revers.adresa ? revers.adresa : " ";
+										if(nalog.broj=="1111111"){
+											document.getElementById("adresa-naloga").value = revers.adresa;
+										}else{
+											document.getElementById("adresa-naloga").value = nalog.adresa ? nalog.adresa : revers.adresa ? revers.adresa : " ";
+										}
 									</script>
 								</div>
 								<div class="inputWrap">
@@ -483,7 +487,12 @@
 									        doc.setFontType("normal");
 											doc.setFontSize(16);
 											yPos = yPos + 10;
-											var adresa = nalog.adresa ? nalog.adresa : revers.adresa ? revers.adresa : " ";
+											if(nalog.broj=="1111111"){
+												var adresa = revers.adresa;
+											}else{
+												var adresa = nalog.adresa ? nalog.adresa : revers.adresa ? revers.adresa : " ";
+											}
+											
 											doc.text(adresa,pageWidth/2,yPos,'center');
 											yPos = yPos + 10;
 									        doc.text(vremePrijema(revers.datetime),pageWidth/2,yPos,'center');
