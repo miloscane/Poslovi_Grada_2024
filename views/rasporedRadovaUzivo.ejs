@@ -1077,6 +1077,8 @@ function layoutNoOverlap(container) {
 									ime.innerHTML = majstori[j].ime;
 									if(majstori[j].checkIns.length>0){
 										ime.style.color = "rgb(20,200,20)"
+									}else{
+										ime.style.color = "rgb(200,0,0)"
 									}
 									majstorElem.appendChild(ime);
 
@@ -1109,12 +1111,12 @@ function layoutNoOverlap(container) {
 
 										var boxes = document.createElement("DIV");
 										boxes.setAttribute("class","boxes odradjeno");
-											if(majstori[j].checkIns.length==0){
+											/*if(majstori[j].checkIns.length==0){
 												var box = document.createElement("DIV");
 												box.setAttribute("class","box nerad");
 												box.innerHTML = "ODSUTAN";
 												boxes.appendChild(box)
-											}else{
+											}else{*/
 												//Prodji kroz dodele
 												/*
 												<option value="Zamena">Zamena</option>
@@ -1143,8 +1145,8 @@ function layoutNoOverlap(container) {
 												    return ah * 60 + am - (bh * 60 + bm);
 												});
 
+
 												for(var k=0;k<majstori[j].dodele.length;k++){
-														console.log(majstori[j].dodele[k])
 													if(majstori[j].dodele[k].tipRada=="Zamena"){
 														var box = document.createElement("DIV");
 														box.setAttribute("class","box zamena");
@@ -1202,7 +1204,14 @@ function layoutNoOverlap(container) {
 														boxes.appendChild(box)
 													}
 												}
-											}
+												if(majstori[j].dodele.length==0){
+													var box = document.createElement("DIV");
+													box.setAttribute("class","box nerad");
+													box.innerHTML = "NEMA NALOGA";
+													boxes.appendChild(box)
+												}
+
+												
 											
 										ucinak.appendChild(boxes);
 
