@@ -345,14 +345,13 @@ function layoutNoOverlap(container) {
 							}else if(majstori[i].raspored==20){
 								ime.style = "background-color:rgb(200,0,0);color:rgb(255,255,255)"
 							}else if(majstori[i].raspored==30){
-								console.log(majstori[i].ime)
 								ime.style = "background-color:#ffa500;color:rgb(0,0,0)"
 							}else if(majstori[i].raspored==40){
 								ime.style = "background-color:#fff500;color:rgb(0,0,0)"
 							}else if(majstori[i].raspored==50){
 								ime.style = "background-color:#00cdfe;color:rgb(0,0,0)"
 							}else if(majstori[i].raspored==60){
-								ime.style = "background-color:rgb(32,51,100);color:rgb(0,0,0)"
+								ime.style = "background-color:rgb(32,51,100);color:rgb(255,255,255)"
 							}else{
 								ime.style = "background-color:#cc8899;color:rgb(255,255,255)"
 							}
@@ -401,20 +400,18 @@ function layoutNoOverlap(container) {
 
 								var statusNaloga = document.createElement("DIV");
 								statusNaloga.setAttribute("class","statusNaloga");
-								statusNaloga.innerHTML = dodelaJson.nalogInfo.statusNaloga;
+								statusNaloga.innerHTML = dodelaJson.tipRada[0];
+								if(majstori[i].dodele[j].majstorZavrsio==1){
+									statusNaloga.style.color = "rgb(20,255,20)";
+								}else if(majstori[i].dodele[j].majstorStigao==1){
+									statusNaloga.style.color = "rgb(255, 211, 67)";
+								}
 								dodelaWrap.appendChild(statusNaloga);
-
-								/*var adresaNaloga = document.createElement("DIV");
-								adresaNaloga.setAttribute("class","adresaNaloga");
-								adresaNaloga.innerHTML = dodelaJson.nalogInfo.radnaJedinica+"<br>"+dodelaJson.nalogInfo.adresa;
-								dodelaWrap.appendChild(adresaNaloga);*/
 							dodele.appendChild(dodelaWrap);
 						}
 						adjustLeftPositionsTight(dodele)
 
-						//requestAnimationFrame(() => {
-						  //layoutNoOverlap(dodele); // or dodeleElem if you rename it
-						//});
+						
 						const now = new Date();
 						const nowMin = now.getHours() * 60 + now.getMinutes();
 
@@ -998,7 +995,7 @@ function layoutNoOverlap(container) {
 			</div>
 			<!--<div class="title">ДАНАС РЕШЕНО</div>-->
 			<div class="jucerasnjiUcinakUzivo">
-				<div class="title">ЈУЧЕРАШЊИ УЧИНАК</div>
+				<div class="title">ДАНАШЊИ УЧИНАК</div>
 				<div class="majstoriWrap" id="ucinak"></div>
 			</div>
 		</div>
@@ -1061,95 +1058,6 @@ function layoutNoOverlap(container) {
 		
 		<script>
 			var podelaOpstina = <%-JSON.stringify(podelaOpstina)%>;
-			var majstoriZaExport = [];
-
-			var majstori2 = [
-    {
-        "ime": "Goran Stojanović",
-        "region": "SEVER",
-        "zpokc":[1,2,0,2,0]
-    },
-    {
-        "ime": "Igor Bakić",
-        "region": "SEVER",
-        "zpokc":[1,1,0,0,0]
-    },
-    {
-        "ime": "Kumar Mahendra",
-        "region": "SEVER",
-        "zpokc":[1,1,1,1,0]
-    },
-    {
-        "ime": "Živoslav Stančić",
-        "region": "SEVER",
-        "zpokc":[0,0,0,0,0]
-    },
-    {
-        "ime": "Dalibor Tripković",
-        "region": "ZAPAD",
-        "zpokc":[0,0,0,0,0]
-    },
-    {
-        "ime": "Tomislav Maksimovic",
-        "region": "ZAPAD",
-        "zpokc":[3,0,1,2,0]
-    },
-    {
-        "ime": "Vojin Civrić",
-        "region": "ZAPAD",
-        "zpokc":[0,0,0,0,0]
-    },
-    {
-        "ime": "Zoran Mihajlović",
-        "region": "ZAPAD",
-        "zpokc":[0,0,0,0,0]
-    },
-    {
-        "ime": "Zoran Veselinović",
-        "region": "ZAPAD",
-        "zpokc":[0,0,0,0,0]
-    },
-    {
-        "ime": "Aleksandar Pavlović",
-        "region": "ISTOK",
-        "zpokc":[0,0,0,4,0]
-    },
-    {
-        "ime": "Duško Spasović",
-        "region": "ISTOK",
-        "zpokc":[1,0,0,5,0]
-    },
-    {
-        "ime": "Sasa Jovanoski",
-        "region": "ISTOK",
-        "zpokc":[0,0,0,3,0]
-    },
-    {
-        "ime": "Uros Janjic",
-        "region": "ISTOK",
-        "zpokc":[0,2,0,4,0]
-    },
-    {
-        "ime": "Zoran Ostojić",
-        "region": "ISTOK",
-        "zpokc":[0,0,0,0,0]
-    },
-    {
-        "ime": "Aleksandar  Ramanović",
-        "region": "JUG",
-        "zpokc":[1,1,0,2,0]
-    },
-    {
-        "ime": "Anđelo Vasić",
-        "region": "JUG",
-        "zpokc":[2,0,0,2,0]
-    },
-    {
-        "ime": "Goran Stoiljković",
-        "region": "JUG",
-        "zpokc":[2,2,0,2,0]
-    }
-]
 			for(var i=0;i<podelaOpstina.length;i++){
 				var opstina = document.createElement("DIV")
 				opstina.setAttribute("class","opstina");
@@ -1162,7 +1070,6 @@ function layoutNoOverlap(container) {
 					majstoriElem.setAttribute("class","majstori");
 						for(var j=0;j<majstori.length;j++){
 							if(majstori[j].region==podelaOpstina[i].naziv){
-								majstoriZaExport.push(majstori[j])
 								var majstorElem = document.createElement("DIV");
 								majstorElem.setAttribute("class","majstorElem");
 									var ime = document.createElement("DIV");

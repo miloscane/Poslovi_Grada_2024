@@ -1263,7 +1263,7 @@ http.listen(process.env.PORT, async function(){
 		}
 
 		var naloziToExport = [];
-		var month = 9;
+		var month = 10;
 		for(var i=0;i<nalozi.length;i++){
 			if(nalozi[i].faktura.broj){
 				if(nalozi[i].faktura.broj.length>3){
@@ -9833,10 +9833,12 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 		var zakazaneDodele = await dodeljivaniNaloziDB.find({deleted: {$ne:1},nalog:{$in:brojeviNaloga}}).toArray();
 		for(var i=0;i<otvoreniNalozi.length;i++){
 			otvoreniNalozi[i].planiran = 0;
+			otvoreniNalozi[i].danasnjeDodele = [];
 			for(var j=0;j<zakazaneDodele.length;j++){
 				if(otvoreniNalozi[i].broj==zakazaneDodele[j].nalog){
 					if(istiDatum(new Date(zakazaneDodele[j].datumRadova),today)){
 						otvoreniNalozi[i].planiran = 1;
+						otvoreniNalozi[i].danasnjeDodele.push(zakazaneDodele[j])
 					}else if(new Date(zakazaneDodele[j].datumRadova).getTime()>today.getTime()){
 						otvoreniNalozi[i].planiran = 2;
 					}
@@ -13311,9 +13313,8 @@ server.get('/prisustvo', async (req, res)=> {
 						users[i].ime = users[i].name;
 						users[i].uniqueId = users[i].email;
 					}
-					checkInMajstoraDB.find({year:{$in:[year,year.toString()]},month:{$in:[month,Number(month)]},date:{$in:[dateStr,Number(dateStr)]}}).toArray()
+					checkInMajstoraDB.find({year:{$in:[year,year.toString()]},month:{$in:[month,Number(month)]},date:{$in:[dateStr.toString(),Number(dateStr)]}}).toArray()
 					.then((checkIns)=>{
-
 						res.render("prisustvo",{
 					    pageTitle: "Присуство радника на дан "+getDateAsStringForDisplay(date),
 					    pomocnici: pomocnici,
