@@ -9246,7 +9246,9 @@ server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
 							}
 						}
 					}*/
-					vozila2.vozila.Data[j].dailySummary = [];
+					for(var j=0;j<vozila2.vozila.Data.length;j++){
+						vozila2.vozila.Data[j].dailySummary =[];
+					}
 					
 					for(var i=0;i<vozila2.vozila.Data.length;i++){
 						var config = {
@@ -9267,7 +9269,7 @@ server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
            // const response = await axios(config);
 
             vozila2.vozila.Data[i].mileageSummary = [];
-						await new Promise(resolve => setTimeout(resolve, 2000));
+						//await new Promise(resolve => setTimeout(resolve, 2000));
 					}
 				}
 				
