@@ -4274,6 +4274,7 @@ const sendEmail = () => {
 };
 
 const saveStops = async () => {
+	console.log("Saving stops")
 	var date = new Date();
 	var vozila2 = JSON.parse(JSON.stringify(vozila));
 	var startTime = date.toISOString().split('T')[0] + " 00:00:00";
@@ -4333,6 +4334,8 @@ const saveStops = async () => {
 
 	
 
+	
+
 	var assetIds = [];
 	for(var i=0;i<vozila2.vozila.Data.length;i++){
 		//console.log(vozila2.vozila.Data[i])
@@ -4380,6 +4383,7 @@ const saveStops = async () => {
   	logError(error)
   })
 };
+
 
 //setTimeout(function(){saveStops();},11000)
 
@@ -9234,14 +9238,15 @@ server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
 				    }
 					};
 					console.log("Waiting daily summary")
-					var dailySummary = await axios(config);
+					/*var dailySummary = await axios(config);
 					for(var i=0;i<dailySummary.data.length;i++){
 						for(var j=0;j<vozila2.vozila.Data.length;j++){
 							if(vozila2.vozila.Data[j].DeviceName==dailySummary.data[i].RegNo){
 								vozila2.vozila.Data[j].dailySummary = dailySummary.data[i];
 							}
 						}
-					}
+					}*/
+					vozila2.vozila.Data[j].dailySummary = [];
 					
 					for(var i=0;i<vozila2.vozila.Data.length;i++){
 						var config = {
@@ -9259,8 +9264,9 @@ server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
               }
             };
 
-            const response = await axios(config);
-            vozila2.vozila.Data[i].mileageSummary = response.data;
+           // const response = await axios(config);
+
+            vozila2.vozila.Data[i].mileageSummary = [];
 						await new Promise(resolve => setTimeout(resolve, 2000));
 					}
 				}

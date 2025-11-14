@@ -451,7 +451,7 @@ function layoutNoOverlap(container) {
 				}
 					var td = document.createElement("TD");
 					td.setAttribute("class","brojNaloga");
-					var extraInfo = Number(nalog.zatvorenaVoda == 1) ? "⚠️⚠️" : ""
+					var extraInfo = Number(nalog.zatvorenaVoda == 1) ? "⚠️⚠️" : "";
 					td.innerHTML = "<div class=\"value\">"+nalog.broj+extraInfo+"</div>";
 					tr.appendChild(td);
 					if(!tip){
@@ -460,31 +460,31 @@ function layoutNoOverlap(container) {
 						
 							var printOut = "?";
 							if(nalog.statusNaloga=="Potrebna WOMA"){
-								printOut = "🚚"
+								printOut = "🚚";
 							}else if(nalog.statusNaloga=="Zagušenje"){
-								printOut = "🪠"
+								printOut = "🪠";
 							}else if(nalog.statusNaloga=="Zamena"){
-								printOut = "ZM"
+								printOut = "ZM";
 							}else if(nalog.statusNaloga=="Crpljenje"){
-								printOut = "🪣"
+								printOut = "🪣";
 							}else if(nalog.statusNaloga=="Dezinfekcija"){
-								printOut = "🦠"
+								printOut = "🦠";
 							}else if(nalog.statusNaloga=="Masinsko kopanje"){
-								printOut = "🚜"
+								printOut = "🚜";
 							}else if(nalog.statusNaloga=="Rucno kopanje"){
-								printOut = "⛏️"
+								printOut = "⛏️";
 							}else if(nalog.statusNaloga=="Finalizacija" || nalog.statusNaloga=="Zakazana finalizacija"){
-								printOut = "🧱"
+								printOut = "🧱";
 							}else if(nalog.statusNaloga=="Betonaža" || nalog.statusNaloga=="Asfalt" || nalog.statusNaloga=="Bekaton"){
-								printOut = "🚧"
+								printOut = "🚧";
 							}else if(nalog.statusNaloga=="Preventivno čišćenje"){
-								printOut = "🧼"
+								printOut = "🧼";
 							}else if(nalog.statusNaloga=="Snimanje kamerom"){
-								printOut = "🎥"
+								printOut = "🎥";
 							}else if(nalog.statusNaloga=="Kombinovano"){
-								printOut = "🚛"
+								printOut = "🚛";
 							}else if(nalog.statusNaloga=="Potreban pristup"){
-								printOut = "⛔"
+								printOut = "⛔";
 							}
 							td.innerHTML = printOut;
 					}
