@@ -676,6 +676,7 @@
 								<div class="inline">
 									<div class="note">Тип<br>радова</div>
 									<select id="danasnji-tip-radova">
+										<option value="Odaberi">Odaberi</option>
 										<option value="Zamena">Zamena</option>
 										<option value="Odgusenje">Odgusenje</option>
 										<option value="Popis">Popis</option>
@@ -704,6 +705,10 @@
 							</form>
 							<script>
 								function majstorNaNalogu(){
+									if(document.getElementById("danasnji-tip-radova").value = "Odaberi"){
+										alert("Niste odabrali tip radova")
+										return
+									}
 									var submitJson = {};
 									submitJson.user = {};
 									submitJson.user.email = user.email;
