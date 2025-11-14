@@ -440,9 +440,14 @@ function layoutNoOverlap(container) {
 		<script>
 			function generateNalogRow(elem,nalog,tip){
 				var tr = document.createElement("TR");
-				console.log(nalog.danasnjeDodele)
+				console.log()
 				if(nalog.vrstaRada=="TEKUCE"){
 					tr.style.backgroundColor = "#FFCE1B"
+				}
+				if(nalog.danasnjeDodele.length>0){
+					if(nalog.danasnjeDodele[nalog.danasnjeDodele.length-1].majstorStigao){
+						tr.style.backgroundColor = "rgba(20,255,20,0.6)"
+					}
 				}
 					var td = document.createElement("TD");
 					td.setAttribute("class","brojNaloga");
