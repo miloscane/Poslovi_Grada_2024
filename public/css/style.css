@@ -6042,6 +6042,9 @@ input[type=number] {
 }
 
 
+
+
+
 .otvoreniNaloziUzivo{
     font-size: 0;
 }
@@ -8125,6 +8128,56 @@ input[type=number] {
     color: #fff;
     box-shadow: 0 2px 6px rgba(0, 120, 215, 0.4);
     transform: translateY(-2px);
+}
+
+.danasnjaEkipa .inline{
+    display:inline-block;
+    vertical-align: top;
+    width:300px;
+    padding:10px;
+    border-radius:5px;
+    border:1px solid rgb(100,100,100);
+    margin:5px;
+}
+
+.danasnjaEkipa .inline .title{
+    font-size:20px;
+    font-weight:600;
+    text-align: center;
+    color:rgb(32,51,100);
+    margin-bottom:10px;
+}
+
+.danasnjaEkipa .inline .subTitle{
+    font-weight:500;
+    font-size:14px;
+}
+
+.danasnjaEkipa .inline select{
+    margin-bottom:8px;
+}
+
+.danasnjaEkipa .inline .checkboxWrap{
+    text-align: left;
+    margin-bottom:3px;
+}
+
+.danasnjaEkipa .inline .checkboxWrap .label{
+    display:inline-block;
+    vertical-align: middle;
+    font-weight:500;
+    font-size:14px;
+    width:110px;
+}
+
+.danasnjaEkipa .inline .checkboxWrap .checkboxWrapper{
+    display:inline-block;
+    vertical-align: middle;
+}
+
+.danasnjaEkipa .inline .checkboxWrap .checkboxWrapper input{
+    width:20px;
+    height:20px;
 }
 
 @media screen and (max-width: 1100px) {

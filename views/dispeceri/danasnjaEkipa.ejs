@@ -1,0 +1,181 @@
+<%- include ("partials/header") -%>
+	<script>
+		var majstori = <%-JSON.stringify(majstori)%>;
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+		var pomocnici = <%-JSON.stringify(pomocnici)%>;
+		pomocnici.sort((a, b) => a.ime.localeCompare(b.ime));
+		var dispeceri = <%-JSON.stringify(dispeceri)%>;
+		var navigacijaInfo = <%-JSON.stringify(navigacijaInfo)%>;
+		var dnevnaEkipa = <%-JSON.stringify(dnevnaEkipa)%>;
+		console.log(dnevnaEkipa)
+	</script>
+	<div class="pageWidth">
+		<div class="danasnjaEkipa" id="ekipe"></div>
+		<script>
+			for(var i=0;i<majstori.length;i++){
+				var majstor = majstori[i];
+				var dnevnoStanje = {};
+				if(dnevnaEkipa.ekipe){
+					for(var j=0;j<dnevnaEkipa.ekipe.length;j++){
+						if(dnevnaEkipa.ekipe[j].majstor==majstor.uniqueId){
+							dnevnoStanje = dnevnaEkipa.ekipe[j];
+							break;
+						}
+					}	
+				}
+				
+				var inline = document.createElement("DIV");
+				inline.setAttribute("class","inline");
+				inline.setAttribute("data-id",majstor.uniqueId);
+					var title = document.createElement("DIV");
+					title.setAttribute("class","title");
+					title.innerHTML = majstor.ime;
+					inline.appendChild(title);
+
+					var checkboxWrap = document.createElement("DIV");
+					checkboxWrap.setAttribute("class","checkboxWrap");
+						var label = document.createElement("DIV");
+						label.setAttribute("class","label");
+						label.innerHTML = "Odsutan:";
+						checkboxWrap.appendChild(label);
+
+						var checkboxWrapper = document.createElement("DIV");
+						checkboxWrapper.setAttribute("class","checkboxWrapper");
+						checkboxWrapper.innerHTML = "<input type=\"checkbox\" class=\"odsutan\">";
+						if(dnevnoStanje.odsutan==true){
+							checkboxWrapper.innerHTML = "<input type=\"checkbox\" class=\"odsutan\" checked=\"checked\">";
+						}
+						checkboxWrap.appendChild(checkboxWrapper);
+					inline.appendChild(checkboxWrap);
+
+					var subTitle = document.createElement("DIV");
+					subTitle.setAttribute("class","subTitle");
+					subTitle.innerHTML = "Vozilo:"
+					inline.appendChild(subTitle);
+					var voziloSelect = document.createElement("SELECT");
+					voziloSelect.setAttribute("class","voziloSelect");
+						var option = document.createElement("OPTION");
+						option.setAttribute("value","Nijedano");
+						option.innerHTML = "Nijedano";
+						voziloSelect.appendChild(option)
+						for(var j=0;j<navigacijaInfo.vozila.Data.length;j++){
+							if(!navigacijaInfo.vozila.Data[j].ImeiNumber.toString().startsWith("200")){
+								var option = document.createElement("OPTION");
+								option.setAttribute("value",navigacijaInfo.vozila.Data[j].DeviceName);
+								if(dnevnoStanje.vozilo==navigacijaInfo.vozila.Data[j].DeviceName){
+									option.setAttribute("selected","selected")
+								}
+								option.innerHTML = navigacijaInfo.vozila.Data[j].DeviceName;
+								voziloSelect.appendChild(option)	
+							}
+							
+						}
+					inline.appendChild(voziloSelect);
+
+					var subTitle = document.createElement("DIV");
+					subTitle.setAttribute("class","subTitle");
+					subTitle.innerHTML = "Pomocnik:"
+					inline.appendChild(subTitle);
+					var pomocnikSelect = document.createElement("SELECT");
+					pomocnikSelect.setAttribute("class","pomocnikSelect");
+						var option = document.createElement("OPTION");
+						option.setAttribute("value","Nijedan");
+						option.innerHTML = "Nijedan";
+						pomocnikSelect.appendChild(option)
+						for(var j=0;j<pomocnici.length;j++){
+							var option = document.createElement("OPTION");
+							option.setAttribute("value",pomocnici[j].uniqueId);
+							if(dnevnoStanje.pomocnik==pomocnici[j].uniqueId){
+								option.setAttribute("selected","selected")
+							}
+							option.innerHTML = pomocnici[j].ime;
+							pomocnikSelect.appendChild(option)
+						}
+					inline.appendChild(pomocnikSelect);
+
+					var subTitle = document.createElement("DIV");
+					subTitle.setAttribute("class","subTitle");
+					subTitle.innerHTML = "Dispecer:";
+					inline.appendChild(subTitle);
+
+					var dispecerSelect = document.createElement("SELECT");
+					dispecerSelect.setAttribute("class","dispecerSelect");
+						var option = document.createElement("OPTION");
+						option.setAttribute("value","Nijedan");
+						option.innerHTML = "Nijedan";
+						dispecerSelect.appendChild(option)
+
+						for(var j=0;j<dispeceri.length;j++){
+							var option = document.createElement("OPTION");
+							option.setAttribute("value",dispeceri[j].email);
+							if(dnevnoStanje.dispecer==dispeceri[j].email){
+								option.setAttribute("selected","selected")
+							}
+							option.innerHTML = dispeceri[j].name;
+							dispecerSelect.appendChild(option)
+						}
+					inline.appendChild(dispecerSelect);
+
+					var checkboxWrap = document.createElement("DIV");
+					checkboxWrap.setAttribute("class","checkboxWrap");
+						var label = document.createElement("DIV");
+						label.setAttribute("class","label");
+						label.innerHTML = "Druga smena:";
+						checkboxWrap.appendChild(label);
+
+						var checkboxWrapper = document.createElement("DIV");
+						checkboxWrapper.setAttribute("class","checkboxWrapper");
+						checkboxWrapper.innerHTML = "<input type=\"checkbox\" class=\"drugaSmena\">";
+						if(dnevnoStanje.drugaSmena==true){
+							checkboxWrapper.innerHTML = "<input type=\"checkbox\" class=\"drugaSmena\" checked=\"checked\">";
+						}
+						checkboxWrap.appendChild(checkboxWrapper);
+					inline.appendChild(checkboxWrap);
+					
+					var checkboxWrap = document.createElement("DIV");
+					checkboxWrap.setAttribute("class","checkboxWrap");
+						var label = document.createElement("DIV");
+						label.setAttribute("class","label");
+						label.innerHTML = "Dezuran:";
+						checkboxWrap.appendChild(label);
+
+						var checkboxWrapper = document.createElement("DIV");
+						checkboxWrapper.setAttribute("class","checkboxWrapper");
+						checkboxWrapper.innerHTML = "<input type=\"checkbox\" class=\"dezuran\">";
+						if(dnevnoStanje.dezuran==true){
+							checkboxWrapper.innerHTML = "<input type=\"checkbox\" class=\"dezuran\" checked=\"checked\">";
+						}
+						checkboxWrap.appendChild(checkboxWrapper);
+					inline.appendChild(checkboxWrap);
+				document.getElementById("ekipe").appendChild(inline);
+			}
+		</script>
+		<div class="inputWrap"><div class="button" onclick="submitForm()">САЧУВАЈ</div></div>
+		<form method="POST" action="/danasnjaEkipa" id="form" style="display:none">
+			<input type="text" id="json" name="json">
+		</form>
+		<script>
+			function submitForm(){
+				var json = {};
+				json.ekipe = [];
+				var majstoriElems = document.getElementById("ekipe").getElementsByClassName("inline");
+				for(var i=0;i<majstoriElems.length;i++){
+					var ekipaJson = {};
+					ekipaJson.majstor = majstoriElems[i].dataset.id;
+					ekipaJson.dispecer = majstoriElems[i].getElementsByClassName("dispecerSelect")[0].value;
+					ekipaJson.pomocnik = majstoriElems[i].getElementsByClassName("pomocnikSelect")[0].value;
+					ekipaJson.vozilo = majstoriElems[i].getElementsByClassName("voziloSelect")[0].value;
+					ekipaJson.odsutan = majstoriElems[i].getElementsByClassName("odsutan")[0].checked;
+					ekipaJson.dezuran = majstoriElems[i].getElementsByClassName("dezuran")[0].checked;
+					ekipaJson.drugaSmena = majstoriElems[i].getElementsByClassName("drugaSmena")[0].checked;
+					json.ekipe.push(ekipaJson);
+				}
+				json.datum = dnevnaEkipa.datum;
+				//console.log(json)
+				document.getElementById("json").value = JSON.stringify(json);
+				loadGif();
+				document.getElementById("form").submit();
+			}
+		</script>
+	</div>
+<%- include ("partials/footer") -%>

@@ -882,6 +882,7 @@ var naloziTrecihLicaDB;
 var izvestajiTrecihLicaDB;
 var opomeneDispeceraDB;
 var opravdanjaDispeceraDB;
+var dnevneEkipeDB;
 var stariCenovnikJsons = [];
 var stareSpecifikacijePodizvodjacaDB;
 
@@ -931,6 +932,7 @@ http.listen(process.env.PORT, async function(){
 		izvestajiTrecihLicaDB = client.db("Poslovi_Grada_2024").collection('Izvestaji Trecih Lica');
 		opomeneDispeceraDB 		= client.db("Poslovi_Grada_2024").collection('Opomene dispecera');
 		opravdanjaDispeceraDB	= client.db("Poslovi_Grada_2024").collection('Opravdanja dispecera');
+		dnevneEkipeDB					= client.db("Poslovi_Grada_2024").collection('Dnevne Ekipe');
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
 		nalozi2022DB					=	client.db("Poslovi-Grada").collection('nalozi2022');
@@ -3601,6 +3603,11 @@ http.listen(process.env.PORT, async function(){
 		}					
 		fs.writeFileSync("naloziMasinskoKopanje.csv",csvString,{encoding:"Utf8"})
 		console.log("Wrote file")*/
+
+
+
+
+
 
 
 		/*var nalozi = await naloziDB.find({majstor:"3XIoPOY--1751371868923"}).toArray();
@@ -9810,6 +9817,131 @@ server.get('/dispecer/rasporedRadova', async(req,res)=>{
 		}
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+})
+
+
+server.get('/dispecer/danasnjaEkipa', async(req,res)=>{
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+
+	if(Number(req.session.user.role)!=20){
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+		});
+	}
+	try{
+		var today = new Date();
+		var dnevneEkipe = await dnevneEkipeDB.find({datum:getDateAsStringForDisplay(today)}).toArray();
+		var dnevnaEkipa = {};
+		if(dnevneEkipe.length==0){
+			today.setDate(today.getDate()-1);
+			var dnevneEkipe = await dnevneEkipeDB.find({datum:getDateAsStringForDisplay(today)}).toArray();
+			if(dnevneEkipe.length!=0){
+				dnevnaEkipa = dnevneEkipe[0];
+			}
+		}else{
+			dnevnaEkipa = dnevneEkipe[0];
+		}
+		var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
+		var pomocnici = await pomocniciDB.find({}).toArray();
+		var dispeceri = await usersDB.find({role:"20"}).toArray();
+		for(var i=0;i<dispeceri.length;i++){
+			delete dispeceri[i].password;
+			if(dispeceri[i].email.includes("+")){
+				dispeceri.splice(i,1);
+				i--;
+			}
+		}
+
+		var navigacijaInfo = {};
+
+		var config = {
+			method: 'post',
+			url: baseUrl+'/token', // Replace with your actual URL
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			data: data
+		};
+		var response = await axios(config);
+		token = response.data.access_token;
+		config = {
+	      url: baseUrl + '/api/Client/GetClient',
+	      method: 'POST', // If necessary
+	      headers: { 
+	          'Content-Type': 'application/json',
+	          'Authorization': `Bearer ${token}`
+	      },
+	      data: { 'ClientId': telematicsId }
+	  };
+	  var response = await axios(config);
+	  navigacijaInfo.clientInfo = response.data.client[0];
+	  config = {
+	      url: baseUrl + '/api/Asset/GetDevicesCurrentData',
+	      method: 'POST', // If necessary
+	      headers: { 
+	          'Content-Type': 'application/json',
+	          'Authorization': `Bearer ${token}`
+	      },
+	      data: { 'ClientId': telematicsId }
+	  };
+	  var response = await axios(config);
+		navigacijaInfo.vozila = response.data;
+		res.render("dispeceri/danasnjaEkipa",{
+			pageTitle: "Данашње екипе",
+			user: req.session.user,
+			majstori: majstori,
+			pomocnici: pomocnici,
+			dispeceri: dispeceri,
+			navigacijaInfo: navigacijaInfo,
+			dnevnaEkipa: dnevnaEkipa
+		})
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Дошло је до грешке број 9843.</div>"
+		});
+	}
+})
+
+server.post('/danasnjaEkipa', async(req,res)=>{
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+
+	if(Number(req.session.user.role)!=20){
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+		});
+	}
+	try{
+		var today = new Date();
+		var dnevnaEkipa = JSON.parse(req.body.json);
+		var dnevneEkipe = await dnevneEkipeDB.find({datum:getDateAsStringForDisplay(today)}).toArray();
+		if(dnevneEkipe.length==0){
+			//ubaci novu
+			dnevnaEkipa.datum = getDateAsStringForDisplay(today)
+			await dnevneEkipeDB.insertOne(dnevnaEkipa);
+		}else{
+			await dnevneEkipeDB.replaceOne({datum:getDateAsStringForDisplay(today)},dnevnaEkipa)
+		}
+		res.redirect("/dispecer/danasnjaEkipa")
+
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Дошло је до грешке број 9938.</div>"
+		});
 	}
 })
 
