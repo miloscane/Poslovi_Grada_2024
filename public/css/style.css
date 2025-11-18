@@ -6231,6 +6231,27 @@ input[type=number] {
     color:rgb(255,255,255);
 }
 
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem{
+    position:relative;
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .specials{
+    position: absolute;
+    top:5px;
+    left:5px;
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .specials .special{
+    display:inline-block;
+    vertical-align: middle;
+    padding:2px;
+    font-size:10px;
+    font-weight:600;
+    background-color:#CC8899;
+    color:rgb(255,255,255);
+    margin:2px;
+    border-radius:3px;
+}
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .ucinak .zamena{
     width:80px;

@@ -3493,7 +3493,7 @@ http.listen(process.env.PORT, async function(){
 
 
 		//ZA HERMINU
-		/*var mesec = "09.2025"
+		/*var mesec = "10.2025"
 		//Hermina Wome
 		var nalozi = await naloziDB.find({}).toArray();
 		var nalozi2024 = await nalozi2024DB.find({}).toArray();
@@ -9948,6 +9948,11 @@ server.post('/danasnjaEkipa', async(req,res)=>{
 server.get('/rasporedRadovaUzivo', async (req,res)=>{
 	try{
 		var today = new Date();
+		var danasnjeEkipe = await dnevneEkipeDB.find({datum:getDateAsStringForDisplay(today)}).toArray();
+		var danasnjaEkipa = [];
+		if(danasnjeEkipe.length!=0){
+			danasnjaEkipa = danasnjeEkipe[0].ekipe;
+		}
 		//today.setDate(today.getDate()-1);
 		var majstori = await majstoriDB.find({}).toArray();
 		var dodele = await dodeljivaniNaloziDB.find({deleted: {$ne:1},datumRadova:getDateAsStringForInputObject(today)}).toArray();
@@ -10018,6 +10023,7 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 				
 			}
 		}
+		var pomocnici = await pomocniciDB.find({}).toArray();
 
 
 		res.render("rasporedRadovaUzivo",{
@@ -10028,6 +10034,8 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 			otvoreniNalozi: otvoreniNalozi,
 			podelaOpstina: podelaOpstina,
 			danasnjeDodele: danasnjeDodele,
+			danasnjaEkipa: danasnjaEkipa,
+			pomocnici: pomocnici,
 			zavrseniNalozi: zavrseniNalozi
 		})
 	}catch(err){
