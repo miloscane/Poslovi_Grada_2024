@@ -6235,6 +6235,25 @@ input[type=number] {
     position:relative;
 }
 
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .imeMajstora{
+    font-weight:600;
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .pomocnik{
+    font-weight:400;
+    font-size:14px;
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .vozilo{
+    font-weight:400;
+    font-size:14px;
+}
+
+.jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .dispecer{
+    font-weight:400;
+    font-size:14px;
+}
+
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem .specials{
     position: absolute;
     top:5px;

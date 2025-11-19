@@ -138,6 +138,24 @@ function getMajstorByCode(majstorId){
   return majstor
 }
 
+function getPomocnikByCode(pomocnikId){
+  var pomocnik = {};
+  if(majstori){
+    for(var i=0;i<pomocnici.length;i++){
+      if(pomocnici[i].uniqueId==pomocnikId){
+        pomocnik = pomocnici[i]
+      }
+    }
+    if(!pomocnik.ime){
+      console.log("No majstor found")
+    }
+  }else{
+    console.log("No array majstori defined");
+  }
+  console.log(pomocnik)
+  return pomocnik
+}
+
 
 function getProizvodByCode(uniqueId){
   var proizvod = {};
@@ -154,6 +172,17 @@ function getProizvodByCode(uniqueId){
     console.log("No array proizvodi defined");
   }
   return proizvod
+}
+
+function getUserInfo(email){
+  var user = {};
+  for(var i=0;i<users.length;i++){
+    if(users[i].email==email){
+      user = users[i]
+    }
+  }
+  console.log(user)
+  return user
 }
 
 function getPriceItemByCode(code){

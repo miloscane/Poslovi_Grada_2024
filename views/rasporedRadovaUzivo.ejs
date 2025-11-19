@@ -26,10 +26,11 @@
 			}else if(tamnoPlavi.indexOf(majstori[i].ime)>=0){
 				majstori[i].raspored = 60;
 			}
-			console.log(majstori[i].ime + "--"+majstori[i].raspored)
 		}
 
 		majstori.sort((a, b) => a.raspored - b.raspored);
+		var pomocnici = <%-JSON.stringify(pomocnici)%>;
+		var users = <%-JSON.stringify(dispeceri)%>;
 
 		var danasnjeDodele = <%-JSON.stringify(danasnjeDodele)%>;
 
@@ -279,6 +280,7 @@ function layoutNoOverlap(container) {
 		<div id="vremena-dugme" style="position:fixed;bottom:5px;left:55px;font-size:46px;cursor:pointer;z-index:2000000" onclick="showTable()">🕓</div>
 		<div id="raspored-dugme" style="position:fixed;bottom:5px;left:105px;font-size:46px;cursor:pointer;z-index:2000000" onclick="showNalozi()">📋</div>
 		<div id="total" style="position:fixed;bottom:5px;left:155px;font-size:46px;cursor:pointer;z-index:2000000" onclick="total()">📊</div>
+		<div id="total" style="position:fixed;bottom:5px;left:205px;font-size:46px;cursor:pointer;z-index:2000000" onclick="location.reload();">🔄</div>
 		<script>
 			function showNalozi(){
 				document.getElementById("raspored").style.display = "none"
@@ -1086,12 +1088,13 @@ function layoutNoOverlap(container) {
 								majstorElem.setAttribute("class","majstorElem");
 									var ime = document.createElement("DIV");
 									ime.setAttribute("class","ime");
-									ime.innerHTML = danasnjaEkipa[j].majstorInfo.ime;
-									if(danasnjaEkipa[j].odsutan==true){
-										ime.style.color = "rgb(200,0,0)"
-									}else{
-										ime.style.color = "rgb(20,200,20)"
-									}
+									ime.innerHTML = "<span class=\"imeMajstora\">"+danasnjaEkipa[j].majstorInfo.ime+"</span><br>";
+									var imePomocnika = danasnjaEkipa[j].pomocnik=="Nijedan" ? "Bez pomocnika" : getPomocnikByCode(danasnjaEkipa[j].pomocnik).ime;
+									ime.innerHTML += "<span class=\"pomocnik\">"+ imePomocnika +"</span><br>";
+									ime.innerHTML += "<span class=\"vozilo\">"+ danasnjaEkipa[j].vozilo +"</span><br>";
+									var imeDispecera = danasnjaEkipa[j].dispecer=="Nijedan" ? "Bez dispecera" : getUserInfo(danasnjaEkipa[j].dispecer).name;
+									ime.innerHTML += "<span class=\"dispecer\">"+ imeDispecera+"</span>";
+
 									majstorElem.appendChild(ime);
 
 									var specials = document.createElement("DIV");
@@ -1109,7 +1112,6 @@ function layoutNoOverlap(container) {
 										specials.appendChild(special)
 									}
 									majstorElem.appendChild(specials)
-									console.log(specials)
 
 									var ucinak = document.createElement("DIV");
 									ucinak.setAttribute("class","ucinak");
@@ -1276,12 +1278,13 @@ function layoutNoOverlap(container) {
 							majstorElem.setAttribute("class","majstorElem");
 								var ime = document.createElement("DIV");
 								ime.setAttribute("class","ime");
-								ime.innerHTML = danasnjaEkipa[j].majstorInfo.ime;
-								if(danasnjaEkipa[j].odsutan==true){
-									ime.style.color = "rgb(200,0,0)"
-								}else{
-									ime.style.color = "rgb(20,200,20)"
-								}
+								ime.innerHTML = "<span class=\"imeMajstora\">"+danasnjaEkipa[j].majstorInfo.ime+"</span><br>";
+								var imePomocnika = danasnjaEkipa[j].pomocnik=="Nijedan" ? "Bez pomocnika" : getPomocnikByCode(danasnjaEkipa[j].pomocnik).ime;
+								ime.innerHTML += "<span class=\"pomocnik\">"+ imePomocnika +"</span><br>";
+								ime.innerHTML += "<span class=\"vozilo\">"+ danasnjaEkipa[j].vozilo +"</span><br>";
+								var imeDispecera = danasnjaEkipa[j].dispecer=="Nijedan" ? "Bez dispecera" : getUserInfo(danasnjaEkipa[j].dispecer).name;
+								ime.innerHTML += "<span class=\"dispecer\">"+ imeDispecera+"</span>";
+
 								majstorElem.appendChild(ime);
 
 								var specials = document.createElement("DIV");
@@ -1464,12 +1467,17 @@ function layoutNoOverlap(container) {
 								majstorElem.setAttribute("class","majstorElem");
 									var ime = document.createElement("DIV");
 									ime.setAttribute("class","ime");
-									ime.innerHTML = danasnjaEkipa[j].majstorInfo.ime;
-									if(danasnjaEkipa[j].odsutan==true){
+									ime.innerHTML = "<span class=\"imeMajstora\">"+danasnjaEkipa[j].majstorInfo.ime+"</span><br>";
+									var imePomocnika = danasnjaEkipa[j].pomocnik=="Nijedan" ? "Bez pomocnika" : getPomocnikByCode(danasnjaEkipa[j].pomocnik).ime;
+									ime.innerHTML += "<span class=\"pomocnik\">"+ imePomocnika +"</span><br>";
+									ime.innerHTML += "<span class=\"vozilo\">"+ danasnjaEkipa[j].vozilo +"</span><br>";
+									var imeDispecera = danasnjaEkipa[j].dispecer=="Nijedan" ? "Bez dispecera" : getUserInfo(danasnjaEkipa[j].dispecer).name;
+									ime.innerHTML += "<span class=\"dispecer\">"+ imeDispecera+"</span>";
+									/*if(danasnjaEkipa[j].odsutan==true){
 										ime.style.color = "rgb(200,0,0)"
 									}else{
 										ime.style.color = "rgb(20,200,20)"
-									}
+									}*/
 									majstorElem.appendChild(ime);
 
 									var specials = document.createElement("DIV");
@@ -1653,12 +1661,12 @@ function layoutNoOverlap(container) {
 								majstorElem.setAttribute("class","majstorElem");
 									var ime = document.createElement("DIV");
 									ime.setAttribute("class","ime");
-									ime.innerHTML = danasnjaEkipa[j].majstorInfo.ime;
-									if(danasnjaEkipa[j].odsutan==true){
-										ime.style.color = "rgb(200,0,0)"
-									}else{
-										ime.style.color = "rgb(20,200,20)"
-									}
+									ime.innerHTML = "<span class=\"imeMajstora\">"+danasnjaEkipa[j].majstorInfo.ime+"</span><br>";
+									var imePomocnika = danasnjaEkipa[j].pomocnik=="Nijedan" ? "Bez pomocnika" : getPomocnikByCode(danasnjaEkipa[j].pomocnik).ime;
+									ime.innerHTML += "<span class=\"pomocnik\">"+ imePomocnika +"</span><br>";
+									ime.innerHTML += "<span class=\"vozilo\">"+ danasnjaEkipa[j].vozilo +"</span><br>";
+									var imeDispecera = danasnjaEkipa[j].dispecer=="Nijedan" ? "Bez dispecera" : getUserInfo(danasnjaEkipa[j].dispecer).name;
+									ime.innerHTML += "<span class=\"dispecer\">"+ imeDispecera+"</span>";
 									majstorElem.appendChild(ime);
 
 									var specials = document.createElement("DIV");
