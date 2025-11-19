@@ -9948,7 +9948,7 @@ server.post('/danasnjaEkipa', async(req,res)=>{
 server.get('/rasporedRadovaUzivo', async (req,res)=>{
 	try{
 		var today = new Date();
-		today.setDate(today.getDate()-1)
+		//today.setDate(today.getDate()-1)
 		var danasnjeEkipe = await dnevneEkipeDB.find({datum:getDateAsStringForDisplay(today)}).toArray();
 		var danasnjaEkipa = [];
 		if(danasnjeEkipe.length!=0){
@@ -10114,7 +10114,7 @@ server.get('/jucerasnjiRasporedRadova', async (req,res)=>{
 		if(Number(req.session.user.role)==20 || Number(req.session.user.role)==25){
 			try{
 				var today = new Date();
-				//today.setDate(today.getDate()-1);
+				today.setDate(today.getDate()-1);
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				var dodele = await dodeljivaniNaloziDB.find({deleted: {$ne:1},datumRadova:getDateAsStringForInputObject(today)}).toArray();
 				var brojeviNaloga = [];
