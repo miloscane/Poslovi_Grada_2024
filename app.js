@@ -9842,6 +9842,7 @@ server.get('/dispecer/danasnjaEkipa', async(req,res)=>{
 			var dnevneEkipe = await dnevneEkipeDB.find({datum:getDateAsStringForDisplay(today)}).toArray();
 			if(dnevneEkipe.length!=0){
 				dnevnaEkipa = dnevneEkipe[0];
+				delete dnevnaEkipa.datum;
 			}
 		}else{
 			dnevnaEkipa = dnevneEkipe[0];
@@ -9944,6 +9945,7 @@ server.post('/danasnjaEkipa', async(req,res)=>{
 		});
 	}
 })
+
 
 server.get('/rasporedRadovaUzivo', async (req,res)=>{
 	try{
