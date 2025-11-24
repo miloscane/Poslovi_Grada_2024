@@ -152,7 +152,6 @@ function getPomocnikByCode(pomocnikId){
   }else{
     console.log("No array majstori defined");
   }
-  console.log(pomocnik)
   return pomocnik
 }
 
@@ -181,7 +180,6 @@ function getUserInfo(email){
       user = users[i]
     }
   }
-  console.log(user)
   return user
 }
 

@@ -4121,7 +4121,90 @@ http.listen(process.env.PORT, async function(){
 
 		//var nalozi = await naloziDB.find({statusNaloga:"Stanari koče"}).toArray();
 
+		/*var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
+		var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:"2025-11"}}).toArray();
+		for(var i=0;i<izvestaji.length;i++){
+			izvestaji[i].majstorInfo = {};
+			for(var j=0;j<majstori.length;j++){
+				if(majstori[j].uniqueId==izvestaji[i].majstor){
+					izvestaji[i].majstorInfo = majstori[j]
+				}
+			}
+		}
 
+		console.log("**********************  TRECA LICA *****************")
+		for(var i=0;i<izvestaji.length;i++){
+			for(var j=0;j<izvestaji[i].nalozi.length;j++){
+				if(izvestaji[i].nalozi[j].broj=="1111111"){
+					console.log(izvestaji[i].majstorInfo.ime + " "+reshuffleDate(izvestaji[i].date))
+					console.log("----------------")
+					break;
+				}
+			}
+		}
+
+		console.log("**********************  NALOZI SA NULAMA *****************")
+		for(var i=0;i<izvestaji.length;i++){
+			for(var j=0;j<izvestaji[i].nalozi.length;j++){
+				if(isNaN(parseFloat(izvestaji[i].nalozi[j].iznos)) || parseFloat(izvestaji[i].nalozi[j].iznos)==0){
+					console.log(izvestaji[i].majstorInfo.ime + " "+reshuffleDate(izvestaji[i].date))
+					console.log("----------------")
+					break;
+				}
+			}
+		}
+		console.log("DONE")*/
+		//2022 - 2023 = 35.04.16.004 ; 2024 = 80.02.09.008 ; 2025 = 80.02.09.008;
+
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var nalozi2024 = await nalozi2024DB.find({}).toArray();
+		for(var i=0;i<nalozi.length;i++){
+			nalozi[i].godina = 2024;
+		}
+		for(var i=0;i<nalozi2024.length;i++){
+			nalozi[i].godina = 2024;
+			nalozi.push(nalozi2024[i])
+		}
+		var nalozi2023 = await client.db("Poslovi-Grada").collection('nalozi').find({}).toArray();
+		for(var i=0;i<nalozi2023.length;i++){
+			nalozi[i].godina = 2023;
+			nalozi.push(nalozi2023[i])
+		}
+		var nalozi2022 = await client.db("Poslovi-Grada").collection('nalozi2022').find({}).toArray();
+		for(var i=0;i<nalozi2022.length;i++){
+			nalozi[i].godina = 2022;
+			nalozi.push(nalozi2022[i])
+		}
+		var dezinfekcijaBroj = 0;
+		for(var i=0;i<nalozi.length;i++){
+			var dezinfekcija = false;
+			if([2022,2023].indexOf(nalozi[i].godina)>=0){
+				if(nalozi[i].obracun){
+					console.log(nalozi[i].obracun)
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(nalozi[i].obracun[j].code=="35.04.16.004" || nalozi[i].obracun[j].code=="80.02.09.008"){
+							dezinfekcija = true;
+							break
+						}
+					}
+				}
+			}else{
+				if(nalozi[i].obracun){
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(nalozi[i].obracun[j].code=="80.02.09.008"){
+							dezinfekcija = true;
+							break
+						}
+					}
+				}
+				
+			}
+			if(dezinfekcija==true){
+				dezinfekcijaBroj++;
+			}
+		}
+		console.log(nalozi.length)
+		console.log(dezinfekcijaBroj)*/
 
 	})
 	.catch(error => {

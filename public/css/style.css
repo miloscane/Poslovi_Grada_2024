@@ -6229,6 +6229,8 @@ input[type=number] {
     text-align:center;
     padding:2px 0px;
     color:rgb(255,255,255);
+    background-color: rgba(32,51,100,0.6);
+    width:40px;
 }
 
 .jucerasnjiUcinakUzivo .opstina .majstori .majstorElem{

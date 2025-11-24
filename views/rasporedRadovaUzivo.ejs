@@ -442,7 +442,6 @@ function layoutNoOverlap(container) {
 		<script>
 			function generateNalogRow(elem,nalog,tip){
 				var tr = document.createElement("TR");
-				console.log()
 				if(nalog.vrstaRada=="TEKUCE"){
 					tr.style.backgroundColor = "#FFCE1B"
 				}
@@ -1065,9 +1064,205 @@ function layoutNoOverlap(container) {
 		
 		
 		<script>
+			function generateDodele(elem,danasnjaEkipa){//danasnjaEkipa[j].majstorInfo.dodele
+				var dodele = danasnjaEkipa.majstorInfo.dodele;
+				var boxes = document.createElement("DIV");
+				boxes.setAttribute("class","boxes odradjeno");
+					
+					dodele.sort((a, b) => {
+					    const [ah, am] = a.vremeDolaska.split(":").map(Number);
+					    const [bh, bm] = b.vremeDolaska.split(":").map(Number);
+
+					    return ah * 60 + am - (bh * 60 + bm);
+					});
+
+
+
+					for(var k=0;k<dodele.length;k++){
+						if(dodele[k].tipRada=="Zamena"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box zamena");
+							var printOut = "Z";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.color = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.color = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Odgusenje"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box odgusenje");
+							var printOut = "O";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.color = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.color = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Popis"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box popis");
+							var printOut = "P";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.color = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.color = "#ffd343";
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Konstatacija"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box konstatacija");
+							var printOut = "K";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.color = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.color = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Crpljenje"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box crpljenje");
+							var printOut = "C";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.color = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.color = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="WOMA"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box voma");
+							var printOut = "W";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.color = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.color = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Kombinovano"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box kombinovano");
+							var printOut = "🚚";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.backgroundColor = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.backgroundColor = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Dezinfekcija"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box dezinfekcija");
+							var printOut = "D";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.color = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.color = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Masinsko kopanje"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box masinskoKopanje");
+							var printOut = "🚜";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.backgroundColor = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.backgroundColor = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Rucno kopanje"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box rucnoKopanje");
+							var printOut = "⛏️";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.backgroundColor = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.backgroundColor = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Finalizacija"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box finalizacija");
+							var printOut = "F";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.color = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.color = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(["Betonaža","Asfalt","Bekaton"].indexOf(dodele[k].tipRada)>=0){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box asfalt");
+							var printOut = "🚧";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.backgroundColor = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.color = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Preventivno čišćenje"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box preventivnoCiscenje");
+							var printOut = "PČ";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.backgroundColor = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.backgroundColor = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Snimanje kamerom"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box snimanjeKamerom");
+							var printOut = "🎥";
+							if(dodele[k].majstorZavrsio==1){
+								box.style.backgroundColor = "rgb(20,255,20)"
+							}else if(dodele[k].majstorStigao==1){
+								box.style.backgroundColor = "#ffd343"
+							}
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else{
+							console.log("WTF")
+						}
+						/*
+
+						*/
+					}
+
+
+					if(dodele.length==0){
+						var box = document.createElement("DIV");
+						box.setAttribute("class","box nerad");
+						box.style.backgroundColor = "rgb(255,255,255)"
+						box.innerHTML = "NEMA NALOGA";
+						boxes.appendChild(box)
+					}
+
+					if(danasnjaEkipa.odsutan==true){
+						boxes.innerHTML = "";
+						var box = document.createElement("DIV");
+						box.setAttribute("class","box nerad");
+						box.style.backgroundColor = "rgb(255,255,255)"
+						box.innerHTML = "ODSUTAN";
+						boxes.appendChild(box)
+					}
+				elem.appendChild(boxes);
+			}
+
 			var podelaOpstina = <%-JSON.stringify(podelaOpstina)%>;
 			var danasnjaEkipa = <%-JSON.stringify(danasnjaEkipa)%>;
-			
 			for(var j=0;j<danasnjaEkipa.length;j++){
 				danasnjaEkipa[j].majstorInfo = getMajstorByCode(danasnjaEkipa[j].majstor)
 			}
@@ -1139,120 +1334,9 @@ function layoutNoOverlap(container) {
 												boxes.appendChild(box)
 											}
 										ucinak.appendChild(boxes);
-
-										var boxes = document.createElement("DIV");
-										boxes.setAttribute("class","boxes odradjeno");
-											/*if(majstori[j].checkIns.length==0){
-												var box = document.createElement("DIV");
-												box.setAttribute("class","box nerad");
-												box.innerHTML = "ODSUTAN";
-												boxes.appendChild(box)
-											}else{*/
-												//Prodji kroz dodele
-												/*
-												<option value="Zamena">Zamena</option>
-												<option value="Odgusenje">Odgusenje</option>
-												<option value="Popis">Popis</option>
-												<option value="Popis">Konstatacija</option>
-												<option value="WOMA">ВОМА</option>
-												<option value="Kombinovano">Комбиновано</option>
-												<option value="Zagušenje">Загушење</option>
-												<option value="Crpljenje">Црпљење</option>
-												<option value="Dezinfekcija">Дезинфекција</option>
-												<option value="Masinsko kopanje">Машинско копање</option>
-												<option value="Rucno kopanje">Ручно копање</option>
-												<option value="Finalizacija">Финализација</option>
-												<option value="Betonaža">Бетонажа</option>
-												<option value="Asfalt">Асфалт</option>
-												<option value="Bekaton">Бекатон</option>
-												<option value="Kombinovano">Комбиновано</option>
-												<option value="Preventivno čišćenje">Превентивно чишћење</option>
-												<option value="Snimanje kamerom">Снимање камером</option>
-												*/
-												danasnjaEkipa[j].majstorInfo.dodele.sort((a, b) => {
-												    const [ah, am] = a.vremeDolaska.split(":").map(Number);
-												    const [bh, bm] = b.vremeDolaska.split(":").map(Number);
-
-												    return ah * 60 + am - (bh * 60 + bm);
-												});
-
-
-												for(var k=0;k<danasnjaEkipa[j].majstorInfo.dodele.length;k++){
-													if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Zamena"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box zamena");
-														var printOut = "Z";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Odgusenje"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box odgusenje");
-														var printOut = "O";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Popis"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box popis");
-														var printOut = "P";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343";
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Konstatacija"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box konstatacija");
-														var printOut = "K";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Crpljenje"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box crpljenje");
-														var printOut = "C";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}
-												}
-
-
-												if(danasnjaEkipa[j].majstorInfo.dodele.length==0){
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box nerad");
-													box.innerHTML = "NEMA NALOGA";
-													boxes.appendChild(box)
-												}
-
-												if(danasnjaEkipa[j].odsutan==true){
-													boxes.innerHTML = "";
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box nerad");
-													box.innerHTML = "ODSUTAN";
-													boxes.appendChild(box)
-												}
+										generateDodele(ucinak,danasnjaEkipa[j])
+										
 											
-										ucinak.appendChild(boxes);
 
 									majstorElem.appendChild(ucinak);
 								majstoriElem.appendChild(majstorElem)
@@ -1330,119 +1414,7 @@ function layoutNoOverlap(container) {
 										}
 									ucinak.appendChild(boxes);
 
-									var boxes = document.createElement("DIV");
-									boxes.setAttribute("class","boxes odradjeno");
-										/*if(majstori[j].checkIns.length==0){
-											var box = document.createElement("DIV");
-											box.setAttribute("class","box nerad");
-											box.innerHTML = "ODSUTAN";
-											boxes.appendChild(box)
-										}else{*/
-											//Prodji kroz dodele
-											/*
-											<option value="Zamena">Zamena</option>
-											<option value="Odgusenje">Odgusenje</option>
-											<option value="Popis">Popis</option>
-											<option value="Popis">Konstatacija</option>
-											<option value="WOMA">ВОМА</option>
-											<option value="Kombinovano">Комбиновано</option>
-											<option value="Zagušenje">Загушење</option>
-											<option value="Crpljenje">Црпљење</option>
-											<option value="Dezinfekcija">Дезинфекција</option>
-											<option value="Masinsko kopanje">Машинско копање</option>
-											<option value="Rucno kopanje">Ручно копање</option>
-											<option value="Finalizacija">Финализација</option>
-											<option value="Betonaža">Бетонажа</option>
-											<option value="Asfalt">Асфалт</option>
-											<option value="Bekaton">Бекатон</option>
-											<option value="Kombinovano">Комбиновано</option>
-											<option value="Preventivno čišćenje">Превентивно чишћење</option>
-											<option value="Snimanje kamerom">Снимање камером</option>
-											*/
-											danasnjaEkipa[j].majstorInfo.dodele.sort((a, b) => {
-											    const [ah, am] = a.vremeDolaska.split(":").map(Number);
-											    const [bh, bm] = b.vremeDolaska.split(":").map(Number);
-
-											    return ah * 60 + am - (bh * 60 + bm);
-											});
-
-
-											for(var k=0;k<danasnjaEkipa[j].majstorInfo.dodele.length;k++){
-												if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Zamena"){
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box zamena");
-													var printOut = "Z";
-													if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-														box.style.color = "rgb(20,255,20)"
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-														box.style.color = "#ffd343"
-													}
-													box.innerHTML = printOut;
-													boxes.appendChild(box)
-												}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Odgusenje"){
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box odgusenje");
-													var printOut = "O";
-													if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-														box.style.color = "rgb(20,255,20)"
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-														box.style.color = "#ffd343"
-													}
-													box.innerHTML = printOut;
-													boxes.appendChild(box)
-												}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Popis"){
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box popis");
-													var printOut = "P";
-													if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-														box.style.color = "rgb(20,255,20)"
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-														box.style.color = "#ffd343";
-													}
-													box.innerHTML = printOut;
-													boxes.appendChild(box)
-												}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Konstatacija"){
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box konstatacija");
-													var printOut = "K";
-													if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-														box.style.color = "rgb(20,255,20)"
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-														box.style.color = "#ffd343"
-													}
-													box.innerHTML = printOut;
-													boxes.appendChild(box)
-												}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Crpljenje"){
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box crpljenje");
-													var printOut = "C";
-													if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-														box.style.color = "rgb(20,255,20)"
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-														box.style.color = "#ffd343"
-													}
-													box.innerHTML = printOut;
-													boxes.appendChild(box)
-												}
-											}
-
-
-											if(danasnjaEkipa[j].majstorInfo.dodele.length==0){
-												var box = document.createElement("DIV");
-												box.setAttribute("class","box nerad");
-												box.innerHTML = "NEMA NALOGA";
-												boxes.appendChild(box)
-											}
-
-											if(danasnjaEkipa[j].odsutan==true){
-												boxes.innerHTML = "";
-												var box = document.createElement("DIV");
-												box.setAttribute("class","box nerad");
-												box.innerHTML = "ODSUTAN";
-												boxes.appendChild(box)
-											}
-										
-									ucinak.appendChild(boxes);
+									generateDodele(ucinak,danasnjaEkipa[j])//danasnjaEkipa[j].majstorInfo.dodele
 
 								majstorElem.appendChild(ucinak);
 							majstoriElem.appendChild(majstorElem)
@@ -1524,119 +1496,7 @@ function layoutNoOverlap(container) {
 											}
 										ucinak.appendChild(boxes);
 
-										var boxes = document.createElement("DIV");
-										boxes.setAttribute("class","boxes odradjeno");
-											/*if(majstori[j].checkIns.length==0){
-												var box = document.createElement("DIV");
-												box.setAttribute("class","box nerad");
-												box.innerHTML = "ODSUTAN";
-												boxes.appendChild(box)
-											}else{*/
-												//Prodji kroz dodele
-												/*
-												<option value="Zamena">Zamena</option>
-												<option value="Odgusenje">Odgusenje</option>
-												<option value="Popis">Popis</option>
-												<option value="Popis">Konstatacija</option>
-												<option value="WOMA">ВОМА</option>
-												<option value="Kombinovano">Комбиновано</option>
-												<option value="Zagušenje">Загушење</option>
-												<option value="Crpljenje">Црпљење</option>
-												<option value="Dezinfekcija">Дезинфекција</option>
-												<option value="Masinsko kopanje">Машинско копање</option>
-												<option value="Rucno kopanje">Ручно копање</option>
-												<option value="Finalizacija">Финализација</option>
-												<option value="Betonaža">Бетонажа</option>
-												<option value="Asfalt">Асфалт</option>
-												<option value="Bekaton">Бекатон</option>
-												<option value="Kombinovano">Комбиновано</option>
-												<option value="Preventivno čišćenje">Превентивно чишћење</option>
-												<option value="Snimanje kamerom">Снимање камером</option>
-												*/
-												danasnjaEkipa[j].majstorInfo.dodele.sort((a, b) => {
-												    const [ah, am] = a.vremeDolaska.split(":").map(Number);
-												    const [bh, bm] = b.vremeDolaska.split(":").map(Number);
-
-												    return ah * 60 + am - (bh * 60 + bm);
-												});
-
-
-												for(var k=0;k<danasnjaEkipa[j].majstorInfo.dodele.length;k++){
-													if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Zamena"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box zamena");
-														var printOut = "Z";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Odgusenje"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box odgusenje");
-														var printOut = "O";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Popis"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box popis");
-														var printOut = "P";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343";
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Konstatacija"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box konstatacija");
-														var printOut = "K";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Crpljenje"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box crpljenje");
-														var printOut = "C";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}
-												}
-
-
-												if(danasnjaEkipa[j].majstorInfo.dodele.length==0){
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box nerad");
-													box.innerHTML = "NEMA NALOGA";
-													boxes.appendChild(box)
-												}
-
-												if(danasnjaEkipa[j].odsutan==true){
-													boxes.innerHTML = "";
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box nerad");
-													box.innerHTML = "ODSUTAN";
-													boxes.appendChild(box)
-												}
-											
-										ucinak.appendChild(boxes);
+										generateDodele(ucinak,danasnjaEkipa[j])
 
 									majstorElem.appendChild(ucinak);
 								majstoriElem.appendChild(majstorElem)
@@ -1713,119 +1573,7 @@ function layoutNoOverlap(container) {
 											}
 										ucinak.appendChild(boxes);
 
-										var boxes = document.createElement("DIV");
-										boxes.setAttribute("class","boxes odradjeno");
-											/*if(majstori[j].checkIns.length==0){
-												var box = document.createElement("DIV");
-												box.setAttribute("class","box nerad");
-												box.innerHTML = "ODSUTAN";
-												boxes.appendChild(box)
-											}else{*/
-												//Prodji kroz dodele
-												/*
-												<option value="Zamena">Zamena</option>
-												<option value="Odgusenje">Odgusenje</option>
-												<option value="Popis">Popis</option>
-												<option value="Popis">Konstatacija</option>
-												<option value="WOMA">ВОМА</option>
-												<option value="Kombinovano">Комбиновано</option>
-												<option value="Zagušenje">Загушење</option>
-												<option value="Crpljenje">Црпљење</option>
-												<option value="Dezinfekcija">Дезинфекција</option>
-												<option value="Masinsko kopanje">Машинско копање</option>
-												<option value="Rucno kopanje">Ручно копање</option>
-												<option value="Finalizacija">Финализација</option>
-												<option value="Betonaža">Бетонажа</option>
-												<option value="Asfalt">Асфалт</option>
-												<option value="Bekaton">Бекатон</option>
-												<option value="Kombinovano">Комбиновано</option>
-												<option value="Preventivno čišćenje">Превентивно чишћење</option>
-												<option value="Snimanje kamerom">Снимање камером</option>
-												*/
-												danasnjaEkipa[j].majstorInfo.dodele.sort((a, b) => {
-												    const [ah, am] = a.vremeDolaska.split(":").map(Number);
-												    const [bh, bm] = b.vremeDolaska.split(":").map(Number);
-
-												    return ah * 60 + am - (bh * 60 + bm);
-												});
-
-
-												for(var k=0;k<danasnjaEkipa[j].majstorInfo.dodele.length;k++){
-													if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Zamena"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box zamena");
-														var printOut = "Z";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Odgusenje"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box odgusenje");
-														var printOut = "O";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Popis"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box popis");
-														var printOut = "P";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343";
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Konstatacija"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box konstatacija");
-														var printOut = "K";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}else if(danasnjaEkipa[j].majstorInfo.dodele[k].tipRada=="Crpljenje"){
-														var box = document.createElement("DIV");
-														box.setAttribute("class","box crpljenje");
-														var printOut = "C";
-														if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorZavrsio==1){
-															box.style.color = "rgb(20,255,20)"
-														}else if(danasnjaEkipa[j].majstorInfo.dodele[k].majstorStigao==1){
-															box.style.color = "#ffd343"
-														}
-														box.innerHTML = printOut;
-														boxes.appendChild(box)
-													}
-												}
-
-
-												if(danasnjaEkipa[j].majstorInfo.dodele.length==0){
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box nerad");
-													box.innerHTML = "NEMA NALOGA";
-													boxes.appendChild(box)
-												}
-
-												if(danasnjaEkipa[j].odsutan==true){
-													boxes.innerHTML = "";
-													var box = document.createElement("DIV");
-													box.setAttribute("class","box nerad");
-													box.innerHTML = "ODSUTAN";
-													boxes.appendChild(box)
-												}
-											
-										ucinak.appendChild(boxes);
+										generateDodele(ucinak,danasnjaEkipa[j])
 
 									majstorElem.appendChild(ucinak);
 								majstoriElem.appendChild(majstorElem)
