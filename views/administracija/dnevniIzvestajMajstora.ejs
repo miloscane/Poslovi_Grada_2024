@@ -243,11 +243,11 @@
 							    	checkbox.checked = true;
 							    }
 							    var stariRadovi = ["Попис","Црпљење","Дезинфекција","Штемање","Шелна","ВиК Исправне","Локални квар","Потребма вома","Нема приступа","Одбијају сарадњу","Неспремно"];
-							    for(var j=0;j<izvestaj.nalozi[i].tipoviRada.length;j++){
+							    /*for(var j=0;j<izvestaj.nalozi[i].tipoviRada.length;j++){
 							    	if(stariRadovi.indexOf(izvestaj.nalozi[i].tipoviRada[j])>=0 && r=="Констатација"){
 							    		checkbox.checked = true;
 							    	}
-							    }
+							    }*/
 							    checkbox.id = startIndex+"radovi_" + index;
 							    label.htmlFor = checkbox.id;
 							    label.appendChild(checkbox);

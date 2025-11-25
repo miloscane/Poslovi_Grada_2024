@@ -4146,7 +4146,7 @@ http.listen(process.env.PORT, async function(){
 		console.log("**********************  NALOZI SA NULAMA *****************")
 		for(var i=0;i<izvestaji.length;i++){
 			for(var j=0;j<izvestaji[i].nalozi.length;j++){
-				if(isNaN(parseFloat(izvestaji[i].nalozi[j].iznos)) || parseFloat(izvestaji[i].nalozi[j].iznos)==0){
+				if(isNaN(parseFloat(izvestaji[i].nalozi[j].ucinak.replace(/,/g, "."))) || parseFloat(izvestaji[i].nalozi[j].ucinak.replace(/,/g, "."))==0){
 					console.log(izvestaji[i].majstorInfo.ime + " "+reshuffleDate(izvestaji[i].date))
 					console.log("----------------")
 					break;

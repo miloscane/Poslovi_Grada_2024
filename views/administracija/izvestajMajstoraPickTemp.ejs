@@ -152,7 +152,10 @@
 												if(majstori[j].izvestaji[l].nalozi[q].tipoviRada.indexOf(radovi[k])>=0){
 													nalozi++;
 													ukupnoNaloga++;
-													var ucinakNaloga = isNaN(parseFloat(majstori[j].izvestaji[l].nalozi[q].ucinak.replace(/,/g, "."))) ?  0 : parseFloat(majstori[j].izvestaji[l].nalozi[q].ucinak.replace(/,/g, "."))
+													var ucinakNaloga = isNaN(parseFloat(majstori[j].izvestaji[l].nalozi[q].ucinak.replace(/,/g, "."))) ?  0 : parseFloat(majstori[j].izvestaji[l].nalozi[q].ucinak.replace(/,/g, "."));
+													if((majstori[j].izvestaji[l].nalozi[q].tipoviRada.indexOf("Одгушење")>=0 || majstori[j].izvestaji[l].nalozi[q].tipoviRada.indexOf("Црпљење")>=0) && majstori[j].izvestaji[l].nalozi[q].tipoviRada.indexOf("Замена")<0){
+														ucinakNaloga = ucinakNaloga*0.74;
+													}
 													novcaniUcinak = novcaniUcinak + ucinakNaloga;
 													for(var w=0;w<ukupnoPoTipu.length;w++){
 														if(ukupnoPoTipu[w].naziv==radovi[k]){
@@ -260,7 +263,6 @@
 
 										var td = document.createElement("TD");
 										var finalnaPlata = parseFloat(bodoviFromUcinak(novcaniUcinak)*500) - kazne + nagrade + uticajNaPlatu;
-										console.log()
 										td.innerHTML = brojSaRazmacima(finalnaPlata) + " РСД";
 										tr.appendChild(td);
 									table.appendChild(tr);
