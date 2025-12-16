@@ -220,13 +220,18 @@
 														novac2 = novac2 + ucinakNaloga;
 														naloziForElem.push(majstori[j].izvestaji[l].nalozi[q]);
 														//var radovi = ["Замена","Попис","Одгушење","Констатација","Црпљење"];
-														if(radovi[k]=="Замена"){
-															zamene++;
-														}else if(["Попис","Констатација"].indexOf(radovi[k])>=0){
-															konstatacije++;
-														}else if(["Одгушење","Црпљење"].indexOf(radovi[k])>=0){
-															odgusenja++;
+														if(Number(majstori[j].izvestaji[l].norma)==1){
+															zamene = zamene + 2.5;
+														}else{
+															if(radovi[k]=="Замена"){
+																zamene++;
+															}else if(["Попис","Констатација"].indexOf(radovi[k])>=0){
+																konstatacije++;
+															}else if(["Одгушење","Црпљење"].indexOf(radovi[k])>=0){
+																odgusenja++;
+															}
 														}
+														
 													}
 												}
 												

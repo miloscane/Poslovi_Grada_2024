@@ -55,6 +55,9 @@
 							}
 							if(izvestaji[i].odsustvo=="Присутан"){
 								var ostvarenaStruktura = zamene*vrednostZamene + odgusenja*vrednostOdgusenja + konstatacije*vrednostKonstatacije;
+								if(Number(izvestaj.norma)==1){
+									ostvarenaVrednost = 14
+								}
 								penaliStrukture = penaliStrukture + (potrebnaVrednost - ostvarenaStruktura)*penalPoPoenu;
 							}
 							
@@ -391,7 +394,9 @@
 
 							if(izvestaj.nalozi){
 								if(izvestaj.nalozi.length>0){
-									
+									if(Number(izvestaj.norma)==1){
+										ostvarenaVrednost = 14
+									}
 									var ostvarenaVrednost = zamene*vrednostZamene + odgusenja*vrednostOdgusenja + konstatacije*vrednostKonstatacije;
 									penalStrukture.innerHTML = (potrebnaVrednost-ostvarenaVrednost)*penalPoPoenu*(-1) + " поена";
 								}
@@ -415,6 +420,13 @@
 								var skalaItem = document.createElement("DIV");
 								skalaItem.setAttribute("class","skalaItem konstatacija");
 								skalaItem.innerHTML = "K";
+								skalaOdradjeno.appendChild(skalaItem);
+							}
+
+							if(Number(izvestaj.norma)==1){
+								var skalaItem = document.createElement("DIV");
+								skalaItem.setAttribute("class","skalaItem ispunjenje");
+								skalaItem.innerHTML = "I";
 								skalaOdradjeno.appendChild(skalaItem);
 							}
 

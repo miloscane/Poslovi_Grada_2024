@@ -6676,6 +6676,16 @@ input[type=number] {
 
 .majstorMesec .skala{
     font-size:0;
+    position:relative;
+}
+
+.majstorMesec .ispunjenje{
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    width:calc(14*20px);
+    background-color:rgba(20,255,20,0.4);
 }
 
 .majstorMesec .skala .skalaItem{

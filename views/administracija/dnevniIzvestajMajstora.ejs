@@ -50,6 +50,37 @@
 				}
 			wrap.appendChild(checkboxes);
 
+			var separator = document.createElement("DIV");
+			separator.setAttribute("class","separator")
+			separator.setAttribute("style","height:2px;margin:20px auto;background-color:rgb(0,0,0)")
+			wrap.appendChild(separator);
+
+
+			var checkboxes = document.createElement("DIV");
+			checkboxes.setAttribute("class","prisustvoCheckboxes");
+			checkboxes.setAttribute("id","norma-checkboxes");
+				//for(var i=0;i<checkBoxValues.length;i++){
+					var checkboxWrap = document.createElement("DIV");
+					checkboxWrap.setAttribute("class","checkboxWrap");
+					checkboxWrap.setAttribute("onclick","normaCheckboxClick(this)");
+						var checkbox = document.createElement("INPUT");
+						checkbox.setAttribute("class","checkbox");
+						checkbox.setAttribute("type","checkbox");
+						checkbox.setAttribute("value","1");
+						checkboxWrap.appendChild(checkbox);
+
+						var checkboxLabel = document.createElement("DIV");
+						checkboxLabel.setAttribute("class","label");
+						checkboxLabel.innerHTML = "Испуњена норма";
+						checkboxWrap.appendChild(checkboxLabel); 
+						if(Number(izvestaj.norma)==1){
+							checkbox.checked = true;
+							checkboxWrap.classList.add("checkboxWrapActive")
+						}
+					checkboxes.appendChild(checkboxWrap);
+				//}
+			wrap.appendChild(checkboxes);
+
 			var table = document.createElement("TABLE");
 			table.setAttribute("class","stimulacijaTable");
 				var tr = document.createElement("TR");
@@ -573,6 +604,13 @@
 					json.odsustvo = checkboxes[i].value;
 				}
 			}
+			json.norma = 0;
+			var checkboxes = document.getElementById("norma-checkboxes").getElementsByClassName("checkbox");
+			for(var i=0;i<checkboxes.length;i++){
+				if(checkboxes[i].checked){
+					json.norma = checkboxes[i].value;
+				}
+			}
 			document.getElementById("json").value = JSON.stringify(json)
 			loadGif();
 			document.getElementById("form").submit();
@@ -854,6 +892,17 @@
 
 		function prisustvoCheckboxClick(elem){
 			var checkboxes = document.getElementById("prisustvo-checkboxes").getElementsByClassName("checkboxWrap");
+			for(var i=0;i<checkboxes.length;i++){
+				checkboxes[i].classList.remove("checkboxWrapActive");
+				checkboxes[i].getElementsByTagName("INPUT")[0].checked = false;
+			}
+			elem.classList.add("checkboxWrapActive");
+			elem.getElementsByTagName("INPUT")[0].checked = true;
+
+		}
+		
+		function normaCheckboxClick(elem){
+			var checkboxes = document.getElementById("norma-checkboxes").getElementsByClassName("checkboxWrap");
 			for(var i=0;i<checkboxes.length;i++){
 				checkboxes[i].classList.remove("checkboxWrapActive");
 				checkboxes[i].getElementsByTagName("INPUT")[0].checked = false;
