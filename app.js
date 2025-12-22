@@ -9750,39 +9750,49 @@ server.get('/izvestajMajstoraPickTemp',async (req,res)=>{
 	}
 });
 
-server.get('/izvestajMajstoraPickTemp/:date',async (req,res)=>{
-	if(req.session.user){
-		if(Number(req.session.user.role)==10){
-			try{
-				//req.params.date je za izvestaje koji postoje
-				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
-				var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:req.params.date}}).toArray();
-				//var izvestaji = await dnevniIzvestajiDB.find({date: { $gt: "2025-10-14" }}).toArray();
-				res.render("administracija/izvestajMajstoraPickTemp",{
-					pageTitle:"Одабери мајстора и датум",
-					user: req.session.user,
-					majstori: majstori,
-					izvestaji: izvestaji,
-					podelaOpstina: podelaOpstina,
-					date: req.params.date
-				})
-			}catch(err){
-				logError(err);
-				res.render("message",{
-					pageTitle: "Програмска грешка",
-					user: req.session.user,
-					message: "<div class=\"text\">Дошло је до грешке у бази податка 7345.</div>"
-				});
-			}
-		}else{
-			res.render("message",{
-				pageTitle: "Грешка",
-				user: req.session.user,
-				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
-			});
-		}
-	}else{
-		res.redirect("/login?url="+encodeURIComponent(req.url));
+server.get('/sumiranIzvestaj',async (req,res)=>{
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+	if(Number(req.session.user.role)!=10){
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+		});
+	}
+	res.redirect("/sumiranIzvestaj/"+getDateAsStringForInputObject(new Date()))
+});
+
+server.get('/sumiranIzvestaj/:date',async (req,res)=>{
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+	if(Number(req.session.user.role)!=10){
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+		});
+	}
+	try{
+		var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
+		var dodele = await dodeljivaniNaloziDB.find({datumRadova:{$regex:req.params.date},deleted:{$ne:1}}).toArray();
+		res.render("administracija/sumiranIzvestaj",{
+			pageTitle:"Sumiran izvestaj za "+reshuffleDate(req.params.date),
+			user: req.session.user,
+			majstori: majstori,
+			dodele: dodele,
+			podelaOpstina: podelaOpstina,
+			datum: reshuffleDate(req.params.date)
+		})
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Програмска грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Дошло је до грешке у бази податка 9785.</div>"
+		});
 	}
 });
 
@@ -9792,7 +9802,7 @@ server.get('/izvestajMajstoraPickTemp/:date/:date2',async (req,res)=>{
 			try{
 				//req.params.date je za izvestaje koji postoje
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
-				var izvestaji = await dnevniIzvestajiDB.find({date: {$gte: req.params.date,$lte: req.params.date2}}).toArray();
+				var dodeljivaniNalozi = await dnevniIzvestajiDB.find({date: {$gte: req.params.date,$lte: req.params.date2}}).toArray();
 				//var izvestaji = await dnevniIzvestajiDB.find({date: { $gt: "2025-10-14" }}).toArray();
 				res.render("administracija/izvestajMajstoraPickTemp",{
 					pageTitle:"Одабери мајстора и датум",

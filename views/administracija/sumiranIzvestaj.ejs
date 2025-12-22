@@ -1,0 +1,119 @@
+<%- include ("partials/header") -%>
+<style>
+	.pageWidth{
+		width:100% !important;
+		max-width:none !important;
+	}
+</style>
+	<script>
+		var majstori = <%-JSON.stringify(majstori)%>;
+		var dodele = <%-JSON.stringify(dodele)%>;
+		for(var i=0;i<majstori.length;i++){
+			majstori[i].dodele = [];
+			for(var j=0;j<dodele.length;j++){
+				if(dodele[j].majstor==majstori[i].uniqueId){
+					majstori[i].dodele.push(dodele[j]);
+				}
+			}
+			//console.log(majstori[i].izvestaji)
+		}
+		var podelaOpstina = <%-JSON.stringify(podelaOpstina)%>;
+		var radovi = ["Zamena","Crpljenje","Odgusenje","Konstatacija","Popis"];
+		/*
+		<option value="Odaberi">Odaberi</option>
+										<option value="Zamena">Zamena</option>
+										<option value="Odgusenje">Odgusenje</option>
+										<option value="Popis">Popis</option>
+										<option value="Konstatacija">Konstatacija</option>
+										<option value="WOMA">ВОМА</option>
+										<option value="Kombinovano">Комбиновано</option>
+										<option value="Crpljenje">Црпљење</option>
+										<option value="Dezinfekcija">Дезинфекција</option>
+										<option value="Masinsko kopanje">Машинско копање</option>
+										<option value="Rucno kopanje">Ручно копање</option>
+										<option value="Finalizacija">Финализација</option>
+										<option value="Betonaža">Бетонажа</option>
+										<option value="Asfalt">Асфалт</option>
+										<option value="Bekaton">Бекатон</option>
+										<option value="Preventivno čišćenje">Превентивно чишћење</option>
+										<option value="Snimanje kamerom">Снимање камером</option>
+			*/
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+	</script>
+	<div class="pageWidth sumiranIzvestaj">
+		<table id="table">
+			<tr>
+				<td>Datum: <%=datum%></td>
+				<td>Zamena</td>
+				<td>Crpljenje</td>
+				<td>Odgušenje</td>
+				<td>Konstatacija</td>
+				<td>Popis</td>
+				<td>Drugo</td>
+				<td>Ukupno</td>
+			</tr>
+		</table>
+		<script>
+			for(var i=0;i<podelaOpstina.length;i++){
+				var tr = document.createElement("TR");
+					var td = document.createElement("TD");
+					td.setAttribute("colspan","8");
+					td.setAttribute("style","text-align:center;font-weight:700;letter-spacing:20px;font-size:24px;");
+					td.innerHTML = podelaOpstina[i].naziv;
+					tr.appendChild(td);
+				document.getElementById("table").appendChild(tr);
+
+				for(var j=0;j<majstori.length;j++){
+					var majstor = majstori[j];
+					if(majstor.region==podelaOpstina[i].naziv && majstor.tipRada.indexOf("Zamena")>=0){
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+							td.innerHTML = majstor.ime;
+							tr.appendChild(td);
+						document.getElementById("table").appendChild(tr);
+
+						majstor.strukturaDodela = [];
+						for(var k=0;k<radovi.length;k++){
+							var json = {};
+							json.nazivRadova = radovi[k];
+							json.nalozi = 0;
+							majstor.strukturaDodela.push(json);
+						}
+						var json = {};
+						json.nazivRadova = "Drugo";
+						json.nalozi = 0;
+						majstor.strukturaDodela.push(json);
+
+						for(var k=0;k<majstor.dodele.length;k++){
+							var dodelaFound = false;
+							for(var l=0;l<majstor.strukturaDodela.length;l++){
+								if(majstor.dodele[k].tipRada==majstor.strukturaDodela[l].nazivRadova){
+									majstor.strukturaDodela[l].nalozi++;
+									dodelaFound = true;
+									break;
+								}
+							}
+							if(!dodelaFound){
+								majstor.strukturaDodela[majstor.strukturaDodela.length-1].nalozi++;
+							}
+						}
+						for(var k=0;k<majstor.strukturaDodela.length;k++){
+							var td = document.createElement("TD");
+							td.innerHTML = majstor.strukturaDodela[k].nalozi;
+							tr.appendChild(td);
+						}
+						var td = document.createElement("TD");
+						td.innerHTML = majstor.dodele.length;
+						tr.appendChild(td);
+					}
+
+					
+				}
+
+
+				
+				
+			}
+		</script>
+	</div>
+<%- include ("partials/footer") -%>

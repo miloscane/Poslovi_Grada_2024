@@ -8232,6 +8232,16 @@ input[type=number] {
     height:20px;
 }
 
+.sumiranIzvestaj table{
+    border-collapse: collapse;
+}
+
+.sumiranIzvestaj table td{
+    padding:5px;
+    text-align: left;
+    border:1px solid rgb(100,100,100);
+}
+
 @media screen and (max-width: 1100px) {
     .pageWidth{
         padding-left:10px;
