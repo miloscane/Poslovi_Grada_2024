@@ -12,81 +12,13 @@
 					document.getElementById("naziv").value = treceLice.naziv;
 				</script>
 			</div>
-			<div class="inlineHalf">
-				<div class="inline">
-					<div class="inputWrap">
-						<div class="title">Порески идентификациони број</div>
-						<div class="inputWrapper"><input type="number" id="pib" placeholder="ПИБ" disabled></div>
-						<script>
-							document.getElementById("pib").value = treceLice.pib;
-						</script>
-					</div>
-				</div>
-				<div class="inline">
-					<div class="inputWrap">
-						<div class="title">Матични број</div>
-						<div class="inputWrapper"><input type="number" id="mb" placeholder="МБ" disabled></div>
-						<script>
-							document.getElementById("mb").value = treceLice.mb;
-						</script>
-					</div>
-				</div>
+			<div class="inputWrap title">
+				<textarea id="opis" placeholder="Opis трећег лица" disabled></textarea>
+				<script>
+					document.getElementById("opis").value = treceLice.opis;
+				</script>
 			</div>
-			<div class="inputWrap">
-				<div class="inputWrap">
-					<div class="title">Адреса</div>
-					<div class="inputWrapper"><input type="text" id="adresa" placeholder="Адреса" disabled></div>
-					<script>
-						document.getElementById("adresa").value = treceLice.adresa;
-					</script>
-				</div>
-			</div>
-			<div class="cenovnikWrapper">
-				<div class="inputWrap" style="margin-top:20px;margin-bottom: 2px;"><div class="title">Ценовник</div></div>
-				<div class="krajnjiCenovnik">
-					<div class="row firstRow">
-						<div class="item broj">Бр.</div>
-						<div class="item sifra">Шифра</div>
-						<div class="item naziv">Назив</div>
-						<div class="item jedinica">Јединица мере</div>
-						<div class="item cena">Цена без ПДВ</div>
-					</div>
-					<div class="body" id="krajnji-cenovnik"></div>
-					<script>
-						var cenovnik = treceLice.cenovnik;
-						var finalniCenovnik = cenovnik;
-						for(var i=0;i<cenovnik.length;i++){
-							var row = document.createElement("DIV");
-							row.setAttribute("class","row")
-								var rowElem = document.createElement("DIV");
-					        	rowElem.setAttribute("class","item broj");
-					        	rowElem.innerHTML = eval(i+1)+".";
-					        	row.appendChild(rowElem);
-
-								var rowElem = document.createElement("DIV");
-					        	rowElem.setAttribute("class","item sifra");
-				        		rowElem.innerHTML = cenovnik[i].code;
-					        	row.appendChild(rowElem);
-
-								var rowElem = document.createElement("DIV");
-					        	rowElem.setAttribute("class","item naziv");
-				        		rowElem.innerHTML = cenovnik[i].name;
-					        	row.appendChild(rowElem);
-
-								var rowElem = document.createElement("DIV");
-					        	rowElem.setAttribute("class","item jedinica");
-				        		rowElem.innerHTML = cenovnik[i].unit;
-					        	row.appendChild(rowElem);
-
-								var rowElem = document.createElement("DIV");
-					        	rowElem.setAttribute("class","item cena");
-				        		rowElem.innerHTML = brojSaRazmacima(cenovnik[i].price);
-					        	row.appendChild(rowElem);
-							document.getElementById("krajnji-cenovnik").appendChild(row);
-						}
-					</script>
-				</div>
-			</div>
+			
 			<div class="inputWrap" style="margin-top:20px;margin-bottom: 2px;"><div class="title">Налози</div></div>
 			<div class="otvoreniNalozi">
 				<div class="tableWrap">
@@ -95,10 +27,9 @@
 							<tr>
 								<td><div class="value redniBroj">Редни број</div></td>
 								<td><div class="value brojNaloga">Број налога</div></td>
-								<td><div class="value datumNaloga">Датум налога</div></td>
-								<td><div class="value adresa">Назив пројекта</div></td>
+								<td><div class="value datumNaloga">Датум радова</div></td>
+								<td><div class="value adresa">Адреса</div></td>
 								<td><div class="value status">Статус</div></td>
-								<td><div class="value majstor">Majstor</div></td>
 							</tr>
 						</table>
 					</div>
@@ -130,14 +61,14 @@
 								var td = document.createElement("TD");
 									var div = document.createElement("DIV");
 									div.setAttribute("class","value datumNaloga");
-									div.innerHTML = nalozi[i].datum.datum;
+									div.innerHTML = reshuffleDate(nalozi[i].datumRadova);
 									td.appendChild(div);
 								tr.appendChild(td);
 								
 								var td = document.createElement("TD");
 									var div = document.createElement("DIV");
 									div.setAttribute("class","value adresa");
-									div.innerHTML = nalozi[i].nazivProjekta;
+									div.innerHTML = nalozi[i].adresa;
 									td.appendChild(div);
 								tr.appendChild(td);
 								
@@ -145,13 +76,6 @@
 									var div = document.createElement("DIV");
 									div.setAttribute("class","value status");
 									div.innerHTML = nalozi[i].statusNaloga;
-									td.appendChild(div);
-								tr.appendChild(td);
-								
-								var td = document.createElement("TD");
-									var div = document.createElement("DIV");
-									div.setAttribute("class","value iznos");
-									div.innerHTML = brojSaRazmacima(nalozi[i].ukupanIznos);
 									td.appendChild(div);
 								tr.appendChild(td);
 								

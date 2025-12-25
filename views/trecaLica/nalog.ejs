@@ -2,7 +2,6 @@
 	<script>
 		var treceLice = <%-JSON.stringify(treceLice)%>;
 		var nalog = <%-JSON.stringify(nalog)%>;
-		var cenovnik = treceLice.cenovnik;
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
 	</script>
 	<div class="pageWidth">
@@ -14,9 +13,9 @@
 						<div class="title">Адреса</div>
 						<div class="text"><span id="adresa-naloga"></span></div>
 						<script>
-							document.getElementById("adresa-naloga").innerHTML = treceLice.adresa;
+							document.getElementById("adresa-naloga").innerHTML = nalog.adresa;
 						</script>
-						<div class="note">Кликни да видиш на мапи</div>
+						<div class="note"></div>
 					</div>
 				</div>
 				<div class="box">
@@ -26,8 +25,21 @@
 						<div class="text">
 							<select id="status-naloga">
 								<option value="Primljen" default="default">Примљен</option>
-								<option value="Radovi u toku">Радови у току</option>
+								<option value="Dodeljen majstoru">Додељен мајстору</option>
+								<option value="Potrebna WOMA">ВОМА</option>
+								<option value="Kombinovano">Комбиновано</option>
+								<option value="Zagušenje">Загушење</option>
+								<option value="Zamena">Замена</option>
+								<option value="Crpljenje">Црпљење</option>
+								<option value="Dezinfekcija">Дезинфекција</option>
+								<option value="Masinsko kopanje">Машинско копање</option>
+								<option value="Rucno kopanje">Ручно копање</option>
 								<option value="Finalizacija">Финализација</option>
+								<option value="Betonaža">Бетонажа</option>
+								<option value="Asfalt">Асфалт</option>
+								<option value="Bekaton">Бекатон</option>
+								<option value="Preventivno čišćenje">Превентивно чишћење</option>
+								<option value="Snimanje kamerom">Снимање камером</option>
 								<option value="Završeno">Завршено</option>
 								<option value="Spreman za obračun">Спреман за обрачун</option>
 								<option value="Spreman za fakturisanje">Спреман за фактурисање</option>
@@ -46,20 +58,11 @@
 						<div class="title">Датум налога</div>
 						<div class="text"><span id="datum-naloga"></span></div>
 						<script>
-							document.getElementById("datum-naloga").innerHTML = nalog.datum.datum;
+							document.getElementById("datum-naloga").innerHTML = reshuffleDate(nalog.datumRadova);
 						</script>
 					</div>
 				</div>
-				<div class="box">
-					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
-					<div class="info">
-						<div class="title">Назив пројекта</div>
-						<div class="text"><span id="naziv-projekta"></span></div>
-						<script>
-							document.getElementById("naziv-projekta").innerHTML = nalog.nazivProjekta;
-						</script>
-					</div>
-				</div>
+				
 				<div class="box">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
 					<div class="info">
@@ -71,7 +74,6 @@
 					</div>
 				</div>
 			</div>
-			<%- include ("partials/obracunNaloga") -%>
 			<div class="detalji">
 				<div class="title">Оператива</div>
 				<div class="boxesWrap">
@@ -85,7 +87,7 @@
 			</div>
 			<div class="izvestaji">
 				<div class="title">Извештаји</div>
-				<div class="qrWrap">
+				<!--<div class="qrWrap">
 					<div id="qr"></div>
 					<div class="sticker"><div class="relative"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png"></div></div>
 					<div class="note"><div>Скенирајте како би додали слике са вашег телефона.</div></div>
@@ -108,8 +110,8 @@
 					socket.on("phoneAccessCode",function(code){
 						generateQr(code);
 					})
-				</script>
-				<div id="komentari"></div>
+				</script>-->
+				<div id="komentari" style="margin-top:50px !important"></div>
 				<script>
 					for(var i=0;i<izvestaji.length;i++){
 						var izvestajBox = document.createElement("DIV");
@@ -248,36 +250,12 @@
 				</div>
 			</div>
 			<script>
-				if(nalog.obracun){
-					for(var i=0;i<nalog.obracun.length;i++){
-						addRow({code:nalog.obracun[i].code,quantity:nalog.obracun[i].quantity,price:nalog.obracun[i].price})
-					}
-					calculateTable();
-				}
-				addRow();
 
 				function saveNalog(){
 					var nalogJson = {};
 					nalogJson.id = nalog.uniqueId;
 					nalogJson.broj = nalog.broj;
 					nalogJson.status = document.getElementById("status-naloga").value;
-					nalogJson.obracun = [];
-					var obracuni = document.getElementById("obracun-wrap").getElementsByClassName("row");
-					var ukupanIznos = 0;
-					for(var i=0;i<obracuni.length;i++){
-						var obracunElem = obracuni[i];
-						
-						if(obracunElem.getElementsByClassName("sifra")[0].getElementsByTagName("INPUT")[0].value){
-							var obracunJson = {};
-							obracunJson.code		= 	obracunElem.getElementsByClassName("sifra")[0].getElementsByTagName("INPUT")[0].value;
-							obracunJson.quantity	= 	obracunElem.getElementsByClassName("kolicina")[0].getElementsByTagName("INPUT")[0].value;
-							var iznosStavke = getPriceByCode(obracunJson.code) ? parseFloat(getPriceByCode(obracunJson.code).price)*obracunJson.quantity : 0;	
-							
-							ukupanIznos = ukupanIznos + iznosStavke;
-							nalogJson.obracun.push(obracunJson);
-						}
-					}
-					nalogJson.ukupanIznos = ukupanIznos;
 					nalogJson.izvestaj = document.getElementById("komentar").value;
 
 					nalogJson.stariNalog = {};

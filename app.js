@@ -4776,6 +4776,12 @@ http.listen(process.env.PORT, async function(){
 			console.log(izvestajiZaPrint[i].majstor + " - "+reshuffleDate(izvestajiZaPrint[i].date))
 		}*/
 
+		/*var nalozi = await naloziDB.find({$or:[{"digitalizacija.stambeno.datum":"2025-12-18"},{"digitalizacija.stambeno.datum":"2025-12-19"}]}).toArray();
+		console.log(nalozi)
+		for(var i=0;i<nalozi.length;i++){
+			console.log(nalozi[i].broj)
+		}*/
+
 	})
 	.catch(error => {
 		logError(error);
@@ -13008,19 +13014,13 @@ server.post('/novoTreceLice', async (req, res)=> {
 		if(Number(req.session.user.role)==10){
 			try{
 				var json = JSON.parse(req.body.json);
-				var cenovnik = JSON.parse(JSON.stringify(json.cenovnik));
-				delete json.cenovnik;
-				json.uniqueId = generateId(7)+"--"+new Date().getTime();
+				json.uniqueId = generateId(8);
 
 				await trecaLicaDB.insertOne(json);
-				var cenovnikJson = {};
-				cenovnikJson.uniqueId = json.uniqueId;
-				cenovnikJson.cenovnik = cenovnik;
-				await cenovniciTrecihLicaDB.insertOne(cenovnikJson);
 				res.render("message",{
 					pageTitle: "Успешно додато",
 					user: req.session.user,
-					message: "<div class=\"text\">Треће лице "+јson.naziv+" успешно додато.</div>"
+					message: "<div class=\"text\">Треће лице "+json.naziv+" успешно додато.</div>"
 				});
 			}catch(err){
 				logError(err);
@@ -13053,7 +13053,7 @@ server.get('/trecaLica/noviNalog',async (req,res)=>{
 			try{
 				var trecaLica = await trecaLicaDB.find({}).toArray();
 				res.render("trecaLica/noviNalog",{
-					pageTitle: "Креирање трећег лица",
+					pageTitle: "Налог трећег лица",
 					trecaLica: trecaLica,
 					user: req.session.user
 				})
@@ -13084,9 +13084,7 @@ server.get('/trecaLica/:uniqueId',async (req,res)=>{
 				var trecaLica = await trecaLicaDB.find({uniqueId:req.params.uniqueId}).toArray();
 
 				if(trecaLica.length>0){
-					var cenovnik = await cenovniciTrecihLicaDB.find({uniqueId:req.params.uniqueId}).toArray();
 					var treceLice = trecaLica[0];
-					treceLice.cenovnik = cenovnik[0].cenovnik;
 					var nalozi = await naloziTrecihLicaDB.find({treceLice:req.params.uniqueId}).toArray();
 					res.render("trecaLica/administracija",{
 						pageTitle: "Администрација трећег лица",
@@ -13126,7 +13124,7 @@ server.post('/noviNalogTrecihLica', async (req, res)=> {
 		if(Number(req.session.user.role)==10){
 			try{
 				var json = JSON.parse(req.body.json);
-				json.uniqueId = generateId(7)+"--"+new Date().getTime();
+				json.uniqueId = generateId(8);
 
 				var nalozi = await naloziTrecihLicaDB.find({}).toArray();
 				json.broj = eval(nalozi.length+1).toString().padStart(7,"0");
@@ -13136,7 +13134,7 @@ server.post('/noviNalogTrecihLica', async (req, res)=> {
 				json.datum.datum = getDateAsStringForDisplay(new Date());
 				json.obracun = [];
 				json.statusNaloga = "Primljen";
-				json.ukupanIznos = 0;
+				json.fakture = [];
 
 				await naloziTrecihLicaDB.insertOne(json);
 
@@ -13174,8 +13172,6 @@ server.get('/trecaLica/nalog/:uniqueId',async (req,res)=>{
 					var nalog = nalozi[0];
 					var trecaLica = await trecaLicaDB.find({uniqueId:nalozi[0].treceLice}).toArray();
 					var treceLice = trecaLica[0];
-					var cenovnik = await cenovniciTrecihLicaDB.find({uniqueId:nalozi[0].treceLice}).toArray();
-					treceLice.cenovnik = cenovnik[0].cenovnik;
 					var izvestaji = await izvestajiTrecihLicaDB.find({nalogId:req.params.uniqueId}).toArray();
 					res.render("trecaLica/nalog",{
 						pageTitle: "Налог број "+nalozi[0].broj,
@@ -13245,13 +13241,11 @@ server.post('/edit-nalog-treca-lica', async (req, res)=> {
 								//ima izmena na nalogu
 								var setObj	=	{ $set: {
 									statusNaloga: nalogJson.status,
-									obracun: nalogJson.obracun,
-									ukupanIznos: nalogJson.ukupanIznos,
 									izmenio: req.session.user
 								}};
 								await naloziTrecihLicaDB.updateOne({uniqueId:nalogJson.id},setObj);
 							}
-							res.redirect("/trecaLica/nalog/"+nalogJson.id);
+							res.redirect("/trecaLica/nalog/"+nalogJson.uniqueId);
 				    }catch(err){
 				    	logError(err);
 							res.render("message",{

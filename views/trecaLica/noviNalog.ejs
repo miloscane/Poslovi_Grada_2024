@@ -24,11 +24,24 @@
 				</div>
 			</div>
 			<div class="box">
-				<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/statusIcon.png"></div>
+				<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/locationIcon.png"></div>
 				<div class="info">
-					<div class="title">Назив пројекта</div>
+					<div class="title">Adresa</div>
 					<div class="text">
-						<input type="text" id="naziv-projekta">
+						<input type="text" id="adresa">
+					</div>
+					<div class="note"></div>
+				</div>
+			</div>
+			<div class="box">
+				<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumIcon.png"></div>
+				<div class="info">
+					<div class="title">Datum</div>
+					<div class="text">
+						<input type="date" id="datum-radova">
+						<script>
+							document.getElementById("datum-radova").value = getDateAsStringForInputObject(new Date())
+						</script>
 					</div>
 					<div class="note"></div>
 				</div>
@@ -44,6 +57,7 @@
 					<div class="note"></div>
 				</div>
 			</div>
+			<div style="width:100%"></div>
 		</div>
 		<div class="inputWrap">
 			<div class="button" onclick="save()">КРЕИРАЈ НАЛОГ</div>
@@ -55,7 +69,8 @@
 			function save(){
 				var json = {};
 				json.treceLice = document.getElementById("lice-naloga").value;
-				json.nazivProjekta = document.getElementById("naziv-projekta").value;
+				json.adresa = document.getElementById("adresa").value;
+				json.datumRadova = document.getElementById("datum-radova").value;
 				json.opisNaloga = document.getElementById("opis-naloga").value;
 
 				if(!json.treceLice){
@@ -63,8 +78,13 @@
 					return;
 				}
 
-				if(!json.nazivProjekta){
-					alert("Нисте укуцали назив пројекта");
+				if(!json.adresa){
+					alert("Нисте укуцали adresu");
+					return;
+				}
+
+				if(!json.datumRadova){
+					alert("Нисте укуцали datum radova");
 					return;
 				}
 

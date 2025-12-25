@@ -4,7 +4,10 @@
 			<div class="inputWrap title">
 				<input type="text" id="naziv" placeholder="Назив трећег лица">
 			</div>
-			<div class="inlineHalf">
+			<div class="inputWrap title">
+				<textarea id="opis" placeholder="Опис трећег лица"></textarea>
+			</div>
+			<!--<div class="inlineHalf">
 				<div class="inline">
 					<div class="inputWrap">
 						<div class="title">Порески идентификациони број</div>
@@ -65,7 +68,7 @@
 					</div>
 					<div class="body" id="krajnji-cenovnik"></div>
 				</div>
-			</div>
+			</div>-->
 			<div class="inputWrap">
 				<div class="button" onclick="save()">САЧУВАЈ</div>
 			</div>
@@ -73,7 +76,7 @@
 				<input type="text" name="json" id="json">
 			</form>
 			<script>
-				var cenovnik = [];
+				/*var cenovnik = [];
 				document.getElementById('cenovnik-input').addEventListener('change', function(event) {
 				    var file = event.target.files[0];
 				    if (!file) return;
@@ -124,14 +127,7 @@
 					var kolonaNaziva = document.getElementById("kolona-naziva").value;
 					var kolonaJedinica = document.getElementById("kolona-jedinica").value;
 					var kolonaCena = document.getElementById("kolona-cena").value;
-					/*console.log("Kolona sifra")
-					console.log(kolonaSifre)
-					console.log("Kolona naziva")
-					console.log(kolonaNaziva)
-					console.log("Kolona jedinica")
-					console.log(kolonaJedinica)
-					console.log("Kolona cena")
-					console.log(kolonaCena=="")*/
+					
 					var generateCodes = true;
 					if(kolonaSifre!=""){
 						generateCodes = false;
@@ -199,33 +195,18 @@
 						finalniCenovnik.push(json)
 					}
 
-				}
+				}*/
 
 				function save(){
 					var json = {};
 					json.naziv = document.getElementById("naziv").value;
-					json.pib = document.getElementById("pib").value;
-					json.mb = document.getElementById("mb").value;
-					json.adresa = document.getElementById("adresa").value;
-					json.cenovnik = finalniCenovnik;
+					json.opis = document.getElementById("opis").value;
 					if(!json.naziv){
 						alert("Нисте унели назив фирме");
 						return;
 					}
-					if(!json.pib){
-						alert("Нисте унели ПИБ");
-						return;
-					}
-					if(!json.mb){
-						alert("Нисте унели матични број");
-						return;
-					}
-					if(!json.adresa){
-						alert("Нисте унели адреса");
-						return;
-					}
-					if(json.cenovnik.length==0){
-						alert("Нисте унели ценовник");
+					if(!json.opis){
+						alert("Нисте унели opis");
 						return;
 					}
 
