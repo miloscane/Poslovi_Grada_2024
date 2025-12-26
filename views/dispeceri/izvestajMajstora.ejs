@@ -1,0 +1,337 @@
+<%- include ("partials/header") -%>
+	<script>
+		var majstori = <%-JSON.stringify(majstori)%>;
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+		var pomocnici = <%-JSON.stringify(pomocnici)%>;
+		pomocnici.sort((a, b) => a.ime.localeCompare(b.ime));
+		var dispeceri = <%-JSON.stringify(dispeceri)%>;
+		var dnevnaEkipa = <%-JSON.stringify(dnevnaEkipa)%>;
+		for(var i=0;i<majstori.length;i++){
+			var majstor = majstori[i];
+			majstor.dnevnoStanje = {};
+			if(dnevnaEkipa.ekipe){
+				for(var j=0;j<dnevnaEkipa.ekipe.length;j++){
+					if(dnevnaEkipa.ekipe[j].majstor==majstor.uniqueId){
+						majstor.dnevnoStanje = dnevnaEkipa.ekipe[j];
+						break;
+					}
+				}	
+			}
+		}
+	</script>
+	<div style="position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.8);;z-index:100000" id="cover">
+		<div style="position:relative;width:100%;height:100%">
+			<div style="position:absolute;top:50%;left:50%;transform: translate(-50%,-50%);background-color: rgb(255,255,255);padding:20px;border-radius: 5px;">
+				<div style="font-size:40px;margin-bottom:10px;font-weight:600;text-align: center;">Данашње екипе нису дефинисане.</div>
+				<div class="inputWrap">
+					<div class="button"><a href="/dispecer/danasnjaEkipa">Дефиниши екипе</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		if(dnevnaEkipa.ekipe){
+			document.getElementById("cover").style.display="none";
+		}
+	</script>
+	<div class="pageWidth dispecerskiIzvestajiMajstora">
+		<div class="inputWrap">
+			<div class="inputWrapper">
+				<div class="title" style="text-align: left;font-size:16px;">Majstor:</div>
+				<select id="majstor" oninput="selectMajstor()">
+					<option value="Odaberi">Odaberi...</option>
+				</select>
+				<script>
+					for(var i=0;i<majstori.length;i++){
+						var option = document.createElement("OPTION");
+						option.setAttribute("value",majstori[i].uniqueId)
+						option.innerHTML = majstori[i].ime;
+						document.getElementById("majstor").appendChild(option)
+					}
+				</script>
+			</div>
+		</div>
+		<div class="izvestajWrap" id="izvestaj">
+			<div class="title"></div>
+			<div class="inlines">
+				<div class="inline">
+					<div class="valueWrap">
+						<div class="valueTitle">Присутан</div>
+						<div class="value prisutan">&nbsp;</div>
+					</div>
+				</div>
+				<div class="inline">
+					<div class="valueWrap">
+						<div class="valueTitle">Помоћник</div>
+						<div class="value pomocnik">Ниједан</div>
+					</div>
+				</div>
+				<div class="inline">
+					<div class="valueWrap">
+						<div class="valueTitle">Диспечер</div>
+						<div class="value dispecer">Ниједан</div>
+					</div>
+				</div>
+			</div>
+			<div class="inlines" style="margin-top:20px">
+				<div class="inline">
+					<div class="valueWrap">
+						<div class="valueTitle">Возило</div>
+						<div class="value vozilo">&nbsp;</div>
+					</div>
+				</div>
+				<div class="inline">
+					<div class="valueWrap">
+						<div class="valueTitle">Дежуран</div>
+						<div class="value dezuran">&nbsp;</div>
+					</div>
+				</div>
+				<div class="inline">
+					<div class="valueWrap">
+						<div class="valueTitle">Друга смена</div>
+						<div class="value drugaSmena">&nbsp;</div>
+					</div>
+				</div>
+			</div>
+			<div class="inputWrap">
+				<div class="title" style="text-align: left;font-size:16px;">Данашњи налози</div>
+				<div class="inputWrapper">
+					<div id="ucinak-wrap" class="ucinak"></div>
+					<script>
+
+					</script>
+				</div>
+			</div>
+			<div class="inputWrap">
+				<div class="title" style="text-align: left;font-size:16px;">Извештај диспечера</div>
+				<div class="inputWrapper">
+					<textarea class="izvestajDispecera" id="izvestaj-dispecera"></textarea>
+				</div>
+				<div class="note">Извештај генерисао/ла <span id="generisao"></span> у <span id="generisano-u"></span></div>
+			</div>
+			<div class="inputWrap">
+				<div class="button" onclick="save()">Сачувај извештај</div>
+			</div>
+		</div>
+		<form method="POST" action="/dispecerskiIzvestaj" style="display:none" id="form">
+			<input type="text" id="json" name="json">
+		</form>
+		<script>
+			function save(){
+				var json = {};
+				json.datum = dnevnaEkipa.datum;
+				json.majstor = document.getElementById("majstor").value;
+				json.izvestaj = document.getElementById("izvestaj-dispecera").value;
+				if(!json.izvestaj){
+					alert("Нисте написали извештај")
+					return;
+				}
+				if(json.majstor=="Odaberi"){
+					alert("Нисте одабрали мајстора")
+					return;
+				}
+				if(!json.datum){
+					alert("Нисте одабрали датум")
+					return;
+				}
+				document.getElementById("json").value = JSON.stringify(json);
+				loadGif();
+				document.getElementById("form").submit();
+			}
+			function selectMajstor(){
+				var idMajstora = document.getElementById("majstor").value;
+				var majstor = null;
+				for(var i=0;i<majstori.length;i++){
+					if(majstori[i].uniqueId==idMajstora){
+						majstor = majstori[i];
+						break;
+					}
+				}
+
+				var izvestajElem = document.getElementById("izvestaj");
+				izvestajElem.getElementsByClassName("title")[0].innerHTML = "";
+				izvestajElem.getElementsByClassName("pomocnik")[0].innerHTML = "";
+				izvestajElem.getElementsByClassName("dispecer")[0].innerHTML = "";
+				izvestajElem.getElementsByClassName("vozilo")[0].innerHTML = "";
+				izvestajElem.getElementsByClassName("prisutan")[0].innerHTML = "";
+				izvestajElem.getElementsByClassName("dezuran")[0].innerHTML = "";
+				izvestajElem.getElementsByClassName("drugaSmena")[0].innerHTML = "";
+				izvestajElem.getElementsByClassName("izvestajDispecera")[0].value = ""
+				if(majstor!=null){
+					document.getElementById("izvestaj").style.display="block";
+					izvestajElem.getElementsByClassName("title")[0].innerHTML = majstor.ime;
+					izvestajElem.getElementsByClassName("pomocnik")[0].innerHTML = getPomocnikByCode(majstor.dnevnoStanje.pomocnik).ime ? getPomocnikByCode(majstor.dnevnoStanje.pomocnik).ime : "Ниједан";
+					izvestajElem.getElementsByClassName("dispecer")[0].innerHTML = getDispecerByCode(majstor.dnevnoStanje.dispecer).name ? getDispecerByCode(majstor.dnevnoStanje.dispecer).name : "Ниједан";
+					izvestajElem.getElementsByClassName("vozilo")[0].innerHTML = majstor.dnevnoStanje.vozilo ? majstor.dnevnoStanje.vozilo : "Ниједно";
+					izvestajElem.getElementsByClassName("prisutan")[0].innerHTML = majstor.dnevnoStanje.odsutan==true ? "НЕ" : "ДА";
+					izvestajElem.getElementsByClassName("dezuran")[0].innerHTML = majstor.dnevnoStanje.dezuran==true ? "ДА" : "НЕ";
+					izvestajElem.getElementsByClassName("drugaSmena")[0].innerHTML = majstor.dnevnoStanje.drugaSmena==true ? "ДА" : "НЕ";
+					izvestajElem.getElementsByClassName("izvestajDispecera")[0].value = "";
+
+					if(majstor.dnevnoStanje.izvestaj){
+						izvestajElem.getElementsByClassName("izvestajDispecera")[0].value = majstor.dnevnoStanje.izvestaj.text;
+					}
+					
+
+					document.getElementById("ucinak-wrap").innerHTML = "";
+					/*var title = document.createElement("DIV");
+					title.setAttribute("class","title");
+					title.innerHTML = "Захтевано:";
+					document.getElementById("ucinak-wrap").appendChild(title);*/
+
+					var ucinak = document.createElement("DIV");
+					ucinak.setAttribute("class","ucinak");
+						var boxes = document.createElement("DIV");
+						boxes.setAttribute("class","boxes");
+							for(var l=0;l<2;l++){
+								var box = document.createElement("DIV");
+								box.setAttribute("class","box zamena");
+								box.innerHTML = "Z";
+								boxes.appendChild(box)
+							}
+
+							for(var l=0;l<2;l++){
+								var box = document.createElement("DIV");
+								box.setAttribute("class","box odgusenje");
+								box.innerHTML = "O";
+								boxes.appendChild(box)
+							}
+
+							for(var l=0;l<2;l++){
+								var box = document.createElement("DIV");
+								box.setAttribute("class","box konstatacija");
+								box.innerHTML = "K";
+								boxes.appendChild(box)
+							}
+						ucinak.appendChild(boxes);
+					document.getElementById("ucinak-wrap").appendChild(boxes);
+					var dodele = majstor.dodele;
+					dodele.sort((a, b) => {
+					    const [ah, am] = a.vremeDolaska.split(":").map(Number);
+					    const [bh, bm] = b.vremeDolaska.split(":").map(Number);
+
+					    return ah * 60 + am - (bh * 60 + bm);
+					});
+					var boxes = document.createElement("DIV");
+					boxes.setAttribute("class","boxes odradjeno");
+					for(var k=0;k<dodele.length;k++){
+						if(dodele[k].tipRada=="Zamena"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box zamena");
+							var printOut = "Z";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Odgusenje"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box odgusenje");
+							var printOut = "O";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Popis"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box popis");
+							var printOut = "P";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Konstatacija"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box konstatacija");
+							var printOut = "K";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Crpljenje"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box crpljenje");
+							var printOut = "C";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="WOMA"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box voma");
+							var printOut = "W";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Kombinovano"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box kombinovano");
+							var printOut = "🚚";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Dezinfekcija"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box dezinfekcija");
+							var printOut = "D";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Masinsko kopanje"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box masinskoKopanje");
+							var printOut = "🚜";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Rucno kopanje"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box rucnoKopanje");
+							var printOut = "⛏️";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Finalizacija"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box finalizacija");
+							var printOut = "F";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(["Betonaža","Asfalt","Bekaton"].indexOf(dodele[k].tipRada)>=0){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box asfalt");
+							var printOut = "🚧";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Preventivno čišćenje"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box preventivnoCiscenje");
+							var printOut = "PČ";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else if(dodele[k].tipRada=="Snimanje kamerom"){
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box snimanjeKamerom");
+							var printOut = "🎥";
+							box.innerHTML = printOut;
+							boxes.appendChild(box)
+						}else{
+							console.log("WTF")
+						}
+					}
+
+
+					if(dodele.length==0){
+						var box = document.createElement("DIV");
+						box.setAttribute("class","box nerad");
+						box.style.backgroundColor = "rgb(255,255,255)"
+						box.innerHTML = "NEMA NALOGA";
+						boxes.appendChild(box)
+					}
+
+					if(majstor.dnevnoStanje.odsutan==true){
+						boxes.innerHTML = "";
+						var box = document.createElement("DIV");
+						box.setAttribute("class","box nerad");
+						box.style.backgroundColor = "rgb(255,255,255)"
+						box.innerHTML = "ODSUTAN";
+						boxes.appendChild(box)
+					}
+					document.getElementById("ucinak-wrap").appendChild(boxes);
+				}else{
+					alert("Nepostojeci majstor, odaberite drugog majstora.")
+					document.getElementById("izvestaj").style.display="none";
+				}
+			}
+
+			if(window.location.href.split("?").length>1){
+				document.getElementById("majstor").value = window.location.href.split("?")[1];
+				selectMajstor()
+			}
+		</script>
+	</div>
+<%- include ("partials/footer") -%>

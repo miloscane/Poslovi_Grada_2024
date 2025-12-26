@@ -8242,6 +8242,88 @@ input[type=number] {
     border:1px solid rgb(100,100,100);
 }
 
+.dispecerskiIzvestajiMajstora .title{
+    font-size:32px;
+    text-align:center;
+    margin:10px auto;
+    color:rgb(31,52,100);
+    font-weight:600;
+}
+
+.dispecerskiIzvestajiMajstora .inlines{
+    text-align:center;
+    font-size:0;
+}
+
+.dispecerskiIzvestajiMajstora .inlines .inline{
+    display:inline-block;
+    vertical-align: middle;
+    font-size:14px;
+    color:rgb(255,255,255);
+    text-align: left;
+    padding:0 20px;
+    width:33.33%;
+}
+
+.dispecerskiIzvestajiMajstora .inlines .inline .valueWrap{
+    background-color: rgb(31,52,100);
+    padding:7px;
+    border-radius: 3px;
+}
+
+.dispecerskiIzvestajiMajstora .inlines .inline .valueWrap .valueTitle{
+    font-weight:500;
+    font-size:16px;
+}
+
+.dispecerskiIzvestajiMajstora .inlines .inline .valueWrap .value{
+    font-weight:200;
+    font-size:20px;
+}
+
+.dispecerskiIzvestajiMajstora .ucinak .boxes{
+    display:block;
+    height:31px;
+}
+
+.dispecerskiIzvestajiMajstora .ucinak .box{
+    display:inline-block;
+    vertical-align: middle;
+    border:1px solid rgb(255,255,255);
+    font-size:20px;
+    text-align:center;
+    padding:2px 0px;
+    color:rgb(255,255,255);
+    background-color: rgba(32,51,100,0.6);
+    width:40px;
+}
+
+.dispecerskiIzvestajiMajstora .ucinak .zamena{
+    width:80px;
+    background-color:rgb(32,51,100);
+}
+.dispecerskiIzvestajiMajstora .ucinak .odgusenje{
+    width:40px;
+    background-color:rgba(32,51,100,0.8);
+}
+.dispecerskiIzvestajiMajstora .ucinak .crpljenje{
+    width:40px;
+    background-color:rgba(32,51,100,0.6);
+}
+.dispecerskiIzvestajiMajstora .ucinak .popis{
+    width:20px;
+    background-color:rgba(32,51,100,0.6);
+}
+.dispecerskiIzvestajiMajstora .ucinak .konstatacija{
+    width:20px;
+    background-color:rgba(32,51,100,0.6);
+}
+.dispecerskiIzvestajiMajstora .ucinak .nerad{
+    width:200px;
+    border:1px solid rgb(100,100,100);
+    color:rgb(100,100,100);
+}
+
 @media screen and (max-width: 1100px) {
     .pageWidth{
         padding-left:10px;

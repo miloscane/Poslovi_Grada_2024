@@ -4782,6 +4782,8 @@ http.listen(process.env.PORT, async function(){
 			console.log(nalozi[i].broj)
 		}*/
 
+
+
 	})
 	.catch(error => {
 		logError(error);
@@ -10611,6 +10613,129 @@ server.post('/danasnjaEkipa', async(req,res)=>{
 			pageTitle: "Грешка",
 			user: req.session.user,
 			message: "<div class=\"text\">Дошло је до грешке број 9938.</div>"
+		});
+	}
+})
+
+server.get('/dispecer/izvestajMajstora', async(req,res)=>{
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+
+	if(Number(req.session.user.role)!=20){
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+		});
+	}
+	try{
+		var today = new Date();
+		var dnevneEkipe = await dnevneEkipeDB.find({datum:getDateAsStringForDisplay(today)}).toArray();
+		var	dnevnaEkipa = dnevneEkipe[0] ? dnevneEkipe[0] : {};
+		var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
+		var pomocnici = await pomocniciDB.find({}).toArray();
+		var dispeceri = await usersDB.find({role:"20"}).toArray();
+		var dodele = await dodeljivaniNaloziDB.find({deleted: {$ne:1},datumRadova:getDateAsStringForInputObject(today)}).toArray();
+		/*var brojeviNaloga = [];
+		for(var i=0;i<dodele.length;i++){
+			brojeviNaloga.push(dodele[i].nalog);
+		}
+		var nalozi = await naloziDB.find({broj:{$in:brojeviNaloga}}).toArray();
+		for(var i=0;i<dodele.length;i++){
+			for(var j=0;j<nalozi.length;j++){
+				if(dodele[i].nalog==nalozi[j].broj){
+					dodele[i].nalogInfo = nalozi[j];
+					break;
+				}
+			}
+		}*/
+
+		for(var i=0;i<dispeceri.length;i++){
+			delete dispeceri[i].password;
+			if(dispeceri[i].email.includes("+")){
+				dispeceri.splice(i,1);
+				i--;
+			}
+		}
+
+		for(var i=0;i<majstori.length;i++){
+			majstori[i].dodele = [];
+			for(var j=0;j<dodele.length;j++){
+				if(dodele[j].majstor==majstori[i].uniqueId){
+					majstori[i].dodele.push(dodele[j])
+				}
+			}
+		}
+
+		
+		res.render("dispeceri/izvestajMajstora",{
+			pageTitle: "Извештај мајстора",
+			user: req.session.user,
+			majstori: majstori,
+			pomocnici: pomocnici,
+			dispeceri: dispeceri,
+			dnevnaEkipa: dnevnaEkipa
+		});
+
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Дошло је до грешке број 9843.</div>"
+		});
+	}
+})
+
+server.post('/dispecerskiIzvestaj', async(req,res)=>{
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+
+	if(Number(req.session.user.role)!=20){
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен за ову акцију.</div>"
+		});
+	}
+	try{
+		var json = JSON.parse(req.body.json);
+
+		var dnevneEkipe = await dnevneEkipeDB.find({datum:json.datum}).toArray();
+		if(dnevneEkipe.length==0){
+			return res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Greska broj 10711.</div>"
+			});
+		}
+
+		var	dnevnaEkipa = dnevneEkipe[0];
+		for(var i=0;i<dnevnaEkipa.ekipe.length;i++){
+			if(dnevnaEkipa.ekipe[i].majstor==json.majstor){
+				dnevnaEkipa.ekipe[i].izvestaj = {};
+				dnevnaEkipa.ekipe[i].izvestaj.text = json.izvestaj;
+				dnevnaEkipa.ekipe[i].izvestaj.user = req.session.user;
+				dnevnaEkipa.ekipe[i].izvestaj.datetime = new Date().getTime();
+			}
+		}
+		var setObj = {
+			$set:{
+				ekipe: dnevnaEkipa.ekipe
+			}
+		}
+		await dnevneEkipeDB.updateOne({datum:json.datum},setObj);
+
+		res.redirect("/dispecer/izvestajMajstora?"+json.majstor)
+
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Дошло је до грешке број 9843.</div>"
 		});
 	}
 })

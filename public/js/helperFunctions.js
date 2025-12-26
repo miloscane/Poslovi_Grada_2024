@@ -155,6 +155,20 @@ function getPomocnikByCode(pomocnikId){
   return pomocnik
 }
 
+function getDispecerByCode(email){
+  var dispecer = {};
+  if(dispeceri){
+    for(var i=0;i<dispeceri.length;i++){
+      if(dispeceri[i].email==email){
+        dispecer = dispeceri[i]
+      }
+    }
+  }else{
+    console.log("No array dispeceri defined");
+  }
+  return dispecer
+}
+
 
 function getProizvodByCode(uniqueId){
   var proizvod = {};
