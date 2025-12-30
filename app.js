@@ -9816,7 +9816,7 @@ server.get('/izvestajMajstoraPickTemp/:date/:date2',async (req,res)=>{
 					pageTitle:"Одабери мајстора и датум",
 					user: req.session.user,
 					majstori: majstori,
-					izvestaji: izvestaji,
+					izvestaji: dodeljivaniNalozi,
 					podelaOpstina: podelaOpstina,
 					date: req.params.date
 				})
