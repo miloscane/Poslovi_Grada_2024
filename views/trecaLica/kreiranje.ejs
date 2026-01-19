@@ -1,74 +1,17 @@
 <%- include ("partials/header") -%>
 	<div class="pageWidth trecaLica">
 		<div class="kreiranje">
+			<div class="inputWrap title" style="padding-top:20px">
+				<label for="tip-pravno">Pravno lice:</label> <input type="radio" class="tipLica" id="tip-pravno" value="pravno" name="tip" checked><br><p></p>
+				<label for="tip-fizicko">Fizicko lice:</label> <input type="radio" class="tipLica" id="tip-fizicko" value="fizicko" name="tip">
+			</div>
 			<div class="inputWrap title">
 				<input type="text" id="naziv" placeholder="Назив трећег лица">
 			</div>
 			<div class="inputWrap title">
 				<textarea id="opis" placeholder="Опис трећег лица"></textarea>
 			</div>
-			<!--<div class="inlineHalf">
-				<div class="inline">
-					<div class="inputWrap">
-						<div class="title">Порески идентификациони број</div>
-						<div class="inputWrapper"><input type="number" id="pib" placeholder="ПИБ"></div>
-					</div>
-				</div>
-				<div class="inline">
-					<div class="inputWrap">
-						<div class="title">Матични број</div>
-						<div class="inputWrapper"><input type="number" id="mb" placeholder="МБ"></div>
-					</div>
-				</div>
-			</div>
-			<div class="inputWrap">
-				<div class="inputWrap">
-					<div class="title">Адреса</div>
-					<div class="inputWrapper"><input type="text" id="adresa" placeholder="Адреса"></div>
-				</div>
-			</div>
-			<div class="cenovnikWrapper">
-				<div class="inputWrap"><div class="title">Формирање новог ценовника</div></div>
-				<div class="inputWrapper"><input type="file" placeholder="" id="cenovnik-input" accept=".csv"></div>
-				<div class="cenovnik">
-					<div class="inputWrap"><div class="note">
-						Унесите редни број из процесуираног фајла у поља испод како би означили која колона је шифра, назив, јединица мере и цена без ПДВа. Уколико поље за шифру оставите празно програм ће сам ставити шифре. Уколико поље јединица мере оставите програм ће свуда укуцати ком. као јединицу мере.
-					</div></div>
-					<div class="header inputWrap">
-						<div class="sifra inline">
-							<div class="title">Шифра</div>
-							<div class="inputWrapper"><input type="number" id="kolona-sifre" oninput="generisiCenovnik()"></div>
-						</div>
-						<div class="naziv inline">
-							<div class="title">Назив</div>
-							<div class="inputWrapper"><input type="number" id="kolona-naziva" oninput="generisiCenovnik()"></div>
-						</div>
-						<div class="jedinica inline">
-							<div class="title">Јединица мере</div>
-							<div class="inputWrapper"><input type="number" id="kolona-jedinica" oninput="generisiCenovnik()"></div>
-						</div>
-						<div class="cena inline">
-							<div class="title">Цена</div>
-							<div class="inputWrapper"><input type="number" id="kolona-cena" oninput="generisiCenovnik()"></div>
-						</div>
-					</div>
-					<div class="inputWrap"><div class="note" id="tabela">
-						Када убаците фајл формираће се табела испод
-					</div></div>
-					<div class="body" id="formiran-cenovnik" style="height:0px"></div>
-				</div>
-				<div class="inputWrap" style="margin-top:20px;margin-bottom: 2px;"><div class="title">Формиран ценовник</div></div>
-				<div class="krajnjiCenovnik">
-					<div class="row firstRow">
-						<div class="item broj">Бр.</div>
-						<div class="item sifra">Шифра</div>
-						<div class="item naziv">Назив</div>
-						<div class="item jedinica">Јединица мере</div>
-						<div class="item cena">Цена без ПДВ</div>
-					</div>
-					<div class="body" id="krajnji-cenovnik"></div>
-				</div>
-			</div>-->
+			
 			<div class="inputWrap">
 				<div class="button" onclick="save()">САЧУВАЈ</div>
 			</div>
@@ -76,131 +19,11 @@
 				<input type="text" name="json" id="json">
 			</form>
 			<script>
-				/*var cenovnik = [];
-				document.getElementById('cenovnik-input').addEventListener('change', function(event) {
-				    var file = event.target.files[0];
-				    if (!file) return;
-
-				    var reader = new FileReader();
-
-				    reader.onload = function(e) {
-				    	cenovnik = [];
-				        var csvString = e.target.result;
-				        var stringArray = csvString.split("\r\n");
-				        for(var i=0;i<stringArray.length;i++){
-				        	var priceTemp = smartSplitCSVLine(stringArray[i]);
-				        	cenovnik.push(priceTemp)
-				        }
-
-				        //Formiraj prvi red na osnovu prve stavke u cenovniku
-				        var row = document.createElement("DIV");
-					    row.setAttribute("class","row firstRow");    
-				        for(var i=0;i<cenovnik[0].length;i++){
-				        	var rowElem = document.createElement("DIV");
-				        	rowElem.setAttribute("class","item");
-				        	rowElem.innerHTML = eval(i+1);
-				        	row.appendChild(rowElem)
-				        }
-				        document.getElementById("formiran-cenovnik").appendChild(row);
-
-				        for(var i=0;i<cenovnik.length;i++){
-					        var row = document.createElement("DIV");
-						    row.setAttribute("class","row");
-				        	for(var j=0;j<cenovnik[i].length;j++){
-					        	var rowElem = document.createElement("DIV");
-					        	rowElem.setAttribute("class","item");
-					        	rowElem.innerHTML = cenovnik[i][j];
-					        	row.appendChild(rowElem)
-					        }	
-					        document.getElementById("formiran-cenovnik").appendChild(row);
-				        }
-				        document.getElementById("formiran-cenovnik").style.height="400px";
-				    };
-
-				    reader.readAsText(file); // Or use readAsBinaryString or readAsDataURL depending on your use case
-				});
-
-				var finalniCenovnik = [];
-
-				function generisiCenovnik(){
-					var kolonaSifre = document.getElementById("kolona-sifre").value;
-					var kolonaNaziva = document.getElementById("kolona-naziva").value;
-					var kolonaJedinica = document.getElementById("kolona-jedinica").value;
-					var kolonaCena = document.getElementById("kolona-cena").value;
-					
-					var generateCodes = true;
-					if(kolonaSifre!=""){
-						generateCodes = false;
-					}
-					var generateJedinice = true;
-					if(kolonaJedinica!=""){
-						generateJedinice = false;
-					}
-
-					if(kolonaNaziva==""){
-						//alert("Niste odabrali kolonu naziva");
-						return;
-					}
-
-					if(kolonaCena==""){
-						//alert("Niste odabrali kolonu cena");
-						return;
-					}
-					document.getElementById("krajnji-cenovnik").innerHTML = "";
-					finalniCenovnik = [];
-					for(var i=0;i<cenovnik.length;i++){
-						var json = {};
-
-						var row = document.createElement("DIV");
-						row.setAttribute("class","row")
-							var rowElem = document.createElement("DIV");
-				        	rowElem.setAttribute("class","item broj");
-				        	rowElem.innerHTML = eval(i+1)+".";
-				        	row.appendChild(rowElem);
-
-							var rowElem = document.createElement("DIV");
-				        	rowElem.setAttribute("class","item sifra");
-				        	if(generateCodes){
-				        		rowElem.innerHTML = eval(i+1).toString().padStart(6,"0");
-				        		json.code = eval(i+1).toString().padStart(6,"0")
-				        	}else{
-				        		rowElem.innerHTML = cenovnik[i][kolonaSifre-1];
-				        		json.code = cenovnik[i][kolonaSifre-1];
-				        	}
-				        	row.appendChild(rowElem);
-
-							var rowElem = document.createElement("DIV");
-				        	rowElem.setAttribute("class","item naziv");
-			        		rowElem.innerHTML = cenovnik[i][kolonaNaziva-1];
-			        		json.name = cenovnik[i][kolonaNaziva-1];
-				        	row.appendChild(rowElem);
-
-							var rowElem = document.createElement("DIV");
-				        	rowElem.setAttribute("class","item jedinica");
-				        	if(generateJedinice){
-				        		rowElem.innerHTML = "ком.";
-				        		json.unit = "ком.";
-				        	}else{
-				        		rowElem.innerHTML = cenovnik[i][kolonaJedinica-1];
-				        		json.unit = cenovnik[i][kolonaJedinica-1];
-				        	}
-				        	row.appendChild(rowElem);
-
-							var rowElem = document.createElement("DIV");
-				        	rowElem.setAttribute("class","item cena");
-			        		rowElem.innerHTML = brojSaRazmacima(parseLocalizedNumber(cenovnik[i][kolonaCena-1]));
-				        	json.price = parseLocalizedNumber(cenovnik[i][kolonaCena-1]);
-				        	row.appendChild(rowElem);
-						document.getElementById("krajnji-cenovnik").appendChild(row);
-						finalniCenovnik.push(json)
-					}
-
-				}*/
-
 				function save(){
 					var json = {};
 					json.naziv = document.getElementById("naziv").value;
 					json.opis = document.getElementById("opis").value;
+					json.tip = "";
 					if(!json.naziv){
 						alert("Нисте унели назив фирме");
 						return;
@@ -209,6 +32,14 @@
 						alert("Нисте унели opis");
 						return;
 					}
+
+					var tipovi = document.getElementsByClassName("tipLica");
+					for(var i=0;i<tipovi.length;i++){
+						if(tipovi[i].checked){
+							json.tip = tipovi[i].value;
+						}
+					}
+
 
 					document.getElementById("json").value = JSON.stringify(json);
 					loadGif();

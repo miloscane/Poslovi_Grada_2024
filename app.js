@@ -13670,12 +13670,14 @@ server.post('/novoTreceLice', async (req, res)=> {
 			try{
 				var json = JSON.parse(req.body.json);
 				json.uniqueId = generateId(8);
+				json.datumKreiranja = new Date().getTime();
+				json.ugovori = [];
 
 				await trecaLicaDB.insertOne(json);
 				res.render("message",{
 					pageTitle: "Успешно додато",
 					user: req.session.user,
-					message: "<div class=\"text\">Треће лице "+json.naziv+" успешно додато.</div>"
+					message: "<div class=\"text\">Треће лице "+json.naziv+" успешно додато. Додатне информације уностите <a href=\"/trecaLica/"+json.uniqueId+"\">овде.</a></div>"
 				});
 			}catch(err){
 				logError(err);
@@ -13685,9 +13687,84 @@ server.post('/novoTreceLice', async (req, res)=> {
 					message: "<div class=\"text\">Дошло је до грешке у бази податка 10409.</div>"
 				})
 			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
 
+server.post('/editTreceLice', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var json = JSON.parse(req.body.json);
 
-			
+				var setObj = {
+					$set:{
+						naziv: json.naziv,
+						opis: json.opis,
+						tip: json.tip
+					}
+				}
+
+				await trecaLicaDB.updateOne({uniqueId:json.uniqueId},setObj);
+				res.render("message",{
+					pageTitle: "Успешно измењено",
+					user: req.session.user,
+					message: "<div class=\"text\">Треће лице "+json.naziv+" успешно измењено. Додатне информације уностите <a href=\"/trecaLica/"+json.uniqueId+"\">овде.</a></div>"
+				});
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 13727.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.post('/noviUgovorTrecegLica', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var json = JSON.parse(req.body.json);
+
+				var setObj = {
+					$addToSet:{
+						ugovori: {naziv:json.naziv,date:json.datum}
+					}
+				}
+
+				await trecaLicaDB.updateOne({uniqueId:json.uniqueId},setObj);
+				res.render("message",{
+					pageTitle: "Успешно додат уговор",
+					user: req.session.user,
+					message: "<div class=\"text\">Трећем лицу успешно додат уговор. Додатне информације уносите <a href=\"/trecaLica/"+json.uniqueId+"\">овде.</a></div>"
+				});
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 13727.</div>"
+				})
+			}
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",

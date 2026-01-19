@@ -2,23 +2,135 @@
 	<script>
 		var treceLice = <%-JSON.stringify(treceLice)%>;
 		var nalozi = <%-JSON.stringify(nalozi)%>;
-		console.log(nalozi)
 	</script>
 	<div class="pageWidth trecaLica">
 		<div class="kreiranje">
+			<div class="inputWrap title" style="padding-top:20px">
+				<label for="tip-pravno">Pravno lice:</label> <input type="radio" class="tipLica" id="tip-pravno" value="pravno" name="tip"><br><p></p>
+				<label for="tip-fizicko">Fizicko lice:</label> <input type="radio" class="tipLica" id="tip-fizicko" value="fizicko" name="tip">
+				<script>
+					if(treceLice.tip=="fizicko"){
+						document.getElementById("tip-fizicko").checked = true;
+					}else if(treceLice.tip=="pravno"){
+						document.getElementById("tip-pravno").checked = true;
+					}else{
+						document.getElementById("tip-fizicko").checked = true;
+					}
+				</script>
+			</div>
 			<div class="inputWrap title">
-				<input type="text" id="naziv" placeholder="Назив трећег лица" disabled>
+				<input type="text" id="naziv" placeholder="Назив трећег лица">
 				<script>
 					document.getElementById("naziv").value = treceLice.naziv;
 				</script>
 			</div>
 			<div class="inputWrap title">
-				<textarea id="opis" placeholder="Opis трећег лица" disabled></textarea>
+				<textarea id="opis" placeholder="Opis трећег лица"></textarea>
 				<script>
 					document.getElementById("opis").value = treceLice.opis;
 				</script>
 			</div>
-			
+			<div class="inputWrap">
+				<div class="button" onclick="save()">САЧУВАЈ ИНФОРМАЦИЈЕ</div>
+			</div>
+			<form method="POST" action="/editTreceLice" style="display: none;" id="form">
+				<input type="text" name="json" id="json">
+			</form>
+			<script>
+				function save(){
+					var json = {};
+					json.uniqueId = treceLice.uniqueId;
+					json.naziv = document.getElementById("naziv").value;
+					json.opis = document.getElementById("opis").value;
+					json.tip = "";
+					if(!json.naziv){
+						alert("Нисте унели назив фирме");
+						return;
+					}
+					if(!json.opis){
+						alert("Нисте унели opis");
+						return;
+					}
+
+					var tipovi = document.getElementsByClassName("tipLica");
+					for(var i=0;i<tipovi.length;i++){
+						if(tipovi[i].checked){
+							json.tip = tipovi[i].value;
+						}
+					}
+
+
+					document.getElementById("json").value = JSON.stringify(json);
+					loadGif();
+					document.getElementById("form").submit();
+				}
+
+			</script>
+
+
+			<div class="ugovori" id="ugovori-wrap" style="width:400px;margin:0 auto;">
+				<h2>Ugovori:</h2>
+				<div id="ugovori"></div>
+				<script>
+					if(treceLice.ugovori){
+						for(var i=0;i<treceLice.ugovori.length;i++){
+							var row = document.createElement("DIV");
+							row.setAttribute("class","row");
+							row.innerHTML = treceLice.ugovori[i].naziv + " / "+treceLice.ugovori[i].date;
+							document.getElementById("ugovori").appendChild(row);
+						}	
+					}
+				</script>
+				<div class="noviUgovor">
+					<div class="inline" style="display:inlie-block;vertical-align: top;">
+						<div class="inputWrap">
+							<div class="title">Naziv ugovora: </div>
+							<div class="inputWrapper">
+								<input type="text" id="naziv-ugovora">
+							</div>
+						</div>
+					</div>
+					<div class="inline" style="display:inlie-block;vertical-align: top;">
+						<div class="inputWrap">
+							<div class="title">Datum ugovora: </div>
+							<div class="inputWrapper">
+								<input type="date" id="datum-ugovora">
+							</div>
+						</div>
+					</div>
+					<form method="POST" action="/noviUgovorTrecegLica" style="display:none" id="ugovor-form">
+						<input type="text" name="json" id="ugovor-json">
+					</form>
+					<div class="inputWrap">
+						<div class="button" onclick="noviUgovor()">Sacuvaj novi ugovor</div>
+					</div>
+					<script>
+						function noviUgovor(){
+							var json = {};
+							json.naziv = document.getElementById("naziv-ugovora").value;
+							json.datum = document.getElementById("datum-ugovora").value;
+							json.uniqueId = treceLice.uniqueId;
+							if(!json.naziv){
+								alert("Niste uneli naziv ugovora");
+								return;
+							}
+							if(!json.datum){
+								alert("Niste uneli datum ugovora");
+								return;
+							}
+
+							document.getElementById("ugovor-json").value = JSON.stringify(json);
+							loadGif();
+							document.getElementById("ugovor-form").submit();
+						}
+					</script>
+				</div>
+			</div>
+			<script>
+				if(treceLice.tip!="pravno"){
+					document.getElementById("ugovori-wrap").style.display="none";
+				}
+			</script>
 			<div class="inputWrap" style="margin-top:20px;margin-bottom: 2px;"><div class="title">Налози</div></div>
 			<div class="otvoreniNalozi">
 				<div class="tableWrap">
