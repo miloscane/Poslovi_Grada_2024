@@ -5,11 +5,13 @@
 		var izvestaji = <%-JSON.stringify(izvestaji)%>;
 	</script>
 	<div class="pageWidth">
-		<div class="administracijaNalog nalog">
+		<div class="administracijaNalog nalog trecaLica">
 			<div class="boxesWrap">
-				<div class="box" style="cursor:pointer;" onclick="window.open('https://www.google.com/maps/search/?api=1&query='+treceLice.adresa.replace(/,/g, '%2C').replace(/ /g, '+'),'_blank')">
+				<div class="box" style="cursor:pointer;" onclick="window.open('https://www.google.com/maps/search/?api=1&query='+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+'),'_blank')">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/locationIcon.png"></div>
 					<div class="info">
+						<div class="title">Треће лице</div>
+						<div class="text"><%=treceLice.naziv%></div>
 						<div class="title">Адреса</div>
 						<div class="text"><span id="adresa-naloga"></span></div>
 						<script>
@@ -41,9 +43,8 @@
 								<option value="Preventivno čišćenje">Превентивно чишћење</option>
 								<option value="Snimanje kamerom">Снимање камером</option>
 								<option value="Završeno">Завршено</option>
-								<option value="Spreman za obračun">Спреман за обрачун</option>
-								<option value="Spreman za fakturisanje">Спреман за фактурисање</option>
 								<option value="Fakturisan">Фактурисан</option>
+								<option value="Doniran">Дониран</option>
 								<option value="Storniran">Сторниран</option>
 							</select>
 							<script>
@@ -58,21 +59,151 @@
 						<div class="title">Датум налога</div>
 						<div class="text"><span id="datum-naloga"></span></div>
 						<script>
-							document.getElementById("datum-naloga").innerHTML = reshuffleDate(nalog.datumRadova);
+							document.getElementById("datum-naloga").innerHTML = nalog.datum.datum;
 						</script>
 					</div>
 				</div>
-				
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumIcon.png"></div>
+					<div class="info">
+						<div class="title">Датум радова</div>
+						<div class="text"><input type="date" id="datum-radova"></div>
+						<script>
+							document.getElementById("datum-radova").value = nalog.datumRadova ? nalog.datumRadova : getDateAsStringForInputObject(new Date(Number(nalog.datum.datetime)));
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
+					<div class="info">
+						<div class="title">Име контакта</div>
+						<div class="text"><input type="text" id="kontakt-naloga"></div>
+						<script>
+							document.getElementById("kontakt-naloga").value = nalog.kontaktNaloga ? nalog.kontaktNaloga : "";
+						</script>
+					</div>
+				</div><div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
+					<div class="info">
+						<div class="title">Телефон</div>
+						<div class="text"><input type="number" id="telefon-naloga"></div>
+						<script>
+							document.getElementById("telefon-naloga").value = nalog.telefonNaloga ? nalog.telefonNaloga : "";
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/majstorIcon.png"></div>
+					<div class="info">
+						<div class="title">Мајстор</div>
+						<div class="text">
+							<select id="majstor-naloga">
+								<optgroup label="Мајстори" id="majstori-pg">
+									<option value="Nijedan" default="default">Nijedan</option>
+								</optgroup>
+								<optgroup label="Финализери" id="finalizeri"></optgroup>
+								<optgroup label="Воме" id="vome"></optgroup>
+								<optgroup label="Podizvodjaci" id="majstori-podizvodjaci"></optgroup>
+							</select>
+						</div>
+						<script>
+							var majstori = <%-JSON.stringify(majstori)%>;
+							majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+							for(var i=0;i<majstori.length;i++){
+								if(!majstori[i].inactive){
+									var option = document.createElement("OPTION");
+									option.setAttribute("value",majstori[i].uniqueId);
+									option.innerHTML	=	majstori[i].ime;	
+									
+									if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0){
+										document.getElementById("majstori-podizvodjaci").appendChild(option);
+									}else{
+										if(majstori[i].tipRada.indexOf("Finalizacija")>=0){
+											document.getElementById("finalizeri").appendChild(option);
+										}else if(majstori[i].tipRada.indexOf("Voma")>=0){
+											document.getElementById("vome").appendChild(option);
+										}else{
+											document.getElementById("majstori-pg").appendChild(option);
+										}
+										
+									}
+								}
+							}
+							document.getElementById("majstor-naloga").value = nalog.majstor ? nalog.majstor : "Nijedan"
+						</script>
+					</div>
+				</div>
 				<div class="box">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
 					<div class="info">
 						<div class="title">Износ налога</div>
-						<div class="text"><span id="iznos-naloga"></span></div>
+						<div class="text"><input type="number" id="iznos-naloga"></div>
 						<script>
-							document.getElementById("iznos-naloga").innerHTML = brojSaRazmacima(nalog.ukupanIznos);
+							document.getElementById("iznos-naloga").value = nalog.ukupanIznos ? nalog.ukupanIznos : 0;
 						</script>
 					</div>
 				</div>
+				<div class="box" id="fizicko-box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Начин плаћања</div>
+						<div class="text">
+							<select id="nacin-placanja">
+								<option value="Keš">Keš</option>
+								<option value="PNR">PNR</option>
+							</select>
+						</div>
+						<div class="text">
+							<input type="text" placeholder="PNR broj" id="PNR">
+						</div>
+						<script>
+							document.getElementById("nacin-placanja").value = nalog.nacinPlacanja ? nalog.nacinPlacanja : "Keš";
+							document.getElementById("PNR").value = nalog.PNR ? nalog.PNR : "";
+						</script>
+					</div>
+				</div>
+				<div class="box" id="pravno-box" style="display:none">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">Број уговора</div>
+						<div class="text">
+							<select id="broj-ugovora"></select>
+						</div>
+						<script>
+							if(treceLice.ugovori){
+								for(var i=0;i<treceLice.ugovori.length;i++){
+									var option = document.createElement("OPTION");
+									option.setAttribute("value",treceLice.ugovori[i].naziv);
+									option.innerHTML = treceLice.ugovori[i].naziv;
+									document.getElementById("broj-ugovora").appendChild(option);
+								}
+							}
+							
+							document.getElementById("broj-ugovora").value = nalog.brojUgovora ? nalog.brojUgovora : "";
+						</script>
+						<div class="title">Број спецификације</div>
+						<div class="text">
+							<input id="broj-specifikacije" type="text">
+						</div>
+						<div class="title">Број fakture</div>
+						<div class="text">
+							<input id="broj-fakture" type="text">
+						</div>
+						<script>
+							document.getElementById("broj-specifikacije").value = nalog.brojSpecifikacije ? nalog.brojSpecifikacije : "";
+							document.getElementById("broj-fakture").value = nalog.brojFakture ? nalog.brojFakture : "";
+						</script>
+					</div>
+				</div>
+				<script>
+					document.getElementById("fizicko-box").style.display = "block";
+					if(treceLice.tip=="pravno"){
+						document.getElementById("fizicko-box").style.display = "none";
+						document.getElementById("pravno-box").style.display = "block";
+					}
+				</script>
+				
+				
 			</div>
 			<div class="detalji">
 				<div class="title">Оператива</div>
@@ -80,10 +211,47 @@
 					<div class="box">
 						<div class="info">
 							<div class="title">Опис налога</div>
-							<div class="text"><%=nalog.opisNaloga%></div>
+							<div class="text"><textarea id="opis-naloga"></textarea></div>
+							<script>
+								document.getElementById("opis-naloga").value = nalog.opisNaloga;
+							</script>
 						</div>
 					</div>
 				</div>
+			</div>
+			<div class="saveNalog">
+				<div class="inputWrapper">
+					<div class="inputWrap">
+						<div class="button" onclick="saveNalogIzmene()">САЧУВАЈ ИЗМЕНЕ НА НАЛОГУ</div>
+					</div>
+				</div>
+				<form id="nalog-form" style="display: none;" method="POST" action="/izmenaNalogaTrecegLica">
+					<input type="text" id="nalog-form-json" name="json">
+				</form>
+				<script>
+					console.log(nalog)
+					function saveNalogIzmene(){
+						var json = {};
+						json.uniqueId = nalog.uniqueId;
+						json.statusNaloga = document.getElementById("status-naloga").value;
+						json.datumRadova = document.getElementById("datum-radova").value;
+						json.kontaktNaloga = document.getElementById("kontakt-naloga").value;
+						json.telefonNaloga = document.getElementById("telefon-naloga").value;
+						json.majstor = document.getElementById("majstor-naloga").value;
+						json.ukupanIznos = document.getElementById("iznos-naloga").value;
+						json.nacinPlacanja = document.getElementById("nacin-placanja").value;
+						json.PNR = document.getElementById("PNR").value;
+						json.brojUgovora = document.getElementById("broj-ugovora").value;
+						json.brojSpecifikacije = document.getElementById("broj-specifikacije").value;
+						json.brojFakture = document.getElementById("broj-fakture").value;
+						json.opisNaloga = document.getElementById("opis-naloga").value;
+
+						document.getElementById("nalog-form-json").value = JSON.stringify(json);
+						loadGif();
+						document.getElementById("nalog-form").submit();
+
+					}
+				</script>
 			</div>
 			<div class="izvestaji">
 				<div class="title">Извештаји</div>
@@ -244,7 +412,7 @@
 				<div class="saveNalog">
 					<div class="inputWrapper">
 						<div class="inputWrap">
-							<div class="button" onclick="saveNalog()">САЧУВАЈ ИЗМЕНЕ НА НАЛОГУ</div>
+							<div class="button" onclick="saveNalog()">САЧУВАЈ ИЗВЕШТАЈ</div>
 						</div>
 					</div>
 				</div>

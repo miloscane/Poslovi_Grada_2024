@@ -13864,9 +13864,7 @@ server.post('/noviNalogTrecihLica', async (req, res)=> {
 				json.datum = {};
 				json.datum.datetime = new Date().getTime();
 				json.datum.datum = getDateAsStringForDisplay(new Date());
-				json.obracun = [];
 				json.statusNaloga = "Primljen";
-				json.fakture = [];
 
 				await naloziTrecihLicaDB.insertOne(json);
 
@@ -13905,12 +13903,14 @@ server.get('/trecaLica/nalog/:uniqueId',async (req,res)=>{
 					var trecaLica = await trecaLicaDB.find({uniqueId:nalozi[0].treceLice}).toArray();
 					var treceLice = trecaLica[0];
 					var izvestaji = await izvestajiTrecihLicaDB.find({nalogId:req.params.uniqueId}).toArray();
+					var majstori = await majstoriDB.find({}).toArray();
 					res.render("trecaLica/nalog",{
 						pageTitle: "Налог број "+nalozi[0].broj,
 						treceLice: treceLice,
 						nalog: nalog,
 						izvestaji: izvestaji,
 						phoneAccessCode: phoneAccessCode,
+						majstori: majstori,
 						user: req.session.user
 					})
 				}else{
@@ -13939,6 +13939,54 @@ server.get('/trecaLica/nalog/:uniqueId',async (req,res)=>{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
 });
+
+server.post('/izmenaNalogaTrecegLica', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var json = JSON.parse(req.body.json);
+				var setObj = {
+					$set:{
+						statusNaloga: json.statusNaloga,
+						datumRadova: json.datumRadova,
+						kontaktNaloga: json.kontaktNaloga,
+						telefonNaloga: json.telefonNaloga,
+						majstor: json.majstor,
+						ukupanIznos: json.ukupanIznos,
+						nacinPlacanja: json.nacinPlacanja,
+						PNR: json.PNR,
+						brojUgovora: json.brojUgovora,
+						brojSpecifikacije: json.brojSpecifikacije,
+						brojFakture: json.brojFakture,
+						opisNaloga: json.opisNaloga
+					}
+				}
+
+				await naloziTrecihLicaDB.updateOne({uniqueId:json.uniqueId},setObj);
+				res.redirect("/trecaLica/nalog/"+json.uniqueId)
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 13969.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+
+
+
 
 server.post('/edit-nalog-treca-lica', async (req, res)=> {
 	if(req.session.user){
