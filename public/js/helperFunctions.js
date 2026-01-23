@@ -212,6 +212,23 @@ function getPriceItemByCode(code){
   return json
 }
 
+function getTreceLiceByCode(uniqueId){
+  var json = {};
+  if(trecaLica){
+    for(var i=0;i<trecaLica.length;i++){
+      if(trecaLica[i].uniqueId==uniqueId){
+        json = trecaLica[i]
+      }
+    }
+    if(!json.naziv){
+      console.log("No trece lice found")
+    }
+  }else{
+    console.log("No array treca lica defined");
+  }
+  return json
+}
+
 function vremePrijema(datetime){
   var date    = new Date(Number(datetime));
   var yearString  = date.getFullYear();

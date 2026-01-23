@@ -1,6 +1,8 @@
 <%- include ("partials/header") -%>
 	<script>
 		var trecaLica = <%-JSON.stringify(trecaLica)%>;
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+		var majstori = <%-JSON.stringify(majstori)%>;
 		console.log(trecaLica)
 	</script>
 	<div class="pageWidth trecaLica">
@@ -19,6 +21,127 @@
 		</script>
 		<div class="inputWrap">
 			<div class="button"><a href="/trecaLica/new">NOVO TRECE LICE</a></div>
+		</div>
+		<div class="otvoreniNalozi">
+			<div class="filters">
+				<div class="filter">
+					<select id="status-filter" oninput="generateTable()">
+						<option default="default" value="Svi">Svi</option>
+						<option value="Data ponuda">Дата понуда</option>
+						<option value="Dodeljen majstoru">Додељен мајстору</option>
+						<option value="Potrebna WOMA">ВОМА</option>
+						<option value="Kombinovano">Комбиновано</option>
+						<option value="Zagušenje">Загушење</option>
+						<option value="Zamena">Замена</option>
+						<option value="Crpljenje">Црпљење</option>
+						<option value="Dezinfekcija">Дезинфекција</option>
+						<option value="Masinsko kopanje">Машинско копање</option>
+						<option value="Rucno kopanje">Ручно копање</option>
+						<option value="Finalizacija">Финализација</option>
+						<option value="Betonaža">Бетонажа</option>
+						<option value="Asfalt">Асфалт</option>
+						<option value="Bekaton">Бекатон</option>
+						<option value="Preventivno čišćenje">Превентивно чишћење</option>
+						<option value="Snimanje kamerom">Снимање камером</option>
+						<option value="Završeno">Завршено</option>
+						<option value="Fakturisan">Фактурисан</option>
+						<option value="Doniran">Дониран</option>
+						<option value="Storniran">Сторниран</option>
+					</select>
+				</div>
+			</div>
+			<div class="tableWrap">
+				<div class="tableHeader">
+					<table>
+						<tr>
+							<td><div class="value redniBroj">Редни број</div></td>
+							<td><div class="value brojNaloga">Број налога</div></td>
+							<td><div class="value treceLice">Треће лице</div></td>
+							<td><div class="value datumNaloga">Датум радова</div></td>
+							<td><div class="value adresa">Адреса</div></td>
+							<td><div class="value status">Статус</div></td>
+							<td><div class="value iznos">Износ</div></td>
+						</tr>
+					</table>
+				</div>
+				<div class="table" id="table"></div>
+				<script>
+					function generateTable(){
+						document.getElementById("table").innerHTML = "";
+						var table = document.createElement("TABLE");
+						var statusFilter = document.getElementById("status-filter").value;
+						var counter = 0;
+						for(var i=0;i<nalozi.length;i++){
+							if(statusFilter=="Svi" || statusFilter==nalozi[i].statusNaloga){
+								counter++;
+								var tr = document.createElement("TR");
+									var td = document.createElement("TD");
+										var div = document.createElement("DIV");
+										div.setAttribute("class","value redniBroj");
+										div.innerHTML = counter+".";
+										td.appendChild(div);
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+										var div = document.createElement("DIV");
+										div.setAttribute("class","value brojNaloga");
+											var a = document.createElement("A");
+											a.setAttribute("href","/trecaLica/nalog/"+nalozi[i].uniqueId);
+											a.setAttribute("target","_blank");
+											a.setAttribute("onclick","this.parentElement.parentElement.parentElement.style='font-weight:500;background-color:rgb(180,180,180)';");
+											a.innerHTML = nalozi[i].broj;
+											div.appendChild(a);
+										td.appendChild(div);
+									tr.appendChild(td);
+									
+									var td = document.createElement("TD");
+										var div = document.createElement("DIV");
+										div.setAttribute("class","value treceLice");
+										div.innerHTML = getTreceLiceByCode(nalozi[i].treceLice).naziv;
+										td.appendChild(div);
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+										var div = document.createElement("DIV");
+										div.setAttribute("class","value datumNaloga");
+										div.innerHTML = reshuffleDate(nalozi[i].datumRadova);
+										td.appendChild(div);
+									tr.appendChild(td);
+									
+									var td = document.createElement("TD");
+										var div = document.createElement("DIV");
+										div.setAttribute("class","value adresa");
+										div.innerHTML = nalozi[i].adresa;
+										td.appendChild(div);
+									tr.appendChild(td);
+									
+									var td = document.createElement("TD");
+										var div = document.createElement("DIV");
+										div.setAttribute("class","value status");
+										div.innerHTML = nalozi[i].statusNaloga;
+										td.appendChild(div);
+									tr.appendChild(td);
+
+									var td = document.createElement("TD");
+										var div = document.createElement("DIV");
+										div.setAttribute("class","value iznos");
+										div.innerHTML = brojSaRazmacima(nalozi[i].ukupanIznos);
+										td.appendChild(div);
+									tr.appendChild(td);
+									
+									
+
+								table.appendChild(tr);	
+							}
+							
+						}
+						document.getElementById("table").appendChild(table)
+					}
+
+					generateTable();
+					
+				</script>
+			</div>
 		</div>
 	</div>
 <%- include ("partials/footer") -%>

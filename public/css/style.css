@@ -2364,6 +2364,13 @@ input[type=number] {
     overflow: hidden;
 }
 
+.otvoreniNalozi .tableWrap table td .treceLice{
+    width:210px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 .otvoreniNalozi .tableWrap table td .status{
     width:210px;
     text-overflow: ellipsis;

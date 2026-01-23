@@ -142,6 +142,7 @@
 								<td><div class="value datumNaloga">Датум радова</div></td>
 								<td><div class="value adresa">Адреса</div></td>
 								<td><div class="value status">Статус</div></td>
+								<td><div class="value iznos">Износ</div></td>
 							</tr>
 						</table>
 					</div>
@@ -188,6 +189,13 @@
 									var div = document.createElement("DIV");
 									div.setAttribute("class","value status");
 									div.innerHTML = nalozi[i].statusNaloga;
+									td.appendChild(div);
+								tr.appendChild(td);
+								
+								var td = document.createElement("TD");
+									var div = document.createElement("DIV");
+									div.setAttribute("class","value iznos");
+									div.innerHTML = brojSaRazmacima(nalozi[i].ukupanIznos);
 									td.appendChild(div);
 								tr.appendChild(td);
 								

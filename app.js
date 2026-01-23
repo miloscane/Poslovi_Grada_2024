@@ -13609,8 +13609,12 @@ server.get('/trecaLica',async (req,res)=>{
 		if(Number(req.session.user.role)==10){
 			try{
 				var trecaLica = await trecaLicaDB.find({}).toArray();
+				var nalozi = await naloziTrecihLicaDB.find({}).toArray();
+				var majstori = await majstoriDB.find({}).toArray();
 				res.render("trecaLica/home",{
 					pageTitle: "Трећа лица",
+					nalozi: nalozi,
+					majstori: majstori,
 					user: req.session.user,
 					trecaLica: trecaLica
 				})
@@ -13897,6 +13901,54 @@ server.get('/trecaLica/nalog/:uniqueId',async (req,res)=>{
 		if(Number(req.session.user.role)==10){
 			try{
 				var nalozi = await naloziTrecihLicaDB.find({uniqueId:req.params.uniqueId}).toArray();
+
+				if(nalozi.length>0){
+					var nalog = nalozi[0];
+					var trecaLica = await trecaLicaDB.find({uniqueId:nalozi[0].treceLice}).toArray();
+					var treceLice = trecaLica[0];
+					var izvestaji = await izvestajiTrecihLicaDB.find({nalogId:req.params.uniqueId}).toArray();
+					var majstori = await majstoriDB.find({}).toArray();
+					res.render("trecaLica/nalog",{
+						pageTitle: "Налог број "+nalozi[0].broj,
+						treceLice: treceLice,
+						nalog: nalog,
+						izvestaji: izvestaji,
+						phoneAccessCode: phoneAccessCode,
+						majstori: majstori,
+						user: req.session.user
+					})
+				}else{
+					res.render("message",{
+						pageTitle: "Грешка",
+						user: req.session.user,
+						message: "<div class=\"text\">Непостојећи налог.</div>"
+					})
+				}
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 10384.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/trecaLica/nalogBroj/:broj',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var nalozi = await naloziTrecihLicaDB.find({broj:req.params.broj}).toArray();
 
 				if(nalozi.length>0){
 					var nalog = nalozi[0];

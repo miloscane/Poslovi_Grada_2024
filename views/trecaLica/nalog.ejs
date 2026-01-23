@@ -13,7 +13,7 @@
 			</div>
 			<script>
 				function copyToViber(elem){
-					var text = nalog.broj+"\r\n*"+nalog.adresa+", *\r\n\r\n"+nalog.opisNaloga+"\r\n\r\n"+nalog.kontaktNaloga+"\r\n\r\n"+nalog.telefonNaloga//+"Klikni ovde za navigaciju do naloga:\r\n"+"https://www.google.com/maps/search/?api=1&query="+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+');
+					var text = nalog.broj+"\r\n*"+nalog.adresa+",*\r\n\r\n"+nalog.opisNaloga+"\r\n\r\n"+nalog.kontaktNaloga+"\r\n\r\n"+nalog.telefonNaloga//+"Klikni ovde za navigaciju do naloga:\r\n"+"https://www.google.com/maps/search/?api=1&query="+nalog.adresa.replace(/,/g, '%2C').replace(/ /g, '+');
 					navigator.clipboard.writeText(text)
 					.then(()=>{
 						elem.innerHTML = "КОПИРАНО"
@@ -44,6 +44,7 @@
 						<div class="text">
 							<select id="status-naloga">
 								<option value="Primljen" default="default">Примљен</option>
+								<option value="Data ponuda">Дата понуда</option>
 								<option value="Dodeljen majstoru">Додељен мајстору</option>
 								<option value="Potrebna WOMA">ВОМА</option>
 								<option value="Kombinovano">Комбиновано</option>
