@@ -1036,8 +1036,15 @@ http.listen(process.env.PORT, async function(){
 		stariCenovnik = await stariCenovnikDB.find({}).toArray()
 		cenovnikHigh = await pricesHighDB.find({}).toArray()
 		cenovnikHigh2024 = await pricesHigh2024DB.find({}).toArray()
-		cenovnikLow = await pricesLowDB.find({}).toArray()
+		cenovnikLow = await pricesLowDB.find({}).toArray();
 		console.log("Cenovnici inicijalizovani");
+
+		/*var csvString = "Sifra;Naziv;Jedinica;Cena\r\n"
+		for(var i=0;i<cenovnikHigh.length;i++){
+			csvString += cenovnikHigh[i].code+";"+cenovnikHigh[i].name+";"+cenovnikHigh[i].unit+";"+cenovnikHigh[i].price+"\r\n";
+		}
+		fs.writeFileSync("cenovnikPodizvodjaca.csv",csvString,{encoding:"utf8"});
+		console.log("Wrote file")*/
 
 		/*var cenovnikPodizvodjaca = await pricesDB.find({}).toArray();
 		for(var i=0;i<cenovnikPodizvodjaca.length;i++){
@@ -16784,7 +16791,7 @@ io.on('connection', function(socket){
 						warnings.push("Nije moguce odrediti broj fakture za nalog "+nalogToPush.broj+", broj fakture"+nalogToPush.brojFakture);
 					}else{
 						if(Number(nalogToPush.faktura.samoBroj)>=Number(odBroja) && Number(nalogToPush.faktura.samoBroj)<=Number(doBroja)){
-							if(nalogToPush.faktura.broj.includes("2025")){
+							if(nalogToPush.faktura.broj.includes("2026")){
 								naloziToSend.push(nalogToPush)	
 							}
 							
