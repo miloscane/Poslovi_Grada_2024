@@ -16876,7 +16876,7 @@ io.on('connection', function(socket){
 					warnings.push("Nije moguce odrediti broj fakture za nalog "+nalogToPush.broj+", broj fakture"+nalogToPush.brojFakture);
 				}else{
 					if(Number(nalogToPush.faktura.samoBroj)>=Number(odBroja) && Number(nalogToPush.faktura.samoBroj)<=Number(doBroja)){
-						if(nalogToPush.faktura.broj.includes("/2025")){
+						if(nalogToPush.faktura.broj.includes("/2026")){
 							naloziToSend.push(nalogToPush)
 						}
 						
