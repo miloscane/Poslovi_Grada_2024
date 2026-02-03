@@ -4131,9 +4131,9 @@ http.listen(process.env.PORT, async function(){
 
 
 
-
+		//ZA MILICU
 		/*var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
-		var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:"2025-12"}}).toArray();
+		var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:"2026-01"}}).toArray();
 		for(var i=0;i<izvestaji.length;i++){
 			izvestaji[i].majstorInfo = {};
 			for(var j=0;j<majstori.length;j++){
@@ -4146,7 +4146,7 @@ http.listen(process.env.PORT, async function(){
 		console.log("**********************  TRECA LICA *****************")
 		for(var i=0;i<izvestaji.length;i++){
 			for(var j=0;j<izvestaji[i].nalozi.length;j++){
-				if(izvestaji[i].nalozi[j].broj=="1111111"){
+				if(izvestaji[i].nalozi[j].broj=="1111111" || izvestaji[i].nalozi[j].broj.startsWith("00")){
 					console.log(izvestaji[i].majstorInfo.ime + " "+reshuffleDate(izvestaji[i].date))
 					console.log("----------------")
 					break;
@@ -10266,7 +10266,7 @@ server.get('/izvestajMajstoraPickTemp',async (req,res)=>{
 			try{
 				//req.params.date je za izvestaje koji postoje
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
-				var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:"2025-11"}}).toArray();
+				var izvestaji = await dnevniIzvestajiDB.find({date:{$regex:"2026-01"}}).toArray();
 				res.render("administracija/izvestajMajstoraPickTemp",{
 					pageTitle:"Одабери мајстора и датум",
 					user: req.session.user,
