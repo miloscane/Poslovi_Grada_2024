@@ -41,7 +41,11 @@
 										}else{
 											if(!isNaN(Number(brojNaloga))){
 												loadGif()
-												window.location.href = "/nalog/"+brojNaloga;
+												if(brojNaloga.startsWith("00")){
+													window.location.href='/treceLiceNalogBroj/'+brojNaloga;
+												}else{
+													window.location.href='/nalog/'+brojNaloga;
+												}
 											}
 										}
 									}
@@ -120,6 +124,7 @@
 								<div class="subMenu">
 									<div class="subMenuItem"><a href="/trecaLica" onclick="loadGif()">Преглед</a><div class="bottomBorder"></div></div>
 									<div class="subMenuItem"><a href="/trecaLica/noviNalog" onclick="loadGif()">Нови налог</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/trecaLicaNalozi/otvoreniNalozi" onclick="loadGif()">Отворени налози</a><div class="bottomBorder"></div></div>
 								</div>
 							</div>
 						<% }else if(Number(user.role)==20){ %>
@@ -132,6 +137,8 @@
 									<div class="subMenuItem"><a href="/dispecer/dodeljeniNalozi" onclick="loadGif()">Додељени налози</a></div>
 									<div class="subMenuItem"><a href="/listaWoma" onclick="loadGif()">Wome</a></div>
 									<div class="subMenuItem"><a href="/wome" onclick="loadGif()">Mapa Woma</a></div>
+									<div class="subMenuItem"><a href="/trecaLicaNalozi/otvoreniNalozi" onclick="loadGif()">Отворени налози трећа лица</a><div class="bottomBorder"></div></div>
+
 								</div>
 							</div>
 							<div class="menuItem"><a href="#">Распоред радова <span class="carret">&or;</span></a><div class="rightBorder"></div>

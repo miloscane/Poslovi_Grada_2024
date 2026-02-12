@@ -12524,6 +12524,23 @@ server.get('/dispecer/pretragaNaloga',async (req,res)=>{
 	}
 });
 
+server.get('/treceLiceNalogBroj/:broj',async (req,res)=>{
+	if(req.session.user){
+		var nalozi = await naloziTrecihLicaDB.find({}).toArray();
+		if(nalozi.length>0){
+			res.redirect("/trecaLica/nalog/"+nalozi[0].uniqueId)
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Nepostojeci nalog trecih lica.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.get('/dispecer/mapaUzivo', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==20){
@@ -14530,6 +14547,44 @@ server.get('/trecaLica/:uniqueId',async (req,res)=>{
 	}
 })
 
+server.get('/trecaLicaNalozi/otvoreniNalozi',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
+			try{
+				var trecaLica = await trecaLicaDB.find({}).toArray();
+				var nalozi = await naloziTrecihLicaDB.find({statusNaloga:{$nin:["Završeno","Fakturisan","Doniran","Storniran"]}}).toArray();
+				for(var i=0;i<nalozi.length;i++){
+					for(var j=0;j<trecaLica.length;j++){
+						if(nalozi[i].treceLice==trecaLica[j].uniqueId){
+							nalozi[i].treceLiceNaziv = trecaLica[j].naziv;
+						}
+					}
+				}
+				res.render("trecaLica/otvoreniNalozi",{
+					pageTitle: "Отворени налози трећих лица",
+					nalozi: nalozi,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 10384.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
+
 server.post('/noviNalogTrecihLica', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==10){
@@ -14556,9 +14611,6 @@ server.post('/noviNalogTrecihLica', async (req, res)=> {
 					message: "<div class=\"text\">Дошло је до грешке у бази податка 10409.</div>"
 				})
 			}
-
-
-			
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -14573,7 +14625,7 @@ server.post('/noviNalogTrecihLica', async (req, res)=> {
 
 server.get('/trecaLica/nalog/:uniqueId',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			try{
 				var nalozi = await naloziTrecihLicaDB.find({uniqueId:req.params.uniqueId}).toArray();
 
@@ -14669,25 +14721,36 @@ server.get('/trecaLica/nalogBroj/:broj',async (req,res)=>{
 
 server.post('/izmenaNalogaTrecegLica', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			try{
 				var json = JSON.parse(req.body.json);
-				var setObj = {
-					$set:{
-						statusNaloga: json.statusNaloga,
-						datumRadova: json.datumRadova,
-						kontaktNaloga: json.kontaktNaloga,
-						telefonNaloga: json.telefonNaloga,
-						majstor: json.majstor,
-						ukupanIznos: json.ukupanIznos,
-						nacinPlacanja: json.nacinPlacanja,
-						PNR: json.PNR,
-						brojUgovora: json.brojUgovora,
-						brojSpecifikacije: json.brojSpecifikacije,
-						brojFakture: json.brojFakture,
-						opisNaloga: json.opisNaloga
+				if(Number(req.session.user.role)==10){
+					var setObj = {
+						$set:{
+							statusNaloga: json.statusNaloga,
+							datumRadova: json.datumRadova,
+							kontaktNaloga: json.kontaktNaloga,
+							telefonNaloga: json.telefonNaloga,
+							majstor: json.majstor,
+							ukupanIznos: json.ukupanIznos,
+							nacinPlacanja: json.nacinPlacanja,
+							PNR: json.PNR,
+							brojUgovora: json.brojUgovora,
+							brojSpecifikacije: json.brojSpecifikacije,
+							brojFakture: json.brojFakture,
+							opisNaloga: json.opisNaloga
+						}
+					}
+				}else if(Number(req.session.user.role)==20){
+					var setObj = {
+						$set:{
+							statusNaloga: json.statusNaloga,
+							datumRadova: json.datumRadova,
+							majstor: json.majstor
+						}
 					}
 				}
+				
 
 				await naloziTrecihLicaDB.updateOne({uniqueId:json.uniqueId},setObj);
 				res.redirect("/trecaLica/nalog/"+json.uniqueId)
@@ -14717,7 +14780,7 @@ server.post('/izmenaNalogaTrecegLica', async (req, res)=> {
 
 server.post('/edit-nalog-treca-lica', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 				uploadSlika(req, res, async function (error) {
 				    if (error) {
 				      logError(error);

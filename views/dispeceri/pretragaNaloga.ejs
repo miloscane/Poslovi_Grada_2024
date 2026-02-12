@@ -21,7 +21,12 @@
 									alert("Број налога делује неисправно. Потребно је да има 7 цифри.")
 								}else{
 									loadGif();
-									window.location.href='/nalog/'+brojNaloga;
+									if(brojNaloga.startsWith("00")){
+										window.location.href='/treceLiceNalogBroj/'+brojNaloga;
+									}else{
+										window.location.href='/nalog/'+brojNaloga;
+									}
+									
 								}
 							}
 							document.getElementById("broj-naloga").addEventListener('keypress', function(event) {
