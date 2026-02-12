@@ -164,6 +164,7 @@
 									document.getElementById("product-code").value = productJson.code;
 									document.getElementById("product-price").value = productJson.price;
 									document.getElementById("product-stanje").value = productJson.realnoStanje;
+									document.getElementById("product-unit-input").value = productJson.unit;
 									document.getElementById("product-kriticno-stanje").value = productJson.alarm;
 									document.getElementById("product-stanje-popis").value = "";
 									document.getElementById("product-unit").innerHTML = productJson.unit;
@@ -218,6 +219,7 @@
 								document.getElementById("product-name").value = "";
 								document.getElementById("product-code").value = "";
 								document.getElementById("product-stanje").value = "";
+								document.getElementById("product-unit-input").value = "";
 								document.getElementById("product-kriticno-stanje").value = "";
 								document.getElementById("product-stanje-popis").value = "";
 								document.getElementById("obracun-stanja").innerHTML = "";
@@ -269,6 +271,15 @@
 
 								</div>
 								<div class="inputWrap">
+									<div class="inputTitle">Јединица мере</div>
+									<div class="inputWrapper">
+										<div class="input">
+											<input type="text" id="product-unit-input">
+										</div>
+									</div>
+
+								</div>
+								<div class="inputWrap">
 									<div class="inputTitle">Стање:</div>
 									<div class="inputWrapper">
 										<input type="text" id="product-stanje" disabled><span class="unit" id="product-unit"></span>
@@ -282,7 +293,7 @@
 										<input type="text" id="product-kriticno-stanje"><span class="unit" id="product-unit2"></span>
 									</div>
 								</div>
-								<div class="inputWrap">
+								<div class="inputWrap specijalMagacin" style="display:none">
 									<div class="inputTitle">Стање са новог пописа:</div>
 									<div class="note">Уколико се унесе ово поље, за рачуницу стања неће се узимати реверси и улази старији од датума који се унесе у следећем пољу.</div>
 									<div class="inputWrapper">
@@ -300,6 +311,7 @@
 											json.uniqueId = document.getElementById("product-id").value;
 											json.alarm = document.getElementById("product-kriticno-stanje").value;
 											json.price = document.getElementById("product-price").value;
+											json.unit = document.getElementById("product-unit-input").value;
 											if(document.getElementById("product-stanje-popis").value){
 												json.popis = document.getElementById("product-stanje-popis").value;
 											}
@@ -311,19 +323,23 @@
 									</script>
 								</div>
 								<div style="margin-top:3px;margin-bottom:3px;border-bottom:3px solid rgb(50,50,50)"></div>
-								<div class="title">Podesi ulaz:</div>
-								<div class="inputWrap">
-									<div class="inputTitle">Количина:</div>
-									<div class="inputWrapper">
-										<input type="number" id="product-ulaz-kolicina">
+								<div class="specijalMagacin" style="display:none">
+									<div class="title">Podesi ulaz:</div>
+									<div class="inputWrap">
+										<div class="inputTitle">Количина:</div>
+										<div class="inputWrapper">
+											<input type="number" id="product-ulaz-kolicina">
+										</div>
+									</div>
+									<div class="inputWrap">
+										<div class="button" onclick="saveUlaz()">Сачувај улаз</div>
+										<form method="POST" action="/sacuvaj-ulaz" style="display:none" id="sacuvaj-ulaz-form">
+											<input type="text" name="json" id="sacuvaj-ulaz-json">
+										</form>
 									</div>
 								</div>
-								<div class="inputWrap">
-									<div class="button" onclick="saveUlaz()">Сачувај улаз</div>
-									<form method="POST" action="/sacuvaj-ulaz" style="display:none" id="sacuvaj-ulaz-form">
-										<input type="text" name="json" id="sacuvaj-ulaz-json">
-									</form>
-								</div>
+								
+								
 								<script>
 									function saveUlaz(){
 										if(document.getElementById("product-ulaz-kolicina").value){
@@ -339,14 +355,25 @@
 									}
 								</script>
 								<div style="margin-top:3px;margin-bottom:3px;border-bottom:3px solid rgb(50,50,50)"></div>
-								<div class="title">Улази:</div>
-								<div class="inputWrap"><div class="note">Приказани су само улази од последњег пописа</div></div>
-								<div id="lista-ulaza"></div>
+								<div class="specijalMagacin" style="display:none">
+									<div class="title">Улази:</div>
+									<div class="inputWrap"><div class="note">Приказани су само улази од последњег пописа</div></div>
+									<div id="lista-ulaza"></div>
+								</div>
+								
 								<script>
 									function deleteUlaz(id){
 										document.getElementById("obrisi-ulaz-input").value = id;
 										loadGif();
 										document.getElementById("obrisi-ulaz-form").submit();
+									}
+								</script>
+								<script>
+									if(["ivan.zivadinovic+magacioner@poslovigrada.rs","vladeta.stamenkovic+magacioner@poslovigrada.rs"].indexOf(user.email)>=0){
+										var specijals = document.getElementsByClassName("specijalMagacin");
+										for(var i=0;i<specijals.length;i++){
+											specijals[i].style.display = "block";
+										}
 									}
 								</script>
 								<form method="POST" style="display:none" action="/obrisi-ulaz" id="obrisi-ulaz-form">

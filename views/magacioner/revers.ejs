@@ -281,6 +281,7 @@
 										<select id="majstor-reversa"></select>
 										<script>
 											var majstori	=	<%-JSON.stringify(majstori)%>;
+											majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 											var option = document.createElement("OPTION");
 											option.setAttribute("value","fantom");
 											option.innerHTML	=	"Фантомски мајстор";
@@ -499,7 +500,8 @@
 											yPos = yPos + 10;
 									        doc.setFontType("bold");
 											doc.text("Требован материјал:",5,yPos);
-											doc.text("Уграђен материјал:",150,yPos);
+											doc.text("Уграђено:",150,yPos);
+											doc.text("Раздужено:",180,yPos);
 											doc.setFontType("normal");
 											doc.setFontSize(14);
 											yPos = yPos + 7;
@@ -508,9 +510,10 @@
 												doc.text(eval(i+1).toString()+".",5,yPos);
 												doc.setFontType("normal");
 												doc.text(getProductById(revers.zaduzenje[i].uniqueId).name,15,yPos);
-												doc.text(revers.zaduzenje[i].quantity+" kom.",120,yPos);
+												doc.text(revers.zaduzenje[i].quantity+" "+getProductById(revers.zaduzenje[i].uniqueId).unit,120,yPos);
 												//doc.text(revers.zaduzenje[i].quantity2+" kom.",150,yPos);
-												doc.text("_____ kom.",150,yPos);
+												doc.text("_____ "+getProductById(revers.zaduzenje[i].uniqueId).unit,150,yPos);
+												doc.text("_____ "+getProductById(revers.zaduzenje[i].uniqueId).unit,180,yPos);
 												yPos = yPos + 7;
 												if(yPos>285){
 													doc.addPage()

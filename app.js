@@ -13490,6 +13490,7 @@ server.post('/izmeni-proizvod', async (req, res)=> {
 										alarm:json.alarm,
 										stanje:json.popis,
 										price:json.price,
+										unit:json.unit,
 										datumPopisa:getDateAsStringForDisplay(new Date()),
 										datetimePopisa: new Date().getTime()
 									}
@@ -13497,6 +13498,7 @@ server.post('/izmeni-proizvod', async (req, res)=> {
 			}else{
 				var setObj	=	{ $set: {
 										alarm:json.alarm,
+										unit:json.unit,
 										price:json.price
 									}
 							};

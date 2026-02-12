@@ -142,6 +142,7 @@
 										<select id="majstor-reversa"></select>
 										<script>
 											var majstori	=	<%-JSON.stringify(majstori)%>;
+											majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 											var option = document.createElement("OPTION");
 											option.setAttribute("value","fantom");
 											option.innerHTML	=	"Фантомски мајстор";
