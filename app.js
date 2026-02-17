@@ -1273,11 +1273,11 @@ http.listen(process.env.PORT, async function(){
 		}
 
 		var naloziToExport = [];
-		var month = 12;
+		var month = 1;
 		for(var i=0;i<nalozi.length;i++){
 			if(nalozi[i].faktura.broj){
 				if(nalozi[i].faktura.broj.length>3){
-					if(nalozi[i].prijemnica.datum.datum.includes("."+month.toString().padStart(2,'0')+".2025")){
+					if(nalozi[i].prijemnica.datum.datum.includes("."+month.toString().padStart(2,'0')+".2026")){
 						naloziToExport.push(nalozi[i])
 					}
 				}
@@ -1329,7 +1329,7 @@ http.listen(process.env.PORT, async function(){
 		for(var i=0;i<problemNalozi.length;i++){
 			csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
 		}
-		fs.writeFileSync("./PG-Premijus-"+month+"-2025.csv",csvString,"utf8");
+		fs.writeFileSync("./PG-Premijus-"+month+"-2026.csv",csvString,"utf8");
 		console.log("Written Premijus")*/
 
 
