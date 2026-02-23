@@ -3422,6 +3422,11 @@ input[type=number] {
     background-color:rgba(0,0,0,0.1);
 }
 
+.rezultatPretrageReversa table tr:hover{
+    background-color: rgba(30,51,100,1);
+    color:rgb(255,255,255);
+}
+
 .rezultatPretrageReversa table td{
     border:1px solid rgb(150,150,150);
 }

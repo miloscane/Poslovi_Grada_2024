@@ -10,12 +10,41 @@
 		var proizvodi = <%-JSON.stringify(proizvodi)%>;
 	</script>
 	<div class="pageWidth">
+		<div>
+			Nadji reverse za dan <input type="date" id="date"><button onclick="pretragaPoDanu()">Nadji</button>
+		</div>
+		<div id="stats" style="margin-top:20px"></div>
+		<script>
+			<% if (typeof dan!="undefined") { %>
+				document.getElementById("date").value = "<%=dan%>";
+			<%}else{%>
+				document.getElementById("date").value = getDateAsStringForInputObject(new Date());
+			<%}%>
+			
+			function pretragaPoDanu(){
+				window.location.href="/magacioner/reversiNaDan/"+document.getElementById("date").value
+			}
+		</script>
 		<div class="rezultatPretrageReversa">
 			<div id="table"></div>
 			<script>
+				var tipoviReversa = [];
 				var table = document.createElement("TABLE");
 				for(var i=0;i<reversi.length;i++){
+					var tipFound = false;
+					for(var j=0;j<tipoviReversa.length;j++){
+						if(tipoviReversa[j].tip==reversi[i].tip){
+							tipFound = true;
+							tipoviReversa[j].broj++;
+							break;
+						}
+					}
+					if(!tipFound){
+						tipoviReversa.push({tip:reversi[i].tip,broj:1})
+					}
 					var tr = document.createElement("TR");
+					tr.setAttribute("onclick","window.location.href='/magacioner/revers/"+reversi[i].uniqueId+"'")
+					tr.style.cursor = "pointer"
 						var td = document.createElement("TD");
 						td.innerHTML = "<div class=\"value\">"+eval(i+1)+".</div>";
 						tr.appendChild(td);
@@ -28,7 +57,7 @@
 						var reversDate = new Date(Number(reversi[i].datetime));
 						var datum = reversi[i].datum ?  reversi[i].datum : reshuffleDate(reversi[i].date);//.date je za stare reverse
 						var td = document.createElement("TD");
-						td.innerHTML = "<div class=\"value\">"+datum+" "+reversDate.getHours().toString().padStart(2,'0')+":"+reversDate.getMinutes().toString().padStart(2,'0')+"</div>";
+						td.innerHTML = "<div class=\"value\">"+datum+"<br>"+reversDate.getHours().toString().padStart(2,'0')+":"+reversDate.getMinutes().toString().padStart(2,'0')+"</div>";
 						tr.appendChild(td);
 
 						var td = document.createElement("TD");
@@ -47,13 +76,16 @@
 						tr.appendChild(td);
 
 						var td = document.createElement("TD");
-						td.innerHTML = "<div class=\"value\"><a href=\"/magacioner/revers/"+reversi[i].uniqueId+"\">Види реверс</div>";
+						td.innerHTML = "<div class=\"value\">"+reversi[i].tip+"</div>";
 						tr.appendChild(td);
 
 					table.appendChild(tr);
 					var redniBroj = document.cr
 				}
 				document.getElementById("table").appendChild(table);
+				for(var i=0;i<tipoviReversa.length;i++){
+					document.getElementById("stats").innerHTML += " | "+tipoviReversa[i].tip+": "+tipoviReversa[i].broj
+				}
 
 				function getNalogByBroj(broj){
 					var nalog = {};
