@@ -5696,7 +5696,7 @@ http.listen(process.env.PORT, async function(){
 		console.log("Iznos: "+brojSaRazmacima(ukupanIznos))
 		console.log("Naloga: "+ukupnoNaloga)*/
 
-		/*function getPreviousWeekDates() {
+		function getPreviousWeekDates() {
 		  const today = new Date();
 
 		  // get current day (0=Sun, 1=Mon...)
@@ -5722,13 +5722,62 @@ http.listen(process.env.PORT, async function(){
 		var datesInPreviousWeek = getPreviousWeekDates();
 		var dodeljivaniNalozi = await dodeljivaniNaloziDB.find({"datum.datum":{$in:datesInPreviousWeek}}).toArray();
 		
-		const seen = new Set();
+		/*const seen = new Set();
 
 		dodeljivaniNalozi = dodeljivaniNalozi.filter(item => {
 		  if (seen.has(item.nalog)) return false;
 		  seen.add(item.nalog);
 		  return true;
+		});*/
+
+		const seen = new Set();
+
+		dodeljivaniNalozi = dodeljivaniNalozi.map(item => {
+		  const isDuplicate = seen.has(item.nalog);
+		  seen.add(item.nalog);
+
+		  return {
+		    ...item,
+		    isDuplicate
+		  };
 		});
+
+		var users = [];
+		for(var i=0;i<dodeljivaniNalozi.length;i++){
+			var userExists = false;
+			for(var j=0;j<users.length;j++){
+				if(dodeljivaniNalozi[i].user.name==users[j].user.name){
+					userExists = true; 
+				}
+			}
+			if(!userExists){
+				var json = {};
+				json.user = dodeljivaniNalozi[i].user;
+				json.nalozi = 0;
+				json.dupliraniNalozi = 0;
+				users.push(json)
+			}
+		}
+
+		for(var i=0;i<dodeljivaniNalozi.length;i++){
+			for(var j=0;j<users.length;j++){
+				if(users[j].user.email==dodeljivaniNalozi[i].user.email){
+					if(dodeljivaniNalozi[i].isDuplicate){
+						users[j].dupliraniNalozi++;
+					}else{
+						users[j].nalozi++;
+					}
+				}
+			}
+		}
+
+		for(var i=0;i<users.length;i++){
+			console.log(users[i].user.name)
+			console.log(" Nalozi: "+users[i].nalozi)
+			console.log(" Duplirano: "+users[i].dupliraniNalozi)
+			console.log("----------------------------------------")
+		}
+		
 
 		var brojeviNaloga = [];
 		for(var i=0;i<dodeljivaniNalozi.length;i++){
@@ -5814,7 +5863,7 @@ http.listen(process.env.PORT, async function(){
 		console.log("Crpljenje i dezinfekcija: "+ brojSaRazmacima(crpljenje)+" RSD")
 		console.log("Finalizacije: "+ brojSaRazmacima(finalizacije)+" RSD")
 		console.log("----------------------------------")
-		console.log("Ukupno: "+brojSaRazmacima(zamene+odgusenje+kopanje+bager+wome+crpljenje+finalizacije) + " RSD");*/
+		console.log("Ukupno: "+brojSaRazmacima(zamene+odgusenje+kopanje+bager+wome+crpljenje+finalizacije) + " RSD");
 
 
 
@@ -15507,6 +15556,30 @@ server.post('/portalStambenoUgovori', async (req, res)=> {
 		})	
 	}
 });
+
+
+
+
+//FADATA TESTIRANJE
+server.post('/portalStambenoNaloziTest', (req, res) => {
+  return res.status(200).json({
+    code: "200",
+    message: "Primio sam podatke.",
+    received: req.body
+  });
+});
+
+server.post('/portalStambenoUgovoriTest', (req, res) => {
+  return res.status(200).json({
+    code: "200",
+    message: "Primio sam podatke.",
+    received: req.body
+  });
+});
+
+
+
+
 
 server.get('/tv2', async (req, res)=> {
   naloziDB.find({statusNaloga:{$nin:["Završeno","Nalog u Stambenom","Spreman za fakturisanje","Fakturisan","Storniran"]}}).toArray()
