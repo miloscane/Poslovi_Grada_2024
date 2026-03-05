@@ -72,6 +72,7 @@ var config = {
 var token;
 var telematicsId = process.env.telematicsid;
 
+
 /*request(websiteOptions, (error,response,body)=>{
 	if(error){
 		console.log(error)
@@ -5696,7 +5697,7 @@ http.listen(process.env.PORT, async function(){
 		console.log("Iznos: "+brojSaRazmacima(ukupanIznos))
 		console.log("Naloga: "+ukupnoNaloga)*/
 
-		function getPreviousWeekDates() {
+		/*function getPreviousWeekDates() {
 		  const today = new Date();
 
 		  // get current day (0=Sun, 1=Mon...)
@@ -5728,7 +5729,7 @@ http.listen(process.env.PORT, async function(){
 		  if (seen.has(item.nalog)) return false;
 		  seen.add(item.nalog);
 		  return true;
-		});*/
+		});
 
 		const seen = new Set();
 
@@ -5863,7 +5864,306 @@ http.listen(process.env.PORT, async function(){
 		console.log("Crpljenje i dezinfekcija: "+ brojSaRazmacima(crpljenje)+" RSD")
 		console.log("Finalizacije: "+ brojSaRazmacima(finalizacije)+" RSD")
 		console.log("----------------------------------")
-		console.log("Ukupno: "+brojSaRazmacima(zamene+odgusenje+kopanje+bager+wome+crpljenje+finalizacije) + " RSD");
+		console.log("Ukupno: "+brojSaRazmacima(zamene+odgusenje+kopanje+bager+wome+crpljenje+finalizacije) + " RSD");*/
+
+
+		//var sifraWoma						= ["80.02.09.003","80.02.09.004","80.02.09.020","80.02.09.021","80.02.09.022","80.02.09.023","80.02.09.024","80.02.09.025","80.02.09.026","80.02.09.027","80.02.09.028","80.02.09.029","80.04.01.006","80.02.09.031"];
+		//var sifraOdgusenja 			= ["80.02.09.001","80.02.09.002","80.02.09.005","80.02.09.006","80.02.10.003","80.02.10.004","80.02.10.005","80.02.10.007"];
+		//var sifraWoma2024				= ["80.02.09.020","80.02.09.021","80.02.09.022"];
+		//var sifraOdgusenja2024 = ["80.02.09.001","80.02.09.002","80.02.09.003","80.02.09.004","80.02.09.005"];
+
+
+		/*var nalozi =	await naloziDB.find({}).toArray();
+		var naloziOdgusenja = [];
+		for(var i=0;i<nalozi.length;i++){
+			var nalog = nalozi[i];
+			nalog.brojOdgusenja = 0;
+			nalog.naloziOdgusenja = [];
+			for(var j=0;j<nalog.obracun.length;j++){
+				if(sifraOdgusenja.indexOf(nalog.obracun[j].code)>=0){
+					nalog.brojOdgusenja++;
+					var nalogExists = false;
+					for(var k=0;k<naloziOdgusenja.length;k++){
+						if(naloziOdgusenja[k].adresa==nalog.adresa){
+							nalogExists = true;
+							naloziOdgusenja[k].brojOdgusenja++;
+							naloziOdgusenja[k].naloziOdgusenja.push({nalog:nalog.broj,datum:nalog.datum.datum})
+							break;
+						}
+					}
+					if(!nalogExists){
+						naloziOdgusenja.push(nalog);
+					}
+					break;
+				}
+			}
+		}*/
+
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var nalozi2024 = await nalozi2024DB.find({}).toArray();
+		nalozi = [...nalozi, ...nalozi2024];
+
+		var naloziOdgusenja = [];
+		var filterCodes = [...sifraWoma, ...sifraWoma2024];
+
+		for(var i=0;i<nalozi.length;i++){
+			var nalog = nalozi[i];
+
+			var imaOdgusenje = false;
+
+			if(nalog.obracun && nalog.obracun.length>0){
+				for(var j=0;j<nalog.obracun.length;j++){
+					if(filterCodes.indexOf(nalog.obracun[j].code)>=0){
+						imaOdgusenje = true;
+						break; // nalog ima bar jedno odgusenje
+					}
+				}
+			}
+
+			if(imaOdgusenje){
+				var nalogExists = false;
+
+				for(var k=0;k<naloziOdgusenja.length;k++){
+					if(naloziOdgusenja[k].adresa==nalog.adresa){
+						nalogExists = true;
+
+						// broj naloga na toj adresi koji imaju odgusenje
+						naloziOdgusenja[k].brojOdgusenja++;
+
+						// upisi nalog u listu
+						naloziOdgusenja[k].naloziOdgusenja.push({
+							broj: nalog.broj,
+							datum: nalog.datum && nalog.datum.datum ? nalog.datum.datum : ""
+						});
+
+						break;
+					}
+				}
+
+				if(!nalogExists){
+					var json = {};
+					json.adresa = nalog.adresa;
+					json.brojOdgusenja = 1; // prvi nalog za tu adresu
+					json.broj = nalog.broj;
+					json.datum = nalog.datum;
+					json.radnaJedinica = nalog.radnaJedinica;
+					json.naloziOdgusenja = [];
+
+					// OBAVEZNO: ubaci i prvi nalog odmah
+					json.naloziOdgusenja.push({
+						broj: nalog.broj,
+						datum: nalog.datum && nalog.datum.datum ? nalog.datum.datum : ""
+					});
+
+					naloziOdgusenja.push(json);
+				}
+			}
+		}
+
+		console.log(naloziOdgusenja)
+
+		async function exportOdgusenjaHorizontal(naloziOdgusenja, outPath = "./wome.xlsx") {
+		  const workbook = new ExcelJS.Workbook();
+		  const sheet = workbook.addWorksheet("Odgusenja");
+
+		  // 1) Find max number of sub-nalozi (excluding the main nalog itself)
+		  var maxPods = 0;
+		  for (var i = 0; i < naloziOdgusenja.length; i++) {
+		    var item = naloziOdgusenja[i];
+		    if (!item.naloziOdgusenja) continue;
+
+		    var podsCount = 0;
+		    for (var j = 0; j < item.naloziOdgusenja.length; j++) {
+		      if (item.naloziOdgusenja[j].broj != item.broj) {
+		        podsCount++;
+		      }
+		    }
+		    if (podsCount > maxPods) maxPods = podsCount;
+		  }
+
+		  // 2) Build columns dynamically
+		  var columns = [
+			  { header: "Radna jedinica", key: "radnaJedinica", width: 20 }, // 👈 NEW
+			  { header: "Adresa", key: "adresa", width: 35 },
+			  { header: "Broj odgusenja", key: "brojOdgusenja", width: 15 },
+			  { header: "Glavni broj", key: "glavniBroj", width: 15 },
+			  { header: "Glavni datum", key: "glavniDatum", width: 15 },
+			];
+
+		  for (var p = 1; p <= maxPods; p++) {
+		    columns.push({ header: "Nalog " + p, key: "podBroj" + p, width: 15 });
+		    columns.push({ header: "Datum " + p, key: "podDatum" + p, width: 15 });
+		  }
+
+		  sheet.columns = columns;
+		  sheet.getRow(1).font = { bold: true };
+
+		  // 3) Add one row per address/group
+		  for (var i = 0; i < naloziOdgusenja.length; i++) {
+		    var item = naloziOdgusenja[i];
+
+		    if ((item.brojOdgusenja ?? 0) <= 1) continue;
+
+		    var row = {};
+
+				row.radnaJedinica = item.radnaJedinica || ""; // 👈 NEW
+				row.adresa = item.adresa || "";
+				row.brojOdgusenja = item.brojOdgusenja ?? "";
+				row.glavniBroj = item.broj ?? "";
+				row.glavniDatum = (item.datum && item.datum.datum) ? item.datum.datum : "";
+
+		    var podsIndex = 1;
+
+		    if (item.naloziOdgusenja && item.naloziOdgusenja.length > 0) {
+		      for (var j = 0; j < item.naloziOdgusenja.length; j++) {
+		        var s = item.naloziOdgusenja[j];
+
+		        // skip the "main == sub" entry
+		        if (s.broj == item.broj) continue;
+
+		        row["podBroj" + podsIndex] = s.broj ?? "";
+		        row["podDatum" + podsIndex] = s.datum ?? "";
+		        podsIndex++;
+		      }
+		    }
+
+		    sheet.addRow(row);
+		  }
+
+		  await workbook.xlsx.writeFile(outPath);
+		  return outPath;
+		}
+
+		exportOdgusenjaHorizontal(naloziOdgusenja)*/
+
+		/*for(var i=0;i<naloziOdgusenja.length;i++){
+			if(naloziOdgusenja[i].brojOdgusenja>1){
+				console.log(naloziOdgusenja[i].adresa + " ("+naloziOdgusenja[i].brojOdgusenja.length+")")//new line
+				console.log(naloziOdgusenja[i].broj,naloziOdgusenja[i].datum.datum)
+				for(var j=0;j<naloziOdgusenja[i].naloziOdgusenja.length;j++){
+					console.log(naloziOdgusenja[i].naloziOdgusenja[j].broj,naloziOdgusenja[i].naloziOdgusenja[j].datum.datum)
+				}
+			}
+		}*/
+
+		
+
+		/*var datesInPreviousWeek = getPreviousWeekDates();
+		var dodeljivaniNalozi = await dodeljivaniNaloziDB.find({"datum.datum":{$in:datesInPreviousWeek}}).toArray();
+		
+		/*const seen = new Set();
+
+		dodeljivaniNalozi = dodeljivaniNalozi.filter(item => {
+		  if (seen.has(item.nalog)) return false;
+		  seen.add(item.nalog);
+		  return true;
+		});*/
+
+		/*const seen = new Set();
+
+		dodeljivaniNalozi = dodeljivaniNalozi.map(item => {
+		  const isDuplicate = seen.has(item.nalog);
+		  seen.add(item.nalog);
+
+		  return {
+		    ...item,
+		    isDuplicate
+		  };
+		});
+
+		var users = [];
+		for(var i=0;i<dodeljivaniNalozi.length;i++){
+			var userExists = false;
+			for(var j=0;j<users.length;j++){
+				if(dodeljivaniNalozi[i].user.name==users[j].user.name){
+					userExists = true; 
+				}
+			}
+			if(!userExists){
+				var json = {};
+				json.user = dodeljivaniNalozi[i].user;
+				json.nalozi = [];
+				for(var j=0;j<datesInPreviousWeek.length;j++){
+					var json2 = {};
+					json2.datum = datesInPreviousWeek[j];
+					json2.nalozi = [];
+					json.nalozi.push(json2)
+				}
+				users.push(json)
+			}
+		}
+
+
+
+		for(var i=0;i<dodeljivaniNalozi.length;i++){
+			for(var j=0;j<users.length;j++){
+				if(users[j].user.email==dodeljivaniNalozi[i].user.email){
+					for(var k=0;k<users[j].nalozi.length;k++){
+						if(users[j].nalozi[k].datum==reshuffleDate(dodeljivaniNalozi[i].datumRadova)){
+							users[j].nalozi[k].nalozi.push(dodeljivaniNalozi[i]);
+						}
+					}
+				}
+			}
+		}
+
+		var majstori = await majstoriDB.find({}).toArray();
+
+		for(var i=0;i<users.length;i++){
+			for(var j=0;j<users[i].nalozi.length;j++){
+				users[i].nalozi[j].poEkipama = [];
+				for(var k=0;k<users[i].nalozi[j].nalozi.length;k++){
+					var ekipaExists = false;
+					for(var l=0;l<users[i].nalozi[j].poEkipama.length;l++){
+						if(users[i].nalozi[j].poEkipama[l].majstor==users[i].nalozi[j].nalozi[k].majstor){
+							users[i].nalozi[j].poEkipama[l].nalozi.push(users[i].nalozi[j].nalozi[k]);
+							ekipaExists = true;
+							break;
+						}
+					}
+					if(!ekipaExists){
+						var json = {};
+						json.majstor = users[i].nalozi[j].nalozi[k].majstor;
+						json.nalozi = [users[i].nalozi[j].nalozi[k]];
+						users[i].nalozi[j].poEkipama.push(json);
+					}
+				}
+			}
+		}
+
+		//console.log(JSON.stringify(users))
+		var naziviUNedelji = ["Ponedeljak","Utorak","Sreda","Cetvrtak","Petak","Subota","Nedelja"]
+		for(var i=0;i<users.length;i++){
+			console.log(users[i].user.name)
+			for(var j=0;j<users[i].nalozi.length;j++){
+				console.log("  "+naziviUNedelji[j]+" " +users[i].nalozi[j].datum)
+				for(var k=0;k<users[i].nalozi[j].poEkipama.length;k++){
+					var imeMajstora = "???";
+					for(var l=0;l<majstori.length;l++){
+						if(majstori[l].uniqueId==users[i].nalozi[j].poEkipama[k].majstor){
+							imeMajstora = majstori[l].ime;
+						}
+					}
+					console.log("    Ekipa "+eval(k+1)+": "+imeMajstora)//ovde mozes da nadjes majstora ime
+					for(var l=0;l<users[i].nalozi[j].poEkipama[k].nalozi.length;l++){
+						console.log("     "+eval(l+1)+". | "+users[i].nalozi[j].poEkipama[k].nalozi[l].nalog + " | "+users[i].nalozi[j].poEkipama[k].nalozi[l].adresa+" | "+users[i].nalozi[j].poEkipama[k].nalozi[l].tipRada);
+					}
+				}
+			}
+			console.log("-------------------------")
+		}
+
+		fs.writeFileSync("nalozi.json",JSON.stringify(users))
+		fs.writeFileSync("majstori.json",JSON.stringify(majstori))*/
+
+		/*var stopovi = await stopoviDB.find({date:"2026-03-02"}).toArray();
+		var ukupnoKilometara = 0;
+		for(var i=0;i<stopovi[0].vozila.Data.length;i++){
+			ukupnoKilometara = ukupnoKilometara + stopovi[0].vozila.Data[i].dailySummary.DailyDistance;
+		}
+		console.log(ukupnoKilometara)*/
+
+		//nda, reversi,
 
 
 
@@ -5873,6 +6173,29 @@ http.listen(process.env.PORT, async function(){
 		console.log('Failed to connect to database');
 	});
 });
+
+function getPreviousWeekDates() {
+  const today = new Date();
+
+  // get current day (0=Sun, 1=Mon...)
+  const day = today.getDay();
+
+  // calculate last Monday
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  const lastMonday = new Date(today);
+  lastMonday.setDate(today.getDate() + diffToMonday - 7);
+
+  const dates = [];
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(lastMonday);
+    d.setDate(lastMonday.getDate() + i);
+
+    dates.push(reshuffleDate(d.toISOString().split("T")[0])); // YYYY-MM-DD, ali DD.MM.YYYY zbog reshuffleDate
+  }
+
+  return dates;
+}
 
 function s(v) { return v === undefined || v === null ? "" : String(v); }
 function n(v) { const x = parseFloat(v); return Number.isFinite(x) ? x : 0; }

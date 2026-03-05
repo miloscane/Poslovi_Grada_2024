@@ -6,6 +6,7 @@
 		console.log(trecaLica)
 	</script>
 	<div class="pageWidth trecaLica">
+		<input id="filter" type="text" placeholder="Filter..." oninput="filterLica()">
 		<div class="boxesWrap" id="treca-lica"></div>
 		<script>
 			for(var i=0;i<trecaLica.length;i++){
@@ -17,6 +18,22 @@
 					naziv.innerHTML = trecaLica[i].naziv;
 					treceLiceBox.appendChild(naziv);
 				document.getElementById("treca-lica").appendChild(treceLiceBox);
+			}
+
+			function filterLica(){
+				var filterValue = document.getElementById("filter").value
+				var boxes = document.getElementById("treca-lica").getElementsByClassName("box");
+				for(var i=0;i<boxes.length;i++){
+					if(filterValue==""){
+						boxes[i].style.display="block";
+						continue;
+					}
+					if(boxes[i].getElementsByClassName("naziv")[0].innerHTML.toLowerCase().includes(filterValue.toLowerCase())){
+						boxes[i].style.display="block"
+					}else{
+						boxes[i].style.display="none"
+					}
+				}
 			}
 		</script>
 		<div class="inputWrap">

@@ -1,6 +1,7 @@
 <%- include ("partials/header") -%>
 	<script>
 		var trecaLica = <%-JSON.stringify(trecaLica)%>;
+		trecaLica.sort((a, b) => a.naziv.localeCompare(b.naziv));
 	</script>
 	<div class="pageWidth trecaLica">
 		<div class="boxesWrap">
