@@ -1,0 +1,239 @@
+<%- include ("partials/header") -%>
+	<script>
+		var proizvodi	=	<%-JSON.stringify(proizvodi)%>;
+		console.log(proizvodi)
+		proizvodi = proizvodi.sort((a, b) => {
+			if (a.code < b.code) {
+				return -1;
+			}
+		});
+	</script>
+	<div class="magacinStanje magacinRevers">
+		<div class="pageWidth">
+			<input type="text" placeholder="Nadji..." id="filter" oninput="filter()">
+			<script>
+				function filter(){
+					var filterValue = document.getElementById("filter").value;
+					var elements = document.getElementById("proizvodi-lista").getElementsByClassName("productButton");
+					for(var i=0;i<elements.length;i++){
+						if(filterValue==""){
+							elements[i].style.display="block"
+						}else{
+							if(elements[i].innerHTML.toLowerCase().includes(filterValue.toLowerCase())){
+								elements[i].style.display="block"
+							}else{
+								elements[i].style.display="none"
+							}
+						}
+					}
+				}
+			</script>
+			<div class="lightBlueBox">
+				<div class="inlines">
+					<div class="proizvodiWrap">
+						<script>
+
+							function productPick(elem){
+								var productId = elem.dataset.uniqueid;
+								var productJson = {};
+								for(var i=0;i<proizvodi.length;i++){
+									if(proizvodi[i].uniqueId==productId){
+										productJson = JSON.parse(JSON.stringify(proizvodi[i]));
+										break;
+									}
+								}
+								if(productJson.uniqueId){
+									var postojeceStavke = document.getElementById("revers-stavke").getElementsByClassName("uniqueId");
+									var stavkaNaListi = -1;
+									for(var i=0;i<postojeceStavke.length;i++){
+										if(postojeceStavke[i].value == productJson.uniqueId){
+											stavkaNaListi = i;
+											break;
+										}
+									}
+									if(stavkaNaListi>=0){
+										postojeceStavke[stavkaNaListi].parentElement.getElementsByClassName("quantityInput")[0].value = parseFloat(postojeceStavke[i].parentElement.getElementsByClassName("quantityInput")[0].value) + 1; 
+									}else{
+										var stavkaWrap = document.createElement("DIV");
+										stavkaWrap.setAttribute("class","stavkaWrap");
+											var idElem = document.createElement("INPUT");
+											idElem.setAttribute("class","uniqueId");
+											idElem.setAttribute("style","display:none");
+											idElem.setAttribute("type","text")
+											idElem.setAttribute("value",productJson.uniqueId)
+											stavkaWrap.appendChild(idElem);
+
+											var div = document.createElement("DIV");
+												var rBr = document.createElement("DIV");
+												rBr.setAttribute("class","number");
+												rBr.innerHTML = postojeceStavke.length+1+".";
+												div.appendChild(rBr);
+
+												var itemName = document.createElement("DIV");
+												itemName.setAttribute("class","name");
+												itemName.innerHTML = productJson.name;
+												div.appendChild(itemName);
+											stavkaWrap.appendChild(div);
+											
+
+											var div = document.createElement("DIV");
+												var quantity = document.createElement("DIV");
+												quantity.setAttribute("class","quantity");
+												quantity.innerHTML = "<input type=\"number\" class=\"quantityInput\" min=\"0\" value=\"1\"><div class=\"unit\">"+productJson.unit+"</div>";
+												stavkaWrap.appendChild(quantity);
+
+												var quantity2 = document.createElement("DIV");
+												quantity2.setAttribute("class","quantity2");
+												quantity2.innerHTML = "<input type=\"number\" class=\"quantity2Input\" min=\"0\" value=\"0\"><div class=\"unit\">"+productJson.unit+"</div>";
+												stavkaWrap.appendChild(quantity2);
+
+												var deleteElem = document.createElement("DIV");
+												deleteElem.setAttribute("class","delete");
+												deleteElem.setAttribute("onclick","deleteStavkaRow(this)");
+												deleteElem.innerHTML = "<img src=\"\https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/deleteRow.png\">";
+												stavkaWrap.appendChild(deleteElem);
+											stavkaWrap.appendChild(div);
+											
+
+										document.getElementById("revers-stavke").appendChild(stavkaWrap);
+									}
+								}else{
+									console.log("Nisam mogao da nadjem prozivod")
+								}
+							}
+
+							function deleteStavkaRow(elem){
+								elem.parentElement.remove();
+								var postojeceStavke = document.getElementById("revers-stavke").getElementsByClassName("stavkaWrap");
+								for(var i=0;i<postojeceStavke.length;i++){
+									postojeceStavke[i].getElementsByClassName("number")[0].innerHTML = eval(i+1)+"."
+								}
+							}
+						</script>
+						<div id="proizvodi">
+							<div class="buttons" id="proizvodi-lista"></div>
+							<script>
+								for(var i=0;i<proizvodi.length;i++){
+									var mainButton = document.createElement("DIV");
+									mainButton.setAttribute("class","productButton");
+									mainButton.setAttribute("onclick","productPick(this)");
+									mainButton.setAttribute("data-uniqueid",proizvodi[i].uniqueId);
+									mainButton.innerHTML = "<div class=\"value\">"+proizvodi[i].name+"<br><span class='code'>"+proizvodi[i].code+"</span></div>"
+									document.getElementById("proizvodi-lista").appendChild(mainButton);
+								}
+							</script>
+						</div>
+					</div>
+					<div class="proizvodForm">
+						<div id="form">
+							<div class="title">Реверс</div>
+							<div id="form-content">
+								<div class="inputWrap">
+									<div class="inputTitle">Мајстор:</div>
+									<div class="inputWrapper">
+										<input type="text" id="majstor-reversa">
+									</div>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Datum izdavanja robe:</div>
+									<input type="date" id="datum-reversa">
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Vreme izdavanja robe:</div>
+									<select id="vreme-reversa">
+										<option value="07:00">07:00</option>
+										<option value="07:30">07:30</option>
+										<option value="08:00">08:00</option>
+										<option value="08:30">08:30</option>
+										<option value="09:00">09:00</option>
+										<option value="09:30">09:30</option>
+										<option value="10:00">10:00</option>
+										<option value="10:30">10:30</option>
+										<option value="11:00">11:00</option>
+										<option value="11:30">11:30</option>
+										<option value="12:00">12:00</option>
+										<option value="12:30">12:30</option>
+										<option value="13:00">13:00</option>
+										<option value="13:30">13:30</option>
+										<option value="14:00">14:00</option>
+										<option value="14:30">14:30</option>
+										<option value="15:00">15:00</option>
+										<option value="15:30">15:30</option>
+										<option value="16:00">16:00</option>
+										<option value="16:30">16:30</option>
+										<option value="17:00">17:00</option>
+										<option value="17:30">17:30</option>
+										<option value="18:00">18:00</option>
+										<option value="18:30">18:30</option>
+										<option value="19:00">19:00</option>
+										<option value="19:30">19:30</option>
+										<option value="20:00">20:00</option>
+										<option value="20:30">20:30</option>
+										<option value="21:00">21:00</option>
+										<option value="21:30">21:30</option>
+										<option value="22:00">22:00</option>
+										<option value="22:30">22:30</option>
+									</select>
+									<script>
+										document.getElementById("datum-reversa").value = getDateAsStringForInputObject(new Date());
+										var currentHours = new Date().getHours().toString().padStart(2,"0")
+										var currentMinutes = new Date().getMinutes();
+										currentMinutes = currentMinutes>29 ? "30" : "00";
+										document.getElementById("vreme-reversa").value = currentHours + ":" + currentMinutes;
+									</script>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Ставке:</div>
+									<div id="revers-stavke"></div>
+								</div>
+								<div class="inputWrap">
+									<div class="button" onclick="saveRevers()">Сачувај</div>
+									<form method="POST" action="/cuprija/novi-revers" style="display:none" id="novi-revers-form">
+										<input type="text" name="json" id="novi-revers-json">
+									</form>
+									<script>
+										function saveRevers(){
+											var zaduzenjeElems = document.getElementById("revers-stavke").getElementsByClassName("stavkaWrap");
+											if(zaduzenjeElems.length>0){
+												var json = {};
+												json.majstor = document.getElementById("majstor-reversa").value;
+												if(!json.majstor){
+													alert("Niste upisali majstora");
+													return;
+												}
+												json.zaduzenje = [];
+												var date = new Date(document.getElementById("datum-reversa").value);
+												var timestamp = document.getElementById("vreme-reversa").value;
+												if(!timestamp){
+													alert("Niste odabrali vreme izdavanja robe");
+													return;
+												}
+												date.setHours(Number(timestamp.split(":")[0]));
+												date.setMinutes(Number(timestamp.split(":")[1]));
+												json.datetime = date.getTime();
+												json.datum = getDateAsStringForDisplay(date);
+												for(var i=0;i<zaduzenjeElems.length;i++){
+													var zaduzenjeJson = {};
+													zaduzenjeJson.uniqueId = zaduzenjeElems[i].getElementsByClassName("uniqueId")[0].value;
+													zaduzenjeJson.quantity = zaduzenjeElems[i].getElementsByClassName("quantityInput")[0].value;
+													zaduzenjeJson.quantity2 = zaduzenjeElems[i].getElementsByClassName("quantity2Input")[0].value;
+													json.zaduzenje.push(zaduzenjeJson)
+												}
+												document.getElementById("novi-revers-json").value = JSON.stringify(json);
+												loadGif();
+												document.getElementById("novi-revers-form").submit();
+											}else{
+												alert("Нисте унели ниједну ставку");
+											}
+										}
+									</script>
+								</div>
+							</div>
+						</div>
+					</div>	
+				</div>
+				
+			</div>		
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

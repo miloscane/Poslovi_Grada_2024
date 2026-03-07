@@ -1,0 +1,439 @@
+<%- include ("partials/header") -%>
+	<script>
+		var proizvodi	=	<%-JSON.stringify(proizvodi)%>;
+		var revers		=	<%-JSON.stringify(revers)%>;
+		proizvodi = proizvodi.sort((a, b) => {
+			if (a.code < b.code) {
+				return -1;
+			}
+		});
+	</script>
+	<div class="magacinStanje magacinRevers">
+		<div class="pageWidth">
+			<div class="lightBlueBox">
+				<div class="inlines">
+					<div class="proizvodiWrap">
+						<div id="proizvodi">
+							<div class="buttons" id="proizvodi-lista"></div>
+						</div>
+						<script>
+							for(var i=0;i<proizvodi.length;i++){
+								var mainButton = document.createElement("DIV");
+								mainButton.setAttribute("class","productButton");
+								mainButton.setAttribute("onclick","productPick(this)");
+								mainButton.setAttribute("data-uniqueid",proizvodi[i].uniqueId);
+								mainButton.innerHTML = "<div class=\"value\">"+proizvodi[i].name+"<br><span class='code'>"+proizvodi[i].code+"</span></div>"
+								document.getElementById("proizvodi-lista").appendChild(mainButton);
+							}
+
+							function productPick(elem){
+								var productId = elem.dataset.uniqueid;
+								var productJson = {};
+								for(var i=0;i<proizvodi.length;i++){
+									if(proizvodi[i].uniqueId==productId){
+										productJson = JSON.parse(JSON.stringify(proizvodi[i]));
+										break;
+									}
+								}
+								if(productJson.uniqueId){
+									var postojeceStavke = document.getElementById("revers-stavke").getElementsByClassName("uniqueId");
+									var stavkaNaListi = -1;
+									for(var i=0;i<postojeceStavke.length;i++){
+										if(postojeceStavke[i].value == productJson.uniqueId){
+											stavkaNaListi = i;
+											break;
+										}
+									}
+									if(stavkaNaListi>=0){
+										postojeceStavke[stavkaNaListi].parentElement.getElementsByClassName("quantityInput")[0].value = parseFloat(postojeceStavke[i].parentElement.getElementsByClassName("quantityInput")[0].value) + 1; 
+									}else{
+										var stavkaWrap = document.createElement("DIV");
+										stavkaWrap.setAttribute("class","stavkaWrap");
+											var idElem = document.createElement("INPUT");
+											idElem.setAttribute("class","uniqueId");
+											idElem.setAttribute("style","display:none");
+											idElem.setAttribute("type","text")
+											idElem.setAttribute("value",productJson.uniqueId)
+											stavkaWrap.appendChild(idElem);
+
+											var div = document.createElement("DIV");
+												var rBr = document.createElement("DIV");
+												rBr.setAttribute("class","number");
+												rBr.innerHTML = postojeceStavke.length+1+".";
+												div.appendChild(rBr);
+
+												var itemName = document.createElement("DIV");
+												itemName.setAttribute("class","name");
+												itemName.innerHTML = productJson.name;
+												div.appendChild(itemName);
+											stavkaWrap.appendChild(div);
+											
+
+											var div = document.createElement("DIV");
+												var quantity = document.createElement("DIV");
+												quantity.setAttribute("class","quantity");
+												quantity.innerHTML = "<input type=\"number\" class=\"quantityInput\" min=\"0\" value=\"1\"><div class=\"unit\">"+productJson.unit+"</div>";
+												stavkaWrap.appendChild(quantity);
+
+												var quantity2 = document.createElement("DIV");
+												quantity2.setAttribute("class","quantity2");
+												quantity2.innerHTML = "<input type=\"number\" class=\"quantity2Input\" min=\"0\" value=\"0\"><div class=\"unit\">"+productJson.unit+"</div>";
+												stavkaWrap.appendChild(quantity2);
+
+												var deleteElem = document.createElement("DIV");
+												deleteElem.setAttribute("class","delete");
+												deleteElem.setAttribute("onclick","deleteStavkaRow(this)");
+												deleteElem.innerHTML = "<img src=\"https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/deleteRow.png\">";
+												stavkaWrap.appendChild(deleteElem);
+											stavkaWrap.appendChild(div);
+											
+
+										document.getElementById("revers-stavke").appendChild(stavkaWrap);
+									}
+								}else{
+									console.log("Nisam mogao da nadjem prozivod")
+								}
+							}
+
+							function deleteStavkaRow(elem){
+								elem.parentElement.remove();
+								var postojeceStavke = document.getElementById("revers-stavke").getElementsByClassName("stavkaWrap");
+								for(var i=0;i<postojeceStavke.length;i++){
+									postojeceStavke[i].getElementsByClassName("number")[0].innerHTML = eval(i+1)+"."
+								}
+							}
+
+							function getProductById(uniqueId){
+								var product = {};
+								for(var i=0;i<proizvodi.length;i++){
+									if(proizvodi[i].uniqueId==uniqueId){
+										product = proizvodi[i];
+									}
+								}
+								return product;
+							}
+
+							function dodajStavku(json){
+								var postojeceStavke = document.getElementById("revers-stavke").getElementsByClassName("stavkaWrap");
+								var stavkaWrap = document.createElement("DIV");
+								stavkaWrap.setAttribute("class","stavkaWrap");
+									var idElem = document.createElement("INPUT");
+									idElem.setAttribute("class","uniqueId");
+									idElem.setAttribute("style","display:none");
+									idElem.setAttribute("type","text")
+									idElem.setAttribute("value",json.uniqueId)
+									stavkaWrap.appendChild(idElem);
+
+									var div = document.createElement("DIV");
+										var rBr = document.createElement("DIV");
+										rBr.setAttribute("class","number");
+										rBr.innerHTML = postojeceStavke.length+1+".";
+										div.appendChild(rBr);
+
+										var itemName = document.createElement("DIV");
+										itemName.setAttribute("class","name");
+										itemName.innerHTML = getProductById(json.uniqueId).name;
+										div.appendChild(itemName);
+									stavkaWrap.appendChild(div);
+									
+
+									var div = document.createElement("DIV");
+										var quantity = document.createElement("DIV");
+										quantity.setAttribute("class","quantity");
+										quantity.innerHTML = "<input type=\"number\" class=\"quantityInput\" min=\"0\" value=\""+json.quantity+"\"><div class=\"unit\">"+getProductById(json.uniqueId).unit+"</div>";
+										stavkaWrap.appendChild(quantity);
+
+										var quantity2 = document.createElement("DIV");
+										quantity2.setAttribute("class","quantity2");
+										quantity2.innerHTML = "<input type=\"number\" class=\"quantity2Input\" min=\"0\" value=\""+json.quantity2+"\"><div class=\"unit\">"+getProductById(json.uniqueId).unit+"</div>";
+										stavkaWrap.appendChild(quantity2);
+
+										var deleteElem = document.createElement("DIV");
+										deleteElem.setAttribute("class","delete");
+										deleteElem.setAttribute("onclick","deleteStavkaRow(this)");
+										deleteElem.innerHTML = "<img src=\"\https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/deleteRow.png\">";
+										stavkaWrap.appendChild(deleteElem);
+									stavkaWrap.appendChild(div);
+									
+
+								document.getElementById("revers-stavke").appendChild(stavkaWrap);
+							}
+						</script>
+					</div>
+					<div class="proizvodForm">
+						<div id="form">
+							<div class="title">Реверс</div>
+							<div id="form-content">
+								<div class="inputWrap">
+									<div class="inputTitle" id="date"></div>
+									<script>
+										var datumReversa = new Date(Number(revers.datetime));
+										var datum = revers.datum ? revers.datum : reshuffleDate(revers.date);
+										document.getElementById("date").innerHTML = datum + " "+ datumReversa.getHours().toString().padStart(2,"0")+":"+datumReversa.getMinutes().toString().padStart(2,"0");
+									</script>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Datum izdavanja robe:</div>
+									<input type="date" id="datum-reversa">
+									<script>
+										document.getElementById("datum-reversa").value = getDateAsStringForInputObject(datumReversa)
+									</script>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Vreme izdavanja robe:</div>
+									<select id="vreme-reversa">
+										<option value="07:00">07:00</option>
+										<option value="07:30">07:30</option>
+										<option value="08:00">08:00</option>
+										<option value="08:30">08:30</option>
+										<option value="09:00">09:00</option>
+										<option value="09:30">09:30</option>
+										<option value="10:00">10:00</option>
+										<option value="10:30">10:30</option>
+										<option value="11:00">11:00</option>
+										<option value="11:30">11:30</option>
+										<option value="12:00">12:00</option>
+										<option value="12:30">12:30</option>
+										<option value="13:00">13:00</option>
+										<option value="13:30">13:30</option>
+										<option value="14:00">14:00</option>
+										<option value="14:30">14:30</option>
+										<option value="15:00">15:00</option>
+										<option value="15:30">15:30</option>
+										<option value="16:00">16:00</option>
+										<option value="16:30">16:30</option>
+										<option value="17:00">17:00</option>
+										<option value="17:30">17:30</option>
+										<option value="18:00">18:00</option>
+										<option value="18:30">18:30</option>
+										<option value="19:00">19:00</option>
+										<option value="19:30">19:30</option>
+										<option value="20:00">20:00</option>
+										<option value="20:30">20:30</option>
+										<option value="21:00">21:00</option>
+										<option value="21:30">21:30</option>
+										<option value="22:00">22:00</option>
+										<option value="22:30">22:30</option>
+									</select>
+									<script>
+										var currentHours = new Date(Number(revers.datetime)).getHours().toString().padStart(2,"0")
+										var currentMinutes = new Date(Number(revers.datetime)).getMinutes();
+										currentMinutes = currentMinutes>29 ? "30" : "00";
+										document.getElementById("vreme-reversa").value = currentHours + ":" + currentMinutes;
+									</script>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Мајстор:</div>
+									<div class="inputWrapper">
+										<input type="text" id="majstor-reversa">
+										<script>
+											document.getElementById("majstor-reversa").value = revers.majstor;
+										</script>
+									</div>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Број реверса:</div>
+									<input type="text" id="broj-reversa">
+									<script>
+										document.getElementById("broj-reversa").value = revers.brojReversa;
+									</script>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Раздужен:</div>
+									<input type="checkbox" id="razduzen-revers">
+									<script>
+										document.getElementById("razduzen-revers").checked = revers.razduzen;
+									</script>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Ставке:</div>
+									<div id="revers-stavke"></div>
+									<script>
+										for(var i=0;i<revers.zaduzenje.length;i++){
+											dodajStavku(revers.zaduzenje[i])
+										}
+									</script>
+								</div>
+								<div class="inputWrap reversButtons">
+									<div class="button" onclick="saveRevers()">Сачувај измене</div>
+									<div class="button deleteButton" onclick="loadGif();document.getElementById('obrisi-revers-form').submit()">Обриши реверс</div>
+									<div class="button" onclick="printRevers()">
+										<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
+										<div class="label">Штампај реверс</div>
+									</div>
+									<form method="POST" action="/cuprija/izmeni-revers" style="display:none" id="izmeni-revers-form">
+										<input type="text" name="json" id="izmeni-revers-json">
+									</form>
+									<form method="POST" action="/cuprija/obrisi-revers" style="display:none" id="obrisi-revers-form">
+										<input type="text" name="id" value="<%=revers.uniqueId%>">
+									</form>
+									<%- include ("partials/printer") -%>
+									<div style="overflow:hidden;height:1px;width:1px;">
+										<canvas id="logo-canvas" height="306" width="300"></canvas>
+										<script>
+											var logoCanvas = document.getElementById('logo-canvas');
+											var logoCanvasContext = logoCanvas.getContext('2d');
+											var logoLogoBlob;
+											function make_base3(){
+											  base_image3 = new Image();
+											  base_image3.crossOrigin="anonymous"
+											  //base_image3.src = 'https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/fakturaLogo.png';
+											  base_image3.src = '/images/fakturaLogo.png';
+											  base_image3.onload = function(){
+											    logoCanvasContext.drawImage(base_image3, 0, 0);
+											    logoLogoBlob 	=	logoCanvas.toDataURL("image/png", 1.0);
+
+											  }
+											}
+											make_base3();
+										</script>
+									</div>
+									<div style="overflow:hidden;width:1px;height:1px">
+										<canvas id="logo-stambeno-canvas" height="87" width="238"></canvas>
+										<script>
+											var logoStambenoCanvas = document.getElementById('logo-stambeno-canvas');
+											var logoStambenoCanvasContext = logoStambenoCanvas.getContext('2d');
+											var logoStambenoLogoBlob;
+											function make_base4(){
+											  base_image4 = new Image();
+											  base_image4.crossOrigin="anonymous"
+											  base_image4.src = 'https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo_stambeno.png';
+											  base_image4.onload = function(){
+											    logoStambenoCanvasContext.drawImage(base_image4, 0, 0);
+											    logoStambenoLogoBlob 	=	logoStambenoCanvas.toDataURL("image/png", 1.0);
+
+											  }
+											}
+											make_base4();
+										</script>
+									</div>
+									<script>
+										function saveRevers(){
+											var zaduzenjeElems = document.getElementById("revers-stavke").getElementsByClassName("stavkaWrap");
+											if(zaduzenjeElems.length>0){
+												var json = {};
+												json.uniqueId = revers.uniqueId;
+												json.majstor = document.getElementById("majstor-reversa").value;
+												var date = new Date(document.getElementById("datum-reversa").value);
+												var timestamp = document.getElementById("vreme-reversa").value;
+												date.setHours(Number(timestamp.split(":")[0]));
+												date.setMinutes(Number(timestamp.split(":")[1]));
+												json.datetime = date.getTime();
+												json.datum = getDateAsStringForDisplay(date);
+												json.razduzen = document.getElementById("razduzen-revers").checked;
+												json.zaduzenje = [];
+												for(var i=0;i<zaduzenjeElems.length;i++){
+													var zaduzenjeJson = {};
+													zaduzenjeJson.uniqueId = zaduzenjeElems[i].getElementsByClassName("uniqueId")[0].value;
+													zaduzenjeJson.quantity = zaduzenjeElems[i].getElementsByClassName("quantityInput")[0].value;
+													zaduzenjeJson.quantity2 = zaduzenjeElems[i].getElementsByClassName("quantity2Input")[0].value;
+													json.zaduzenje.push(zaduzenjeJson)
+												}
+												document.getElementById("izmeni-revers-json").value = JSON.stringify(json);
+												loadGif();
+												document.getElementById("izmeni-revers-form").submit();
+											}else{
+												alert("Нисте унели ниједну ставку");
+											}
+										}
+
+										function splitInto40(str) {
+										    var result = [];
+										    for (var i = 0; i < str.length; i += 40) {
+										        result.push(str.substring(i, i + 40));
+										    }
+										    return result;
+										}
+
+										function printRevers(){
+											doc = new jsPDF({
+												orientation: 'p',
+												unit: 'mm',
+												format: 'a4',
+												compress: true
+												//putOnlyUsedFonts:true
+											});
+											pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+											pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+											var yPos = 40;
+											var xPos = 12;
+											//doc.getFontList("Helvetica");
+											doc.addFileToVFS("PTSans.ttf", PTSans);
+											doc.addFileToVFS("PTSansBold.ttf", PTSansBold);
+											doc.addFont('PTSans.ttf', 'PTSans', 'normal');
+											doc.addFont('PTSansBold.ttf', 'PTSans', 'bold');
+
+											doc.setFont('PTSans'); // set font
+											doc.getFontList("PTSans");
+											if(logoStambenoLogoBlob){
+												doc.addImage(logoStambenoLogoBlob, 'PNG', 5, 5, 119/mm, 43/mm,'','FAST');
+											}
+
+									        doc.setFontType("bold");
+											doc.setFontSize(20);
+									        doc.text("Реверс по налогу број "+revers.brojReversa,pageWidth/2,yPos,'center');
+									        yPos = yPos + 10;
+									        doc.setFontType("normal");
+											doc.setFontSize(16);
+											yPos = yPos + 10;
+											
+											doc.text("Ћуприја",pageWidth/2,yPos,'center');
+											yPos = yPos + 10;
+									        doc.text(vremePrijema(revers.datetime),pageWidth/2,yPos,'center');
+											yPos = yPos + 10;
+									        doc.setFontType("bold");
+											doc.text("Требован материјал:",5,yPos);
+											doc.text("Уграђено:",150,yPos);
+											doc.text("Раздужено:",180,yPos);
+											doc.setFontType("normal");
+											doc.setFontSize(14);
+											yPos = yPos + 7;
+											for(var i=0;i<revers.zaduzenje.length;i++){
+									        	doc.setFontType("bold");
+												doc.text(eval(i+1).toString()+".",5,yPos);
+												doc.setFontType("normal");
+												var proizvodNaziv = splitInto40(getProductById(revers.zaduzenje[i].uniqueId).name);
+												doc.text(revers.zaduzenje[i].quantity+" "+getProductById(revers.zaduzenje[i].uniqueId).unit,120,yPos);
+												//doc.text(revers.zaduzenje[i].quantity2+" kom.",150,yPos);
+												doc.text("_____ "+getProductById(revers.zaduzenje[i].uniqueId).unit,150,yPos);
+												doc.text("_____ "+getProductById(revers.zaduzenje[i].uniqueId).unit,180,yPos);
+												for(var j=0;j<proizvodNaziv.length;j++){
+													doc.text(proizvodNaziv[j],15,yPos);
+													yPos = yPos + 7;
+												}
+												
+												yPos = yPos + 7;
+												if(yPos>285){
+													doc.addPage()
+													yPos = 5;
+												}
+											}
+											yPos = yPos + 7;
+											if(yPos>285){
+												doc.addPage()
+												yPos = 5;
+											}
+											doc.setFontType("bold");
+											doc.text(revers.majstor,5,yPos);
+											yPos = yPos + 15;
+											if(yPos>285){
+												doc.addPage()
+												yPos = 5;
+											}
+											doc.setDrawColor(0);
+									        doc.setFillColor(0,0,0);
+											doc.rect(5, yPos, 50, 0.4, 'F');
+
+											
+									        window.open(doc.output('bloburl'), '_blank');
+										}
+									</script>
+								</div>
+							</div>
+						</div>
+					</div>	
+				</div>
+			</div>		
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

@@ -887,6 +887,10 @@ var opravdanjaDispeceraDB;
 var dnevneEkipeDB;
 var stariCenovnikJsons = [];
 var stareSpecifikacijePodizvodjacaDB;
+var cuprijaMaterijalDB;
+var cuprijaReversiDB;
+var cuprijaObrisaniReversiDB;
+var cuprijaUlaziDB;
 
 http.listen(process.env.PORT, async function(){
 	console.log("Poslovi Grada 2024");
@@ -935,6 +939,10 @@ http.listen(process.env.PORT, async function(){
 		opomeneDispeceraDB 		= client.db("Poslovi_Grada_2024").collection('Opomene dispecera');
 		opravdanjaDispeceraDB	= client.db("Poslovi_Grada_2024").collection('Opravdanja dispecera');
 		dnevneEkipeDB					= client.db("Poslovi_Grada_2024").collection('Dnevne Ekipe');
+		cuprijaReversiDB							=	client.db("Poslovi_Grada_2024").collection('cuprijaReversi');
+		cuprijaObrisaniReversiDB			=	client.db("Poslovi_Grada_2024").collection('cuprijaObrisaniReversi');
+		cuprijaMaterijalDB		=	client.db("Poslovi_Grada_2024").collection('cuprijaMaterijal');
+		cuprijaUlaziDB				=	client.db("Poslovi_Grada_2024").collection('cuprijaUlazi');
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
 		nalozi2022DB					=	client.db("Poslovi-Grada").collection('nalozi2022');
@@ -945,6 +953,50 @@ http.listen(process.env.PORT, async function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
+		/*var setObj = {$set:{
+			stanje: 0,
+			datumPopisa: "06.03.2026",
+			datetimePopisa: 1772755200000
+		}};
+		var response = await cuprijaMaterijalDB.updateMany({},setObj)
+		console.log(response)*/
+
+		/*function extractItems(csvText) {
+		  var lines = csvText.split('\n');
+		  var result = [];
+
+		  for (var i = 0; i < lines.length; i++) {
+		    var line = lines[i].trim();
+		    if (!line) continue;
+
+		    var lastComma = line.lastIndexOf(',');
+		    if (lastComma === -1) continue;
+
+		    var name = line.substring(0, lastComma).trim();
+		    var unit = line.substring(lastComma + 1).trim();
+
+		    // remove surrounding quotes if present
+		    if (name.startsWith('"') && name.endsWith('"')) {
+		      name = name.substring(1, name.length - 1);
+		    }
+
+		    result.push({
+		      name: name,
+		      unit: unit
+		    });
+		  }
+
+		  return result;
+		}
+
+		var items = extractItems(fs.readFileSync("cuprijaMaterijal.csv",{encoding:"utf8"}));
+		for(var i=0;i<items.length;i++){
+			items[i].uniqueId = generateId(8);
+			items[i].code = eval(i+1).toString().padStart(5,"0");
+			console.log(items[i].unit)
+		}
+		var response = await cuprijaMaterijalDB.insertMany(items);
+		console.log(response)*/
 
 		/*nalozi2023DB.find({}).toArray()
 		.then((nalozi)=>{
@@ -6790,6 +6842,8 @@ server.get('/',async (req,res)=>{
 			res.redirect("/magacioner/stanje")
 		}else if(Number(req.session.user.role)==60){
 			res.redirect("/majstor/mesec")
+		}else if(Number(req.session.user.role)==70){
+			res.redirect("/cuprija/stanje")
 		}else{
 			res.render("message",{
 				pageTitle: "Грешка",
@@ -14080,6 +14134,54 @@ server.post('/izmeni-proizvod', async (req, res)=> {
 	}
 });
 
+
+server.post('/cuprija/izmeni-proizvod', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			var json = JSON.parse(req.body.json);
+			if(json.popis){
+				var setObj	=	{ $set: {
+										alarm:json.alarm,
+										stanje:json.popis,
+										price:json.price,
+										unit:json.unit,
+										datumPopisa:getDateAsStringForDisplay(new Date()),
+										datetimePopisa: new Date().getTime()
+									}
+							};
+			}else{
+				var setObj	=	{ $set: {
+										alarm:json.alarm,
+										unit:json.unit,
+										price:json.price
+									}
+							};
+			}
+			
+			cuprijaMaterijalDB.updateOne({uniqueId:json.uniqueId},setObj)
+			.then((dbResponse)=>{
+				res.redirect("/cuprija/stanje");
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2929.</div>"
+				})
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
 server.post('/sacuvaj-ulaz', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==50){
@@ -14114,6 +14216,40 @@ server.post('/sacuvaj-ulaz', async (req, res)=> {
 	}
 });
 
+server.post('/cuprija/sacuvaj-ulaz', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			var json = JSON.parse(req.body.json);
+			var insertJson = {};
+			insertJson.uniqueId = generateId(7)+"--"+new Date().getTime();
+			insertJson.productUniqueId = json.uniqueId;
+			insertJson.quantity = json.kolicina;
+			insertJson.datum = getDateAsStringForDisplay(new Date());
+			insertJson.datetime = new Date().getTime();
+
+			cuprijaUlaziDB.insertOne(insertJson)
+			.then((dbResponse)=>{
+				res.redirect("/cuprija/stanje");
+			}).catch((err)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2929.</div>"
+				})
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
 server.post('/obrisi-ulaz', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==50){
@@ -14127,6 +14263,33 @@ server.post('/obrisi-ulaz', async (req, res)=> {
 					pageTitle: "Програмска грешка",
 					user: req.session.user,
 					message: "<div class=\"text\">Дошло је до грешке у бази податка 3022.</div>"
+				})
+			});
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.post('/cuprija/obrisi-ulaz', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+
+			cuprijaUlaziDB.deleteOne({uniqueId:req.body.id})
+			.then((dbResponse)=>{
+				res.redirect("/cuprija/stanje");
+			}).catch((err)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 14201.</div>"
 				})
 			});
 		}else{
@@ -14184,6 +14347,38 @@ server.get('/magacioner/noviRevers',async (req,res)=>{
 	}
 });
 
+
+
+server.get('/cuprija/noviRevers',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
+				res.render("cuprija/noviRevers",{
+					pageTitle:"Нови реверс",
+					proizvodi: proizvodi,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3026.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.post('/novi-revers', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==50){
@@ -14213,6 +14408,39 @@ server.post('/novi-revers', async (req, res)=> {
 	}
 });
 
+server.post('/cuprija/novi-revers', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var json = JSON.parse(req.body.json);
+				json.uniqueId = generateId(7)+"--"+new Date().getTime();
+				json.datetime = Number(json.datetime);
+				var broj = await cuprijaReversiDB.countDocuments();
+				var broj2 = await cuprijaObrisaniReversiDB.countDocuments();
+				broj = broj + broj2 + 1;
+				json.brojReversa = broj.toString().padStart(5,"0");
+				await cuprijaReversiDB.insertOne(json);
+				res.redirect("/cuprija/revers/"+json.uniqueId);
+			}catch(error){
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3062.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
 server.post('/izmeni-revers', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==50){
@@ -14229,6 +14457,40 @@ server.post('/izmeni-revers', async (req, res)=> {
 			magacinReversiDB.updateOne({uniqueId:json.uniqueId},setObj)
 			.then((dbResponse)=>{
 				res.redirect("/magacioner/revers/"+json.uniqueId);
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3094.</div>"
+				})
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.post('/cuprija/izmeni-revers', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			var json = JSON.parse(req.body.json);
+			var setObj	=	{ $set: {
+				zaduzenje: json.zaduzenje,
+				datetime: Number(json.datetime),
+				razduzen: json.razduzen,
+				datum: json.datum
+			}};
+			cuprijaReversiDB.updateOne({uniqueId:json.uniqueId},setObj)
+			.then((dbResponse)=>{
+				res.redirect("/cuprija/revers/"+json.uniqueId);
 			})
 			.catch((error)=>{
 				logError(error);
@@ -14281,6 +14543,34 @@ server.post('/obrisi-revers', async (req, res)=> {
 	}
 });
 
+server.post('/cuprija/obrisi-revers', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var revers = await cuprijaReversiDB.find({uniqueId:req.body.id}).toArray();
+				await cuprijaObrisaniReversiDB.insertOne(revers[0])
+				await cuprijaReversiDB.deleteOne({uniqueId:req.body.id});
+				res.redirect("/cuprija/stanje")
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3134.</div>"
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
 server.get('/magacioner/revers/:uniqueId',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==50){
@@ -14308,6 +14598,46 @@ server.get('/magacioner/revers/:uniqueId',async (req,res)=>{
 						proizvodi: proizvodi,
 						majstori: majstori,
 						nalog: nalog,
+						revers: reversi[0],
+						user: req.session.user
+					})
+				}
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3026.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/cuprija/revers/:uniqueId',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
+				var reversi = await cuprijaReversiDB.find({uniqueId:req.params.uniqueId}).toArray();
+				if(reversi.length==0){
+					return res.render("message",{
+								pageTitle: "Грешка",
+								user: req.session.user,
+								message: "<div class=\"text\">Реверс није у бази података или је обрисан.</div>"
+							});
+				}else{
+					res.render("cuprija/revers",{
+						pageTitle:"Rеверс број "+reversi[0].brojReversa,
+						proizvodi: proizvodi,
 						revers: reversi[0],
 						user: req.session.user
 					})
@@ -14421,6 +14751,38 @@ server.post('/pretraga-reversa', async (req, res)=> {
 		}
 	}else{
 		res.redirect("/login");	
+	} 
+});
+
+server.get('/cuprija/reversi', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var reversi = await cuprijaReversiDB.find({}).toArray();
+				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
+				res.render("cuprija/reversi",{
+					pageTitle: "Листа издатих реверса",
+					user: req.session.user,
+					reversi: reversi,
+					proizvodi: proizvodi
+				});
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3449.</div>"
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
 	} 
 });
 
@@ -15409,6 +15771,44 @@ server.post('/edit-nalog-treca-lica', async (req, res)=> {
 		})	
 	}
 });*/
+
+
+server.get('/cuprija/stanje',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
+				var ulazi = await cuprijaUlaziDB.find({}).toArray();
+				var reversi = await cuprijaReversiDB.find({}).toArray();
+				res.render("cuprija/stanje",{
+					pageTitle:"Стање",
+					proizvodi: proizvodi,
+					ulazi: ulazi,
+					reversi: reversi,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до програмске грешке број 15468.</div>"
+				});
+			}
+			
+
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
 
 
 server.post('/portalStambenoNalozi', async (req, res)=> {

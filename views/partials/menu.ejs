@@ -229,6 +229,10 @@
 							<div class="menuItem"><a href="/majstor/mesec">Месечни преглед</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/majstor/nalozi">Данашњи налози</a><div class="rightBorder"></div></div>
 							<div class="menuItem"><a href="/majstor/pravilnik">Правилник</a><div class="rightBorder"></div></div>
+						<% }else if(Number(user.role)==70){ %>
+							<div class="menuItem"><a href="/cuprija/stanje" onclick="loadGif()">Стање</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/cuprija/noviRevers" onclick="loadGif()">Нови реверс</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="/cuprija/reversi">Реверси</a><div class="rightBorder"></div></div>
 						<% } %>
 					</div>
 				</div>

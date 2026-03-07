@@ -1,0 +1,379 @@
+<%- include ("partials/header") -%>
+	<script>
+		var proizvodi	=	<%-JSON.stringify(proizvodi)%>;
+		proizvodi = proizvodi.sort((a, b) => {
+			if (a.code < b.code) {
+				return -1;
+			}
+		});
+		var ulazi 		=	<%-JSON.stringify(ulazi)%>;
+		var reversi 	=	<%-JSON.stringify(reversi)%>;
+		console.log(reversi)
+	</script>
+	<div class="magacinStanje">
+		<div class="pageWidth">
+			<div class="ukupnaVrednost" style="display:none">Укупна вредност магацина: <span id="vrednost-magacina"></span></div>
+			<div class="inputWrap printButton" style="display:none">
+				<div class="button" onclick="excelExport()">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/printIcon.png"></div>
+					<div class="label">Извези у Excel</div>
+				</div>
+			</div>	
+			<script>
+				var ukupnaVrednostMagacina = 0;
+				for(var i=0;i<proizvodi.length;i++){
+					if(proizvodi[i].datumPopisa){
+						proizvodi[i].datumPopisa = reshuffleDateInverse2(proizvodi[i].datumPopisa);
+					}else{
+						proizvodi[i].datumPopisa = "1970-01-01";	
+					}
+					if(proizvodi[i].stanje){
+						proizvodi[i].realnoStanje = parseFloat(proizvodi[i].stanje);
+					}else{
+						proizvodi[i].realnoStanje = 0;
+					}
+					
+					proizvodi[i].obracunStanja = [];
+					
+					proizvodi[i].obracunStanja.push("<p>Стање на попису " + getDateAsStringForDisplay(new Date(Number(proizvodi[i].datetimePopisa))) + " : " + proizvodi[i].stanje + "</p>");
+					proizvodi[i].ukupnoDodato = 0;
+					proizvodi[i].ukupnoUzeto = 0;
+					for(var j=0;j<ulazi.length;j++){
+						var datetimeUlaza = Number(ulazi[j].datetime);
+						var datetimePopisa = Number(proizvodi[i].datetimePopisa);
+						if(ulazi[j].productUniqueId==proizvodi[i].uniqueId){
+							if(datetimeUlaza>=datetimePopisa){
+
+								proizvodi[i].realnoStanje = proizvodi[i].realnoStanje + parseFloat(ulazi[j].quantity);
+								proizvodi[i].ukupnoDodato = proizvodi[i].ukupnoDodato + parseFloat(ulazi[j].quantity);
+								proizvodi[i].obracunStanja.push("<p>Улаз за производ дана "+ulazi[j].datum+" : "+ulazi[j].quantity+"</p>");
+							}
+							
+						}
+					}
+
+					for(var j=0;j<reversi.length;j++){
+						for(var k=0;k<reversi[j].zaduzenje.length;k++){
+							if(reversi[j].zaduzenje[k].uniqueId==proizvodi[i].uniqueId){
+								if(reversi[j].date){
+									//Stari revers
+									var datetimeReversa = new Date(reversi[j].date).getTime();
+									var datetimePopisa = Number(proizvodi[i].datetimePopisa);//+1 dodato zbog toga jer se popis radi isti dan kad se izdaje materijal ujutru pa se izdati materijal racuna
+									if(datetimeReversa>=datetimePopisa){
+										var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
+										proizvodi[i].ukupnoUzeto = proizvodi[i].ukupnoUzeto + uzeto;
+										var vraceno = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity2);
+										proizvodi[i].ukupnoDodato = proizvodi[i].ukupnoDodato + vraceno;
+										proizvodi[i].realnoStanje = proizvodi[i].realnoStanje - uzeto + vraceno;
+										var imeMajstora = reversi[j].majstor;
+										proizvodi[i].obracunStanja.push("<p>Реверс за "+imeMajstora+" по броју "+reversi[j].brojReversa+" дана "+reshuffleDate(reversi[j].date)+" узето "+uzeto+",  враћено "+vraceno+"</p>");
+									}
+								}else{
+									//novi revers
+									var datetimeReversa = Number(reversi[j].datetime);
+									var datetimePopisa = Number(proizvodi[i].datetimePopisa);//+1 dodato zbog toga jer se popis radi isti dan kad se izdaje materijal ujutru pa se izdati materijal racuna
+									if(datetimeReversa>=datetimePopisa){
+										var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
+										proizvodi[i].ukupnoUzeto = proizvodi[i].ukupnoUzeto + uzeto;
+										var vraceno = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity2);
+										proizvodi[i].ukupnoDodato = proizvodi[i].ukupnoDodato + vraceno;
+										proizvodi[i].realnoStanje = proizvodi[i].realnoStanje - uzeto + vraceno;
+										var imeMajstora = reversi[j].majstor;
+										proizvodi[i].obracunStanja.push("<p>Реверс за "+imeMajstora+" по броју "+reversi[j].brojReversa+" дана "+reversi[j].datum+" узето "+uzeto+",  враћено "+vraceno+"</p>");
+									}
+								}
+								
+								
+							}
+						}
+					}
+					proizvodi[i].obracunStanja.push("<div style=\"border-bottom:2px solid rgb(37,57,101);\"></div>");
+					proizvodi[i].obracunStanja.push("<p>Попис: <b>"+proizvodi[i].stanje+"</b></p>");
+					proizvodi[i].obracunStanja.push("<p>Улаз и враћено: <b>"+proizvodi[i].ukupnoDodato+"</b></p>");
+					proizvodi[i].obracunStanja.push("<p>Издато: <b>"+proizvodi[i].ukupnoUzeto+"</b></p>");
+					var cenaProizvoda = isNaN(parseFloat(proizvodi[i].price)) ? 0 : parseFloat(proizvodi[i].price);
+					ukupnaVrednostMagacina = ukupnaVrednostMagacina + proizvodi[i].realnoStanje*cenaProizvoda;
+					document.getElementById("vrednost-magacina").innerHTML = brojSaRazmacima(ukupnaVrednostMagacina) + " дин.";
+				}
+
+				function excelExport(){
+					var csvString = "Šifra stavke,Naziv stavke,Jedinica mere,Stanje,Jedinicna Cena,Ukupna Cena\r\n";
+					for(var i=0;i<proizvodi.length;i++){
+						var cenaStavke = proizvodi[i].price!=0 && proizvodi[i].price!="" ? parseFloat(proizvodi[i].price) : 0;
+						cenaStavke = isNaN(cenaStavke) ? 0 : cenaStavke;
+						console.log(cenaStavke)
+						csvString += "\""+proizvodi[i].code+"\""+","+proizvodi[i].name.replace(/,/g,'')+","+proizvodi[i].unit+","+proizvodi[i].realnoStanje+","+cenaStavke+","+parseFloat(proizvodi[i].realnoStanje)*cenaStavke+"\r\n"
+					}
+					var blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+					var url = URL.createObjectURL(blob);
+
+					// Create a link to download it
+					var pom = document.createElement('a');
+					pom.href = url;
+					pom.setAttribute('download', "Stanje u magacinu");
+					pom.click();
+				}
+			</script>
+			<input type="text" placeholder="Nadji..." id="filter" oninput="filter()">
+			<script>
+				function filter(){
+					var filterValue = document.getElementById("filter").value;
+					var elements = document.getElementById("proizvodi-lista").getElementsByClassName("productButton");
+					for(var i=0;i<elements.length;i++){
+						if(filterValue==""){
+							elements[i].style.display="block"
+						}else{
+							if(elements[i].innerHTML.toLowerCase().includes(filterValue.toLowerCase())){
+								elements[i].style.display="block"
+							}else{
+								elements[i].style.display="none"
+							}
+						}
+					}
+				}
+			</script>
+			<div class="lightBlueBox">
+				<div class="inlines">
+					<div class="proizvodiWrap">
+						<div id="proizvodi">
+							<div class="buttons" id="proizvodi-lista"></div>
+						</div>
+						<script>
+							for(var i=0;i<proizvodi.length;i++){
+								var mainButton = document.createElement("DIV");
+								mainButton.setAttribute("class","productButton");
+								mainButton.setAttribute("onclick","productPick(this)");
+								mainButton.setAttribute("data-uniqueid",proizvodi[i].uniqueId);
+								var realnoStanje = proizvodi[i].realnoStanje;
+								if(realnoStanje.toString().includes(".")){
+									realnoStanje = realnoStanje.toFixed(2)
+								}
+								var classes = proizvodi[i].realnoStanje<proizvodi[i].alarm ? "stanje stanjeKriticno" : "stanje" 
+								mainButton.innerHTML = "<div class=\"value\">"+proizvodi[i].name+"<br><span class='code'>"+proizvodi[i].code+"</span><br><span class='"+classes+"'>"+realnoStanje+"</span></div>"
+								document.getElementById("proizvodi-lista").appendChild(mainButton);
+							}
+
+							function clearForm(){
+								document.getElementById("form-content").style.display="none";
+								document.getElementById("form").getElementsByClassName("title")[0].innerHTML = "Одабери производ";
+								document.getElementById("product-id").value = "";
+								document.getElementById("product-name").value = "";
+								document.getElementById("product-code").value = "";
+								document.getElementById("product-stanje").value = "";
+								document.getElementById("product-unit-input").value = "";
+								document.getElementById("product-kriticno-stanje").value = "";
+								document.getElementById("product-stanje-popis").value = "";
+								document.getElementById("obracun-stanja").innerHTML = "";
+								document.getElementById("product-ulaz-kolicina").value = "";
+								document.getElementById("lista-ulaza").innerHTML = ""
+								document.getElementById("product-unit").innerHTML = "";
+								document.getElementById("product-unit2").innerHTML = "";
+								document.getElementById("product-unit3").innerHTML = "";
+
+							}
+
+							function productPick(elem){
+								clearForm();
+								var productId = elem.dataset.uniqueid;
+								var productJson = {};
+								for(var i=0;i<proizvodi.length;i++){
+									if(proizvodi[i].uniqueId==productId){
+										productJson = JSON.parse(JSON.stringify(proizvodi[i]));
+										break;
+									}
+								}
+								if(productJson.uniqueId){
+									document.getElementById("form").getElementsByClassName("title")[0].innerHTML = "Pregled proizvoda:";
+									document.getElementById("product-id").value = productJson.uniqueId;
+									document.getElementById("product-name").value = productJson.name;
+									document.getElementById("product-code").value = productJson.code;
+									document.getElementById("product-price").value = productJson.price ? productJson.price : "";
+									document.getElementById("product-stanje").value = productJson.realnoStanje;
+									document.getElementById("product-unit-input").value = productJson.unit;
+									document.getElementById("product-kriticno-stanje").value = productJson.alarm ? productJson.alarm : "";
+									document.getElementById("product-stanje-popis").value = "";
+									document.getElementById("product-unit").innerHTML = productJson.unit;
+									document.getElementById("product-unit2").innerHTML = productJson.unit;
+									document.getElementById("product-unit3").innerHTML = productJson.unit;
+									for(var i=0;i<productJson.obracunStanja.length;i++){
+										var item = document.createElement("DIV");
+										item.setAttribute("class","item");
+										item.innerHTML = productJson.obracunStanja[i];
+										document.getElementById("obracun-stanja").appendChild(item);
+									}
+									for(var i=0;i<ulazi.length;i++){
+										if(ulazi[i].productUniqueId==productJson.uniqueId){
+											//check the date
+											var datetimeUlaza = Number(ulazi[i].datetime);
+											var datetimePopisa = new Date(productJson.datumPopisa).getTime();
+											if(datetimeUlaza>=datetimePopisa){
+												var item = document.createElement("DIV");
+												item.setAttribute("class","item");
+
+													var datum = document.createElement("DIV");
+													datum.setAttribute("class","datum");
+													datum.innerHTML = ulazi[i].datum;
+													item.appendChild(datum);
+
+													var kolicina = document.createElement("DIV");
+													kolicina.setAttribute("class","kolicina");
+													kolicina.innerHTML = ulazi[i].quantity;
+													item.appendChild(kolicina);
+
+													var obrisi = document.createElement("DIV");
+													obrisi.setAttribute("class","obrisi");
+													obrisi.setAttribute("onclick","deleteUlaz('"+ulazi[i].uniqueId+"')")
+													obrisi.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/deleteRow.png'>";
+													item.appendChild(obrisi);
+
+
+												document.getElementById("lista-ulaza").appendChild(item);
+											}
+										}
+									}
+									document.getElementById("form-content").style.display="block";
+								}else{
+									console.log("Nisam mogao da nadjem prozivod")
+								}
+							}
+						</script>
+					</div>
+					<div class="proizvodForm">
+						<div id="form">
+							<div class="title">Одабери производ</div>
+							<div id="form-content" style="display:none">
+								<input type="text" id="product-id" style="display:none">
+								<div class="inputWrap">
+									<div class="inputTitle">Назив Производа:</div>
+									<div class="inputWrapper">
+										<textarea id="product-name" disabled></textarea>
+									</div>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Шифра производа:</div>
+									<div class="inputWrapper">
+										<input type="text" id="product-code" disabled>
+									</div>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Цена производа</div>
+									<div class="inputWrapper">
+										<div class="input">
+											<input type="text" id="product-price">
+										</div>
+										<div class="unit">
+											дин.
+										</div>
+									</div>
+
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Јединица мере</div>
+									<div class="inputWrapper">
+										<div class="input">
+											<input type="text" id="product-unit-input">
+										</div>
+									</div>
+
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Стање:</div>
+									<div class="inputWrapper">
+										<input type="text" id="product-stanje" disabled><span class="unit" id="product-unit"></span>
+									</div>
+									<div class="prikaziStanje" style="text-decoration: underline;margin-bottom:5px" onclick="document.getElementById('obracun-stanja').style.display='block'">Прикажи обрачун стања</div>
+									<div id="obracun-stanja" style="display:none"></div>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Критично стање:</div>
+									<div class="inputWrapper">
+										<input type="text" id="product-kriticno-stanje"><span class="unit" id="product-unit2"></span>
+									</div>
+								</div>
+								<div class="inputWrap specijalMagacin">
+									<div class="inputTitle">Стање са новог пописа:</div>
+									<div class="note">Уколико се унесе ово поље, за рачуницу стања неће се узимати реверси и улази старији од датума који се унесе у следећем пољу.</div>
+									<div class="inputWrapper">
+										<input type="number" id="product-stanje-popis"><span class="unit" id="product-unit3"></span>
+									</div>
+								</div>
+								<div class="inputWrap">
+									<div class="button" onclick="saveProduct()">Сачувај</div>
+									<form method="POST" action="/cuprija/izmeni-proizvod" style="display:none" id="izmeni-proizvod-form">
+										<input type="text" name="json" id="izmeni-proizvod-json">
+									</form>
+									<script>
+										function saveProduct(){
+											var json = {};
+											json.uniqueId = document.getElementById("product-id").value;
+											json.alarm = document.getElementById("product-kriticno-stanje").value;
+											json.price = document.getElementById("product-price").value;
+											json.unit = document.getElementById("product-unit-input").value;
+											if(document.getElementById("product-stanje-popis").value){
+												json.popis = document.getElementById("product-stanje-popis").value;
+											}
+											document.getElementById("izmeni-proizvod-json").value = JSON.stringify(json);
+											loadGif();
+											document.getElementById("izmeni-proizvod-form").submit();
+
+										}
+									</script>
+								</div>
+								<div style="margin-top:3px;margin-bottom:3px;border-bottom:3px solid rgb(50,50,50)"></div>
+								<div class="specijalMagacin">
+									<div class="title">Podesi ulaz:</div>
+									<div class="inputWrap">
+										<div class="inputTitle">Количина:</div>
+										<div class="inputWrapper">
+											<input type="number" id="product-ulaz-kolicina">
+										</div>
+									</div>
+									<div class="inputWrap">
+										<div class="button" onclick="saveUlaz()">Сачувај улаз</div>
+										<form method="POST" action="/cuprija/sacuvaj-ulaz" style="display:none" id="sacuvaj-ulaz-form">
+											<input type="text" name="json" id="sacuvaj-ulaz-json">
+										</form>
+									</div>
+								</div>
+								
+								
+								<script>
+									function saveUlaz(){
+										if(document.getElementById("product-ulaz-kolicina").value){
+											var json = {};
+											json.kolicina = document.getElementById("product-ulaz-kolicina").value;
+											json.uniqueId = document.getElementById("product-id").value;
+											document.getElementById("sacuvaj-ulaz-json").value = JSON.stringify(json);
+											loadGif();
+											document.getElementById("sacuvaj-ulaz-form").submit();
+										}else{
+											alert("Morate podesiti kolicinu ulaza");
+										}
+									}
+								</script>
+								<div style="margin-top:3px;margin-bottom:3px;border-bottom:3px solid rgb(50,50,50)"></div>
+								<div class="specijalMagacin" style="display:none">
+									<div class="title">Улази:</div>
+									<div class="inputWrap"><div class="note">Приказани су само улази од последњег пописа</div></div>
+									<div id="lista-ulaza"></div>
+								</div>
+								
+								<script>
+									function deleteUlaz(id){
+										document.getElementById("obrisi-ulaz-input").value = id;
+										loadGif();
+										document.getElementById("obrisi-ulaz-form").submit();
+									}
+								</script>
+								<form method="POST" style="display:none" action="/cuprija/obrisi-ulaz" id="obrisi-ulaz-form">
+									<input type="text" name="id" id="obrisi-ulaz-input">
+								</form>
+							</div>
+						</div>
+					</div>	
+				</div>
+				
+			</div>		
+		</div>
+	</div>
+<%- include ("partials/footer") -%>
