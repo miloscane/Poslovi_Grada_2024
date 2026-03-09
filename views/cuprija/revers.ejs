@@ -365,8 +365,8 @@
 
 											doc.setFont('PTSans'); // set font
 											doc.getFontList("PTSans");
-											if(logoStambenoLogoBlob){
-												doc.addImage(logoStambenoLogoBlob, 'PNG', 5, 5, 119/mm, 43/mm,'','FAST');
+											if(logoLogoBlob ){
+												doc.addImage(logoLogoBlob , 'PNG', 5, 5, 119/mm, 119/mm,'','FAST');
 											}
 
 									        doc.setFontType("bold");
@@ -402,7 +402,7 @@
 													yPos = yPos + 7;
 												}
 												
-												yPos = yPos + 7;
+												//yPos = yPos + 7;
 												if(yPos>285){
 													doc.addPage()
 													yPos = 5;

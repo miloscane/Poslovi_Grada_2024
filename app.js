@@ -14379,6 +14379,38 @@ server.get('/cuprija/noviRevers',async (req,res)=>{
 	}
 });
 
+server.get('/cuprija/dnevnaLista',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var reversi = await cuprijaReversiDB.find({datum:getDateAsStringForDisplay(new Date())}).toArray();
+				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
+				res.render("cuprija/dnevnaLista",{
+					pageTitle:"Дневна листа",
+					proizvodi: proizvodi,
+					reversi: reversi,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3026.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.post('/novi-revers', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==50){
