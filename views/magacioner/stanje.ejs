@@ -374,7 +374,7 @@
 									}
 								</script>
 								<script>
-									if(["ivan.zivadinovic+magacioner@poslovigrada.rs","vladeta.stamenkovic+magacioner@poslovigrada.rs"].indexOf(user.email)>=0){
+									if(["ivan.zivadinovic+magacioner@poslovigrada.rs","vladeta.stamenkovic+magacioner@poslovigrada.rs"].indexOf(user.email)>=0 || user.region=="istok"){
 										var specijals = document.getElementsByClassName("specijalMagacin");
 										for(var i=0;i<specijals.length;i++){
 											specijals[i].style.display = "block";
