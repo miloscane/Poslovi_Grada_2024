@@ -13776,7 +13776,7 @@ server.get('/podizvodjac/obradjeniNalozi',async (req,res)=>{
 				if(req.session.user.nalozi=="SeHQZ--1672650353244" || req.session.user.nalozi=="IIwY4--1672650358507" || req.session.nalozi=="mile--1672650353244"){
 					cenovnikZaPrikaz = cenovnikHigh;
 				}else{
-					cenovnikZaPrikaz = cenovnikLow;
+					cenovnikZaPrikaz = cenovnikHigh;
 				}
 				res.render("podizvodjaci/obradjeniNalozi",{
 					pageTitle:"Обрађени налози",

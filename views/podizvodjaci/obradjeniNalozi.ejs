@@ -73,9 +73,15 @@
 					for(var i=0;i<naloziToShow.length;i++){
 						var obracunatIznos = 0;
 						for(var j=0;j<naloziToShow[i].obracun.length;j++){
-							obracunatIznos = obracunatIznos + getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity);
+							var iznosStavke = getPriceByCode(naloziToShow[i].obracun[j].code)*parseFloat(naloziToShow[i].obracun[j].quantity);
+							console.log(iznosStavke);
+							if(isNaN(iznosStavke)){
+								console.log(naloziToShow[i].obracun[j].code)
+							}
+							obracunatIznos = obracunatIznos + iznosStavke;
 						}
 						naloziToShow[i].ukupanIznos = obracunatIznos;
+						console.log(naloziToShow[i].ukupanIznos)
 						ukupanIznos = ukupanIznos + obracunatIznos;
 						var tr = document.createElement("TR");
 						tr.setAttribute("data-nalog",JSON.stringify(naloziToShow[i]));
