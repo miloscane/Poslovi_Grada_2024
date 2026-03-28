@@ -953,6 +953,79 @@ http.listen(process.env.PORT, async function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
+
+		/*var nalozi = await naloziDB.find({}).toArray();//obracun
+		var nalozi2024 = await nalozi2024DB.find({}).toArray();//obracun
+		var nalozi2023 = await nalozi2023DB.find({}).toArray();
+
+		var ventili = [
+			{velicina:"1/2",brojVentila:0,nalozi:[],sifre:["80.01.06.017","80.01.06.049"],sifre2024:["80.01.06.001","80.01.06.033"],sifre2023:["34.02.04.001"]},
+			{velicina:"3/4",brojVentila:0,nalozi:[],sifre:["80.01.06.018","80.01.06.050"],sifre2024:["80.01.06.002","80.01.06.034"],sifre2023:["34.02.04.002"]},
+			{velicina:"1",brojVentila:0,nalozi:[],sifre:["80.01.06.019","80.01.06.051"],sifre2024:["80.01.06.003","80.01.06.035"],sifre2023:["34.02.04.003"]},
+			{velicina:"5/4",brojVentila:0,nalozi:[],sifre:["80.01.06.020","80.01.06.052"],sifre2024:["80.01.06.004","80.01.06.036"],sifre2023:["34.02.04.004"]},
+			{velicina:"6/4",brojVentila:0,nalozi:[],sifre:["80.01.06.021","80.01.06.053"],sifre2024:["80.01.06.005","80.01.06.037"],sifre2023:["34.02.04.005"]},
+			{velicina:"2",brojVentila:0,nalozi:[],sifre:["80.01.06.022","80.01.06.054"],sifre2024:["80.01.06.006","80.01.06.038"],sifre2023:["34.02.04.006"]},
+			{velicina:"2 1/2",brojVentila:0,nalozi:[],sifre:["80.01.06.023","80.01.06.055"],sifre2024:["80.01.06.007","80.01.06.039"],sifre2023:["34.02.04.007"]},
+			{velicina:"3",brojVentila:0,nalozi:[],sifre:["80.01.06.024","80.01.06.056"],sifre2024:["80.01.06.008","80.01.06.040"],sifre2023:["34.02.04.008"]}
+		];
+
+		var ukupnoVentila = 0;
+		var svegaVentila = 0;
+		for(var i=0;i<nalozi.length;i++){
+			var nalog = nalozi[i];
+			for(var j=0;j<nalog.obracun.length;j++){
+				var stavka = nalog.obracun[j];
+				for(var k=0;k<ventili.length;k++){
+					if(ventili[k].sifre.indexOf(stavka.code)>=0){
+						ventili[k].brojVentila = ventili[k].brojVentila + parseFloat(stavka.quantity);
+						ukupnoVentila = ukupnoVentila + parseFloat(stavka.quantity);
+					}
+				}
+			}
+		}
+		console.log("Ukupno ventila za novi ugovor: "+ukupnoVentila);
+		svegaVentila = svegaVentila + ukupnoVentila;
+		ukupnoVentila = 0;
+
+		for(var i=0;i<nalozi2024.length;i++){
+			var nalog = nalozi2024[i];
+			for(var j=0;j<nalog.obracun.length;j++){
+				var stavka = nalog.obracun[j];
+				for(var k=0;k<ventili.length;k++){
+					if(ventili[k].sifre2024.indexOf(stavka.code)>=0){
+						ventili[k].brojVentila = ventili[k].brojVentila + parseFloat(stavka.quantity);
+						ukupnoVentila = ukupnoVentila + parseFloat(stavka.quantity);
+					}
+				}
+			}
+		}
+		console.log("Ukupno ventila za prethodni ugovor: "+ukupnoVentila);
+		svegaVentila = svegaVentila + ukupnoVentila;
+		ukupnoVentila = 0;
+
+		for(var i=0;i<nalozi2023.length;i++){
+			var nalog = nalozi2023[i];
+			for(var j=0;j<nalog.fakturisanje.length;j++){
+				var stavka = nalog.fakturisanje[j];
+				for(var k=0;k<ventili.length;k++){
+					if(ventili[k].sifre2023.indexOf(stavka.sifraArtikla)>=0){
+						ventili[k].brojVentila = ventili[k].brojVentila + parseFloat(stavka.izvedenaKolicina);
+						ukupnoVentila = ukupnoVentila + parseFloat(stavka.izvedenaKolicina);
+					}
+				}
+			}
+		}
+		console.log("Ukupno ventila za ugovor 2023: "+ukupnoVentila);
+		console.log("---------------------------------")
+		svegaVentila = svegaVentila + ukupnoVentila;
+		for(var i=0;i<ventili.length;i++){
+			console.log(ventili[i].velicina)
+			console.log("  " + ventili[i].brojVentila)
+			console.log("------------------")
+		}
+		console.log("SVEGA VENTILA: "+svegaVentila)
+		console.log("DONE")*/
+
 		/*var setObj = {$set:{
 			stanje: 0,
 			datumPopisa: "06.03.2026",
@@ -1326,7 +1399,7 @@ http.listen(process.env.PORT, async function(){
 		}
 
 		var naloziToExport = [];
-		var month = 1;
+		var month = 2;
 		for(var i=0;i<nalozi.length;i++){
 			if(nalozi[i].faktura.broj){
 				if(nalozi[i].faktura.broj.length>3){
