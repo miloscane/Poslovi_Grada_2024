@@ -1,0 +1,56 @@
+<%- include ("partials/header") -%>
+	<script>
+		var proizvodi	=	<%-JSON.stringify(proizvodi)%>;
+		proizvodi = proizvodi.sort((a, b) => {
+			if (a.code < b.code) {
+				return -1;
+			}
+		});
+	</script>
+	<div class="magacinStanje">
+		<div class="pageWidth">
+			<div class="lightBlueBox">
+				<div class="inlines">
+					<div class="proizvodForm">
+						<div id="form">
+							<div id="form-content">
+								<div class="inputWrap">
+									<div class="inputTitle">Назив Производа:</div>
+									<div class="inputWrapper">
+										<textarea id="product-name"></textarea>
+									</div>
+								</div>
+								<div class="inputWrap">
+									<div class="inputTitle">Јединица мере</div>
+									<div class="inputWrapper">
+										<div class="input">
+											<input type="text" id="product-unit-input">
+										</div>
+									</div>
+								</div>
+								<div class="inputWrap">
+									<div class="button" onclick="saveProduct()">Сачувај</div>
+									<form method="POST" action="/cuprija/novi-proizvod" style="display:none" id="novi-proizvod-form">
+										<input type="text" name="json" id="novi-proizvod-json">
+									</form>
+									<script>
+										function saveProduct(){
+											var json = {};
+											json.name = document.getElementById("product-name").value;
+											json.unit = document.getElementById("product-unit-input").value;
+											document.getElementById("novi-proizvod-json").value = JSON.stringify(json);
+											loadGif();
+											document.getElementById("novi-proizvod-form").submit();
+
+										}
+									</script>
+								</div>
+							</div>
+						</div>
+					</div>	
+				</div>
+				
+			</div>		
+		</div>
+	</div>
+<%- include ("partials/footer") -%>

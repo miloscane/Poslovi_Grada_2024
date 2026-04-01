@@ -14262,6 +14262,43 @@ server.post('/cuprija/izmeni-proizvod', async (req, res)=> {
 	}
 });
 
+server.post('/cuprija/novi-proizvod', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			var json = JSON.parse(req.body.json);
+			json.uniqueId = generateId(8);
+			var broj = await cuprijaMaterijalDB.countDocuments();
+			broj = broj + 2;
+			json.code = broj.toString().padStart(5,"0");
+			json.datumPopisa = getDateAsStringForDisplay(new Date());
+			json.datetimePopisa = new Date().getTime();
+			json.stanje = 0;
+			json.alarm = "";
+			json.price = "";
+			cuprijaMaterijalDB.insertOne(json)
+			.then((dbResponse)=>{
+				res.redirect("/cuprija/stanje");
+			})
+			.catch((error)=>{
+				logError(error);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2929.</div>"
+				})
+			})
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
 server.post('/sacuvaj-ulaz', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==50){
@@ -14438,6 +14475,36 @@ server.get('/cuprija/noviRevers',async (req,res)=>{
 				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
 				res.render("cuprija/noviRevers",{
 					pageTitle:"Нови реверс",
+					proizvodi: proizvodi,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 3026.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.get('/cuprija/noviProizvod',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
+				res.render("cuprija/noviProizvod",{
+					pageTitle:"Креирање новог материјала",
 					proizvodi: proizvodi,
 					user: req.session.user
 				})
