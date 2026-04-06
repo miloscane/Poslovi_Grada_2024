@@ -222,6 +222,7 @@
 														//var radovi = ["Замена","Попис","Одгушење","Констатација","Црпљење"];
 														if(Number(majstori[j].izvestaji[l].norma)==1){
 															zamene = zamene + 2.5;
+															break;
 														}else{
 															if(radovi[k]=="Замена"){
 																zamene++;
@@ -247,6 +248,7 @@
 										td.innerHTML = ukupnoNaloga +" naloga";
 										tr.appendChild(td)
 
+
 										var td = document.createElement("TD");
 										td.innerHTML = radniDani*2 +" / "+radniDani*2+" / "+radniDani*2+"<br>"+zamene +" / "+odgusenja+" / "+konstatacije;
 										tr.appendChild(td);
@@ -258,6 +260,12 @@
 										var potrebnaVrednost = (2*vrednostZamene + 2*vrednostOdgusenja + 2*vrednostKonstatacije)*radniDani;
 
 										var ostvarenaVrednost = zamene*vrednostZamene + odgusenja*vrednostOdgusenja + konstatacije*vrednostKonstatacije;
+										if(majstori[j].uniqueId=="hG888mw--1771937088671"){
+											console.log(ostvarenaVrednost);
+											console.log(zamene)
+											console.log(odgusenja)
+											console.log(konstatacije)
+										}
 
 										var uticajNaPlatu = (potrebnaVrednost-ostvarenaVrednost)*penalPoPoenu*(-1);
 
