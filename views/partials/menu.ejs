@@ -161,7 +161,16 @@
 									<div class="subMenuItem"><a href="/proveraLokacijeMajstora" onclick="loadGif()">Провера локације мајстора</a></div>
 								</div>
 							</div>
-							<div class="menuItem"><a href="/dispecer/mojUcinak" onclick="loadGif()">Мој учинак</a><div class="rightBorder"></div></div>
+							<div class="menuItem"><a href="#">Реверси <span class="carret">&or;</span></a><div class="rightBorder"></div>
+								<div class="subMenu">
+									<div class="subMenuItem"><a href="/magacioner/noviRevers" onclick="loadGif()">Нови реверс</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/magacioner/danasnjiReversi" onclick="loadGif()">Данашњи реверси</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/magacioner/jucerasnjiReversi" onclick="loadGif()">Јучерашњи реверси</a></div>
+									<div class="subMenuItem"><a href="/magacioner/prekojucerasnjiReversi" onclick="loadGif()">Прекојучерашњи реверси</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/magacioner/reversiNaDan" onclick="loadGif()">Реверси на дан</a><div class="bottomBorder"></div></div>
+									<div class="subMenuItem"><a href="/magacioner/pretragaReversa" onclick="loadGif()">Претрага реверса</a><div class="bottomBorder"></div></div>
+								</div>
+							</div>
 							<div class="menuItem"><a href="/dispecer/mapaUzivo2" onclick="loadGif()">Мапа</a><div class="rightBorder"></div></div>
 						<% }else if(Number(user.role)==25){ %>
 							<div class="menuItem"><a href="/kontrola/naslovna">Неизвршени налози</a><div class="rightBorder"></div></div>

@@ -6705,8 +6705,116 @@ http.listen(process.env.PORT, async function(){
 		console.log("--------------------------------------")
 		console.log("--------------------------------------")
 		console.log("--------------------------------------")*/
+		/*const betonaze = ["80.03.02.001","80.03.02.002","80.03.02.003","80.03.02.004","80.03.02.005","80.03.02.006","80.03.02.007","80.03.02.008","80.03.02.009","80.03.02.010","80.03.02.011","80.03.02.012","80.03.02.013","80.03.02.014","80.03.02.016","80.03.03.009","80.03.03.014","80.03.04.016","80.03.04.017","80.03.04.018","80.03.04.019","80.03.04.020","80.03.04.021","80.03.04.022","80.03.04.024","80.03.04.025","80.03.04.026","80.03.04.029","80.03.04.031","80.03.04.033","80.03.04.034","80.03.04.035","80.03.04.036","80.03.08.008","80.03.08.009","80.03.08.010","80.03.08.011","80.03.08.012","80.03.08.013"];
+		const sifraFinalizacija 	= ["80.03.02.001","80.03.02.002","80.03.02.003","80.03.02.004","80.03.02.005","80.03.02.006","80.03.02.007","80.03.02.008","80.03.02.009","80.03.02.010","80.03.02.011","80.03.02.012","80.03.02.013","80.03.02.014","80.03.02.015","80.03.02.016","80.03.03.004","80.03.03.005","80.03.03.006","80.03.03.007","80.03.03.008","80.03.03.009","80.03.03.010","80.03.03.011","80.03.03.012","80.03.03.013","80.03.03.014","80.03.03.015","80.03.03.016","80.03.03.017","80.03.03.018","80.03.03.019","80.03.03.020","80.03.03.021","80.03.03.022","80.03.03.023","80.03.03.024","80.03.03.025","80.03.03.026","80.03.03.027","80.03.03.028","80.03.03.029","80.03.03.030","80.03.03.031","80.03.03.032","80.03.03.033","80.03.03.034","80.03.03.035","80.03.03.036","80.03.03.037","80.03.03.038","80.03.03.039","80.03.03.040","80.03.03.041","80.03.03.042","80.03.03.043","80.03.03.044","80.03.03.045","80.03.03.046","80.03.03.047","80.03.03.048","80.03.03.142","80.03.04.016","80.03.04.017","80.03.04.018","80.03.04.019","80.03.04.020","80.03.04.021","80.03.04.022","80.03.04.025","80.03.04.026","80.03.04.027","80.03.04.029","80.03.04.031","80.03.04.033","80.03.04.034","80.03.04.035","80.03.04.036","80.03.05.002","80.03.05.003","80.03.05.004","80.03.05.005","80.03.05.006","80.03.05.007","80.03.05.008","80.03.05.009","80.03.05.010","80.03.05.011","80.03.05.012","80.03.05.013","80.03.06.002","80.03.06.003","80.03.06.004","80.03.06.005","80.03.06.006","80.03.06.007","80.03.06.011","80.03.06.013","80.03.06.014","80.03.07.002","80.03.07.003","80.03.07.004","80.03.07.005","80.03.07.006","80.03.07.007","80.03.07.008","80.03.07.009","80.03.07.010","80.03.07.013","80.03.07.014","80.03.07.015","80.03.07.016","80.03.07.017","80.03.07.018","80.03.07.019","80.03.07.022","80.03.07.023","80.03.08.002","80.03.08.003","80.03.08.004","80.03.08.007","80.03.08.009","80.03.08.010","80.03.08.012","80.03.08.013","80.03.09.001","80.03.09.002","80.03.09.003","80.03.09.004","80.03.09.005","80.03.09.006","80.03.09.007","80.03.09.008","80.03.09.009","80.04.01.001","80.04.01.003"];
+
+		var nalozi = await naloziDB.find({statusNaloga:"Fakturisan","prijemnica.datum.datum":{$regex:"03.2026"}}).toArray();
+		var brojeviNaloga = [];
+		for(var i=0;i<nalozi.length;i++){
+			brojeviNaloga.push(nalozi[i].broj)
+		}
+		var betonazeIznos = 0;
+		for(var i=0;i<nalozi.length;i++){
+			var nalog = nalozi[i];
+			for(var j=0;j<nalozi[i].obracun.length;j++){
+				var cenaPoCenovniku = 0;
+				for(var k=0;k<cenovnik.length;k++){
+					if(cenovnik[k].code==nalozi[i].obracun[j].code){
+						cenaPoCenovniku = cenovnik[k].price
+					}
+				}
+				var iznos = parseFloat(nalozi[i].obracun[j].quantity)*cenaPoCenovniku;
+				if(isNaN(iznos)){
+					console.log("Ne valja iznos stavke za nalog: " + nalog.broj);
+					console.log(cenaPoCenovniku)
+					console.log(nalozi[i].obracun[j].quantity)
+				}
+				if(betonaze.indexOf(nalozi[i].obracun[j].code)>=0){
+					betonazeIznos = betonazeIznos + iznos;
+				}
+			}
+		}
+
+		console.log("Iznos betonaza za Mart: "+brojSaRazmacima(betonazeIznos) +" rsd");
+
+		var majstori = await majstoriDB.find({}).toArray();
+		var finalizeri = [];
+		for(var i=0;i<majstori.length;i++){
+			if(majstori[i].tipRada){
+				if(majstori[i].tipRada.indexOf("Finalizacija")>=0){
+					finalizeri.push(majstori[i])
+				}
+			}
+		}
+
+		for(var i=0;i<finalizeri.length;i++){
+			var finalizer = finalizeri[i];
+			finalizer.nalozi = [];
+			for(var j=0;j<nalozi.length;j++){
+				if(nalozi[j].majstor==finalizer.uniqueId){
+					finalizer.nalozi.push(nalozi[j])
+				}
+			}
+		}
+
+		var dodeljivaniNalozi = await dodeljivaniNaloziDB.find({nalog:{$in:brojeviNaloga}}).toArray();
+		for(var i=0;i<finalizeri.length;i++){
+			var finalizer = finalizeri[i];
+			for(var j=0;j<dodeljivaniNalozi.length;j++){
+				var dodeljenNalog = dodeljivaniNalozi[j];
+				if(dodeljenNalog.majstor==finalizer.uniqueId){
+					//proveri da li vec postoji nalog
+
+					var nalogIndex = -1;
+					for(var k=0;k<finalizer.nalozi.length;k++){
+						if(finalizer.nalozi[k].broj==dodeljenNalog.nalog){
+							nalogIndex = k;
+							break;
+						}
+					}
+
+					if(nalogIndex==-1){
+						for(var k=0;k<nalozi.length;k++){
+							if(nalozi[k].broj==dodeljenNalog.nalog){
+								finalizer.nalozi.push(nalozi[k])
+							}
+						}
+					}
+
+				}
+			}
+
+		}
+
+		for(var i=0;i<finalizeri.length;i++){
+			var finalizer = finalizeri[i];
+			finalizer.ucinak = 0;
+			for(var j=0;j<finalizer.nalozi.length;j++){
+				var nalog = finalizer.nalozi[j];
+				for(var k=0;k<nalog.obracun.length;k++){
+					var cenaPoCenovniku = 0;
+					for(var l=0;l<cenovnik.length;l++){
+						if(cenovnik[l].code==nalog.obracun[k].code){
+							cenaPoCenovniku = cenovnik[l].price
+						}
+					}
+					var iznos = parseFloat(nalog.obracun[k].quantity)*cenaPoCenovniku;
+					if(sifraFinalizacija.indexOf(nalog.obracun[k].code)>=0 && betonaze.indexOf(nalog.obracun[k].code)<0){
+						finalizer.ucinak = finalizer.ucinak + iznos;
+					}
+				}
+			}
+		}
 
 
+		for(var i=0;i<finalizeri.length;i++){
+			var finalizer = finalizeri[i];
+			if(finalizer.nalozi.length>0){
+				console.log(finalizer.ime)
+				console.log("  Naloga: "+finalizer.nalozi.length);
+				console.log("  Ucinak: "+brojSaRazmacima(finalizer.ucinak)+" rsd");
+			}
+		}*/
 		
 
 
@@ -14844,7 +14952,7 @@ server.post('/cuprija/obrisi-ulaz', async (req, res)=> {
 
 server.get('/magacioner/noviRevers',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			try{
 				var proizvodi = await proizvodiDB.find({}).toArray();
 				var majstorFilter = {};
@@ -14980,7 +15088,7 @@ server.get('/cuprija/dnevnaLista',async (req,res)=>{
 
 server.post('/novi-revers', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			var json = JSON.parse(req.body.json);
 			json.uniqueId = generateId(7)+"--"+new Date().getTime();
 			json.datetime = Number(json.datetime);
@@ -15045,7 +15153,7 @@ server.post('/cuprija/novi-revers', async (req, res)=> {
 
 server.post('/izmeni-revers', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			var json = JSON.parse(req.body.json);
 			var setObj	=	{ $set: {
 				majstor: json.majstor,
@@ -15116,7 +15224,7 @@ server.post('/cuprija/izmeni-revers', async (req, res)=> {
 
 server.post('/obrisi-revers', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			magacinReversiDB.deleteOne({uniqueId:req.body.id})
 			.then((dbResponse)=>{
 				res.render("message",{
@@ -15175,7 +15283,7 @@ server.post('/cuprija/obrisi-revers', async (req, res)=> {
 
 server.get('/magacioner/revers/:uniqueId',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			try{
 				var proizvodi = await proizvodiDB.find({}).toArray();
 				var majstorFilter = {};
@@ -15280,7 +15388,7 @@ server.get('/cuprija/revers/:uniqueId',async (req,res)=>{
 
 server.get('/magacioner/pretragaReversa',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			res.render("magacioner/pretragaReversa",{
 				pageTitle:"Претрага реверса",
 				user: req.session.user
@@ -15300,9 +15408,9 @@ server.get('/magacioner/pretragaReversa',async (req,res)=>{
 
 server.get('/brzaPretragaReversa/:brojNaloga', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			try{
-				var reversFilter = {nalog:req.params.brojNaloga};
+				var reversFilter = {nalog:req.params.brojNaloga,region:{$ne:"istok"}};
 				if(req.session.user.region=="istok"){
 					reversFilter = {nalog:req.params.brojNaloga,region:"istok"}
 				}
@@ -15350,9 +15458,9 @@ server.get('/brzaPretragaReversa/:brojNaloga', async (req, res)=> {
 
 server.post('/pretraga-reversa', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			try{
-				var reversFilter = {nalog:req.body.brojnaloga};
+				var reversFilter = {nalog:req.body.brojnaloga,region:{$ne:"istok"}};
 				if(req.session.user.region=="istok"){
 					reversFilter = {nalog:req.body.brojnaloga,region:"istok"}
 				}
@@ -15435,12 +15543,12 @@ server.get('/cuprija/reversi', async (req, res)=> {
 
 server.get('/magacioner/danasnjiReversi', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			var today = new Date();
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
 			try{
-				var reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()}};
+				var reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()},region:{$ne:"istok"}};
 				if(req.session.user.region=="istok"){
 					reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()},region:"istok"}
 				}
@@ -15496,13 +15604,13 @@ server.get('/magacioner/danasnjiReversi', async (req, res)=> {
 
 server.get('/magacioner/jucerasnjiReversi', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			var today = new Date();
 			today.setDate(today.getDate()-1);
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
 			try{
-				var reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()}};
+				var reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()},region:{$ne:"istok"}};
 				if(req.session.user.region=="istok"){
 					reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()},region:"istok"}
 				}
@@ -15558,13 +15666,13 @@ server.get('/magacioner/jucerasnjiReversi', async (req, res)=> {
 
 server.get('/magacioner/prekojucerasnjiReversi', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			var today = new Date();
 			today.setDate(today.getDate()-2);
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
 			try{
-				var reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()}};
+				var reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()},region:{$ne:"istok"}};
 				if(req.session.user.region=="istok"){
 					reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()},region:"istok"}
 				}
@@ -15630,13 +15738,13 @@ server.get('/magacioner/reversiNaDan', async (req, res)=> {
 
 server.get('/magacioner/reversiNaDan/:dan', async (req, res)=> {
 	if(req.session.user){
-		if(Number(req.session.user.role)==50){
+		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			var today = new Date(req.params.dan);
 			today.setDate(today.getDate()-2);
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
 			try{
-				var reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()}};
+				var reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()},region:{$ne:"istok"}};
 				if(req.session.user.region=="istok"){
 					reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()},region:"istok"}
 				}
