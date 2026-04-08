@@ -7680,6 +7680,45 @@ server.get('/administracija/potrebnaFinalizacija',async (req,res)=>{
 	}
 })
 
+server.get('/odobrenje',async (req,res)=>{
+	res.redirect("/odobrenje/"+getDateAsStringForInputObject(new Date())+"/"+getDateAsStringForInputObject(new Date()))
+})
+
+server.get('/odobrenje/:datum1/:datum2',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				const odDatuma = req.params.datum1 + "T00:00:00Z";
+				const doDatuma = req.params.datum2 + "T23:59:59Z";
+				var stambenoInfo = await portalStambenoTestDB.find({vrsta_promene:"STATUS",status_code:"NA_ODOBRENJU",datum_azuriranja:{$gte:odDatuma,$lte:doDatuma}}).toArray();
+				//var stambenoInfo = await portalStambenoTestDB.find({vrsta_promene:"STATUS",status_code:"NA_ODOBRENJU",datum_azuriranja:{$regex:"2024-10-23"}}).toArray();
+				res.render("administracija/odobrenje",{
+					pageTitle:"Poslato na odobrenje za period od "+reshuffleDate(req.params.datum1)+" do "+reshuffleDate(req.params.datum2),
+					stambenoInfo: stambenoInfo,
+					datum1: req.params.datum1,
+					datum2: req.params.datum2,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 1849.</div>"
+				});
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
+
 server.get('/login',async (req,res)=>{
 	if(req.session.user){
 		res.redirect("/")
