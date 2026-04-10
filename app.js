@@ -12118,7 +12118,7 @@ server.get('/stefan/ucinakDispecera',async (req,res)=>{
 
 server.get('/izvestajMajstoraPick',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			try{
 				var yesterday = new Date();
 				yesterday.setDate(yesterday.getDate()-1);
@@ -12145,7 +12145,7 @@ server.get('/izvestajMajstoraPick',async (req,res)=>{
 
 server.get('/izvestajMajstoraPick/:date',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			try{
 				//req.params.date je za izvestaje koji postoje
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
@@ -12180,7 +12180,7 @@ server.get('/izvestajMajstoraPick/:date',async (req,res)=>{
 
 server.get('/izvestajMajstoraPickTemp',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			try{
 				//req.params.date je za izvestaje koji postoje
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
@@ -12217,7 +12217,7 @@ server.get('/sumiranIzvestaj',async (req,res)=>{
 	if(!req.session.user){
 		return res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
-	if(Number(req.session.user.role)!=10){
+	if([10,20].indexOf(Number(req.session.user.role))<0){
 		return res.render("message",{
 			pageTitle: "Грешка",
 			user: req.session.user,
@@ -12231,7 +12231,7 @@ server.get('/sumiranIzvestaj/:date',async (req,res)=>{
 	if(!req.session.user){
 		return res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
-	if(Number(req.session.user.role)!=10){
+	if([10,20].indexOf(Number(req.session.user.role))<0){
 		return res.render("message",{
 			pageTitle: "Грешка",
 			user: req.session.user,
@@ -12261,7 +12261,7 @@ server.get('/sumiranIzvestaj/:date',async (req,res)=>{
 
 server.get('/izvestajMajstoraPickTemp/:date/:date2',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
 			try{
 				//req.params.date je za izvestaje koji postoje
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci},aktivan:true}).toArray();
@@ -12299,7 +12299,7 @@ server.get('/izvestajMajstoraPickTemp/:date/:date2',async (req,res)=>{
 
 server.get('/izvestajMajstora/:majstorId/:date',async (req,res)=>{
 	if(req.session.user){
-		if(Number(req.session.user.role)==10){
+		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20 ){
 			try{
 				var majstori = await majstoriDB.find({uniqueId:req.params.majstorId}).toArray();
 				var majstor = majstori[0];
