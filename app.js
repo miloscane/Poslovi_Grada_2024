@@ -1389,7 +1389,7 @@ http.listen(process.env.PORT, async function(){
 
 		//ZA PREMIJUS
 
-		/*var nalozi = await naloziDB.find({}).toArray();
+		var nalozi = await naloziDB.find({}).toArray();
 		var nalozi2024 = await nalozi2024DB.find({}).toArray();
 		for(var i=0;i<nalozi2024.length;i++){
 			nalozi.push(nalozi2024[i])
@@ -1401,7 +1401,7 @@ http.listen(process.env.PORT, async function(){
 		}
 
 		var naloziToExport = [];
-		var month = 2;
+		var month = 3;
 		for(var i=0;i<nalozi.length;i++){
 			if(nalozi[i].faktura.broj){
 				if(nalozi[i].faktura.broj.length>3){
@@ -1458,7 +1458,7 @@ http.listen(process.env.PORT, async function(){
 			csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
 		}
 		fs.writeFileSync("./PG-Premijus-"+month+"-2026.csv",csvString,"utf8");
-		console.log("Written Premijus")*/
+		console.log("Written Premijus")
 
 
 
