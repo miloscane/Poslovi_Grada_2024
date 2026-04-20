@@ -16922,7 +16922,22 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				if(nalogJson.vrstaRada!="HAUSMAJSTOR"){
 					await naloziDB.insertOne(nalogJson)
 				}else{
-					await client.db("Hausmajstor").collection('Nalozi').insertOne(nalogJson)
+					await client.db("Hausmajstor").collection('Nalozi').insertOne(nalogJson);
+					var tokenCRM = "T232KMObLMcZxAWp2141ab3c4d5e6f";
+					var configCRM = {
+						url: 'https://floumaster.com/majstori_grada/api.php',
+						method: 'POST', // If necessary
+						headers: { 
+							'Content-Type': 'application/json',
+							'Authorization': `Bearer ${tokenCRM}`
+						},
+						data: { 'nalog': nalogJson }
+				  };
+				  try{
+				  	var response = await axios(configCRM);
+				  }catch(err){
+				  	logError(err);
+				  }
 				}
 				res.status(200).json({
 					code: "200",
