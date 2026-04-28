@@ -1,0 +1,85 @@
+<%- include ("partials/header") -%>
+	<script>
+		var stambenoInfo = <%-JSON.stringify(stambenoInfo)%>;
+		console.log(stambenoInfo)
+	</script>
+	<div class="pageWidth odobrenje">
+		<div style="margin-bottom:20px;padding-top:30px">
+			Od <input type="date" id="od" value="<%=datum1%>"><br>
+			Do <input type="date" id="do" value="<%=datum2%>"><br>
+			<button onclick="loadGif();window.location.href='/odobrenjePodizvodjaci/'+document.getElementById('od').value+'/'+document.getElementById('do').value">Pretrazi</button>
+		</div>
+		<div style="margin-top:20px;">Filteri</div>
+		<select id="select" oninput="generateTable()">
+			<option value="sve" default>SVE</option>
+			<option value="istok" default>ISTOK</option>
+			<option value="zapad" default>ZAPAD</option>
+		</select>
+		<table id="table">
+			<tr>
+				<td>Datum</td>
+				<td>Nalog</td>
+				<td>Region</td>
+				<td>Radna jedinica</td>
+				<td>Iznos</td>
+			</tr>
+		</table>
+		<script>
+			function generateTable(){
+				var trs = document.getElementById("table").getElementsByTagName("TR");
+				for(var i=1;i<trs.length;i++){
+					if(trs[i]){
+						trs[i].remove();
+						i--
+					}
+					
+				}
+				var filterValue = document.getElementById("select").value;
+				var ukupanIznos = 0;
+				for(var i=0;i<stambenoInfo.length;i++){
+					var nalog = stambenoInfo[i];
+					if(filterValue=="sve" || (filterValue=="istok" && istok.indexOf(nalog.radna_jedinica)>=0) || (filterValue=="zapad" && zapad.indexOf(nalog.radna_jedinica)>=0)){
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+							td.innerHTML = nalog.datum_azuriranja.split("T")[0];
+							tr.appendChild(td)
+
+							var td = document.createElement("TD");
+							td.innerHTML = "<a href='/nalog/"+nalog.broj_naloga+"' target='_blank' onclick='this.style.backgroundColor=\"blue\";this.style.color=\"white\"'>"+nalog.broj_naloga+"</a>";
+							tr.appendChild(td)
+
+							var td = document.createElement("TD");
+							td.innerHTML = istok.indexOf(nalog.radna_jedinica)>=0 ? "ISTOK" : "ZAPAD";
+							tr.appendChild(td)
+
+							var td = document.createElement("TD");
+							td.innerHTML = nalog.radna_jedinica;
+							tr.appendChild(td)
+
+							var td = document.createElement("TD");
+							var iznos = 0;
+							for(var j=0;j<nalog.order_lines.length;j++){
+								iznos = iznos + nalog.order_lines[j].ukupna_cena_dobavljaca
+							}
+							ukupanIznos = ukupanIznos + iznos;
+							td.innerHTML = brojSaRazmacima(iznos);
+							tr.appendChild(td)
+						document.getElementById("table").appendChild(tr);
+					}
+					
+				}
+				var tr = document.createElement("TR");
+					var td = document.createElement("TD");
+					td.setAttribute("colspan","5")
+					td.setAttribute("style","font-size:60px;font-weight:800")
+					td.innerHTML = brojSaRazmacima(ukupanIznos)
+					tr.appendChild(td);
+				document.getElementById("table").appendChild(tr);
+			}
+
+			generateTable()
+			
+			
+		</script>
+	</div>
+<%- include ("partials/footer") -%>

@@ -1460,6 +1460,154 @@ http.listen(process.env.PORT, async function(){
 		fs.writeFileSync("./PG-Premijus-"+month+"-2026.csv",csvString,"utf8");
 		console.log("Written Premijus")*/
 
+		//ZA PREMIJUS
+
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var nalozi2024 = await nalozi2024DB.find({}).toArray();
+		for(var i=0;i<nalozi2024.length;i++){
+			nalozi.push(nalozi2024[i])
+		}
+		var hmNalozi = await client.db("Hausmajstor").collection('Nalozi').find({}).toArray();
+		for(var i=0;i<hmNalozi.length;i++){
+			//hmNalozi.vrstaRada = "HAUSMAJSTOR"
+			nalozi.push(hmNalozi[i])
+		}
+
+		var naloziToExport = [];
+		var month = 3;
+		for(var i=0;i<nalozi.length;i++){
+			if(nalozi[i].faktura.broj){
+				if(nalozi[i].faktura.broj.length>3){
+					if(nalozi[i].prijemnica.datum.datum.includes("."+month.toString().padStart(2,'0')+".2026")){
+						naloziToExport.push(nalozi[i])
+					}
+				}
+			}
+		}
+
+		for(var i=0;i<naloziToExport.length;i++){
+			if(naloziToExport[i].prijemnica.datum.datum){
+				if(naloziToExport[i].prijemnica.datum.datum.length>3){
+					var dateElements = naloziToExport[i].prijemnica.datum.datum.split(".");
+					naloziToExport[i].sorting = new Date(dateElements[2]+"-"+dateElements[1]+"-"+dateElements[0]).getTime();
+				}
+			}
+		}
+
+		naloziToExport.sort((a, b) => parseFloat(b.sorting) - parseFloat(a.sorting));
+
+		var problemNalozi = [];
+
+		var csvString = "Broj Fakture;Datum PDV;Iznos/Osnovica;Penal;PDV;Iznos sa penalom i PDV;PG Iznos/Osnovica;PG PDV;PG Penal;PG Iznos sa PDVom;Vrsta Naloga\r\n";
+		for(var i=0;i<naloziToExport.length;i++){
+			var osnovica = parseFloat(naloziToExport[i].ukupanIznos);
+			var iznosPenala = eval(osnovica* (100 - naloziToExport[i].faktura.penal)/100);
+			var pdv = osnovica<=500000 ? osnovica*0.2 : 0;
+			var iznosSaPenalomIPdv = osnovica + pdv - iznosPenala;
+			var umanjenje = naloziToExport[i].vrstaRada=="HAUSMAJSTOR" ? 1 : 0.675;
+			var pgOsnovica = osnovica * umanjenje;
+			var pgPdv = pgOsnovica <=500000 ? pgOsnovica*0.2 : 0;
+			var pgPenal = iznosPenala;
+			var pgIznosSaPDVom = pgOsnovica + pgPdv - pgPenal;
+
+			if(!isNaN(osnovica)){
+				datumPDV = naloziToExport[i].prijemnica.datum.datum;
+				csvString += naloziToExport[i].faktura.broj + ";" + datumPDV + ";" + osnovica.toFixed(2) + ";" + iznosPenala.toFixed(2) + ";" + pdv.toFixed(2) + ";" + iznosSaPenalomIPdv.toFixed(2) + ";" +pgOsnovica.toFixed(2) + ";" + pgPdv.toFixed(2) + ";" + pgPenal.toFixed(2) + ";" + pgIznosSaPDVom.toFixed(2) + ";" + naloziToExport[i].vrstaRada + "\r\n"
+				
+				//csvString += naloziToExport[i].faktura.broj + "," +datumPDV+ "," + iznosBezPDVa + "," + pdv + "," + iznosSaPDVom+"\r\n";
+				if(osnovica==0){
+					naloziToExport[i].problem = "Iznos naloga je nula";
+					console.log(naloziToExport[i].broj)
+					console.log("Nula")
+					problemNalozi.push(naloziToExport[i]);
+				}
+			}else{
+				naloziToExport[i].problem = "Nedefinisan iznos";
+				console.log("Nema iznos");
+				problemNalozi.push(naloziToExport[i]);
+			}
+		}
+		for(var i=0;i<problemNalozi.length;i++){
+			csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
+		}
+		fs.writeFileSync("./PG-Premijus-"+month+"-2026.csv",csvString,"utf8");
+		console.log("Written Premijus")*/
+
+		//ZA PREMIJUS Godisnje
+
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var nalozi2024 = await nalozi2024DB.find({}).toArray();
+		for(var i=0;i<nalozi2024.length;i++){
+			nalozi.push(nalozi2024[i])
+		}
+		var hmNalozi = await client.db("Hausmajstor").collection('Nalozi').find({}).toArray();
+		for(var i=0;i<hmNalozi.length;i++){
+			//hmNalozi.vrstaRada = "HAUSMAJSTOR"
+			nalozi.push(hmNalozi[i])
+		}
+
+		var naloziToExport = [];
+		var month = 3;
+		for(var i=0;i<nalozi.length;i++){
+			if(nalozi[i].faktura.broj){
+				if(nalozi[i].faktura.broj.length>3){
+					if(nalozi[i].prijemnica.datum.datum.includes(".2025")){
+						naloziToExport.push(nalozi[i])
+					}
+				}
+			}
+		}
+
+		for(var i=0;i<naloziToExport.length;i++){
+			if(naloziToExport[i].prijemnica.datum.datum){
+				if(naloziToExport[i].prijemnica.datum.datum.length>3){
+					var dateElements = naloziToExport[i].prijemnica.datum.datum.split(".");
+					naloziToExport[i].sorting = new Date(dateElements[2]+"-"+dateElements[1]+"-"+dateElements[0]).getTime();
+				}
+			}
+		}
+
+		naloziToExport.sort((a, b) => parseFloat(b.sorting) - parseFloat(a.sorting));
+
+		var problemNalozi = [];
+
+		var csvString = "Broj Fakture;Samo Broj;Datum PDV;Iznos/Osnovica;Penal;PDV;Iznos sa penalom i PDV;PG Iznos/Osnovica;PG PDV;PG Penal;PG Iznos sa PDVom;Vrsta Naloga;Mesec\r\n";
+		for(var i=0;i<naloziToExport.length;i++){
+			var osnovica = parseFloat(naloziToExport[i].ukupanIznos);
+			var iznosPenala = eval(osnovica* (100 - naloziToExport[i].faktura.penal)/100);
+			var pdv = osnovica<=500000 ? osnovica*0.2 : 0;
+			var iznosSaPenalomIPdv = osnovica + pdv - iznosPenala;
+			var umanjenje = naloziToExport[i].vrstaRada=="HAUSMAJSTOR" ? 1 : 0.675;
+			var pgOsnovica = osnovica * umanjenje;
+			var pgPdv = pgOsnovica <=500000 ? pgOsnovica*0.2 : 0;
+			var pgPenal = iznosPenala;
+			var pgIznosSaPDVom = pgOsnovica + pgPdv - pgPenal;
+
+			if(!isNaN(osnovica)){
+				datumPDV = naloziToExport[i].prijemnica.datum.datum;
+				var mesecString = naloziToExport[i].prijemnica.datum.datum.split(".")[1]+"."+naloziToExport[i].prijemnica.datum.datum.split(".")[2];
+				csvString += naloziToExport[i].faktura.broj + ";" +naloziToExport[i].faktura.samoBroj+";"+ datumPDV + ";" + osnovica.toFixed(2) + ";" + iznosPenala.toFixed(2) + ";" + pdv.toFixed(2) + ";" + iznosSaPenalomIPdv.toFixed(2) + ";" +pgOsnovica.toFixed(2) + ";" + pgPdv.toFixed(2) + ";" + pgPenal.toFixed(2) + ";" + pgIznosSaPDVom.toFixed(2) + ";" + naloziToExport[i].vrstaRada + ";"+mesecString+"\r\n"
+				
+				//csvString += naloziToExport[i].faktura.broj + "," +datumPDV+ "," + iznosBezPDVa + "," + pdv + "," + iznosSaPDVom+"\r\n";
+				if(osnovica==0){
+					naloziToExport[i].problem = "Iznos naloga je nula";
+					console.log(naloziToExport[i].broj)
+					console.log("Nula")
+					problemNalozi.push(naloziToExport[i]);
+				}
+			}else{
+				naloziToExport[i].problem = "Nedefinisan iznos";
+				console.log("Nema iznos");
+				problemNalozi.push(naloziToExport[i]);
+			}
+		}
+		for(var i=0;i<problemNalozi.length;i++){
+			csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
+		}
+		fs.writeFileSync("./PG-Premijus-2025.csv",csvString,"utf8");
+		console.log("Written Premijus")*/
+
+
 
 
 
@@ -6300,23 +6448,11 @@ http.listen(process.env.PORT, async function(){
 		var response = await proizvodiDB.updateMany({},setObj)
 		console.log(response)*/
 
-		/*var nalozi = await naloziDB.find({"datum.datum":{$regex:"03.2026"}}).toArray();
-		var brojeviNaloga = [];
-		for(var i=0;i<nalozi.length;i++){
-			brojeviNaloga.push(nalozi[i].broj)
-		}
-		var izvestaji = await izvestajiDB.find({nalog:{$in:brojeviNaloga}}).toArray();
-		for(var i=0;i<nalozi.length;i++){
-			nalozi[i].izvestaji = [];
-			for(var j=0;j<izvestaji.length;j++){
-				if(nalozi[i].broj==izvestaji[j].nalog){
-					nalozi[i].izvestaji.push(izvestaji[j])
-				}
-			}
-		}
+		//var nalozi = await naloziDB.find({"datum.datum":{$regex:"04.2026"},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
+		/*var nalozi = await client.db("Hausmajstor").collection('Nalozi').find({"datum.datum":{$regex:"04.2026"},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
 
 		const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet('Dnevnice');
+    const sheet = workbook.addWorksheet('Nalozi');
     sheet.columns = [
       { header: 'Nalog', key: 'nalog', width: 20 },
       { header: 'Adresa', key: 'adresa', width: 30 },
@@ -6335,7 +6471,7 @@ http.listen(process.env.PORT, async function(){
 	    });
     }
 
-    await workbook.xlsx.writeFile("./vik.xlsx");
+    await workbook.xlsx.writeFile("./hm.xlsx");
     console.log('✅ Excel file written');*/
 
 		/*var mesec = "03";
@@ -6818,6 +6954,52 @@ http.listen(process.env.PORT, async function(){
 				console.log("  Ucinak: "+brojSaRazmacima(finalizer.ucinak)+" rsd");
 			}
 		}*/		
+
+		/*var proizvodi = await proizvodiDB.find({}).toArray();
+		for(var i=0;i<proizvodi.length;i++){
+			proizvodi[i].kolicina2026 = 0;
+			proizvodi[i].kolicina2025 = 0;
+		}
+
+		var reversi = await magacinReversiDB.find({datum:{$regex:".2025"}}).toArray();
+		for(var j=0;j<reversi.length;j++){
+			for(var k=0;k<reversi[j].zaduzenje.length;k++){
+				for(var i=0;i<proizvodi.length;i++){
+					if(reversi[j].zaduzenje[k].uniqueId==proizvodi[i].uniqueId){
+						var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
+						var vraceno = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity2)
+						proizvodi[i].kolicina2025 = proizvodi[i].kolicina2025 + uzeto - vraceno;
+						break;
+					}
+				}
+				
+			}
+		}
+
+		var reversi = await magacinReversiDB.find({datum:{$regex:".2026"}}).toArray();
+		for(var j=0;j<reversi.length;j++){
+			for(var k=0;k<reversi[j].zaduzenje.length;k++){
+				for(var i=0;i<proizvodi.length;i++){
+					if(reversi[j].zaduzenje[k].uniqueId==proizvodi[i].uniqueId){
+						var uzeto = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity);
+						var vraceno = isNaN(parseFloat(reversi[j].zaduzenje[k].quantity2)) ? 0 : parseFloat(reversi[j].zaduzenje[k].quantity2)
+						proizvodi[i].kolicina2026 = proizvodi[i].kolicina2026 + uzeto - vraceno;
+						break;
+					}
+				}
+			}
+		}
+
+		proizvodi.sort((a, b) => b.kolicina2025 - a.kolicina2025);
+
+
+		var csvString = "Naziv;2025;2026;Ukupno;Jedinica mere;Cena\r\n";
+		for(var i=0;i<proizvodi.length;i++){
+			var total = proizvodi[i].kolicina2026 + proizvodi[i].kolicina2025;
+			csvString += proizvodi[i].name +";"+proizvodi[i].kolicina2025+";"+proizvodi[i].kolicina2026+";"+total+";"+proizvodi[i].unit+";"+brojSaRazmacima(proizvodi[i].price)+"\r\n";
+		}
+		fs.writeFileSync("proizvodi.csv",csvString,{encoding:"utf8"});
+		console.log("Done")*/
 
 	})
 	.catch(error => {
@@ -7724,6 +7906,73 @@ server.get('/odobrenje/:datum1/:datum2',async (req,res)=>{
 
 				res.render("administracija/odobrenje",{
 					pageTitle:"Poslato na odobrenje za period od "+reshuffleDate(req.params.datum1)+" do "+reshuffleDate(req.params.datum2),
+					stambenoInfo: stambenoInfo,
+					datum1: req.params.datum1,
+					datum2: req.params.datum2,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 1849.</div>"
+				});
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
+
+
+server.get('/odobrenjePodizvodjaci',async (req,res)=>{
+	res.redirect("/odobrenjePodizvodjaci/"+getDateAsStringForInputObject(new Date())+"/"+getDateAsStringForInputObject(new Date()))
+})
+
+server.get('/odobrenjePodizvodjaci/:datum1/:datum2',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				const odDatuma = req.params.datum1 + "T00:00:00Z";
+				const doDatuma = req.params.datum2 + "T23:59:59Z";
+				var stambenoInfo = await portalStambenoTestDB.find({vrsta_promene:"STATUS",status_code:"NA_ODOBRENJU",datum_azuriranja:{$gte:odDatuma,$lte:doDatuma}}).toArray();
+				//var stambenoInfo = await portalStambenoTestDB.find({vrsta_promene:"STATUS",status_code:"NA_ODOBRENJU",datum_azuriranja:{$regex:"2024-10-23"}}).toArray();
+				
+
+				const seen = new Set();
+				stambenoInfo = stambenoInfo.filter(item => {
+				    if (seen.has(item.broj_naloga)) {
+				        return false;
+				    }
+				    seen.add(item.broj_naloga);
+				    return true;
+				});
+
+				var brojeviNaloga = [];
+				for(var i=0;i<stambenoInfo.length;i++){
+					brojeviNaloga.push(stambenoInfo[i].broj_naloga.toString())
+				}
+				var nalozi = await naloziDB.find({broj:{$in:brojeviNaloga}}).toArray();
+				for(var i=0;i<stambenoInfo.length;i++){
+					stambenoInfo[i].nalogPortal = {};
+					for(var j=0;j<nalozi.length;j++){
+						if(stambenoInfo[i].broj_naloga.toString()==nalozi[j].broj){
+							stambenoInfo[i].nalogPortal = nalozi[j];
+						}
+					}
+				}
+
+
+
+				res.render("administracija/odobrenjePodizvodjaci",{
+					pageTitle:"Poslato na odobrenje za podizvodjace za period od "+reshuffleDate(req.params.datum1)+" do "+reshuffleDate(req.params.datum2),
 					stambenoInfo: stambenoInfo,
 					datum1: req.params.datum1,
 					datum2: req.params.datum2,
