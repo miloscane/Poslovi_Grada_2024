@@ -7969,6 +7969,13 @@ server.get('/odobrenjePodizvodjaci/:datum1/:datum2',async (req,res)=>{
 					}
 				}
 
+				for(var i=0;i<stambenoInfo.length;i++){
+					if(podizvodjaci.indexOf(stambenoInfo[i].nalogPortal.majstor)<0){
+						stambenoInfo.splice(i,1);
+						i--
+					}
+				}
+
 
 
 				res.render("administracija/odobrenjePodizvodjaci",{
