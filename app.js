@@ -7868,7 +7868,7 @@ server.get('/odobrenje/:datum1/:datum2',async (req,res)=>{
 			try{
 				const odDatuma = req.params.datum1 + "T00:00:00Z";
 				const doDatuma = req.params.datum2 + "T23:59:59Z";
-				var stambenoInfo = await portalStambenoTestDB.find({vrsta_promene:"STATUS",status_code:"NA_ODOBRENJU",datum_azuriranja:{$gte:odDatuma,$lte:doDatuma}}).toArray();
+				var stambenoInfo = await portalStambenoTestDB.find({vrsta_promene:"STATUS",status_code:"NA_ODOBRENJU",tip_partije:"VIK",datum_azuriranja:{$gte:odDatuma,$lte:doDatuma}}).toArray();
 				//var stambenoInfo = await portalStambenoTestDB.find({vrsta_promene:"STATUS",status_code:"NA_ODOBRENJU",datum_azuriranja:{$regex:"2024-10-23"}}).toArray();
 				
 
@@ -7942,7 +7942,7 @@ server.get('/odobrenjePodizvodjaci/:datum1/:datum2',async (req,res)=>{
 			try{
 				const odDatuma = req.params.datum1 + "T00:00:00Z";
 				const doDatuma = req.params.datum2 + "T23:59:59Z";
-				var stambenoInfo = await portalStambenoTestDB.find({vrsta_promene:"STATUS",status_code:"NA_ODOBRENJU",datum_azuriranja:{$gte:odDatuma,$lte:doDatuma}}).toArray();
+				var stambenoInfo = await portalStambenoTestDB.find({vrsta_promene:"STATUS",status_code:"NA_ODOBRENJU",tip_partije:"VIK",datum_azuriranja:{$gte:odDatuma,$lte:doDatuma}}).toArray();
 				//var stambenoInfo = await portalStambenoTestDB.find({vrsta_promene:"STATUS",status_code:"NA_ODOBRENJU",datum_azuriranja:{$regex:"2024-10-23"}}).toArray();
 				
 
