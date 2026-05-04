@@ -16065,7 +16065,7 @@ server.get('/magacioner/reversiNaDan/:dan', async (req, res)=> {
 	if(req.session.user){
 		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			var today = new Date(req.params.dan);
-			today.setDate(today.getDate()-2);
+			//today.setDate(today.getDate()-2);
 			var dateString = today.getDate().toString().length==1 ? "0"+today.getDate() : today.getDate();
 			var monthString = eval(today.getMonth()+1).toString().length==1 ? "0"+eval(today.getMonth()+1) : eval(today.getMonth()+1);
 			try{
@@ -16074,6 +16074,7 @@ server.get('/magacioner/reversiNaDan/:dan', async (req, res)=> {
 					reversFilter = {datum:{$regex:dateString+"."+monthString+"."+new Date().getFullYear()},region:"istok"}
 				}
 				var reversi = await magacinReversiDB.find(reversFilter).toArray();
+				//console.log(reversi)
 				var naloziToFind = [];
 				for(var i=0;i<reversi.length;i++){
 					naloziToFind.push(reversi[i].nalog);
