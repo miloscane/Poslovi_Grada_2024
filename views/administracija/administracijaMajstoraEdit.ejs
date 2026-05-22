@@ -20,49 +20,66 @@
 				<div class="glavniTip"><%=type%></div>
 				<div class="mainBorder"></div>
 				<div class="inputWrap">
-					<div class="checkboxWrap">
-						<div class="checkboxWrapper">
-							<input value="Odgusenje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
-						</div>
-						<div class="checkboxName">Одгушење</div>
-					</div>
-					<div class="checkboxWrap">
-						<div class="checkboxWrapper">
-							<input value="Zamena" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
-						</div>
-						<div class="checkboxName">Замена</div>
-					</div>
-					<div class="checkboxWrap">
-						<div class="checkboxWrapper">
-							<input value="Crpljenje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
-						</div>
-						<div class="checkboxName">Црпљење</div>
-					</div>
-					<div class="checkboxWrap">
-						<div class="checkboxWrapper">
-							<input value="Kopanje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
-						</div>
-						<div class="checkboxName">Копање</div>
-					</div>
-					<div class="checkboxWrap">
-						<div class="checkboxWrapper">
-							<input value="Finalizacija" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
-						</div>
-						<div class="checkboxName">Финализација</div>
-					</div>
-					<div class="checkboxWrap">
-						<div class="checkboxWrapper">
-							<input value="Bager" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
-						</div>
-						<div class="checkboxName">Багер</div>
-					</div>
-					<div class="checkboxWrap">
-						<div class="checkboxWrapper">
-							<input value="Voma" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
-						</div>
-						<div class="checkboxName">Вома</div>
+					<div class="name">Тип мајстора</div>
+					<div class="inputWrapper">
+						<select id="tip-majstora">
+							<option value="Nijedan">Ниједан</option>
+							<option value="Мајстор">Мајстор</option>
+							<option value="Одгушивач">Одгушивач</option>
+							<option value="Вомаш">Вомаш</option>
+							<option value="Багериста">Багериста</option>
+							<option value="Копач">Копач</option>
+							<option value="Финализер">Финализер</option>
+						</select>
 					</div>
 				</div>
+				<div style="display:none">
+					<div class="inputWrap">
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Odgusenje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Одгушење</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Zamena" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Замена</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Crpljenje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Црпљење</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Kopanje" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Копање</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Finalizacija" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Финализација</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Bager" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Багер</div>
+						</div>
+						<div class="checkboxWrap">
+							<div class="checkboxWrapper">
+								<input value="Voma" type="checkbox" class="tipRadnika" onclick="checkboxPicked(this)">
+							</div>
+							<div class="checkboxName">Вома</div>
+						</div>
+					</div>
+				</div>
+				
 				<div class="singleLineInput">
 					<div class="name">Име мајстора</div>
 					<div class="inputWrapper">
@@ -292,6 +309,10 @@
 				document.getElementById("aktivan").checked = true;
 			}
 
+			if(majstor.tipMajstora){
+				document.getElementById("tip-majstora").value = majstor.tipMajstora;
+			}
+
 			if(majstor.tipRada){
 				var tipovi = document.getElementsByClassName("tipRadnika");
 				for(var i=0;i<tipovi.length;i++){
@@ -326,6 +347,7 @@
 				izmenaJson.aktivan = document.getElementById("aktivan").checked;
 				izmenaJson.ocekivaniUcinak = document.getElementById("ocekivani-ucinak").value;
 				izmenaJson.mesecnaPlata = document.getElementById("mesecna-plata").value;
+				izmenaJson.tipMajstora = document.getElementById("tip-majstora").value;
 				izmenaJson.tipRada = [];
 				var tipovi = document.getElementsByClassName("tipRadnika");
 				for(var i=0;i<tipovi.length;i++){
