@@ -44,7 +44,11 @@
 					}
 					var tr = document.createElement("TR");
 					tr.setAttribute("onclick","window.location.href='/magacioner/revers/"+reversi[i].uniqueId+"'")
-					tr.style.cursor = "pointer"
+					tr.style.cursor = "pointer";
+					if(reversi[i].razduzen==true || reversi[i].razduzen=="true"){
+						tr.style.backgroundColor="rgba(0,255,0,0.2)";
+						tr.style.color="rgba(51,51,51,1)";
+					}
 						var td = document.createElement("TD");
 						td.innerHTML = "<div class=\"value\">"+eval(i+1)+".</div>";
 						tr.appendChild(td);

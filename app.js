@@ -16035,17 +16035,7 @@ server.get('/magacioner/noviRevers',async (req,res)=>{
 		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			try{
 				var proizvodi = await proizvodiDB.find({}).toArray();
-				var majstorFilter = {};
-				if(req.session.user.region=="istok"){
-					majstorFilter = {
-						region: "ISTOK"
-					}
-				}else{
-					majstorFilter = {
-						region: "ZAPAD"
-					}
-				}
-				var majstori = await majstoriDB.find(majstorFilter).toArray();
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				res.render("magacioner/noviRevers",{
 					pageTitle:"Нови реверс",
 					proizvodi: proizvodi,
@@ -16366,17 +16356,7 @@ server.get('/magacioner/revers/:uniqueId',async (req,res)=>{
 		if(Number(req.session.user.role)==50 || Number(req.session.user.role)==20){
 			try{
 				var proizvodi = await proizvodiDB.find({}).toArray();
-				var majstorFilter = {};
-				if(req.session.user.region=="istok"){
-					majstorFilter = {
-						region: "ISTOK"
-					}
-				}else{
-					majstorFilter = {
-						region: "ZAPAD"
-					}
-				}
-				var majstori = await majstoriDB.find(majstorFilter).toArray();
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				var reversFilter = {uniqueId:req.params.uniqueId};
 				if(req.session.user.region=="istok"){
 					reversFilter = {uniqueId:req.params.uniqueId,region:"istok"};
@@ -16496,17 +16476,7 @@ server.get('/brzaPretragaReversa/:brojNaloga', async (req, res)=> {
 				}
 				var reversi = await magacinReversiDB.find(reversFilter).toArray();
 				var nalozi = await naloziDB.find({broj:req.params.brojNaloga.toString()}).toArray();
-				var majstorFilter = {};
-				if(req.session.user.region=="istok"){
-					majstorFilter = {
-						region: "ISTOK"
-					}
-				}else{
-					majstorFilter = {
-						region: "ZAPAD"
-					}
-				}
-				var majstori = await majstoriDB.find(majstorFilter).toArray();
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				var proizvodi = await proizvodiDB.find({}).toArray();
 				res.render("magacioner/rezultatPretrage",{
 					pageTitle: "Резлтати претраге реверса по налогу "+req.params.brojNaloga,
@@ -16546,17 +16516,7 @@ server.post('/pretraga-reversa', async (req, res)=> {
 				}
 				var reversi = await magacinReversiDB.find(reversFilter).toArray();
 				var nalozi = await naloziDB.find({broj:req.body.brojnaloga.toString()}).toArray();
-				var majstorFilter = {}
-				if(req.session.user.region=="istok"){
-					majstorFilter = {
-						region: "ISTOK"
-					}
-				}else{
-					majstorFilter = {
-						region: "ZAPAD"
-					}
-				}
-				var majstori = await majstoriDB.find(majstorFilter).toArray();
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				var proizvodi = await proizvodiDB.find({}).toArray();
 				res.render("magacioner/rezultatPretrage",{
 					pageTitle: "Резлтати претраге реверса по налогу "+req.body.brojnaloga,
@@ -16642,17 +16602,7 @@ server.get('/magacioner/danasnjiReversi', async (req, res)=> {
 				for(var i=0;i<nalozi2024.length;i++){
 					nalozi.push(nalozi2024[i])
 				}
-				var majstorFilter = {}
-				if(req.session.user.region=="istok"){
-					majstorFilter = {
-						region: "ISTOK"
-					}
-				}else{
-					majstorFilter = {
-						region: "ZAPAD"
-					}
-				}
-				var majstori = await majstoriDB.find(majstorFilter).toArray();
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				var proizvodi = await proizvodiDB.find({}).toArray();
 				res.render("magacioner/rezultatPretrage",{
 					pageTitle: "Данашњи реверси",
@@ -16704,17 +16654,7 @@ server.get('/magacioner/jucerasnjiReversi', async (req, res)=> {
 				for(var i=0;i<nalozi2024.length;i++){
 					nalozi.push(nalozi2024[i])
 				}
-				var majstorFilter = {}
-				if(req.session.user.region=="istok"){
-					majstorFilter = {
-						region: "ISTOK"
-					}
-				}else{
-					majstorFilter = {
-						region: "ZAPAD"
-					}
-				}
-				var majstori = await majstoriDB.find(majstorFilter).toArray();
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				var proizvodi = await proizvodiDB.find({}).toArray();
 				res.render("magacioner/rezultatPretrage",{
 					pageTitle: "Јучерашњи реверси",
@@ -16767,17 +16707,8 @@ server.get('/magacioner/prekojucerasnjiReversi', async (req, res)=> {
 					nalozi.push(nalozi2024[i])
 				}
 				var proizvodi = await proizvodiDB.find({}).toArray();
-				var majstorFilter = {}
-				if(req.session.user.region=="istok"){
-					majstorFilter = {
-						region: "ISTOK"
-					}
-				}else{
-					majstorFilter = {
-						region: "ZAPAD"
-					}
-				}
-				var majstori = await majstoriDB.find(majstorFilter).toArray();
+				
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				res.render("magacioner/rezultatPretrage",{
 					pageTitle: "Прекојучерашњи реверси",
 					user: req.session.user,
@@ -16840,17 +16771,7 @@ server.get('/magacioner/reversiNaDan/:dan', async (req, res)=> {
 					nalozi.push(nalozi2024[i])
 				}
 				var proizvodi = await proizvodiDB.find({}).toArray();
-				var majstorFilter = {}
-				if(req.session.user.region=="istok"){
-					majstorFilter = {
-						region: "ISTOK"
-					}
-				}else{
-					majstorFilter = {
-						region: "ZAPAD"
-					}
-				}
-				var majstori = await majstoriDB.find(majstorFilter).toArray();
+				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				res.render("magacioner/rezultatPretrage",{
 					pageTitle: "Reversi na dan "+reshuffleDate(req.params.dan),
 					user: req.session.user,

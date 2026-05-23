@@ -538,7 +538,7 @@ var definicijeProizvoda = [
                     },
                     {
                       "startCode":"01.08",
-                      "name":"Čepovi"
+                      "name":"Pocinkovani čepovi"
                     },
                     {
                       "startCode":"01.09",
@@ -663,6 +663,10 @@ var definicijeProizvoda = [
                     {
                       "startCode":"01.39",
                       "name":"PP"
+                    },
+                    {
+                      "startCode":"01.40",
+                      "name":"Regulatori pritiska"
                     },
                     {
                       "startCode":"02.01",

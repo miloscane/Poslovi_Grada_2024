@@ -143,22 +143,127 @@
 										<script>
 											var majstori	=	<%-JSON.stringify(majstori)%>;
 											majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+
 											var option = document.createElement("OPTION");
-											option.setAttribute("value","fantom");
-											option.innerHTML	=	"Фантомски мајстор";
+											option.setAttribute("value","Nijedan");
+											option.innerHTML	=	"Nijedan";
 											document.getElementById("majstor-reversa").appendChild(option);
-											console.log(podizvodjaci)
+											var optgroupMajstoriIstok = document.createElement("OPTGROUP");
+											optgroupMajstoriIstok.setAttribute("label","ИСТОК Мајстори");
+
+											var optgroupFinalizeriIstok = document.createElement("OPTGROUP");
+											optgroupFinalizeriIstok.setAttribute("label","ИСТОК Финализери");
+
+											var optgroupOdgusivaciIstok = document.createElement("OPTGROUP");
+											optgroupOdgusivaciIstok.setAttribute("label","ИСТОК Одгушивачи");
+
+											var optgroupVomasiIstok = document.createElement("OPTGROUP");
+											optgroupVomasiIstok.setAttribute("label","ИСТОК Вомаши");
+
+											var optgroupBageristiIstok = document.createElement("OPTGROUP");
+											optgroupBageristiIstok.setAttribute("label","ИСТОК Багеристи");
+
+											var optgroupKopaciIstok = document.createElement("OPTGROUP");
+											optgroupKopaciIstok.setAttribute("label","ИСТОК Копачи");
+
+
+											var optgroupMajstoriZapad = document.createElement("OPTGROUP");
+											optgroupMajstoriZapad.setAttribute("label","ЗАПАД Мајстори");
+
+											var optgroupFinalizeriZapad = document.createElement("OPTGROUP");
+											optgroupFinalizeriZapad.setAttribute("label","ЗАПАД Финализери");
+
+											var optgroupОdgusivaciZapad = document.createElement("OPTGROUP");
+											optgroupОdgusivaciZapad.setAttribute("label","ЗАПАД Одгушивачи");
+
+											var optgroupVomasiZapad = document.createElement("OPTGROUP");
+											optgroupVomasiZapad.setAttribute("label","ЗАПАД Вомаши");
+
+											var optgroupBageristiZapad = document.createElement("OPTGROUP");
+											optgroupBageristiZapad.setAttribute("label","ЗАПАД Багеристи");
+
+											var optgroupKopaciZapad = document.createElement("OPTGROUP");
+											optgroupKopaciZapad.setAttribute("label","ЗАПАД Копачи");
+
+											var optgroupNeaktivni = document.createElement("OPTGROUP");
+											optgroupNeaktivni.setAttribute("label","НЕАКТИВНИ");
+											
 											for(var i=0;i<majstori.length;i++){
-												if(!majstori[i].inactive){
-													var option = document.createElement("OPTION");
-													option.setAttribute("value",majstori[i].uniqueId);
-													option.innerHTML	=	majstori[i].ime;
-													if(podizvodjaci.indexOf(majstori[i].uniqueId)<0){
-														document.getElementById("majstor-reversa").appendChild(option);
-													}
+												var option = document.createElement("OPTION");
+												option.setAttribute("value",majstori[i].uniqueId);
+												option.innerHTML	=	majstori[i].ime;
+
+												if(majstori[i].aktivan==true){
+
 													
+													if(majstori[i].tipMajstora=="Мајстор"){
+														if(majstori[i].region=="ISTOK"){
+															optgroupMajstoriIstok.appendChild(option)
+														}else{
+															optgroupMajstoriZapad.appendChild(option)
+														}
+													}else if(majstori[i].tipMajstora=="Финализер"){
+														if(majstori[i].region=="ISTOK"){
+															optgroupFinalizeriIstok.appendChild(option)
+														}else{
+															optgroupFinalizeriZapad.appendChild(option)
+														}
+													}else if(majstori[i].tipMajstora=="Одгушивач"){
+														if(majstori[i].region=="ISTOK"){
+															optgroupOdgusivaciIstok.appendChild(option)
+														}else{
+															optgroupОdgusivaciZapad.appendChild(option)
+														}
+													}else if(majstori[i].tipMajstora=="Вомаш"){
+														if(majstori[i].region=="ISTOK"){
+															optgroupVomasiIstok.appendChild(option)
+														}else{
+															optgroupVomasiZapad.appendChild(option)
+														}
+													}else if(majstori[i].tipMajstora=="Багериста"){
+														if(majstori[i].region=="ISTOK"){
+															optgroupBageristiIstok.appendChild(option)
+														}else{
+															optgroupBageristiZapad.appendChild(option)
+														}
+													}else if(majstori[i].tipMajstora=="Копач"){
+														if(majstori[i].region=="ISTOK"){
+															optgroupKopaciIstok.appendChild(option)
+														}else{
+															optgroupKopaciZapad.appendChild(option)
+														}
+													}else{
+														document.getElementById("majstor-reversa").appendChild(option)
+													}
+												}else{
+													optgroupNeaktivni.appendChild(option)
 												}
 											}
+											console.log(user)
+											if(user.region=="istok"){
+												document.getElementById("majstor-reversa").appendChild(optgroupMajstoriIstok)
+												document.getElementById("majstor-reversa").appendChild(optgroupFinalizeriIstok)
+												document.getElementById("majstor-reversa").appendChild(optgroupVomasiIstok)
+												document.getElementById("majstor-reversa").appendChild(optgroupBageristiIstok)
+												document.getElementById("majstor-reversa").appendChild(optgroupKopaciIstok)
+												document.getElementById("majstor-reversa").appendChild(optgroupMajstoriZapad)
+												document.getElementById("majstor-reversa").appendChild(optgroupFinalizeriZapad)
+												document.getElementById("majstor-reversa").appendChild(optgroupVomasiZapad)
+												document.getElementById("majstor-reversa").appendChild(optgroupBageristiZapad)
+												document.getElementById("majstor-reversa").appendChild(optgroupKopaciZapad)
+											}else{
+												document.getElementById("majstor-reversa").appendChild(optgroupMajstoriZapad)
+												document.getElementById("majstor-reversa").appendChild(optgroupFinalizeriZapad)
+												document.getElementById("majstor-reversa").appendChild(optgroupVomasiZapad)
+												document.getElementById("majstor-reversa").appendChild(optgroupBageristiZapad)
+												document.getElementById("majstor-reversa").appendChild(optgroupKopaciZapad)
+												document.getElementById("majstor-reversa").appendChild(optgroupMajstoriIstok)
+												document.getElementById("majstor-reversa").appendChild(optgroupFinalizeriIstok)
+												document.getElementById("majstor-reversa").appendChild(optgroupVomasiIstok)
+												document.getElementById("majstor-reversa").appendChild(optgroupBageristiIstok)
+												document.getElementById("majstor-reversa").appendChild(optgroupKopaciIstok)
+											}
+											document.getElementById("majstor-reversa").appendChild(optgroupNeaktivni)
 										</script>
 									</div>
 								</div>
