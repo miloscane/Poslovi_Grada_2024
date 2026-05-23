@@ -472,6 +472,13 @@
 									</script>
 								</div>
 								<div class="inputWrap">
+									<div class="inputTitle">Белешка:</div>
+									<textarea id="beleska"></textarea>
+									<script>
+										document.getElementById("beleska").value = revers.beleska ? revers.beleska : "";
+									</script>
+								</div>
+								<div class="inputWrap">
 									<div class="inputTitle">Ставке:</div>
 									<div id="revers-stavke"></div>
 									<script>
@@ -543,6 +550,7 @@
 													json.majstor = document.getElementById("majstor-reversa").value;
 													json.nalog = document.getElementById("broj-naloga").value;
 													json.adresa = document.getElementById("adresa-naloga").value;
+													json.beleska = document.getElementById("beleksa").value;
 													var date = new Date(document.getElementById("datum-reversa").value);
 													var timestamp = document.getElementById("vreme-reversa").value;
 													date.setHours(Number(timestamp.split(":")[0]));
@@ -647,6 +655,13 @@
 													yPos = 5;
 												}
 											}
+											doc.setFontType("bold");
+											doc.text("Белешка:",5,yPos);
+											yPos = yPos + 7;
+											doc.setDrawColor(0);
+									        doc.setFillColor(0,0,0);
+											doc.rect(5, yPos, 200, 0.4, 'F');
+											doc.setFontType("normal");
 											yPos = yPos + 7;
 											if(yPos>285){
 												doc.addPage()

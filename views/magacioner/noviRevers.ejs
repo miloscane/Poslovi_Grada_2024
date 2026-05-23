@@ -357,6 +357,10 @@
 									</select>
 								</div>
 								<div class="inputWrap">
+									<div class="inputTitle">Белешка:</div>
+									<textarea id="beleska"></textarea>
+								</div>
+								<div class="inputWrap">
 									<div class="button" onclick="saveRevers()">Сачувај</div>
 									<form method="POST" action="/novi-revers" style="display:none" id="novi-revers-form">
 										<input type="text" name="json" id="novi-revers-json">
@@ -371,6 +375,7 @@
 													json.nalog = document.getElementById("broj-naloga").value;
 													json.adresa = document.getElementById("adresa-naloga").value;
 													json.tip = document.getElementById("tip-reversa").value;
+													json.beleska = document.getElementById("beleska").value;
 													json.zaduzenje = [];
 													var date = new Date(document.getElementById("datum-reversa").value);
 													var timestamp = document.getElementById("vreme-reversa").value;

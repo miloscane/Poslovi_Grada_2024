@@ -16230,6 +16230,7 @@ server.post('/izmeni-revers', async (req, res)=> {
 				zaduzenje: json.zaduzenje,
 				nalog: json.nalog,
 				adresa: json.adresa,
+				beleska: json.beleska,
 				datetime: Number(json.datetime),
 				razduzen: json.razduzen,
 				datum: json.datum
