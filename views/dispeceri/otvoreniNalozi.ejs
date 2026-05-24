@@ -25,7 +25,7 @@
 				<div class="box">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
 					<div class="info">
-						<div class="title">Ургенције</div>
+						<div class="title">Ургирани налози</div>
 						<div class="text"><span id="urgencije"></span></div>
 						<div class="note"></div>
 					</div>
@@ -450,6 +450,8 @@
 
 						if(zakazano==false){
 							nezakazani++;
+						}else{
+							naloziToShow[i].datumRadova = datumRadova;
 						}
 
 						var tr = document.createElement("TR");
@@ -504,6 +506,8 @@
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value urgencija");
 								div.innerHTML = naloziToShow[i].urgencije;
+								div.style.backgroundColor = "rgba(255,0,0,"+naloziToShow[i].urgencije*2/10+")";
+								div.style.color = "rgba(0,0,0)";
 								td.appendChild(div);
 							tr.appendChild(td);
 							
