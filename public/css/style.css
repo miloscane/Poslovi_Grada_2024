@@ -2308,7 +2308,6 @@ input[type=number] {
 
 .otvoreniNalozi .tableWrap table td .value{
     padding:9px 5px;
-    height:39px;
 }
 
 .otvoreniNalozi .tableWrap table td .redniBroj{
@@ -2319,7 +2318,7 @@ input[type=number] {
 }
 
 .otvoreniNalozi .tableWrap table td .brojNaloga{
-    width:90px;
+    width:80px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -2337,10 +2336,34 @@ input[type=number] {
 }
 
 .otvoreniNalozi .tableWrap table td .datumNaloga{
-    width:120px;
+    width:100px;
+    /*text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;*/
+}
+
+.otvoreniNalozi .tableWrap table td .zakazan{
+    width:130px;
+    /*text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;*/
+    text-align: center;
+}
+
+.otvoreniNalozi .tableWrap table td .komentar{
+    width:264px;
+    /*text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;*/
+    text-align: left;
+}
+
+.otvoreniNalozi .tableWrap table td .urgencija{
+    width:54px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    text-align: center;
 }
 
 .otvoreniNalozi .tableWrap table td .brojFakture{
@@ -2351,16 +2374,17 @@ input[type=number] {
 }
 
 .otvoreniNalozi .tableWrap table td .radnaJedinica{
-    width:160px;
+    width:70px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
 }
 
 .otvoreniNalozi .tableWrap table td .adresa{
-    width:210px;
-    text-overflow: ellipsis;
+    width:100px;
+    /*text-overflow: ellipsis;
     white-space: nowrap;
+    overflow: hidden;*/
     overflow: hidden;
 }
 
@@ -2372,10 +2396,10 @@ input[type=number] {
 }
 
 .otvoreniNalozi .tableWrap table td .status{
-    width:210px;
-    text-overflow: ellipsis;
+    width:100px;
+    /*text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: hidden;
+    overflow: hidden;*/
 }
 
 .otvoreniNalozi .tableWrap table td .majstor{

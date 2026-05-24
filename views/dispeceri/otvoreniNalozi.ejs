@@ -2,18 +2,11 @@
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
 		var majstori = <%-JSON.stringify(majstori)%>;
+		var prikazOpstina = <%-JSON.stringify(prikazOpstina)%>;
 	</script>
 	<div class="pageWidth">
 		<div class="otvoreniNalozi">
 			<div class="boxesWrap">
-				<div class="box">
-					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/sumIcon.png"></div>
-					<div class="info">
-						<div class="title">Укупно налога</div>
-						<div class="text"><%=nalozi.length%></div>
-						<div class="note">За бољи учинак овај број треба да буде што мањи.</div>
-					</div>
-				</div>
 				<div class="box">
 					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
 					<div class="info">
@@ -22,34 +15,26 @@
 					</div>
 				</div>
 				<div class="box">
-					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/datumIcon.png"></div>
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
 					<div class="info">
-						<div class="title">Zakazani nalozi</div>
-						<div class="text"><span id="zakazani-nalozi"></span></div>
+						<div class="title">Nezakazani nalozi</div>
+						<div class="text"><span id="nezakazani-nalozi"></span></div>
 						<div class="note"></div>
 					</div>
 				</div>
 				<div class="box">
-					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/finalizacijaIcon.png"></div>
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
 					<div class="info">
-						<div class="title">За финализацију</div>
-						<div class="text"><span id="nalozi-za-finalizaciju"></span></div>
+						<div class="title">Ургенције</div>
+						<div class="text"><span id="urgencije"></span></div>
 						<div class="note"></div>
 					</div>
 				</div>
 				<div class="box">
-					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/vomaIcon.png"></div>
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/nalogIcon.png"></div>
 					<div class="info">
-						<div class="title">Потребна вома</div>
-						<div class="text"><span id="nalozi-za-vomu"></span></div>
-						<div class="note"></div>
-					</div>
-				</div>
-				<div class="box">
-					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/whiteAlertIcon.png"></div>
-					<div class="info">
-						<div class="title">Неизвршени налози</div>
-						<div class="text"><span id="neizvrseni-nalozi"></span></div>
+						<div class="title">Непознато</div>
+						<div class="text"><span id="nepoznato"></span></div>
 						<div class="note"></div>
 					</div>
 				</div>
@@ -60,7 +45,8 @@
 						<div class="label">Приказане радне јединице:</div>
 						<div class="checkboxes" id="filter-opstine-checkboxes"></div>
 						<script>
-							for(var i=0;i<user.opstine.length;i++){
+							for(var i=0;i<prikazOpstina.length;i++){
+								var opstina = prikazOpstina[i];
 								var checkboxWrapper = document.createElement("DIV");
 								checkboxWrapper.setAttribute("class","checkboxWrapper");
 									var checkboxWrap = document.createElement("DIV");
@@ -68,7 +54,7 @@
 										var input = document.createElement("INPUT");
 										input.setAttribute("type","checkbox");
 										input.setAttribute("class","radnaJedinicaCheckbox");
-										input.setAttribute("value",user.opstine[i]);
+										input.setAttribute("value",opstina);
 										input.setAttribute("oninput","generateTable()");
 										input.setAttribute("oncontextmenu","event.preventDefault();rightClickCheckbox(this)");
 										input.checked = true;
@@ -78,7 +64,7 @@
 									var label = document.createElement("DIV");
 									label.setAttribute("class","label");
 									label.setAttribute("onclick","checkboxLabelClick(this)")
-									label.innerHTML	=	user.opstine[i];
+									label.innerHTML	=	opstina;
 									label.setAttribute("oncontextmenu","event.preventDefault();rightClickCheckbox(this)");
 									checkboxWrapper.appendChild(label);
 								document.getElementById("filter-opstine-checkboxes").appendChild(checkboxWrapper);
@@ -135,7 +121,7 @@
 					<div class="filter">
 						<div class="label">Приказани мајстори:</div>
 						<div class="checkboxes">
-							<select id="majstor-naloga" oninput="generateTable()">
+							<!--<select id="majstor-naloga" oninput="generateTable()">
 								<option value="Svi" default="default">Svi</option>
 								<option value="Nijedan">Nijedan</option>
 								<optgroup label="Мајстори" id="majstori-pg"></optgroup>
@@ -165,6 +151,141 @@
 										}
 									}
 								}
+							</script>-->
+							<select id="majstor-naloga" oninput="generateTable()"></select>
+							<script>
+								var majstori	=	<%-JSON.stringify(majstori)%>;
+								majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+
+								var option = document.createElement("OPTION");
+								option.setAttribute("value","Svi");
+								option.innerHTML	=	"Svi";
+								document.getElementById("majstor-naloga").appendChild(option);
+
+								var option = document.createElement("OPTION");
+								option.setAttribute("value","Nijedan");
+								option.innerHTML	=	"Nijedan";
+								document.getElementById("majstor-naloga").appendChild(option);
+								
+								var optgroupPodizvodjaci = document.createElement("OPTGROUP");
+								optgroupPodizvodjaci.setAttribute("label","ПОДИЗВОЂАЧИ");
+
+								var optgroupMajstoriIstok = document.createElement("OPTGROUP");
+								optgroupMajstoriIstok.setAttribute("label","ИСТОК Мајстори");
+
+								var optgroupFinalizeriIstok = document.createElement("OPTGROUP");
+								optgroupFinalizeriIstok.setAttribute("label","ИСТОК Финализери");
+
+								var optgroupOdgusivaciIstok = document.createElement("OPTGROUP");
+								optgroupOdgusivaciIstok.setAttribute("label","ИСТОК Одгушивачи");
+
+								var optgroupVomasiIstok = document.createElement("OPTGROUP");
+								optgroupVomasiIstok.setAttribute("label","ИСТОК Вомаши");
+
+								var optgroupBageristiIstok = document.createElement("OPTGROUP");
+								optgroupBageristiIstok.setAttribute("label","ИСТОК Багеристи");
+
+								var optgroupKopaciIstok = document.createElement("OPTGROUP");
+								optgroupKopaciIstok.setAttribute("label","ИСТОК Копачи");
+
+
+								var optgroupMajstoriZapad = document.createElement("OPTGROUP");
+								optgroupMajstoriZapad.setAttribute("label","ЗАПАД Мајстори");
+
+								var optgroupFinalizeriZapad = document.createElement("OPTGROUP");
+								optgroupFinalizeriZapad.setAttribute("label","ЗАПАД Финализери");
+
+								var optgroupОdgusivaciZapad = document.createElement("OPTGROUP");
+								optgroupОdgusivaciZapad.setAttribute("label","ЗАПАД Одгушивачи");
+
+								var optgroupVomasiZapad = document.createElement("OPTGROUP");
+								optgroupVomasiZapad.setAttribute("label","ЗАПАД Вомаши");
+
+								var optgroupBageristiZapad = document.createElement("OPTGROUP");
+								optgroupBageristiZapad.setAttribute("label","ЗАПАД Багеристи");
+
+								var optgroupKopaciZapad = document.createElement("OPTGROUP");
+								optgroupKopaciZapad.setAttribute("label","ЗАПАД Копачи");
+
+								var optgroupNeaktivni = document.createElement("OPTGROUP");
+								optgroupNeaktivni.setAttribute("label","НЕАКТИВНИ");
+								
+								for(var i=0;i<majstori.length;i++){
+									var option = document.createElement("OPTION");
+									option.setAttribute("value",majstori[i].uniqueId);
+									option.innerHTML	=	majstori[i].ime;
+
+									if(majstori[i].aktivan==true){
+
+										
+										if(majstori[i].tipMajstora=="Мајстор"){
+											if(majstori[i].region=="ISTOK"){
+												optgroupMajstoriIstok.appendChild(option)
+											}else{
+												optgroupMajstoriZapad.appendChild(option)
+											}
+										}else if(majstori[i].tipMajstora=="Финализер"){
+											if(majstori[i].region=="ISTOK"){
+												optgroupFinalizeriIstok.appendChild(option)
+											}else{
+												optgroupFinalizeriZapad.appendChild(option)
+											}
+										}else if(majstori[i].tipMajstora=="Одгушивач"){
+											if(majstori[i].region=="ISTOK"){
+												optgroupOdgusivaciIstok.appendChild(option)
+											}else{
+												optgroupОdgusivaciZapad.appendChild(option)
+											}
+										}else if(majstori[i].tipMajstora=="Вомаш"){
+											if(majstori[i].region=="ISTOK"){
+												optgroupVomasiIstok.appendChild(option)
+											}else{
+												optgroupVomasiZapad.appendChild(option)
+											}
+										}else if(majstori[i].tipMajstora=="Багериста"){
+											if(majstori[i].region=="ISTOK"){
+												optgroupBageristiIstok.appendChild(option)
+											}else{
+												optgroupBageristiZapad.appendChild(option)
+											}
+										}else if(majstori[i].tipMajstora=="Копач"){
+											if(majstori[i].region=="ISTOK"){
+												optgroupKopaciIstok.appendChild(option)
+											}else{
+												optgroupKopaciZapad.appendChild(option)
+											}
+										}else{
+											document.getElementById("majstor-naloga").appendChild(option)
+										}
+									}else{
+										optgroupNeaktivni.appendChild(option)
+									}
+								}
+								document.getElementById("majstor-naloga").appendChild(optgroupPodizvodjaci)
+								if(user.region=="istok"){
+									document.getElementById("majstor-naloga").appendChild(optgroupMajstoriIstok)
+									document.getElementById("majstor-naloga").appendChild(optgroupFinalizeriIstok)
+									document.getElementById("majstor-naloga").appendChild(optgroupVomasiIstok)
+									document.getElementById("majstor-naloga").appendChild(optgroupBageristiIstok)
+									document.getElementById("majstor-naloga").appendChild(optgroupKopaciIstok)
+									document.getElementById("majstor-naloga").appendChild(optgroupMajstoriZapad)
+									document.getElementById("majstor-naloga").appendChild(optgroupFinalizeriZapad)
+									document.getElementById("majstor-naloga").appendChild(optgroupVomasiZapad)
+									document.getElementById("majstor-naloga").appendChild(optgroupBageristiZapad)
+									document.getElementById("majstor-naloga").appendChild(optgroupKopaciZapad)
+								}else{
+									document.getElementById("majstor-naloga").appendChild(optgroupMajstoriZapad)
+									document.getElementById("majstor-naloga").appendChild(optgroupFinalizeriZapad)
+									document.getElementById("majstor-naloga").appendChild(optgroupVomasiZapad)
+									document.getElementById("majstor-naloga").appendChild(optgroupBageristiZapad)
+									document.getElementById("majstor-naloga").appendChild(optgroupKopaciZapad)
+									document.getElementById("majstor-naloga").appendChild(optgroupMajstoriIstok)
+									document.getElementById("majstor-naloga").appendChild(optgroupFinalizeriIstok)
+									document.getElementById("majstor-naloga").appendChild(optgroupVomasiIstok)
+									document.getElementById("majstor-naloga").appendChild(optgroupBageristiIstok)
+									document.getElementById("majstor-naloga").appendChild(optgroupKopaciIstok)
+								}
+								document.getElementById("majstor-naloga").appendChild(optgroupNeaktivni)
 							</script>
 						</div>
 					</div>
@@ -194,14 +315,16 @@
 					<div class="tableHeader">
 						<table>
 							<tr>
-								<td><div class="value redniBroj">Редни број</div></td>
+								<!--<td><div class="value redniBroj">Редни број</div></td>-->
 								<td><div class="value brojNaloga">Број налога</div></td>
-								<td><div class="value ikonica"></div></td>
 								<td><div class="value datumNaloga">Датум налога</div></td>
 								<td><div class="value radnaJedinica">Радна јединица</div></td>
 								<td><div class="value adresa">Адреса</div></td>
 								<td><div class="value status">Статус</div></td>
-								<td><div class="value majstor">Majstor</div></td>
+								<td><div class="value majstor">Мајстор</div></td>
+								<td><div class="value urgencija">Ургенције</div></td>
+								<td><div class="value zakazan">Заказан</div></td>
+								<td><div class="value komentar">Последњи коментар</div></td>
 							</tr>
 						</table>
 					</div>
@@ -240,14 +363,7 @@
 							var filterMajstora = document.getElementById("majstor-naloga").value;
 							var prikazujPodizvodjace = document.getElementById("podizvodjaci-checkbox").checked;
 
-							var nalogToPush = {};
-							nalogToPush.broj = nalozi[i].broj;
-							nalogToPush.datum = nalozi[i].datum.datum;
-							nalogToPush.radnaJedinica = nalozi[i].radnaJedinica;
-							nalogToPush.adresa = nalozi[i].adresa;
-							nalogToPush.statusNaloga = nalozi[i].statusNaloga;
-							nalogToPush.majstor = nalozi[i].majstor;
-							nalogToPush.kasni = nalozi[i].kasni;
+							var nalogToPush = nalozi[i];
 							
 							if(filterMajstora!="Svi"){
 								if(nalogToPush.majstor==filterMajstora){
@@ -293,36 +409,50 @@
 						}
 					}
 
-					var zakazani		=	0;
-					var finalizacija	=	0;
-					var voma			=	0;
-					var neizvrseni		=	0;
+					var nezakazani		=	0;
+					var urgencije		=	0;
+					var nepoznato		=	0;
 					document.getElementById("table").innerHTML = "";
 					var table = document.createElement("TABLE");
+					console.log(naloziToShow)
 					for(var i=0;i<naloziToShow.length;i++){
-						if(naloziToShow[i].statusNaloga == "Zakazan"){
-							zakazani++;
+						var urgencija = false;
+						naloziToShow[i].urgencije = 0;
+						for(var j=0;j<naloziToShow[i].izvestaji.length;j++){
+							if(naloziToShow[i].izvestaji[j].izvestaj.toLowerCase().includes("urg")){
+								urgencija = true;
+								naloziToShow[i].urgencije++;
+							}
+						}
+						if(urgencija==true){
+							urgencije++;
+						}
+						if(["Primljen","Dodeljen majstoru"].indexOf(naloziToShow[i].statusNaloga)>=0){
+							nepoznato++;
 						}
 
-						if(naloziToShow[i].statusNaloga == "Finalizacija"){
-							finalizacija++;
+						var danas = new Date();
+						var zakazano = false;
+						var datumRadova;
+						for(var j=0;j<naloziToShow[i].dodele.length;j++){
+							var dodele = naloziToShow[i].dodele[j];
+							var sati = Number(dodele.vremeDolaska.split(":")[0])
+							var minuti = Number(dodele.vremeDolaska.split(":")[1])
+							var dodelaDatum = new Date(dodele.datumRadova)
+							dodelaDatum.setHours(sati);
+							dodelaDatum.setMinutes(minuti);
+
+							if(danas.getTime()<=dodelaDatum.getTime()){
+								zakazano = true;
+								datumRadova = dodelaDatum;
+							}
 						}
 
-						if(naloziToShow[i].statusNaloga == "Potrebna WOMA"){
-							voma++;
+						if(zakazano==false){
+							nezakazani++;
 						}
 
-						if(naloziToShow[i].statusNaloga == "Primljen"){
-							neizvrseni++;
-						}
 						var tr = document.createElement("TR");
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value redniBroj");
-								div.innerHTML = eval(i+1)+".";
-								td.appendChild(div);
-							tr.appendChild(td);
-
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojNaloga");
@@ -335,25 +465,10 @@
 								td.appendChild(div);
 							tr.appendChild(td);
 							
-							
-							var td = document.createElement("TD");
-								var div = document.createElement("DIV");
-								div.setAttribute("class","value ikonica");
-								if(naloziToShow[i].kasni && podizvodjaci.indexOf(naloziToShow[i].majstor)<0 && naloziToShow[i].statusNaloga!="Stambeno koci" && naloziToShow[i].statusNaloga!="Stanari koče" ){
-									tr.setAttribute("style","background-color:rgb(200,0,0);color:rgb(255,255,255)")
-								}
-								if(naloziToShow[i].statusNaloga=="Primljen" && podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
-									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/warningIcon.webp'>";	
-								}else if(podizvodjaci.indexOf(naloziToShow[i].majstor)<0){
-									div.innerHTML = "<img src='https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/logo.png'>"
-								}
-								td.appendChild(div);
-							tr.appendChild(td);
-							
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value datumNaloga");
-								div.innerHTML = naloziToShow[i].datum;
+								div.innerHTML = naloziToShow[i].datum.datum;
 								td.appendChild(div);
 							tr.appendChild(td);
 							
@@ -385,16 +500,36 @@
 								td.appendChild(div);
 							tr.appendChild(td);
 							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value urgencija");
+								div.innerHTML = naloziToShow[i].urgencije;
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value zakazan");
+								div.innerHTML = naloziToShow[i].datumRadova ? getDateAsStringForDisplay(naloziToShow[i].datumRadova)+" "+getTimestamp(naloziToShow[i].datumRadova) : "<span style=\"color:rgb(200,0,0);font-weight:700\">!!</span>";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value komentar");
+								div.innerHTML = naloziToShow[i].izvestaji.length>0 ? naloziToShow[i].izvestaji[naloziToShow[i].izvestaji.length-1].izvestaj : "<span style=\"color:rgb(200,0,0);font-weight:700\">!!</span>";
+								td.appendChild(div);
+							tr.appendChild(td);
+							
 							
 
 						table.appendChild(tr);
 					}
 					document.getElementById("table").appendChild(table);
 					document.getElementById("ukupno-prikazanih-naloga").innerHTML	=	naloziToShow.length;
-					document.getElementById("zakazani-nalozi").innerHTML			=	zakazani;
-					document.getElementById("nalozi-za-finalizaciju").innerHTML		=	finalizacija;
-					document.getElementById("nalozi-za-vomu").innerHTML				=	voma;
-					document.getElementById("neizvrseni-nalozi").innerHTML			=	neizvrseni;
+					document.getElementById("nezakazani-nalozi").innerHTML			=	nezakazani;
+					document.getElementById("urgencije").innerHTML		=	urgencije;
+					document.getElementById("nepoznato").innerHTML				=	nepoznato;
 				}
 
 				generateTable();

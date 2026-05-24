@@ -14574,7 +14574,87 @@ server.get('/dispecer/sviNalozi',async (req,res)=>{
 });
 
 server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
-	if(req.session.user){
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+
+	if(["10","20"].indexOf(req.session.user.role)<0){
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+		});
+	}
+	try{
+		var skriveniStatusi = ["Završeno","Nalog u Stambenom","Storniran","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
+		var opstinaFilter = {};
+		var prikazOpstina = [];
+		if(req.session.user.region=="istok" || req.session.user.region=="ISTOK"){
+			opstinaFilter = {
+				radnaJedinica:{$in:istok}
+			}
+			prikazOpstina = istok;
+		}else if(req.session.user.region=="zapad" || req.session.user.region=="ZAPAD"){
+			opstinaFilter = {
+				radnaJedinica:{$in:zapad}
+			}
+			prikazOpstina = zapad;
+		}else{
+			opstinaFilter = {
+				radnaJedinica:{$in:radneJedinice}
+			}
+			prikazOpstina = radneJedinice;
+		}
+		var majstori = await majstoriDB.find({}).toArray();
+		var nalozi = await naloziDB.find({...opstinaFilter,statusNaloga:{$nin:skriveniStatusi}}).toArray();
+		var brojeviNaloga = [];
+		for(var i=0;i<nalozi.length;i++){
+			delete nalozi[i]._id;
+			delete nalozi[i].uniqueId;
+			delete nalozi[i].digitalizacija;
+			delete nalozi[i].opis;
+			delete nalozi[i].vrstaRada;
+			brojeviNaloga.push(nalozi[i].broj)
+		}
+		var izvestaji = await izvestajiDB.find({nalog:{$in:brojeviNaloga}}).toArray();
+		for(var i=0;i<nalozi.length;i++){
+			nalozi[i].izvestaji = [];
+			for(var j=0;j<izvestaji.length;j++){
+				if(nalozi[i].broj==izvestaji[j].nalog){
+					nalozi[i].izvestaji.push(izvestaji[j]);
+				}
+			}
+		}
+		var dodele = await dodeljivaniNaloziDB.find({nalog:{$in:brojeviNaloga}}).toArray();
+
+		for(var i=0;i<nalozi.length;i++){
+			nalozi[i].dodele = [];
+			for(var j=0;j<dodele.length;j++){
+				if(nalozi[i].broj==dodele[j].nalog){
+					nalozi[i].dodele.push(dodele[j]);
+				}
+			}
+		}
+		res.render("dispeceri/otvoreniNalozi",{
+			pageTitle:"Отворени налози",
+			user: req.session.user,
+			majstori: majstori,
+			prikazOpstina: prikazOpstina,
+			nalozi: nalozi
+		});
+	}catch(err){
+		logError(err);
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+		});
+	}
+
+	
+
+
+	/*if(req.session.user){
 			if(Number(req.session.user.role)==20 || Number(req.session.user.role)==10){
 				var skriveniStatusi = ["Završeno","Nalog u Stambenom","Storniran","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
 				if(Number(req.session.user.role)==10){
@@ -14645,7 +14725,7 @@ server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 		}
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url))
-	}
+	}*/
 });
 
 server.get('/dispecer/storniraniNalozi',async (req,res)=>{
