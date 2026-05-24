@@ -2,11 +2,68 @@
 	<script>
 		var majstori = <%-JSON.stringify(majstori)%>;
 		var pomocnici = <%-JSON.stringify(pomocnici)%>;
-		var checkIns = <%-JSON.stringify(checkIns)%>;
-		for(var i=0;i<checkIns.length;i++){
-			console.log(checkIns[i].brojKartice)
-		}
 		var users = <%-JSON.stringify(users)%>;
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
+		pomocnici.sort((a, b) => a.ime.localeCompare(b.ime));
+		users.sort((a, b) => a.ime.localeCompare(b.ime));
+		var checkIns = <%-JSON.stringify(checkIns)%>;
+		checkIns.sort((a, b) => Number(a.datetime) - Number(b.datetime));
+
+		function formatTime(date) {
+			return date.getHours().toString().padStart(2, "0") + ":" +
+				   date.getMinutes().toString().padStart(2, "0");
+		}
+
+		function addCheckInData(list, checkIns) {
+			list.forEach(user => {
+				user.vremeDolaska = "/";
+				user.vremeDolaskaUser = false;
+				user.vremeOdlaska = "/";
+				user.vremeOdlaskaUser = false;
+				user.radnoVreme = "/";
+				user.checkIns = checkIns.filter(checkIn => checkIn.uniqueId == user.uniqueId);
+
+				if (user.checkIns.length > 1) {
+					const prviCheckIn = user.checkIns[0];
+					const zadnjiCheckIn = user.checkIns[user.checkIns.length - 1];
+
+					const vremeDolaska = new Date(Number(prviCheckIn.datetime));
+					const vremeOdlaska = new Date(Number(zadnjiCheckIn.datetime));
+
+					user.vremeDolaska = formatTime(vremeDolaska);
+					user.vremeOdlaska = formatTime(vremeOdlaska);
+
+					if (prviCheckIn.checkInUser) {
+						user.vremeDolaskaUser = prviCheckIn.checkInUser;
+					}
+
+					if (zadnjiCheckIn.checkInUser) {
+						user.vremeOdlaskaUser = zadnjiCheckIn.checkInUser;
+					}
+
+					const totalMiliseconds = vremeOdlaska.getTime() - vremeDolaska.getTime();
+					const totalMinutes = Math.floor(totalMiliseconds / 60000);
+					const hours = Math.floor(totalMinutes / 60);
+					const minutes = totalMinutes % 60;
+
+					user.radnoVreme = String(hours).padStart(2, "0") + ":" + String(minutes).padStart(2, "0");
+
+				} else if (user.checkIns.length == 1) {
+					const vreme = new Date(Number(user.checkIns[0].datetime));
+
+					if (vreme.getHours() < 14) {
+						user.vremeDolaska = formatTime(vreme);
+					} else {
+						user.vremeOdlaska = formatTime(vreme);
+					}
+				}
+			});
+		}
+
+		addCheckInData(majstori, checkIns);
+		addCheckInData(pomocnici, checkIns);
+		addCheckInData(users, checkIns);
+
 		function getPomocnikByCard(card){
 		  var pomocnik = {};
 		  if(pomocnici){
@@ -24,23 +81,6 @@
 		  }
 		  return pomocnik
 		}
-
-		function getVoziloById(id){
-		  var vozilo = {};
-		  if(vozila){
-		    for(var i=0;i<vozila.length;i++){
-		      if(Number(vozila[i].idNavigacije)==Number(id)){
-		        vozilo = vozila[i];
-		        break;
-		      }
-		    }
-		    if(!vozilo.ime){
-		    }
-		  }else{
-		    //console.log("No array vozila defined");
-		  }
-		  return vozilo
-		}
 	</script>
 	<div class="pageWidth pregledPrisustva">
 		<div class="drugiDatum">
@@ -52,6 +92,267 @@
 				window.location.href="/prisustvo/"+document.getElementById("date-input").value;
 			}
 		</script>
+		<!--
+			<option value="Одгушивач">Одгушивач</option>
+			<option value="Вомаш">Вомаш</option>
+			<option value="Багериста">Багериста</option>
+			<option value="Копач">Копач</option>
+			<option value="Финализер">Финализер</option>
+		-->
+		<table id="prisustvo-table">
+			<tr>
+				<td>ЗАПАД</td>
+				<td>ИСТОК</td>
+			</tr>
+			<tr>
+				<td class="title">Mајстори</td>
+				<td class="title">Mајстори</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="majstori-zapad"></td>
+				<td class="tabelica" id="majstori-istok"></td>
+			</tr>
+			<tr>
+				<td class="title">Одгушивачи</td>
+				<td class="title">Одгушивачи</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="odgusivaci-zapad"></td>
+				<td class="tabelica" id="odgusivaci-istok"></td>
+			</tr>
+			<tr>
+				<td class="title">Вомаши</td>
+				<td class="title">Вомаши</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="vomasi-zapad"></td>
+				<td class="tabelica" id="vomasi-istok"></td>
+			</tr>
+			<tr>
+				<td class="title">Багеристи</td>
+				<td class="title">Багеристи</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="bageristi-zapad"></td>
+				<td class="tabelica" id="bageristi-istok"></td>
+			</tr>
+			<tr>
+				<td class="title">Копачи</td>
+				<td class="title">Копачи</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="kopaci-zapad"></td>
+				<td class="tabelica" id="kopaci-istok"></td>
+			</tr>
+			<tr>
+				<td class="title">Финализери</td>
+				<td class="title">Финализери</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="finalizeri-zapad"></td>
+				<td class="tabelica" id="finalizeri-istok"></td>
+			</tr>
+			<tr>
+				<td class="title">Помоћници</td>
+				<td class="title">Помоћници</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="pomocnici-zapad"></td>
+				<td class="tabelica" id="pomocnici-istok"></td>
+			</tr>
+			<tr>
+				<td class="title">Референти</td>
+				<td class="title">Референти</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="referenti-zapad"></td>
+				<td class="tabelica" id="referenti-istok"></td>
+			</tr>
+			<tr>
+				<td class="title">Шефови</td>
+				<td class="title">Шефови</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="sefovi-zapad"></td>
+				<td class="tabelica" id="sefovi-istok"></td>
+			</tr>
+			<tr>
+				<td class="title">Магационери</td>
+				<td class="title">Магационери</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="magacioneri-zapad"></td>
+				<td class="tabelica" id="magacioneri-istok"></td>
+			</tr>
+		</table>
+		<script>
+			for(var i=0;i<majstori.length;i++){
+				var row = document.createElement("DIV");
+				row.setAttribute("class","row");
+					var nameElem = document.createElement("DIV");
+					nameElem.setAttribute("class","name");
+					nameElem.innerHTML = majstori[i].ime;
+					row.appendChild(nameElem);
+
+					var vreme = document.createElement("DIV");
+					vreme.setAttribute("class","vreme");
+					vreme.innerHTML = majstori[i].vremeDolaska;
+					if(majstori[i].vremeDolaskaUser!=false){
+						vreme.style.color = "rgb(200,0,0)"
+					}
+					row.appendChild(vreme);
+
+					var vreme = document.createElement("DIV");
+					vreme.setAttribute("class","vreme");
+					vreme.innerHTML = majstori[i].vremeOdlaska;
+					if(majstori[i].vremeOdlaskaUser!=false){
+						vreme.style.color = "rgb(200,0,0)"
+					}
+					row.appendChild(vreme);
+
+					var vreme = document.createElement("DIV");
+					vreme.setAttribute("class","vreme");
+					vreme.innerHTML = majstori[i].radnoVreme;
+					if(majstori[i].radnoVreme!="/"){
+						row.classList.add("there")
+					}else{
+						row.classList.add("notThere")
+					}
+					row.appendChild(vreme);
+				if(majstori[i].tipMajstora=="Мајстор"){
+					if(majstori[i].region=="ISTOK"){
+						document.getElementById("majstori-istok").appendChild(row);
+					}else{
+						document.getElementById("majstori-zapad").appendChild(row);
+					}
+				}else if(majstori[i].tipMajstora=="Вомаш"){
+					if(majstori[i].region=="ISTOK"){
+						document.getElementById("vomasi-istok").appendChild(row);
+					}else{
+						document.getElementById("vomasi-zapad").appendChild(row);
+					}
+
+				}else if(majstori[i].tipMajstora=="Багериста"){
+					if(majstori[i].region=="ISTOK"){
+						document.getElementById("bageristi-istok").appendChild(row);
+					}else{
+						document.getElementById("bageristi-zapad").appendChild(row);
+					}
+				}else if(majstori[i].tipMajstora=="Копач"){
+					if(majstori[i].region=="ISTOK"){
+						document.getElementById("kopaci-istok").appendChild(row);
+					}else{
+						document.getElementById("kopaci-zapad").appendChild(row);
+					}
+				}else if(majstori[i].tipMajstora=="Финализер"){
+					if(majstori[i].region=="ISTOK"){
+						document.getElementById("finalizeri-istok").appendChild(row);
+					}else{
+						document.getElementById("finalizeri-zapad").appendChild(row);
+					}
+				}
+			}
+
+			for(var i=0;i<pomocnici.length;i++){
+				var row = document.createElement("DIV");
+				row.setAttribute("class","row");
+					var nameElem = document.createElement("DIV");
+					nameElem.setAttribute("class","name");
+					nameElem.innerHTML = pomocnici[i].ime;
+					row.appendChild(nameElem);
+
+					var vreme = document.createElement("DIV");
+					vreme.setAttribute("class","vreme");
+					vreme.innerHTML = pomocnici[i].vremeDolaska;
+					if(pomocnici[i].vremeDolaskaUser!=false){
+						vreme.style.color = "rgb(200,0,0)"
+					}
+					row.appendChild(vreme);
+
+					var vreme = document.createElement("DIV");
+					vreme.setAttribute("class","vreme");
+					vreme.innerHTML = pomocnici[i].vremeOdlaska;
+					if(pomocnici[i].vremeOdlaskaUser!=false){
+						vreme.style.color = "rgb(200,0,0)"
+					}
+					row.appendChild(vreme);
+
+					var vreme = document.createElement("DIV");
+					vreme.setAttribute("class","vreme");
+					vreme.innerHTML = pomocnici[i].radnoVreme;
+					if(pomocnici[i].radnoVreme!="/"){
+						row.classList.add("there")
+					}else{
+						row.classList.add("notThere")
+					}
+					row.appendChild(vreme);
+				if(pomocnici[i].region=="ISTOK"){
+					document.getElementById("pomocnici-istok").appendChild(row);
+				}else{
+					document.getElementById("pomocnici-zapad").appendChild(row);
+				}
+			}
+
+			for(var i=0;i<users.length;i++){
+				var row = document.createElement("DIV");
+				row.setAttribute("class","row");
+					var nameElem = document.createElement("DIV");
+					nameElem.setAttribute("class","name");
+					nameElem.innerHTML = users[i].ime;
+					row.appendChild(nameElem);
+
+					var vreme = document.createElement("DIV");
+					vreme.setAttribute("class","vreme");
+					vreme.innerHTML = users[i].vremeDolaska;
+					if(users[i].vremeDolaskaUser!=false){
+						vreme.style.color = "rgb(200,0,0)"
+					}
+					row.appendChild(vreme);
+
+					var vreme = document.createElement("DIV");
+					vreme.setAttribute("class","vreme");
+					vreme.innerHTML = users[i].vremeOdlaska;
+					if(users[i].vremeOdlaskaUser!=false){
+						vreme.style.color = "rgb(200,0,0)"
+					}
+					row.appendChild(vreme);
+
+					var vreme = document.createElement("DIV");
+					vreme.setAttribute("class","vreme");
+					vreme.innerHTML = users[i].radnoVreme;
+					if(users[i].radnoVreme!="/"){
+						row.classList.add("there")
+					}else{
+						row.classList.add("notThere")
+					}
+					row.appendChild(vreme);
+				if(users[i].role=="10" || users[i].role=="20"){
+					if(users[i].region=="ISTOK" || users[i].region=="istok"){
+						document.getElementById("referenti-istok").appendChild(row);
+					}else{
+						document.getElementById("referenti-zapad").appendChild(row);
+					}
+				}else if(users[i].role=="25"){
+					if(users[i].region=="ISTOK" || users[i].region=="istok"){
+						document.getElementById("sefovi-istok").appendChild(row);
+					}else{
+						document.getElementById("sefovi-zapad").appendChild(row);
+					}
+				}else if(users[i].role=="50"){
+					if(users[i].region=="ISTOK" || users[i].region=="istok"){
+						document.getElementById("magacioneri-istok").appendChild(row);
+					}else{
+						document.getElementById("magacioneri-zapad").appendChild(row);
+					}
+				}
+			}
+		</script>
+		<!--<option value="Мајстор">Мајстор</option>
+							<option value="Одгушивач">Одгушивач</option>
+							<option value="Вомаш">Вомаш</option>
+							<option value="Багериста">Багериста</option>
+							<option value="Копач">Копач</option>
+							<option value="Финализер">Финализер</option>-->
 		<div class="items">
 			<div class="title">Мајстори</div>
 			<div id="majstori"></div>

@@ -9264,16 +9264,9 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 			try{
 				var today = new Date();
 				var nalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Nalog u Stambenom","Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:radneJedinice}}).toArray();
-				var nalozi2024 = await nalozi2024DB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Nalog u Stambenom","Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:radneJedinice}}).toArray();
-				for(var i=0;i<nalozi2024.length;i++){
-					nalozi.push(nalozi2024[i]);
-				}
 
 				var obracunatiNalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},"prijemnica.datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:radneJedinice}}).toArray();
-				var obracunatiNalozi2024 = await nalozi2024DB.find({majstor:{$nin:podizvodjaci},"prijemnica.datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:radneJedinice}}).toArray();
-				for(var i=0;i<obracunatiNalozi2024.length;i++){
-					obracunatiNalozi.push(obracunatiNalozi2024[i]);
-				}
+				
 				res.render("kontrola/neizvrseniNalozi",{
 					pageTitle:"Неизвршени налози на дан "+getDateAsStringForDisplay(today),
 					nalozi: nalozi,
@@ -15843,7 +15836,6 @@ server.post('/cuprija/izmeni-proizvod', async (req, res)=> {
 									}
 							};
 			}
-			
 			cuprijaMaterijalDB.updateOne({uniqueId:json.uniqueId},setObj)
 			.then((dbResponse)=>{
 				res.redirect("/cuprija/stanje");
@@ -18468,149 +18460,58 @@ server.get('/juce', async (req, res)=> {
 });
 
 server.get('/prisustvo', async (req, res)=> {
-	if(req.session.user){
-		var date = new Date();
-		//date.setDate(date.getDate()-2);
-		var year = new Date().getFullYear();
-		var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
-		var dateStr = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
-		
-		majstoriDB.find({}).toArray()
-		.then((majstori)=>{
-			var majstorIdArray = [];
-			for(var i=0;i<majstori.length;i++){
-				majstorIdArray.push(majstori[i].uniqueId)
-				if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0 || !majstori[i].aktivan){
-					majstori.splice(i,1);
-					i--;
-				}
-			}
-			pomocniciDB.find({}).toArray()
-			.then((pomocnici)=>{
-				for(var i=0;i<pomocnici.length;i++){
-					if(!pomocnici[i].aktivan){
-						pomocnici.splice(i,1);
-						i--;
-					}
-				}
-				usersDB.find({}).toArray()
-				.then((users)=>{
-					for(var i=0;i<users.length;i++){
-						delete users[i].password;
-						delete users[i].resetPassDate;
-						delete users[i].resetPassId;
-						delete users[i].resetPassTime;
-						delete users[i]._id;
-						users[i].ime = users[i].name;
-						users[i].uniqueId = users[i].email;
-					}
-					checkInMajstoraDB.find({year:{$in:[year,year.toString()]},month:{$in:[month,Number(month)]},date:{$in:[dateStr.toString(),Number(dateStr)]}}).toArray()
-					.then((checkIns)=>{
-						res.render("prisustvo",{
-					    pageTitle: "Присуство радника на дан "+getDateAsStringForDisplay(date),
-					    pomocnici: pomocnici,
-					    majstori: majstori,
-					    user: req.session.user,
-					    users: users,
-					    checkIns: checkIns
-					  });
-				  })
-				  .catch((error)=>{
-						logError(error);
-						res.send("Greska 4")	
-					})
-
-				})
-				.catch((error)=>{
-					logError(error);
-					res.send("Greska 5")	
-				})
-							
-			})
-			.catch((error)=>{
-				logError(error);
-				res.send("Greska 3")	
-			})
-		})
-		.catch((error)=>{
-			logError(error);
-			res.send("Greska")
-		})	
-	}else{
-		res.redirect("/login?url="+encodeURIComponent(req.url));
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
+
+	res.redirect("/prisustvo/"+getDateAsStringForInputObject(new Date()))
 });
 
 server.get('/prisustvo/:datum', async (req, res)=> {
-	if(req.session.user){
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+
+	try{
 		var date = new Date(req.params.datum);
-		//date.setDate(date.getDate()-2);
+		/*var year = new Date().getFullYear();
+		var month = eval(date.getMonth()+1).toString().padStart(2,"0");  
+		var dateStr = date.getDate().toString().padStart(2,"0");
+		var checkIns = await checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()*/
 		var year = new Date().getFullYear();
 		var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
 		var dateStr = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
-		
-		majstoriDB.find({}).toArray()
-		.then((majstori)=>{
-			var majstorIdArray = [];
-			for(var i=0;i<majstori.length;i++){
-				majstorIdArray.push(majstori[i].uniqueId)
-				if(podizvodjaci.indexOf(majstori[i].uniqueId)>=0 || !majstori[i].aktivan){
-					majstori.splice(i,1);
-					i--;
-				}
-			}
-			pomocniciDB.find({}).toArray()
-			.then((pomocnici)=>{
-				for(var i=0;i<pomocnici.length;i++){
-					if(!pomocnici[i].aktivan){
-						pomocnici.splice(i,1);
-						i--;
-					}
-				}
-				usersDB.find({}).toArray()
-				.then((users)=>{
-					for(var i=0;i<users.length;i++){
-						delete users[i].password;
-						delete users[i].resetPassDate;
-						delete users[i].resetPassId;
-						delete users[i].resetPassTime;
-						delete users[i]._id;
-						users[i].ime = users[i].name;
-						users[i].uniqueId = users[i].email;
-					}
-					checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()
-					.then((checkIns)=>{
+		var checkIns = await checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()
 
-						res.render("prisustvo",{
-					    pageTitle: "Присуство мајстора на дан "+getDateAsStringForDisplay(date),
-					    pomocnici: pomocnici,
-					    majstori: majstori,
-					    user: req.session.user,
-					    users: users,
-					    checkIns: checkIns
-					  });
-				  })
-				  .catch((error)=>{
-						logError(error);
-						res.send("Greska 4")	
-					})
-				})
-				.catch((error)=>{
-					logError(error);
-					res.send("Greska 5")	
-				})			
-			})
-			.catch((error)=>{
-				logError(error);
-				res.send("Greska 3")	
-			})
-		})
-		.catch((error)=>{
-			logError(error);
-			res.send("Greska")
-		})	
-	}else{
-		res.redirect("/login?url="+encodeURIComponent(req.url));
+		var majstori = await majstoriDB.find({aktivan:true,fake:{$exists: false}}).toArray();
+		var pomocnici = await pomocniciDB.find({aktivan:true}).toArray();
+		var users = await usersDB.find({role:{$nin:["30","40","70"]},fake:{$exists: false}}).toArray();
+		for(var i=0;i<users.length;i++){
+			delete users[i].password;
+			delete users[i].resetPassDate;
+			delete users[i].resetPassId;
+			delete users[i].resetPassTime;
+			delete users[i]._id;
+			users[i].ime = users[i].name;
+			users[i].uniqueId = users[i].email;
+		}
+
+		res.render("prisustvo",{
+	    pageTitle: "Присуство мајстора на дан "+getDateAsStringForDisplay(date),
+	    pomocnici: pomocnici,
+	    majstori: majstori,
+	    user: req.session.user,
+	    users: users,
+	    checkIns: checkIns
+	  });
+
+	}catch(err){
+		logError(err);
+		res.render("message",{
+        pageTitle: "Грешка",
+        user: req.session.user,
+        message: "<div class=\"text\">Грешка у бази података 18489.</div>"
+    });
 	}
 });
 
@@ -19944,6 +19845,7 @@ server.post('/manuelniCheckIn',async (req,res)=>{
 		json.month = json.month.toString().padStart(2,"0");
 		json.date = json.date.toString().padStart(2,"0");
 		json.year = Number(json.year);
+		json.checkInUser = req.session.user;
 		await checkInMajstoraDB.insertOne(json);
 		res.redirect("/administracija/manuelnoCekiranje")
 	}catch(err){
