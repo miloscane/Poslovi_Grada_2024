@@ -184,6 +184,14 @@
 				<td class="tabelica" id="magacioneri-zapad"></td>
 				<td class="tabelica" id="magacioneri-istok"></td>
 			</tr>
+			<tr>
+				<td class="title">Хаусмајстори</td>
+				<td class="title">Хаусмајстори</td>
+			</tr>
+			<tr>
+				<td class="tabelica" id="hausmajstori-zapad"></td>
+				<td class="tabelica" id="hausmajstori-istok"></td>
+			</tr>
 		</table>
 		<script>
 			for(var i=0;i<majstori.length;i++){
@@ -249,6 +257,12 @@
 						document.getElementById("finalizeri-istok").appendChild(row);
 					}else{
 						document.getElementById("finalizeri-zapad").appendChild(row);
+					}
+				}else if(majstori[i].tipMajstora=="Хаусмајстор"){
+					if(majstori[i].region=="ISTOK"){
+						document.getElementById("hausmajstori-istok").appendChild(row);
+					}else{
+						document.getElementById("hausmajstori-zapad").appendChild(row);
 					}
 				}
 			}
