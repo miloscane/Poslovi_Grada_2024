@@ -9263,14 +9263,50 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 		if(Number(req.session.user.role)==25){
 			try{
 				var today = new Date();
-				var nalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},statusNaloga:{$nin:["Nalog u Stambenom","Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},radnaJedinica:{$in:radneJedinice}}).toArray();
-
-				var obracunatiNalozi = await naloziDB.find({majstor:{$nin:podizvodjaci},"prijemnica.datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},radnaJedinica:{$in:radneJedinice}}).toArray();
+				var opstinaFilter = {};
+				if(req.session.user.region=="istok" || req.session.user.region=="ISTOK"){
+					opstinaFilter = {
+						radnaJedinica:{$in:istok}
+					}
+				}else if(req.session.user.region=="zapad" || req.session.user.region=="ZAPAD"){
+					opstinaFilter = {
+						radnaJedinica:{$in:zapad}
+					}
+				}else{
+					opstinaFilter = {
+						radnaJedinica:{$in:radneJedinice}
+					}
+				}
+				var nalozi = await naloziDB.find({statusNaloga:{$nin:["Nalog u Stambenom","Završeno","Storniran","Spreman za fakturisanje","Fakturisan","Vraćen"]},...opstinaFilter}).toArray();
+				var obracunatiNalozi = await naloziDB.find({"prijemnica.datum.datum":{$regex:eval(today.getMonth()+1).toString().padStart(2,"0")+"."+today.getFullYear()},...opstinaFilter}).toArray();
 				
+				var prikazOpstina = radneJedinice;
+				if(req.session.user.region=="istok" || req.session.user.region=="ISTOK"){
+					prikazOpstina = istok
+				}else if(req.session.user.region=="zapad" || req.session.user.region=="ZAPAD"){
+					prikazOpstina = zapad
+				}
+
+				var brojeviNaloga = [];
+				for(var i=0;i<nalozi.length;i++){
+					brojeviNaloga.push(nalozi[i].broj)
+				}
+
+				var izvestaji = await izvestajiDB.find({nalog:{$in:brojeviNaloga},izvestaj:{$regex: "urg",$options: "i"},"user.email":"info@stambeno.com"})
+
+				for(var i=0;i<nalozi.length;i++){
+					nalozi[i].izvestaji = [];
+					for(var j=0;j<izvestaji.length;j++){
+						if(nalozi[i].broj==izvestaji[j].nalog){
+							nalozi[i].izvestaji.push(izvestaji[j])
+						}
+					}
+				}
 				res.render("kontrola/neizvrseniNalozi",{
-					pageTitle:"Неизвршени налози на дан "+getDateAsStringForDisplay(today),
+					pageTitle:"Статистика на дан "+getDateAsStringForDisplay(today),
 					nalozi: nalozi,
 					obracunatiNalozi: obracunatiNalozi,
+					prikazOpstina: prikazOpstina,
 					user: req.session.user
 				});
 			}catch(error){
@@ -12382,16 +12418,16 @@ server.get('/dispeceri',async (req,res)=>{
 server.get('/administracijaMajstora',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==20){
-			majstoriDB.find({}).toArray()
+			majstoriDB.find({fake:{$exists:false}}).toArray()
 			.then((majstori)=>{
 				for (var i = majstori.length - 1; i >= 0; i--) {
 			    if (podizvodjaci.indexOf(majstori[i].uniqueId) >= 0) {
 			      majstori.splice(i, 1); 
 			    }
 				}
-				pomocniciDB.find({}).toArray()
+				pomocniciDB.find({fake:{$exists:false}}).toArray()
 				.then((pomocnici)=>{
-					usersDB.find({}).toArray()
+					usersDB.find({fake:{$exists:false}}).toArray()
 					.then((users)=>{
 						for(var i=0;i<users.length;i++){
 							delete users[i].password;

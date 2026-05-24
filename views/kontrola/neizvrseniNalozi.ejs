@@ -2,21 +2,518 @@
 	<script>
 		var nalozi = <%-JSON.stringify(nalozi)%>;
 		var obracunatiNalozi = <%-JSON.stringify(obracunatiNalozi)%>;
-		console.log(obracunatiNalozi)
+		var prikazOpstina = <%-JSON.stringify(prikazOpstina)%>;
 	</script>
 	<div class="pageWidth">
 		<div class="kontrolaNeizvrseniNalozi">
-			<div id="header" class="head">
-				<div class="mainTitle" id="opstine"></div>
+			<div class="newHeader">
+				<div class="fullBox">
+					<div class="title">Фактурисано</div>
+					<div class="text"><span id="ukupan-iznos"></span></div>
+				</div>
+				<div class="halfBox">
+					<div class="title">Послови Града</div>
+					<div class="text"><span id="ukupan-iznos-pg"></span></div>
+				</div>
+				<div class="halfBox">
+					<div class="title">Подизвођачи</div>
+					<div class="text"><span id="ukupan-iznos-podizvodjaci"></span></div>
+				</div>
 				<script>
-					var str = ""
-					for(var i=0;i<radneJedinice.length;i++){
-						str += radneJedinice[i] + ", ";
+					var ukupnoFakturisano = 0;
+					var ukupnoPodizvodjaci = 0;
+					var ukupnoNalogaPodizvodjaci = 0;
+
+					for(var i=0;i<obracunatiNalozi.length;i++){
+						ukupnoFakturisano = ukupnoFakturisano + parseFloat(obracunatiNalozi[i].ukupanIznos);
+						if(podizvodjaci.indexOf(obracunatiNalozi[i].majstor)>=0){
+							ukupnoNalogaPodizvodjaci++;
+							ukupnoPodizvodjaci = ukupnoPodizvodjaci + parseFloat(obracunatiNalozi[i].ukupanIznos)
+						}
 					}
-					document.getElementById("opstine").innerHTML = str.slice(0, -2)
+					var ukupnoPG = ukupnoFakturisano-ukupnoPodizvodjaci;
+					var ukupnoPGNaloga = obracunatiNalozi.length-ukupnoNalogaPodizvodjaci;
+					document.getElementById("ukupan-iznos").innerHTML = brojSaRazmacima(ukupnoFakturisano)+" дин.<br>"+obracunatiNalozi.length+" налога";
+					document.getElementById("ukupan-iznos-pg").innerHTML = brojSaRazmacima(ukupnoPG)+" дин.<br>"+ukupnoPGNaloga+" налога";
+					document.getElementById("ukupan-iznos-podizvodjaci").innerHTML = brojSaRazmacima(ukupnoPodizvodjaci)+" дин.<br>"+ukupnoNalogaPodizvodjaci+" налога";
 				</script>
+			</div>
+			<div class="newHeader" style="background-color:rgb(255,255,255)">
+				<div class="fullBox">
+					<div class="title">Неизвршено налога</div>
+					<div class="text"><span id="ukupno-neizvrseno"></span></div>
+				</div>
+				<div class="halfBox">
+					<div class="title">Послови Града</div>
+					<div class="text"><span id="ukupno-neizvrseno-pg"></span></div>
+				</div>
+				<div class="halfBox">
+					<div class="title">Подизвођачи</div>
+					<div class="text"><span id="ukupno-neizvrseno-podizvodjaci"></span></div>
+				</div>
+				<script>
+					var ukupnoNalogaPG = 0;
+					var ukupnoNalogaPodizvodjaci = 0;
+
+					for(var i=0;i<nalozi.length;i++){
+						if(podizvodjaci.indexOf(obracunatiNalozi[i].majstor)>=0){
+							ukupnoNalogaPodizvodjaci++;
+						}else{
+							ukupnoNalogaPG++;
+						}
+					}
+					document.getElementById("ukupno-neizvrseno").innerHTML = nalozi.length+" налога";
+					document.getElementById("ukupno-neizvrseno-pg").innerHTML = ukupnoNalogaPG+" налога";
+					document.getElementById("ukupno-neizvrseno-podizvodjaci").innerHTML = ukupnoNalogaPodizvodjaci+" налога";
+				</script>
+			</div>
+			<div class="newHeader">
+				<div class="halfBox">
+					<div class="title">Данас налога</div>
+					<div class="text"><span id="danas-naloga"></span></div>
+				</div>
+				<div class="halfBox">
+					<div class="title">Јуче налога</div>
+					<div class="text"><span id="juce-naloga"></span></div>
+				</div>
+				<script>
+					var danasNaloga = 0;
+					var juceNaloga = 0;
+					var danasnjiDatum = new Date();
+					var jucerasnjiDatum = new Date();
+					jucerasnjiDatum.setDate(jucerasnjiDatum.getDate() - 1);
+					
+					for(var i=0;i<obracunatiNalozi.length;i++){
+						var nalog = obracunatiNalozi[i]
+						if(istiDatum(new Date(nalog.datum.punDatum),danasnjiDatum)){
+							danasNaloga++;
+						}
+						if(istiDatum(new Date(nalog.datum.punDatum),jucerasnjiDatum )){
+							juceNaloga++;
+						}
+					}
+					
+					for(var i=0;i<nalozi.length;i++){
+						var nalog = nalozi[i];
+						if(istiDatum(new Date(nalog.datum.punDatum),danasnjiDatum)){
+							danasNaloga++;
+						}
+						if(istiDatum(new Date(nalog.datum.punDatum),jucerasnjiDatum )){
+							juceNaloga++;
+						}
+					}
+					document.getElementById("danas-naloga").innerHTML = danasNaloga;
+					document.getElementById("juce-naloga").innerHTML = juceNaloga;
+				</script>
+			</div>
+			<div id="opstine"></div>
+			<!--
+				<option value="Primljen" default="default">Примљен</option>
+				<option value="Dodeljen majstoru">Додељен мајстору</option>
+				<option value="Potreban pristup">Потребан приступ</option>
+				<option value="Potrebna WOMA">ВОМА</option>
+				<option value="Kombinovano">Комбиновано</option>
+				<option value="Zagušenje">Загушење</option>
+				<option value="Zamena">Спремна замена</option>
+				<option value="Crpljenje">Црпљење</option>
+				<option value="Dezinfekcija">Дезинфекција</option>
+				<option value="Masinsko kopanje">Машинско копање</option>
+				<option value="Rucno kopanje">Ручно копање</option>
+				<option value="Finalizacija">Финализација</option>
+				<option value="Betonaža">Бетонажа</option>
+				<option value="Asfalt">Асфалт</option>
+				<option value="Bekaton">Бекатон</option>
+				<option value="Preventivno čišćenje">Превентивно чишћење</option>
+				<option value="Snimanje kamerom">Снимање камером</option>
+				<option value="Vraćen">Враћен</option>
+				<option value="Završeno">Завршено</option>
+				<option value="Spreman za obračun">Спреман за обрачун</option>
+				<option value="Nalog u Stambenom">Налог у стамбеном</option>
+				<option value="Spreman za fakturisanje">Спреман за фактурисање</option>
+				<option value="Fakturisan">Фактурисан</option>
+				<option value="Storniran">Сторниран</option>
+			-->
+			<script>
+				console.log(prikazOpstina)
+				for(var i=0;i<prikazOpstina.length;i++){
+					var ukupnoNaloga = 0;
+					var ukupnoNalogaPG = 0;
+					var ukupnoNalogaPodizvodjaci = 0;
+					var ukupnoUrgencija = 0;
+					var ukupnoNepoznato = 0;//Primljen, Dodeljen majstoru
+					var zamena = 0;
+					var zagusenje = 0;
+					var voma = 0;
+					var bager = 0;
+					var kopanje = 0;
+					var finalizacija = 0;
+					var crpljenje = 0;
+					var dezinfekcija = 0;
+					var kombinovano = 0;
+					var betonaza = 0;
+					var asfalt = 0;
+					var bekaton = 0;
+					var preventivnoCiscenje = 0;
+					var snimanjeKamerom = 0;
+					var pristup = 0;
+
+					for(var j=0;j<nalozi.length;j++){
+						var nalog = nalozi[j];
+						if(nalog.radnaJedinica==prikazOpstina[i]){
+							ukupnoNaloga++;
+							if(podizvodjaci.indexOf(nalog.majstor)>=0){
+								ukupnoNalogaPodizvodjaci++;
+							}else{
+								ukupnoNalogaPG++;
+							}
+
+							if(nalog.izvestaji.length>0){
+								ukupnoUrgencija++;
+							}
+
+							if(["Primljen","Dodeljen majstoru"].indexOf(nalog.statusNaloga)>=0 && podizvodjaci.indexOf(nalog.majstor)<0){
+								ukupnoNepoznato++;
+							}
+
+							if(nalog.statusNaloga=="Zamena" && podizvodjaci.indexOf(nalog.majstor)<0){
+								zamena++;
+							}
+
+							if(nalog.statusNaloga=="Zagušenje" && podizvodjaci.indexOf(nalog.majstor)<0){
+								zagusenje++;
+							}
+
+							if(nalog.statusNaloga=="Potrebna WOMA" && podizvodjaci.indexOf(nalog.majstor)<0){
+								voma++;
+							}
+
+							if(nalog.statusNaloga=="Masinsko kopanje" && podizvodjaci.indexOf(nalog.majstor)<0){
+								bager++;
+							}
+
+							if(nalog.statusNaloga=="Rucno kopanje" && podizvodjaci.indexOf(nalog.majstor)<0){
+								kopanje++;
+							}
+
+							if(nalog.statusNaloga=="Finalizacija" && podizvodjaci.indexOf(nalog.majstor)<0){
+								finalizacija++;
+							}
+
+							if(nalog.statusNaloga=="Crpljenje" && podizvodjaci.indexOf(nalog.majstor)<0){
+								crpljenje++;
+							}
+
+							if(nalog.statusNaloga=="Dezinfekcija" && podizvodjaci.indexOf(nalog.majstor)<0){
+								dezinfekcija++;
+							}
+
+							if(nalog.statusNaloga=="Kombinovano" && podizvodjaci.indexOf(nalog.majstor)<0){
+								kombinovano++;
+							}
+
+							if(nalog.statusNaloga=="Betonaža" && podizvodjaci.indexOf(nalog.majstor)<0){
+								betonaza++;
+							}
+
+							if(nalog.statusNaloga=="Asfalt" && podizvodjaci.indexOf(nalog.majstor)<0){
+								asfalt++;
+							}
+
+							if(nalog.statusNaloga=="Bekaton" && podizvodjaci.indexOf(nalog.majstor)<0){
+								bekaton++;
+							}
+
+							if(nalog.statusNaloga=="Preventivno čišćenje" && podizvodjaci.indexOf(nalog.majstor)<0){
+								preventivnoCiscenje++;
+							}
+
+							if(nalog.statusNaloga=="Snimanje kamerom" && podizvodjaci.indexOf(nalog.majstor)<0){
+								snimanjeKamerom++;
+							}
+
+							if(nalog.statusNaloga=="Potreban pristup" && podizvodjaci.indexOf(nalog.majstor)<0){
+								pristup++;
+							}
+						}
+					}
+					var opstinaBox = document.createElement("DIV");
+					opstinaBox.setAttribute("class","opstinaBox");
+						var title = document.createElement("DIV");
+						title.setAttribute("class","title");
+						title.innerHTML = prikazOpstina[i];
+						opstinaBox.appendChild(title);
+
+						var boxes = document.createElement("DIV");
+						boxes.setAttribute("class","boxes");
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Укупно налога";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = ukupnoNaloga;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Послови града";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = ukupnoNalogaPG;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Подизвођачи";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = ukupnoNalogaPodizvodjaci;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Ургенције";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = ukupnoUrgencija;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Непознато";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = ukupnoNepoznato;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Замене";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = zamena;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Загушење";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = zagusenje;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Вома";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = voma;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Багер";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = bager;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Копање";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = kopanje;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Финализација";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = finalizacija;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Црпљење";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = crpljenje;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Дезинфекција";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = dezinfekcija;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Комбиновано";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = kombinovano;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Бетонажа";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = betonaza;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Асфалт";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = asfalt;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Бекатон";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = bekaton;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Превентивно чишћење";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = preventivnoCiscenje;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Снимање камером";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = snimanjeKamerom;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+							var box = document.createElement("DIV");
+							box.setAttribute("class","box");
+								var title = document.createElement("DIV");
+								title.setAttribute("class","title");
+								title.innerHTML = "Потребан приступ";
+								box.appendChild(title);
+
+								var value = document.createElement("DIV");
+								value.setAttribute("class","value");
+								value.innerHTML = pristup;
+								box.appendChild(value);
+							boxes.appendChild(box);
+
+
+						opstinaBox.appendChild(boxes);
+					document.getElementById("opstine").appendChild(opstinaBox);
+				}
+			</script>
+
+			<!--<div id="header" class="head">
 				<div class="inlines">
-					<div class="title">Ostvaren Iznos</div>
+					<div class="title">Fakturisano</div>
 					<div class="info" id="ostvaren-iznos"></div>
 				</div>
 				<div class="inlines">
@@ -140,7 +637,7 @@
 				for(var i=0;i<document.getElementsByClassName("naloziWrap").length;i++){
 					document.getElementsByClassName("naloziWrap")[i].getElementsByClassName("title")[0].innerHTML += " <span style=\"font-weight:200;\">(" + document.getElementsByClassName("naloziWrap")[i].getElementsByClassName("nalogWrap").length+ ")</span>";
 				}
-			</script>
+			</script>-->
 		</div>
 	</div>	
 <%- include ("partials/footer") -%>
