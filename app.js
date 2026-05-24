@@ -9292,8 +9292,7 @@ server.get('/kontrola/naslovna',async (req,res)=>{
 					brojeviNaloga.push(nalozi[i].broj)
 				}
 
-				var izvestaji = await izvestajiDB.find({nalog:{$in:brojeviNaloga},izvestaj:{$regex: "urg",$options: "i"},"user.email":"info@stambeno.com"})
-
+				var izvestaji = await izvestajiDB.find({nalog:{$in:brojeviNaloga},izvestaj:{$regex: "urg",$options: "i"},"user.email":{$regex:"stambeno.com",$options:"i"}}).toArray()
 				for(var i=0;i<nalozi.length;i++){
 					nalozi[i].izvestaji = [];
 					for(var j=0;j<izvestaji.length;j++){
