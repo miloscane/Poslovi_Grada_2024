@@ -2311,7 +2311,7 @@ input[type=number] {
 }
 
 .otvoreniNalozi .tableWrap table td .redniBroj{
-    width:70px;
+    width:50px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -2351,7 +2351,7 @@ input[type=number] {
 }
 
 .otvoreniNalozi .tableWrap table td .komentar{
-    width:264px;
+    width:214px;
     /*text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;*/

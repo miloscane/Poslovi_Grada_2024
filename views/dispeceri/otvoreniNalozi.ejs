@@ -315,7 +315,7 @@
 					<div class="tableHeader">
 						<table>
 							<tr>
-								<!--<td><div class="value redniBroj">Редни број</div></td>-->
+								<td><div class="value redniBroj">Бр.</div></td>
 								<td><div class="value brojNaloga">Број налога</div></td>
 								<td><div class="value datumNaloga">Датум налога</div></td>
 								<td><div class="value radnaJedinica">Радна јединица</div></td>
@@ -457,6 +457,13 @@
 						var tr = document.createElement("TR");
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1);
+								td.appendChild(div);
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojNaloga");
 									var a = document.createElement("A");
 									a.setAttribute("href","/nalog/"+naloziToShow[i].broj);
@@ -514,7 +521,7 @@
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value zakazan");
-								div.innerHTML = naloziToShow[i].datumRadova ? getDateAsStringForDisplay(naloziToShow[i].datumRadova)+" "+getTimestamp(naloziToShow[i].datumRadova) : "<span style=\"color:rgb(200,0,0);font-weight:700\">!!</span>";
+								div.innerHTML = naloziToShow[i].datumRadova ? getDateAsStringForDisplay(naloziToShow[i].datumRadova)+" "+getTimestamp(naloziToShow[i].datumRadova) : naloziToShow[i].dodele.length == 0 ? "<span style=\"color:rgb(200,0,0);font-weight:700\">!!!</span>" : "<span style=\"color:rgb(255,220,0);font-weight:900\">!!</span>";
 								td.appendChild(div);
 							tr.appendChild(td);
 							
@@ -550,6 +557,12 @@
 					var table = document.createElement("TABLE");
 					for(var i=0;i<naloziToShowAdresa.length;i++){
 						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1);
+								td.appendChild(div);
+							tr.appendChild(td);
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojNaloga");
@@ -641,6 +654,13 @@
 					var table = document.createElement("TABLE");
 					for(var i=0;i<naloziToShowBroj.length;i++){
 						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+								var div = document.createElement("DIV");
+								div.setAttribute("class","value redniBroj");
+								div.innerHTML = eval(i+1);
+								td.appendChild(div);
+							tr.appendChild(td);
+
 							var td = document.createElement("TD");
 								var div = document.createElement("DIV");
 								div.setAttribute("class","value brojNaloga");
@@ -743,7 +763,7 @@
 					    xOffset = xOffset + 7;
 					    doc.text(naloziToShow[i].broj,xOffset,yPos);
 					    xOffset = xOffset + 25;
-					    doc.text(naloziToShow[i].datum,xOffset,yPos);
+					    doc.text(naloziToShow[i].datum.datum,xOffset,yPos);
 					    xOffset = xOffset + 25;
 					    doc.text(naloziToShow[i].radnaJedinica,xOffset,yPos);
 					    xOffset = xOffset + 25;
