@@ -32,18 +32,28 @@
 					const vremeDolaska = new Date(Number(prviCheckIn.datetime));
 					const vremeOdlaska = new Date(Number(zadnjiCheckIn.datetime));
 
+					const totalMiliseconds = vremeOdlaska.getTime() - vremeDolaska.getTime();
+
 					user.vremeDolaska = formatTime(vremeDolaska);
-					user.vremeOdlaska = formatTime(vremeOdlaska);
 
 					if (prviCheckIn.checkInUser) {
 						user.vremeDolaskaUser = prviCheckIn.checkInUser;
 					}
 
+					// Ako je razlika manja od 1 sat, ne prikazuj vreme odlaska
+					if (totalMiliseconds < 60 * 60 * 1000) {
+						user.vremeOdlaska = "/";
+						user.vremeOdlaskaUser = false;
+						user.radnoVreme = "/";
+						return;
+					}
+
+					user.vremeOdlaska = formatTime(vremeOdlaska);
+
 					if (zadnjiCheckIn.checkInUser) {
 						user.vremeOdlaskaUser = zadnjiCheckIn.checkInUser;
 					}
 
-					const totalMiliseconds = vremeOdlaska.getTime() - vremeDolaska.getTime();
 					const totalMinutes = Math.floor(totalMiliseconds / 60000);
 					const hours = Math.floor(totalMinutes / 60);
 					const minutes = totalMinutes % 60;
