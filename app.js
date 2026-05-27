@@ -18617,6 +18617,7 @@ server.get('/prisustvo/:datum', async (req, res)=> {
 	    majstori: majstori,
 	    user: req.session.user,
 	    users: users,
+	    datum: reshuffleDate(req.params.datum),
 	    checkIns: checkIns
 	  });
 

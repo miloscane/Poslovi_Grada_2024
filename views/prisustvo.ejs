@@ -1,8 +1,10 @@
 <%- include ("partials/header") -%>
+
 	<script>
 		var majstori = <%-JSON.stringify(majstori)%>;
 		var pomocnici = <%-JSON.stringify(pomocnici)%>;
 		var users = <%-JSON.stringify(users)%>;
+		var datum = "<%=datum%>";
 		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 		pomocnici.sort((a, b) => a.ime.localeCompare(b.ime));
 		users.sort((a, b) => a.ime.localeCompare(b.ime));
@@ -101,8 +103,8 @@
 		-->
 		<table id="prisustvo-table">
 			<tr>
-				<td>ЗАПАД</td>
-				<td>ИСТОК</td>
+				<td style="cursor: pointer;" onclick="printTable('zapad')">ЗАПАД</td>
+				<td style="cursor: pointer;" onclick="printTable('istok')">ИСТОК</td>
 			</tr>
 			<tr>
 				<td class="title">Mајстори</td>
@@ -367,6 +369,207 @@
 				}
 			}
 		</script>
+		<%- include ("partials/printer") -%>
+		<script>
+			function printTable(region){
+				doc = new jsPDF({
+					orientation: 'p',
+					unit: 'mm',
+					format: 'a4',
+					compress: true
+					//putOnlyUsedFonts:true
+				});
+				pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+				pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+				var yPos = 12;
+				var xPos = 12;
+				//doc.getFontList("Helvetica");
+				doc.addFileToVFS("PTSans.ttf", PTSans);
+				doc.addFileToVFS("PTSansBold.ttf", PTSansBold);
+				doc.addFont('PTSans.ttf', 'PTSans', 'normal');
+				doc.addFont('PTSansBold.ttf', 'PTSans', 'bold');
+
+				doc.setFont('PTSans'); // set font
+				doc.getFontList("PTSans");
+				doc.setFontSize(20)
+			    doc.setFontType("bold");
+			    doc.text("Prisustvo majstora "+datum, pageWidth / 2, yPos, {align: "center"});
+				doc.setFontSize(10);
+			    var xOffset = 10;
+			    yPos=yPos + 10;
+			    doc.text("Ime i prezime",xOffset,yPos);
+			    xOffset = xOffset + 40;
+			    doc.text("Dolazak",xOffset,yPos);
+			    xOffset = xOffset + 25;
+			    doc.text("Odlazak",xOffset,yPos);
+			    xOffset = xOffset + 25;
+			    doc.text("Satnica",xOffset,yPos);
+			    xOffset = xOffset + 25;
+			    doc.text("Potpis",xOffset,yPos);
+			    yPos= yPos+7;
+			    doc.setFontType("normal");
+			    majstori.forEach(function (item,index){
+			    	if(item?.region?.toLowerCase()==region || (!item.region && region=="zapad")){
+			    		xOffset = 10;
+					    doc.text(item.ime,xOffset,yPos);
+					    xOffset = xOffset + 40;
+					    doc.text(item.vremeDolaska,xOffset,yPos);
+					    xOffset = xOffset + 25;
+					    doc.text(item.vremeOdlaska,xOffset,yPos);
+					    xOffset = xOffset + 25;
+					    doc.text(item.radnoVreme,xOffset,yPos);
+					    xOffset = xOffset + 25;
+					    const lineWidth = 50;
+						doc.line(xOffset, yPos, xOffset + lineWidth, yPos);
+					    yPos= yPos+7;
+					    if(yPos>=285){
+					    	doc.addPage();
+					    	doc.setFontSize(20)
+						    doc.setFontType("bold");
+						    yPos=12;
+						    doc.text("Prisustvo majstora "+datum, pageWidth / 2, yPos, {align: "center"});
+							doc.setFontSize(10);
+						    var xOffset = 10;
+			   				 yPos=yPos + 10;
+						    doc.text("Ime i prezime",xOffset,yPos);
+						    xOffset = xOffset + 40;
+						    doc.text("Dolazak",xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text("Odlazak",xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text("Satnica",xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text("Potpis",xOffset,yPos);
+						    yPos= yPos+7;
+						    doc.setFontType("normal");
+					    }
+			    	}
+			    })
+
+			    doc.addPage();
+		    	doc.setFontSize(20)
+			    doc.setFontType("bold");
+			    yPos=12;
+			    doc.text("Prisustvo pomoćnika "+datum, pageWidth / 2, yPos, {align: "center"});
+				doc.setFontSize(10);
+			    var xOffset = 10;
+			    yPos = yPos + 10;
+			    doc.text("Ime i prezime",xOffset,yPos);
+			    xOffset = xOffset + 40;
+			    doc.text("Dolazak",xOffset,yPos);
+			    xOffset = xOffset + 25;
+			    doc.text("Odlazak",xOffset,yPos);
+			    xOffset = xOffset + 25;
+			    doc.text("Satnica",xOffset,yPos);
+			    xOffset = xOffset + 25;
+			    doc.text("Potpis",xOffset,yPos);
+			    yPos= yPos+7;
+			    doc.setFontType("normal");
+
+			    pomocnici.forEach(function (item,index){
+			    	if(item?.region?.toLowerCase()==region || (!item.region && region=="zapad")){
+			    		xOffset = 10;
+					    doc.text(item.ime,xOffset,yPos);
+					    xOffset = xOffset + 40;
+					    doc.text(item.vremeDolaska,xOffset,yPos);
+					    xOffset = xOffset + 25;
+					    doc.text(item.vremeOdlaska,xOffset,yPos);
+					    xOffset = xOffset + 25;
+					    doc.text(item.radnoVreme,xOffset,yPos);
+					    xOffset = xOffset + 25;
+					    const lineWidth = 50;
+						doc.line(xOffset, yPos, xOffset + lineWidth, yPos);
+					    yPos= yPos+7;
+					    if(yPos>=285){
+					    	doc.addPage();
+					    	doc.setFontSize(20)
+						    doc.setFontType("bold");
+						    yPos=12;
+						    doc.text("Prisustvo pomoćnika "+datum, pageWidth / 2, yPos, {align: "center"});
+							doc.setFontSize(10);
+						    var xOffset = 10;
+						    doc.text("Ime i prezime",xOffset,yPos);
+						    xOffset = xOffset + 7;
+						    doc.text("Dolazak",xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text("Odlazak",xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text("Satnica",xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text("Potpis",xOffset,yPos);
+						    yPos= yPos+7;
+						    doc.setFontType("normal");
+					    }
+			    	}
+			    })
+
+			    doc.addPage();
+		    	doc.setFontSize(20)
+			    doc.setFontType("bold");
+			    yPos=12;
+			    doc.text("Prisustvo radnika "+datum, pageWidth / 2, yPos, {align: "center"});
+				doc.setFontSize(10);
+			    var xOffset = 10;
+			    yPos = yPos + 10;
+			    doc.text("Ime i prezime",xOffset,yPos);
+			    xOffset = xOffset + 40;
+			    doc.text("Dolazak",xOffset,yPos);
+			    xOffset = xOffset + 25;
+			    doc.text("Odlazak",xOffset,yPos);
+			    xOffset = xOffset + 25;
+			    doc.text("Satnica",xOffset,yPos);
+			    xOffset = xOffset + 25;
+			    doc.text("Potpis",xOffset,yPos);
+			    yPos= yPos+7;
+			    doc.setFontType("normal");
+
+			    users.forEach(function (item,index){
+			    	if(!item.fake){
+			    		if(item?.region?.toLowerCase()==region || (!item.region && region=="zapad")){
+				    		xOffset = 10;
+						    doc.text(item.ime,xOffset,yPos);
+						    xOffset = xOffset + 40;
+						    doc.text(item.vremeDolaska,xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text(item.vremeOdlaska,xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    doc.text(item.radnoVreme,xOffset,yPos);
+						    xOffset = xOffset + 25;
+						    const lineWidth = 50;
+							doc.line(xOffset, yPos, xOffset + lineWidth, yPos);
+						    yPos= yPos+7;
+						    if(yPos>=285){
+						    	doc.addPage();
+						    	doc.setFontSize(20)
+							    doc.setFontType("bold");
+							    yPos=12;
+							    doc.text("Prisustvo radnika "+datum, pageWidth / 2, yPos, {align: "center"});
+								doc.setFontSize(10);
+							    var xOffset = 10;
+							    doc.text("Ime i prezime",xOffset,yPos);
+							    xOffset = xOffset + 7;
+							    doc.text("Dolazak",xOffset,yPos);
+							    xOffset = xOffset + 25;
+							    doc.text("Odlazak",xOffset,yPos);
+							    xOffset = xOffset + 25;
+							    doc.text("Satnica",xOffset,yPos);
+							    xOffset = xOffset + 25;
+							    doc.text("Potpis",xOffset,yPos);
+							    yPos= yPos+7;
+							    doc.setFontType("normal");
+						    }
+				    	}
+			    	}
+			    	
+			    })
+			    
+
+		        window.open(doc.output('bloburl'), '_blank');
+			}
+
+
+		</script>
+
 		<!--<option value="Мајстор">Мајстор</option>
 							<option value="Одгушивач">Одгушивач</option>
 							<option value="Вомаш">Вомаш</option>
