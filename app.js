@@ -6479,7 +6479,7 @@ http.listen(process.env.PORT, async function(){
 
 
 
-		/*var mesec = "03";
+		/*var mesec = "05";
 		var godina = "2026";
    	var nalozi = await naloziDB.find({statusNaloga:"Fakturisan","prijemnica.datum.datum":{$regex:mesec+"."+godina}}).toArray()
    	
@@ -6497,10 +6497,10 @@ http.listen(process.env.PORT, async function(){
    	console.log(mesec+"/"+godina)
    	console.log("Ukupno  "+ brojSaRazmacima(ukupno))
    	console.log("Ukupno Podizvodjaci  "+ brojSaRazmacima(ukupnoPodizvodjaci))
-   	console.log("Ukupno PG  "+ brojSaRazmacima(ukupnoPG))*/
+   	console.log("Ukupno PG  "+ brojSaRazmacima(ukupnoPG))
 
 
-   	/*for(var w=0;w<radneJedinice.length;w++){
+   	for(var w=0;w<radneJedinice.length;w++){
 			var opseg = [radneJedinice[w]];
 			var json = {};
 			json.konstatacija = 0;
@@ -6612,9 +6612,9 @@ http.listen(process.env.PORT, async function(){
 		//OVAMO IZNAD TI JE ZA PO RADNIM JEDINICAMA
 
 
-		/*var mesec = "04";
+		var mesec = "05";
 		var godina = "2026";
-   	var nalozi = await naloziDB.find({statusNaloga:"Fakturisan","prijemnica.datum.datum":{$regex:mesec+"."+godina}}).toArray()
+   	var nalozi = await naloziDB.find({statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje"]},"prijemnica.datum.datum":{$regex:mesec+"."+godina}}).toArray()
 
     var sifraKonstatacija 	=	["80.04.01.002","80.04.01.005"];
 		var sifraWoma						= ["80.02.09.003","80.02.09.004","80.02.09.020","80.02.09.021","80.02.09.022","80.02.09.023","80.02.09.024","80.02.09.025","80.02.09.026","80.02.09.027","80.02.09.028","80.02.09.029","80.04.01.006","80.02.09.031"];
@@ -6967,7 +6967,7 @@ http.listen(process.env.PORT, async function(){
 
 		console.log("--------------------------------------")
 		console.log("--------------------------------------")
-		console.log("--------------------------------------")*/
+		console.log("--------------------------------------")
 
 
 

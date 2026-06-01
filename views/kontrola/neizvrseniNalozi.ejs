@@ -56,7 +56,7 @@
 					var ukupnoNalogaPodizvodjaci = 0;
 
 					for(var i=0;i<nalozi.length;i++){
-						if(podizvodjaci.indexOf(obracunatiNalozi[i].majstor)>=0){
+						if(podizvodjaci.indexOf(nalozi[i].majstor)>=0){
 							ukupnoNalogaPodizvodjaci++;
 						}else{
 							ukupnoNalogaPG++;
@@ -511,7 +511,7 @@
 				}
 			</script>
 
-			<!--<div id="header" class="head">
+			<div id="header" class="head">
 				<div class="inlines">
 					<div class="title">Fakturisano</div>
 					<div class="info" id="ostvaren-iznos"></div>
@@ -637,7 +637,7 @@
 				for(var i=0;i<document.getElementsByClassName("naloziWrap").length;i++){
 					document.getElementsByClassName("naloziWrap")[i].getElementsByClassName("title")[0].innerHTML += " <span style=\"font-weight:200;\">(" + document.getElementsByClassName("naloziWrap")[i].getElementsByClassName("nalogWrap").length+ ")</span>";
 				}
-			</script>-->
+			</script>
 		</div>
 	</div>	
 <%- include ("partials/footer") -%>
