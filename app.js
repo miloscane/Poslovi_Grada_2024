@@ -1389,7 +1389,7 @@ http.listen(process.env.PORT, async function(){
 
 		//ZA PREMIJUS
 
-		/*var nalozi = await naloziDB.find({}).toArray();
+		var nalozi = await naloziDB.find({}).toArray();
 		var nalozi2024 = await nalozi2024DB.find({}).toArray();
 		for(var i=0;i<nalozi2024.length;i++){
 			nalozi.push(nalozi2024[i])
@@ -1401,7 +1401,7 @@ http.listen(process.env.PORT, async function(){
 		}
 
 		var naloziToExport = [];
-		var month = 4;
+		var month = 5;
 		for(var i=0;i<nalozi.length;i++){
 			if(nalozi[i].faktura.broj){
 				if(nalozi[i].faktura.broj.length>3){
@@ -1458,7 +1458,7 @@ http.listen(process.env.PORT, async function(){
 			csvString+="NAPOMENA:"+",Broj fakture: "+problemNalozi[i].faktura.broj+" , Broj naloga: "+problemNalozi[i].broj+",Problem: "+problemNalozi[i].problem+", \r\n";
 		}
 		fs.writeFileSync("./PG-Premijus-"+month+"-2026.csv",csvString,"utf8");
-		console.log("Written Premijus")*/
+		console.log("Written Premijus")
 
 		//ZA PREMIJUS
 
@@ -6612,9 +6612,9 @@ http.listen(process.env.PORT, async function(){
 		//OVAMO IZNAD TI JE ZA PO RADNIM JEDINICAMA
 
 
-		var mesec = "05";
+		/*var mesec = "05";
 		var godina = "2026";
-   	var nalozi = await naloziDB.find({statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje"]},"prijemnica.datum.datum":{$regex:mesec+"."+godina}}).toArray()
+   	var nalozi = await naloziDB.find({statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje"]},"prijemnica.datum.datum":{$regex:mesec+"."+godina},majstor:{$in:podizvodjaci}}).toArray()
 
     var sifraKonstatacija 	=	["80.04.01.002","80.04.01.005"];
 		var sifraWoma						= ["80.02.09.003","80.02.09.004","80.02.09.020","80.02.09.021","80.02.09.022","80.02.09.023","80.02.09.024","80.02.09.025","80.02.09.026","80.02.09.027","80.02.09.028","80.02.09.029","80.04.01.006","80.02.09.031"];
@@ -6628,7 +6628,9 @@ http.listen(process.env.PORT, async function(){
 
 		var opseg = radneJedinice;
 		var json = {};
+		json.podizvodjaci = 0;
 		json.konstatacija = 0;
+		json.podizvodjaciNalozi = 0;
 		json.woma = 0;
 		json.crpljenje = 0;
 		json.rucnokopanje = 0;
@@ -6648,6 +6650,10 @@ http.listen(process.env.PORT, async function(){
 		for(var i=0;i<nalozi.length;i++){
 			var nalog = nalozi[i];
 			if(opseg.indexOf(nalog.radnaJedinica)>=0){
+				if(podizvodjaci.indexOf(nalog.majstor)>=0){
+					json.podizvodjaci = json.podizvodjaci + parseFloat(nalozi[i].ukupanIznos)
+					json.podizvodjaciNalozi++;
+				}
 				json.ukupno = json.ukupno + parseFloat(nalozi[i].ukupanIznos);
 				json.ukupnoNaloga++;
 				for(var j=0;j<nalozi[i].obracun.length;j++){
@@ -6733,6 +6739,8 @@ http.listen(process.env.PORT, async function(){
 		console.log("  Kopanje: "+brojSaRazmacima(json.rucnokopanje)+" rsd")
 		console.log("  Finalizacija: "+brojSaRazmacima(json.finalizacija)+" rsd")
 		console.log("  Zamene: "+brojSaRazmacima(json.zamene)+" rsd")
+		console.log("  Podizvodjaci: "+brojSaRazmacima(json.podizvodjaci)+" rsd")
+		console.log("  Podizvodjaci: "+json.podizvodjaciNalozi+" naloga")
 
 
 		console.log("--------------------------------------")
@@ -6746,6 +6754,8 @@ http.listen(process.env.PORT, async function(){
 		
 		var opseg = istok;
 		var json = {};
+		json.podizvodjaci = 0;
+		json.podizvodjaciNalozi = 0;
 		json.konstatacija = 0;
 		json.woma = 0;
 		json.crpljenje = 0;
@@ -6766,6 +6776,10 @@ http.listen(process.env.PORT, async function(){
 		for(var i=0;i<nalozi.length;i++){
 			var nalog = nalozi[i];
 			if(opseg.indexOf(nalog.radnaJedinica)>=0){
+				if(podizvodjaci.indexOf(nalog.majstor)>=0){
+					json.podizvodjaci = json.podizvodjaci + parseFloat(nalozi[i].ukupanIznos)
+					json.podizvodjaciNalozi++;
+				}
 				json.ukupno = json.ukupno + parseFloat(nalozi[i].ukupanIznos);
 				json.ukupnoNaloga++;
 				for(var j=0;j<nalozi[i].obracun.length;j++){
@@ -6851,6 +6865,9 @@ http.listen(process.env.PORT, async function(){
 		console.log("  Kopanje: "+brojSaRazmacima(json.rucnokopanje)+" rsd")
 		console.log("  Finalizacija: "+brojSaRazmacima(json.finalizacija)+" rsd")
 		console.log("  Zamene: "+brojSaRazmacima(json.zamene)+" rsd")
+		console.log("  Podizvodjaci: "+brojSaRazmacima(json.podizvodjaci)+" rsd")
+		console.log("  Podizvodjaci: "+json.podizvodjaciNalozi+" naloga")
+
 
 
 		console.log("--------------------------------------")
@@ -6860,6 +6877,8 @@ http.listen(process.env.PORT, async function(){
 
 		var opseg = zapad;
 		var json = {};
+		json.podizvodjaci = 0;
+		json.podizvodjaciNalozi = 0;
 		json.konstatacija = 0;
 		json.woma = 0;
 		json.crpljenje = 0;
@@ -6880,6 +6899,10 @@ http.listen(process.env.PORT, async function(){
 		for(var i=0;i<nalozi.length;i++){
 			var nalog = nalozi[i];
 			if(opseg.indexOf(nalog.radnaJedinica)>=0){
+				if(podizvodjaci.indexOf(nalog.majstor)>=0){
+					json.podizvodjaci = json.podizvodjaci + parseFloat(nalozi[i].ukupanIznos);
+					json.podizvodjaciNalozi++;
+				}
 				json.ukupno = json.ukupno + parseFloat(nalozi[i].ukupanIznos);
 				json.ukupnoNaloga++;
 				for(var j=0;j<nalozi[i].obracun.length;j++){
@@ -6963,12 +6986,153 @@ http.listen(process.env.PORT, async function(){
 		console.log("  Kopanje: "+brojSaRazmacima(json.rucnokopanje)+" rsd")
 		console.log("  Finalizacija: "+brojSaRazmacima(json.finalizacija)+" rsd")
 		console.log("  Zamene: "+brojSaRazmacima(json.zamene)+" rsd")
+		console.log("  Podizvodjaci: "+brojSaRazmacima(json.podizvodjaci)+" rsd")
+		console.log("  Podizvodjaci: "+json.podizvodjaciNalozi+" naloga")
+
 
 
 		console.log("--------------------------------------")
 		console.log("--------------------------------------")
 		console.log("--------------------------------------")
 
+		var trecaLica = await naloziTrecihLicaDB.find({"datumRadova":{$regex:"2026-05"}}).toArray();
+		var majstori = await majstoriDB.find({}).toArray();
+		var istok = 0;
+		var zapad = 0;
+		for(var i=0;i<trecaLica.length;i++){
+			for(var j=0;j<majstori.length;j++){
+				if(majstori[j].uniqueId==trecaLica[i].majstor){
+					if(majstori[j]?.region?.toLowerCase()=="istok"){
+						istok++;
+					}else{
+						zapad++;
+					}
+					if(podizvodjaci.indexOf(majstori[j].uniqueId)>=0){
+						console.log("PODIZVODJAC NA TRECEM LCIU")
+					}
+				}
+			}
+		}
+
+		console.log("Istok: "+istok)
+		console.log("Zapad: "+zapad)*/
+
+		/*var checkIns = await checkInMajstoraDB.find({month:"05",year:2026}).toArray();
+		var majstori = await majstoriDB.find({}).toArray();
+		var majstoriIds = [];
+		for(var i=0;i<majstori.length;i++){
+			majstoriIds.push(majstori[i].uniqueId)
+		}
+
+		for(var i=0;i<checkIns.length;i++){
+			if(majstoriIds.indexOf(checkIns[i].uniqueId)<0){
+				checkIns.splice(i,1);
+				i--;
+			}
+		}
+
+		for(var i=0;i<checkIns.length;i++){
+			checkIns[i].majstor = {};
+			for(var j=0;j<majstori.length;j++){
+				if(majstori[j].uniqueId==checkIns[i].uniqueId){
+					checkIns[i].majstor = majstori[j];
+				}
+			}
+		}
+
+		var istok = [];
+		var zapad = [];
+		for(var i=0;i<checkIns.length;i++){
+			if(checkIns[i].majstor?.region?.toLowerCase()=="istok"){
+				istok.push(checkIns[i]);
+			}else if(checkIns[i].majstor?.region?.toLowerCase()=="zapad"){
+				zapad.push(checkIns[i]);
+			}
+		}
+
+		const uniquePerDayCount = new Set(
+		  istok.map(item => `${item.uniqueId}-${item.year}-${item.month}-${item.date}`)
+		).size;
+
+		console.log("Istok: "+uniquePerDayCount)
+		console.log(istok.length)
+
+		const uniquePerDayCount2 = new Set(
+		  zapad.map(item => `${item.uniqueId}-${item.year}-${item.month}-${item.date}`)
+		).size;
+		console.log("Zapad: "+uniquePerDayCount2)
+		console.log(zapad.length)*/
+
+
+		/*var checkIns = await checkInMajstoraDB.find({
+		  month: "05",
+		  year: 2026
+		}).toArray();
+
+		var majstori = await majstoriDB.find({}).toArray();
+
+		var majstoriMap = {};
+
+		for (var i = 0; i < majstori.length; i++) {
+		  majstoriMap[majstori[i].uniqueId] = majstori[i];
+		}
+
+		var result = {
+		  istok: {},
+		  zapad: {}
+		};
+
+		const tipoviMajstora = [
+		  "Nijedan",
+		  "Мајстор",
+		  "Одгушивач",
+		  "Вомаш",
+		  "Багериста",
+		  "Копач",
+		  "Финализер",
+		  "Хаусмајстор"
+		];
+
+		// Prepare Sets
+		for (var i = 0; i < tipoviMajstora.length; i++) {
+		  result.istok[tipoviMajstora[i]] = new Set();
+		  result.zapad[tipoviMajstora[i]] = new Set();
+		}
+
+		for (var i = 0; i < checkIns.length; i++) {
+		  var checkIn = checkIns[i];
+		  var majstor = majstoriMap[checkIn.uniqueId];
+
+		  if (!majstor) continue;
+
+		  var region = majstor.region?.toLowerCase();
+
+		  if (region !== "istok" && region !== "zapad") continue;
+
+		  var tip = majstor.tipMajstora || "Nijedan";
+
+		  if (!tipoviMajstora.includes(tip)) {
+		    tip = "Nijedan";
+		  }
+
+		  var key = `${checkIn.uniqueId}-${checkIn.year}-${checkIn.month}-${checkIn.date}`;
+
+		  result[region][tip].add(key);
+		}
+
+		// Convert Sets to numbers
+		var finalResult = {
+		  istok: {},
+		  zapad: {}
+		};
+
+		for (var region in result) {
+		  for (var tip in result[region]) {
+		    finalResult[region][tip] = result[region][tip].size;
+		  }
+		}
+
+		console.log(finalResult);*/
 
 
 
@@ -7177,15 +7341,315 @@ http.listen(process.env.PORT, async function(){
 
 		  return dates;
 		}
-		var previousDates = getDatesBetween("2026-05-18", "2026-05-25");
 
-		for(var i=0;i<previousDates.length;i++){
-			previousDates[i] = getDateAsStringForDisplay(new Date(previousDates[i]));
+		function logResults(region,json){
+			console.log(region)
+			console.log("  Ukupno: "+brojSaRazmacima(json.ukupno) + " ("+json.ukupnoNaloga+")")
+			console.log("  Ukupan broj ekipa: "+json.ekipe)
+			console.log("  Reversi: "+brojSaRazmacima(json.reversi) + " ("+json.reversiBroj+")")
+			console.log("  Zamene: "+brojSaRazmacima(json.zamene)+" ("+json.zameneBroj+")")
+			console.log("  Zamena 0-10: " + brojSaRazmacima(json.nalog010Iznos) + " (" + json.nalog010 + ")");
+			console.log("  Zamena 10-30: " + brojSaRazmacima(json.nalog1030Iznos) + " (" + json.nalog1030 + ")");
+			console.log("  Zamena 30-60: " + brojSaRazmacima(json.nalog3060Iznos) + " (" + json.nalog3060 + ")");
+			console.log("  Zamena 60-100: " + brojSaRazmacima(json.nalog60100Iznos) + " (" + json.nalog60100 + ")");
+			console.log("  Zamena 100-150: " + brojSaRazmacima(json.nalog100150Iznos) + " (" + json.nalog100150 + ")");
+			console.log("  Zamena 150-250: " + brojSaRazmacima(json.nalog150250Iznos) + " (" + json.nalog150250 + ")");
+			console.log("  Zamena 250+: " + brojSaRazmacima(json.nalog250Iznos) + " (" + json.nalog250 + ")");
+			console.log("  Zagusenja: "+brojSaRazmacima(json.odgusenja)+" ("+json.odgusenjaBroj+")")
+			console.log("  Crpljenje: "+brojSaRazmacima(json.crpljenje)+" ("+json.crpljenjeBroj+")")
+			console.log("  Vome: "+brojSaRazmacima(json.woma)+" ("+json.womaBroj+")")
+			console.log("  Rovovi: "+brojSaRazmacima(json.bager)+" ("+json.bagerBroj+")")
+			console.log("  Kopanje: "+brojSaRazmacima(json.rucnokopanje)+" ("+json.rucnokopanjeBroj+")")
+			console.log("  Finalizacija: "+brojSaRazmacima(json.finalizacija)+" ("+json.finalizacijaBroj+")")
+			console.log("  Konstatacija: "+brojSaRazmacima(json.konstatacija)+" ("+json.konstatacijaBroj+")")
+			console.log("  Treca lica: "+brojSaRazmacima(json.trecaLica)+" ("+json.trecaLicaBroj+")")
+
+
+			console.log("--------------------------------------")
+			console.log("--------------------------------------")
+			console.log("--------------------------------------")
 		}
-		console.log(previousDates);
-   	var nalozi = await naloziDB.find({statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje"]},"prijemnica.datum.datum":{$in:previousDates}}).toArray()
 
-    var sifraKonstatacija 	=	["80.04.01.002","80.04.01.005"];
+		function handleData(opseg,json,regionName){
+			json.reversi = 0;
+			json.reversiBroj = 0;
+			json.ekipe = 0;
+			json.konstatacija = 0;
+			json.konstatacijaBroj = 0;
+			json.woma = 0;
+			json.womaBroj = 0;
+			json.crpljenje = 0;
+			json.crpljenjeBroj = 0;
+			json.rucnokopanje = 0;
+			json.rucnokopanjeBroj = 0;
+			json.bager = 0;
+			json.bagerBroj = 0;
+			json.odgusenja = 0;
+			json.odgusenjaBroj = 0;
+			json.finalizacija = 0;
+			json.finalizacijaBroj = 0;
+			json.zamene = 0;
+			json.zameneBroj = 0;
+			json.nalog010 = 0;
+			json.nalog010Iznos = 0;
+			json.nalog1030 = 0;
+			json.nalog1030Iznos = 0;
+			json.nalog3060 = 0;
+			json.nalog3060Iznos = 0;
+			json.nalog60100=0;
+			json.nalog60100Iznos=0;
+			json.nalog100150 = 0;
+			json.nalog100150Iznos = 0;
+			json.nalog150250 = 0;
+			json.nalog150250Iznos = 0;
+			json.nalog250 = 0;
+			json.nalog250Iznos = 0;
+			json.ukupno = 0;
+			json.ukupnoNaloga = 0;
+			json.trecaLica = 0;
+			json.trecaLicaBroj = 0;
+
+			for (var i = 0; i < naloziTrecihLica.length; i++) {
+			  var iznos = parseFloat(naloziTrecihLica[i].ukupanIznos) || 0;
+			  var region = String(naloziTrecihLica[i].region || "").toUpperCase();
+
+			  if (regionName === "BEOGRAD" || region === regionName) {
+			    json.trecaLica += iznos;
+			    json.trecaLicaBroj++;
+			  }
+			}
+
+			if(regionName=="BEOGRAD"){
+				for(var i=0;i<dnevniIzvestaji.length;i++){
+					if(dnevniIzvestaji[i].odsustvo=="Присутан"){
+						json.ekipe++;
+					}
+				}
+
+				for(var i=0;i<reversi.length;i++){
+					json.reversi = json.reversi + reversi[i].iznosReversa;
+					json.reversiBroj++;
+				}
+			}else{
+				for(var i=0;i<dnevniIzvestaji.length;i++){
+					if(dnevniIzvestaji[i].majstorRegion==regionName){
+						if(dnevniIzvestaji[i].odsustvo=="Присутан"){
+							json.ekipe++;
+						}
+					}
+					
+				}
+
+				for(var i=0;i<reversi.length;i++){
+					if(opseg.indexOf(reversi[i].radnaJedinica)>=0){
+						json.reversi = json.reversi + reversi[i].iznosReversa;
+						json.reversiBroj++;
+					}
+					
+				}
+			}
+
+			for(var i=0;i<nalozi.length;i++){
+				var nalog = nalozi[i];
+				if(opseg.indexOf(nalog.radnaJedinica)>=0){
+					json.ukupno = json.ukupno + parseFloat(nalozi[i].ukupanIznos);
+					json.ukupnoNaloga++;
+					var iznosNaloga = 0;
+
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						var cenaPoCenovniku = 0;
+						for(var k=0;k<cenovnik.length;k++){
+							if(cenovnik[k].code==nalozi[i].obracun[j].code){
+								cenaPoCenovniku = cenovnik[k].price
+							}
+						}
+						var iznos = parseFloat(nalozi[i].obracun[j].quantity)*cenaPoCenovniku;
+						iznosNaloga = iznosNaloga + iznos;
+						if(isNaN(iznos)){
+							console.log("Ne valja iznos stavke za nalog: " + nalog.broj);
+							console.log(cenaPoCenovniku)
+							console.log(nalozi[i].obracun[j].quantity)
+						}
+						if(sifraKonstatacija.indexOf(nalozi[i].obracun[j].code)>=0){
+							//json.konstatacija = json.konstatacija + iznos; //ovo racunas dole drugacije
+						}else if(sifraWoma.indexOf(nalozi[i].obracun[j].code)>=0){
+							json.woma = json.woma + iznos;
+						}else if(sifraCrpljenje.indexOf(nalozi[i].obracun[j].code)>=0){
+							json.crpljenje = json.crpljenje + iznos;
+						}else if(sifraKopanje.indexOf(nalozi[i].obracun[j].code)>=0){
+							//json.rucnokopanje = json.rucnokopanje + iznos; //ovo racunas dole drugacije
+						}else if(sifraBager.indexOf(nalozi[i].obracun[j].code)>=0){
+							//json.bager = json.bager + iznos; //ovo racunas dole drugacije
+						}else if(sifraOdgusenja.indexOf(nalozi[i].obracun[j].code)>=0){
+							json.odgusenja = json.odgusenja + iznos;
+						}else if(sifraFinalizacija.indexOf(nalozi[i].obracun[j].code)>=0){
+							json.finalizacija = json.finalizacija + iznos;
+						}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0){
+							json.zamene = json.zamene + iznos;
+						}
+					}
+
+					//Konstatacija
+					var imaNestoDrugo = false;
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifraKonstatacija.indexOf(nalozi[i].obracun[j].code)<0){
+							imaNestoDrugo = true
+						}
+					}
+					if(imaNestoDrugo==false){
+						json.konstatacija = json.konstatacija + iznosNaloga;
+						json.konstatacijaBroj++;
+					}
+
+					//zagusenje
+					var imaZagusenje = false;
+					var imaZamenu = false;
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifraOdgusenja.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaZagusenje = true;
+						}
+
+						if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaZamenu = true
+						}
+					}
+					if(imaZagusenje==true && imaZamenu==false){
+						json.odgusenjaBroj++;
+					}
+
+					//crpljenje
+					var imaCrpljenje = false;
+					var imaZamenu = false;
+					var imaWomu = false;
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifraCrpljenje.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaCrpljenje = true;
+						}
+
+						if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaZamenu = true
+						}
+
+						if(sifraWoma.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaWomu = true
+						}
+					}
+					if(imaCrpljenje==true && imaZamenu==false && imaWomu==false){
+						json.crpljenjeBroj++;
+					}
+
+					//woma
+					var imaWomu = false;
+					var imaZamenu = false;
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifraWoma.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaWomu = true;
+						}
+
+						if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaZamenu = true
+						}
+					}
+					if(imaWomu==true && imaZamenu==false){
+						json.womaBroj++;
+					}
+
+					//rovovi
+					var imaRov = false;
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifraBager.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaRov = true;
+							break;
+						}
+					}
+					if(imaRov==true){
+						json.bagerBroj++;
+						json.bager = json.bager + iznosNaloga;
+					}
+
+					//kopanje
+					var imaKopanje = false;
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifraKopanje.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaKopanje = true;
+							break;
+						}
+					}
+					if(imaKopanje==true){
+						json.rucnokopanjeBroj++;
+						json.rucnokopanje = json.rucnokopanje + iznosNaloga;
+					}
+
+					//zamena
+					var imaZamenu = false;
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaZamenu = true
+						}
+					}
+					if(imaZamenu==true){
+						json.zameneBroj++;
+					}
+
+					//Finalizacija
+					var imaFinalizaciju = false;
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifraFinalizacija.indexOf(nalozi[i].obracun[j].code)>=0){
+							imaFinalizaciju = true
+						}
+					}
+					if(imaFinalizaciju==true){
+						json.finalizacijaBroj++;
+					}
+
+					for(var j=0;j<nalozi[i].obracun.length;j++){
+						if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)<10000){
+							json.nalog010++;
+							json.nalog010Iznos = json.nalog010Iznos + parseFloat(nalozi[i].ukupanIznos);
+							break;
+						}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=10000 && parseFloat(nalozi[i].ukupanIznos)<=30000){
+							json.nalog1030++;
+							json.nalog1030Iznos = json.nalog1030Iznos + parseFloat(nalozi[i].ukupanIznos);
+							break;
+						}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=30000 && parseFloat(nalozi[i].ukupanIznos)<=60000){
+							json.nalog3060++;
+							json.nalog3060Iznos = json.nalog3060Iznos + parseFloat(nalozi[i].ukupanIznos);
+							break;
+						}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>60000 && parseFloat(nalozi[i].ukupanIznos)<100000){
+							json.nalog60100++;
+							json.nalog60100Iznos = json.nalog60100Iznos + parseFloat(nalozi[i].ukupanIznos);
+							break;
+						}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=100000 && parseFloat(nalozi[i].ukupanIznos)<150000){
+							json.nalog100150++;
+							json.nalog100150Iznos = json.nalog100150Iznos + parseFloat(nalozi[i].ukupanIznos);
+							break;
+						}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=150000 && parseFloat(nalozi[i].ukupanIznos)<250000){
+							json.nalog150250++;
+							json.nalog150250Iznos = json.nalog150250Iznos + parseFloat(nalozi[i].ukupanIznos);
+							break;
+						}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=250000){
+							json.nalog250++;
+							json.nalog250Iznos = json.nalog250Iznos + parseFloat(nalozi[i].ukupanIznos);
+							//console.log("ISTOK VELIKI ("+nalozi[i].vrstaRada+"): "+brojSaRazmacima(parseFloat(nalozi[i].ukupanIznos)))
+							break;
+						}
+					}
+				}
+			}
+			//OVERRIDE ZAMENE HERE SO IT ADDS UP posebne zamene izdeljene na delice
+			json.zamene =
+				json.nalog010Iznos +
+				json.nalog1030Iznos +
+				json.nalog3060Iznos +
+				json.nalog60100Iznos +
+				json.nalog100150Iznos +
+				json.nalog150250Iznos +
+				json.nalog250Iznos;
+
+
+		}
+
+		var sifraKonstatacija 	=	["80.04.01.002","80.04.01.005"];
 		var sifraWoma						= ["80.02.09.003","80.02.09.004","80.02.09.020","80.02.09.021","80.02.09.022","80.02.09.023","80.02.09.024","80.02.09.025","80.02.09.026","80.02.09.027","80.02.09.028","80.02.09.029","80.04.01.006","80.02.09.031"];
 		var sifraCrpljenje   		= ["80.02.09.007","80.02.09.008","80.02.09.009","80.02.09.010","80.02.09.011","80.02.09.012","80.02.09.013","80.02.09.014","80.02.09.015","80.02.09.016","80.02.09.017","80.02.09.018","80.04.01.012"];
 		var sifraKopanje 				= ["80.03.01.001","80.03.01.002","80.03.01.003","80.03.01.004","80.03.01.005","80.03.01.006","80.03.01.007","80.03.01.008","80.03.01.009","80.03.01.010","80.03.01.011","80.03.01.012","80.03.01.013","80.03.01.014","80.03.01.015","80.03.01.016","80.03.01.017","80.03.01.018","80.03.01.025","80.03.01.028","80.03.04.001","80.03.04.002","80.03.04.003","80.03.04.004","80.03.04.005","80.03.04.006","80.03.04.007","80.03.04.008","80.03.04.009","80.03.04.010","80.03.04.011","80.03.04.012","80.03.04.013","80.03.08.001","80.03.08.005","80.03.08.006","80.03.08.008","80.03.08.011"];
@@ -7194,348 +7658,110 @@ http.listen(process.env.PORT, async function(){
 		var sifraFinalizacija 	= ["80.03.02.001","80.03.02.002","80.03.02.003","80.03.02.004","80.03.02.005","80.03.02.006","80.03.02.007","80.03.02.008","80.03.02.009","80.03.02.010","80.03.02.011","80.03.02.012","80.03.02.013","80.03.02.014","80.03.02.015","80.03.02.016","80.03.03.004","80.03.03.005","80.03.03.006","80.03.03.007","80.03.03.008","80.03.03.009","80.03.03.010","80.03.03.011","80.03.03.012","80.03.03.013","80.03.03.014","80.03.03.015","80.03.03.016","80.03.03.017","80.03.03.018","80.03.03.019","80.03.03.020","80.03.03.021","80.03.03.022","80.03.03.023","80.03.03.024","80.03.03.025","80.03.03.026","80.03.03.027","80.03.03.028","80.03.03.029","80.03.03.030","80.03.03.031","80.03.03.032","80.03.03.033","80.03.03.034","80.03.03.035","80.03.03.036","80.03.03.037","80.03.03.038","80.03.03.039","80.03.03.040","80.03.03.041","80.03.03.042","80.03.03.043","80.03.03.044","80.03.03.045","80.03.03.046","80.03.03.047","80.03.03.048","80.03.03.142","80.03.04.016","80.03.04.017","80.03.04.018","80.03.04.019","80.03.04.020","80.03.04.021","80.03.04.022","80.03.04.025","80.03.04.026","80.03.04.027","80.03.04.029","80.03.04.031","80.03.04.033","80.03.04.034","80.03.04.035","80.03.04.036","80.03.05.002","80.03.05.003","80.03.05.004","80.03.05.005","80.03.05.006","80.03.05.007","80.03.05.008","80.03.05.009","80.03.05.010","80.03.05.011","80.03.05.012","80.03.05.013","80.03.06.002","80.03.06.003","80.03.06.004","80.03.06.005","80.03.06.006","80.03.06.007","80.03.06.011","80.03.06.013","80.03.06.014","80.03.07.002","80.03.07.003","80.03.07.004","80.03.07.005","80.03.07.006","80.03.07.007","80.03.07.008","80.03.07.009","80.03.07.010","80.03.07.013","80.03.07.014","80.03.07.015","80.03.07.016","80.03.07.017","80.03.07.018","80.03.07.019","80.03.07.022","80.03.07.023","80.03.08.002","80.03.08.003","80.03.08.004","80.03.08.007","80.03.08.009","80.03.08.010","80.03.08.012","80.03.08.013","80.03.09.001","80.03.09.002","80.03.09.003","80.03.09.004","80.03.09.005","80.03.09.006","80.03.09.007","80.03.09.008","80.03.09.009","80.04.01.001","80.04.01.003"];
 		var sifraZamene 				= ["80.01.01.017","80.01.01.018","80.01.01.019","80.01.01.020","80.01.01.021","80.01.01.022","80.01.01.023","80.01.01.024","80.01.01.025","80.01.01.026","80.01.01.027","80.01.01.028","80.01.01.029","80.01.01.030","80.01.01.031","80.01.01.032","80.01.01.033","80.01.01.034","80.01.01.035","80.01.01.036","80.01.01.037","80.01.01.038","80.01.01.039","80.01.01.040","80.01.01.041","80.01.01.042","80.01.01.043","80.01.01.044","80.01.01.045","80.01.01.046","80.01.01.047","80.01.01.048","80.01.02.009","80.01.02.010","80.01.02.011","80.01.02.012","80.01.02.013","80.01.02.014","80.01.02.015","80.01.02.016","80.01.02.017","80.01.02.018","80.01.02.019","80.01.02.020","80.01.02.021","80.01.02.022","80.01.02.023","80.01.02.024","80.01.02.036","80.01.02.037","80.01.02.038","80.01.02.039","80.01.02.040","80.01.02.041","80.01.02.042","80.01.02.043","80.01.02.044","80.01.02.045","80.01.02.046","80.01.02.047","80.01.02.048","80.01.02.049","80.01.02.050","80.01.02.051","80.01.02.064","80.01.02.065","80.01.02.066","80.01.02.067","80.01.02.068","80.01.02.069","80.01.02.070","80.01.02.071","80.01.02.072","80.01.02.073","80.01.02.074","80.01.02.075","80.01.02.076","80.01.02.077","80.01.02.078","80.01.02.079","80.01.02.093","80.01.02.094","80.01.02.095","80.01.02.096","80.01.02.097","80.01.02.098","80.01.02.099","80.01.02.100","80.01.02.101","80.01.02.102","80.01.02.103","80.01.02.104","80.01.02.105","80.01.02.106","80.01.02.107","80.01.02.108","80.01.02.139","80.01.02.140","80.01.02.141","80.01.02.142","80.01.02.143","80.01.02.144","80.01.02.145","80.01.02.146","80.01.02.147","80.01.02.148","80.01.02.149","80.01.02.150","80.01.02.151","80.01.02.152","80.01.02.153","80.01.02.154","80.01.02.155","80.01.02.156","80.01.02.157","80.01.02.158","80.01.02.159","80.01.02.160","80.01.02.161","80.01.02.162","80.01.02.163","80.01.02.164","80.01.02.165","80.01.02.166","80.01.02.167","80.01.02.168","80.01.02.169","80.01.02.170","80.01.02.171","80.01.02.172","80.01.02.173","80.01.02.174","80.01.02.175","80.01.02.176","80.01.02.177","80.01.02.178","80.01.02.179","80.01.02.180","80.01.02.181","80.01.02.182","80.01.02.183","80.01.02.184","80.01.02.185","80.01.02.186","80.01.02.187","80.01.02.188","80.01.02.202","80.01.02.203","80.01.02.204","80.01.02.205","80.01.02.206","80.01.02.207","80.01.02.208","80.01.02.209","80.01.02.210","80.01.02.211","80.01.02.212","80.01.02.213","80.01.02.214","80.01.02.215","80.01.02.216","80.01.02.217","80.01.03.001","80.01.03.002","80.01.03.003","80.01.03.004","80.01.03.005","80.01.03.006","80.01.03.007","80.01.03.008","80.01.03.009","80.01.03.010","80.01.03.011","80.01.03.012","80.01.03.013","80.01.03.014","80.01.03.015","80.01.03.016","80.01.04.001","80.01.04.002","80.01.04.003","80.01.04.004","80.01.04.005","80.01.04.006","80.01.04.007","80.01.04.008","80.01.04.009","80.01.05.009","80.01.05.010","80.01.05.011","80.01.05.012","80.01.05.013","80.01.05.014","80.01.05.015","80.01.05.016","80.01.05.017","80.01.05.018","80.01.05.019","80.01.05.020","80.01.05.021","80.01.05.022","80.01.05.023","80.01.05.024","80.01.05.033","80.01.05.034","80.01.05.035","80.01.05.036","80.01.05.037","80.01.05.038","80.01.05.039","80.01.05.040","80.01.05.041","80.01.05.042","80.01.05.043","80.01.05.044","80.01.05.045","80.01.05.046","80.01.05.047","80.01.05.048","80.01.05.065","80.01.05.066","80.01.05.067","80.01.05.068","80.01.05.069","80.01.05.070","80.01.05.071","80.01.05.072","80.01.05.073","80.01.05.074","80.01.05.075","80.01.05.076","80.01.05.077","80.01.05.078","80.01.05.079","80.01.05.080","80.01.05.081","80.01.05.082","80.01.05.083","80.01.05.084","80.01.05.085","80.01.05.086","80.01.05.087","80.01.05.088","80.01.05.089","80.01.05.090","80.01.05.091","80.01.05.092","80.01.05.093","80.01.05.094","80.01.05.095","80.01.05.096","80.01.06.009","80.01.06.010","80.01.06.011","80.01.06.012","80.01.06.013","80.01.06.014","80.01.06.015","80.01.06.016","80.01.06.017","80.01.06.018","80.01.06.019","80.01.06.020","80.01.06.021","80.01.06.022","80.01.06.023","80.01.06.024","80.01.06.041","80.01.06.042","80.01.06.043","80.01.06.044","80.01.06.045","80.01.06.046","80.01.06.047","80.01.06.048","80.01.06.049","80.01.06.050","80.01.06.051","80.01.06.052","80.01.06.053","80.01.06.054","80.01.06.055","80.01.06.056","80.01.07.009","80.01.07.010","80.01.07.011","80.01.07.012","80.01.07.013","80.01.07.014","80.01.07.015","80.01.07.016","80.01.07.017","80.01.07.018","80.01.07.019","80.01.07.020","80.01.07.021","80.01.07.022","80.01.07.023","80.01.07.024","80.01.08.009","80.01.08.010","80.01.08.011","80.01.08.012","80.01.08.013","80.01.08.014","80.01.08.015","80.01.08.016","80.01.08.017","80.01.08.018","80.01.08.019","80.01.08.020","80.01.08.021","80.01.08.022","80.01.08.023","80.01.08.024","80.01.08.033","80.01.08.034","80.01.08.035","80.01.08.036","80.01.08.037","80.01.08.038","80.01.08.039","80.01.08.040","80.01.08.041","80.01.08.042","80.01.08.043","80.01.08.044","80.01.08.045","80.01.08.046","80.01.08.047","80.01.08.048","80.01.08.057","80.01.08.058","80.01.08.059","80.01.08.065","80.01.08.066","80.01.08.067","80.01.08.081","80.01.08.082","80.01.08.083","80.01.08.084","80.01.08.085","80.01.08.086","80.01.08.087","80.01.08.088","80.01.08.089","80.01.08.090","80.01.08.091","80.01.08.092","80.01.08.093","80.01.08.094","80.01.08.095","80.01.08.096","80.01.08.105","80.01.08.106","80.01.08.107","80.01.08.108","80.01.08.109","80.01.08.110","80.01.08.111","80.01.08.112","80.01.08.113","80.01.08.114","80.01.08.115","80.01.08.116","80.01.08.117","80.01.08.118","80.01.08.119","80.01.08.120","80.01.08.129","80.01.08.130","80.01.08.131","80.01.08.132","80.01.08.133","80.01.08.134","80.01.08.135","80.01.08.136","80.01.08.137","80.01.08.138","80.01.08.139","80.01.08.140","80.01.08.141","80.01.08.142","80.01.08.143","80.01.08.144","80.01.08.153","80.01.08.154","80.01.08.155","80.01.08.161","80.01.08.162","80.01.08.163","80.01.08.178","80.01.08.179","80.01.08.180","80.01.08.181","80.01.08.182","80.01.08.183","80.01.08.184","80.01.08.186","80.01.08.187","80.01.08.188","80.01.08.189","80.01.08.190","80.01.08.191","80.01.08.192","80.01.08.201","80.01.08.202","80.01.08.203","80.01.08.204","80.01.08.205","80.01.08.206","80.01.08.207","80.01.08.208","80.01.08.209","80.01.08.210","80.01.08.211","80.01.08.212","80.01.08.213","80.01.08.214","80.01.08.215","80.01.08.216","80.01.09.009","80.01.09.010","80.01.09.011","80.01.09.012","80.01.09.013","80.01.09.014","80.01.09.015","80.01.09.016","80.01.09.017","80.01.09.018","80.01.09.019","80.01.09.020","80.01.09.021","80.01.09.022","80.01.09.023","80.01.09.024","80.01.10.009","80.01.10.010","80.01.10.011","80.01.10.012","80.01.10.013","80.01.10.014","80.01.10.015","80.01.10.016","80.01.10.017","80.01.10.018","80.01.10.019","80.01.10.020","80.01.10.021","80.01.10.022","80.01.10.023","80.01.10.024","80.01.11.001","80.01.11.002","80.01.11.003","80.01.11.004","80.01.11.005","80.01.11.006","80.01.11.007","80.01.11.008","80.01.11.009","80.01.11.010","80.01.11.011","80.01.11.012","80.01.11.013","80.01.11.014","80.01.11.015","80.01.11.016","80.01.11.017","80.01.11.018","80.01.11.019","80.01.11.020","80.01.11.021","80.01.11.022","80.01.11.023","80.01.11.024","80.01.12.001","80.01.12.002","80.01.12.003","80.01.12.004","80.01.12.005","80.01.12.006","80.01.12.007","80.01.12.008","80.01.13.009","80.01.13.010","80.01.13.011","80.01.13.012","80.01.13.013","80.01.13.014","80.01.13.015","80.01.13.016","80.01.13.017","80.01.13.018","80.01.13.019","80.01.13.020","80.01.13.021","80.01.13.022","80.01.13.023","80.01.13.024","80.01.14.009","80.01.14.010","80.01.14.011","80.01.14.012","80.01.14.013","80.01.14.014","80.01.14.015","80.01.14.016","80.01.14.017","80.01.14.018","80.01.14.019","80.01.14.020","80.01.14.021","80.01.14.022","80.01.14.023","80.01.14.024","80.01.14.033","80.01.14.034","80.01.14.035","80.01.14.036","80.01.14.037","80.01.14.038","80.01.14.039","80.01.14.040","80.01.14.041","80.01.14.042","80.01.14.043","80.01.14.044","80.01.14.045","80.01.14.046","80.01.14.047","80.01.14.048","80.01.15.001","80.01.15.002","80.01.15.003","80.01.15.004","80.01.15.005","80.01.15.006","80.01.15.007","80.01.15.008","80.01.15.009","80.01.15.010","80.01.15.011","80.01.15.012","80.01.15.013","80.01.15.014","80.01.15.015","80.01.15.016","80.01.16.001","80.01.16.002","80.01.16.003","80.01.16.004","80.01.16.005","80.01.16.006","80.02.01.001","80.02.01.002","80.02.01.003","80.02.01.004","80.02.01.005","80.02.01.006","80.02.01.007","80.02.01.008","80.02.01.009","80.02.01.010","80.02.01.011","80.02.01.012","80.02.01.013","80.02.01.014","80.02.01.015","80.02.01.016","80.02.01.017","80.02.01.018","80.02.01.019","80.02.01.020","80.02.01.021","80.02.01.022","80.02.01.023","80.02.01.024","80.02.01.025","80.02.01.026","80.02.01.027","80.02.01.028","80.02.01.029","80.02.01.030","80.02.01.031","80.02.01.032","80.02.01.033","80.02.01.034","80.02.01.035","80.02.01.036","80.02.01.037","80.02.01.038","80.02.01.039","80.02.01.040","80.02.01.041","80.02.02.001","80.02.02.002","80.02.02.003","80.02.02.004","80.02.02.005","80.02.02.006","80.02.02.007","80.02.02.008","80.02.02.009","80.02.02.010","80.02.02.011","80.02.02.012","80.02.02.013","80.02.02.014","80.02.02.015","80.02.02.016","80.02.02.017","80.02.02.018","80.02.02.019","80.02.02.020","80.02.02.021","80.02.02.022","80.02.02.023","80.02.02.024","80.02.02.025","80.02.02.026","80.02.02.027","80.02.02.028","80.02.02.029","80.02.02.030","80.02.02.031","80.02.02.032","80.02.02.033","80.02.02.034","80.02.02.035","80.02.02.036","80.02.02.037","80.02.02.038","80.02.02.039","80.02.02.040","80.02.03.025","80.02.03.026","80.02.03.027","80.02.03.028","80.02.03.029","80.02.03.030","80.02.03.031","80.02.03.032","80.02.03.033","80.02.03.034","80.02.03.035","80.02.03.036","80.02.03.037","80.02.03.038","80.02.03.039","80.02.03.040","80.02.03.041","80.02.03.042","80.02.03.043","80.02.03.044","80.02.03.045","80.02.03.046","80.02.03.047","80.02.03.048","80.02.03.049","80.02.03.050","80.02.03.051","80.02.03.052","80.02.03.053","80.02.03.054","80.02.03.055","80.02.03.056","80.02.03.057","80.02.03.058","80.02.03.059","80.02.03.060","80.02.03.061","80.02.03.062","80.02.03.063","80.02.03.064","80.02.03.065","80.02.03.066","80.02.03.067","80.02.03.068","80.02.03.069","80.02.03.070","80.02.03.071","80.02.03.072","80.02.04.007","80.02.04.008","80.02.04.009","80.02.04.010","80.02.04.011","80.02.04.012","80.02.04.013","80.02.04.014","80.02.04.015","80.02.04.016","80.02.04.017","80.02.04.018","80.02.04.019","80.02.04.020","80.02.04.021","80.02.04.022","80.02.04.023","80.02.04.030","80.02.04.031","80.02.04.032","80.02.04.033","80.02.04.034","80.02.04.035","80.02.04.036","80.02.04.037","80.02.04.038","80.02.04.039","80.02.04.040","80.02.04.041","80.02.04.047","80.02.04.048","80.02.04.049","80.02.04.050","80.02.04.051","80.02.04.052","80.02.04.053","80.02.04.054","80.02.04.055","80.02.04.056","80.02.04.057","80.02.04.058","80.02.04.059","80.02.04.060","80.02.04.061","80.02.04.068","80.02.04.069","80.02.04.070","80.02.04.071","80.02.04.072","80.02.04.073","80.02.04.074","80.02.04.075","80.02.04.076","80.02.04.077","80.02.04.078","80.02.04.079","80.02.04.086","80.02.04.087","80.02.04.088","80.02.04.089","80.02.04.090","80.02.04.091","80.02.04.092","80.02.04.093","80.02.04.094","80.02.04.095","80.02.04.096","80.02.04.097","80.02.04.104","80.02.04.105","80.02.04.106","80.02.04.107","80.02.04.108","80.02.04.109","80.02.04.110","80.02.04.111","80.02.04.112","80.02.04.113","80.02.04.114","80.02.04.115","80.02.04.124","80.02.04.125","80.02.04.126","80.02.04.127","80.02.04.129","80.02.04.130","80.02.04.131","80.02.04.132","80.02.04.133","80.02.04.134","80.02.04.135","80.02.04.137","80.02.04.138","80.02.04.139","80.02.04.152","80.02.04.153","80.02.04.154","80.02.04.155","80.02.04.156","80.02.04.157","80.02.04.158","80.02.04.159","80.02.04.160","80.02.04.161","80.02.04.162","80.02.04.163","80.02.04.164","80.02.04.165","80.02.04.166","80.02.04.167","80.02.04.168","80.02.04.169","80.02.04.170","80.02.04.171","80.02.04.172","80.02.04.173","80.02.04.174","80.02.04.175","80.02.04.188","80.02.04.189","80.02.04.190","80.02.04.191","80.02.04.192","80.02.04.193","80.02.04.194","80.02.04.195","80.02.04.196","80.02.04.197","80.02.04.198","80.02.04.199","80.02.04.200","80.02.04.201","80.02.04.202","80.02.04.203","80.02.04.204","80.02.04.205","80.02.04.206","80.02.04.207","80.02.04.208","80.02.04.209","80.02.04.210","80.02.04.211","80.02.04.221","80.02.04.222","80.02.04.223","80.02.04.224","80.02.04.225","80.02.04.226","80.02.04.227","80.02.04.228","80.02.04.229","80.02.04.230","80.02.04.231","80.02.04.232","80.02.04.233","80.02.04.234","80.02.04.235","80.02.04.236","80.02.04.237","80.02.04.238","80.02.04.248","80.02.04.249","80.02.04.250","80.02.04.251","80.02.04.252","80.02.04.253","80.02.04.254","80.02.04.255","80.02.04.256","80.02.04.257","80.02.04.258","80.02.04.259","80.02.04.260","80.02.04.261","80.02.04.262","80.02.04.263","80.02.04.264","80.02.04.265","80.02.05.006","80.02.05.007","80.02.05.008","80.02.05.009","80.02.05.010","80.02.05.011","80.02.05.012","80.02.05.013","80.02.05.014","80.02.05.015","80.02.06.001","80.02.06.002","80.02.06.003","80.02.06.004","80.02.06.005","80.02.06.006","80.02.07.001","80.02.07.002","80.02.07.003","80.02.07.004","80.02.07.005","80.02.08.001","80.02.08.002","80.02.08.005","80.02.08.006","80.02.08.007","80.02.08.008","80.02.08.009","80.02.08.010","80.02.08.011","80.02.08.012","80.02.09.030","80.02.10.001","80.02.10.002","80.02.10.006","80.02.10.008","80.02.11.001","80.02.11.005","80.02.11.009","80.02.11.020","80.02.11.021","80.02.11.022","80.02.11.023","80.02.11.024","80.02.11.025","80.02.11.026","80.02.11.027","80.02.11.028","80.02.11.029","80.02.11.030","80.02.11.040","80.02.11.041","80.02.11.042","80.02.11.043","80.02.11.044","80.02.11.045","80.02.11.046","80.02.11.047","80.02.11.048","80.02.11.060","80.02.11.061","80.02.11.062","80.02.11.063","80.02.11.064","80.02.11.065","80.02.11.066","80.02.11.067","80.02.11.068","80.02.11.080","80.02.11.081","80.02.11.082","80.02.11.083","80.02.11.084","80.02.11.085","80.02.11.090","80.02.11.091","80.02.11.092","80.02.11.100","80.02.11.101","80.02.11.102","80.02.11.110","80.02.11.120","80.03.03.001","80.03.03.002","80.03.03.003","80.03.03.049","80.03.03.050","80.03.03.051","80.03.03.052","80.03.03.053","80.03.03.054","80.03.03.055","80.03.03.056","80.03.03.057","80.03.03.058","80.03.03.059","80.03.03.060","80.03.03.061","80.03.03.062","80.03.03.063","80.03.03.064","80.03.03.065","80.03.03.066","80.03.03.067","80.03.03.068","80.03.03.069","80.03.03.070","80.03.03.071","80.03.03.072","80.03.03.073","80.03.03.074","80.03.03.075","80.03.03.076","80.03.03.077","80.03.03.078","80.03.03.079","80.03.03.080","80.03.03.081","80.03.03.082","80.03.03.083","80.03.03.084","80.03.03.085","80.03.03.086","80.03.03.087","80.03.03.088","80.03.03.089","80.03.03.090","80.03.03.091","80.03.03.092","80.03.03.093","80.03.03.094","80.03.03.095","80.03.03.096","80.03.03.097","80.03.03.098","80.03.03.099","80.03.03.100","80.03.03.101","80.03.03.102","80.03.03.103","80.03.03.104","80.03.03.105","80.03.03.106","80.03.03.107","80.03.03.108","80.03.03.109","80.03.03.110","80.03.03.111","80.03.03.112","80.03.03.113","80.03.03.114","80.03.03.115","80.03.03.116","80.03.03.117","80.03.03.118","80.03.03.119","80.03.03.120","80.03.03.121","80.03.03.122","80.03.03.123","80.03.03.124","80.03.03.125","80.03.03.126","80.03.03.127","80.03.03.128","80.03.03.129","80.03.03.130","80.03.03.131","80.03.03.132","80.03.03.133","80.03.03.134","80.03.03.135","80.03.03.136","80.03.03.137","80.03.03.138","80.03.03.139","80.03.03.140","80.03.03.141","80.03.05.001","80.03.06.001","80.03.06.010","80.03.06.012","80.03.07.001","80.03.07.011","80.03.07.012","80.03.07.020","80.03.07.021","80.04.01.004","80.04.01.007","80.04.01.008","80.04.01.009","80.04.01.010","80.04.01.011","80.04.01.013","80.04.01.014","80.04.01.015","80.04.01.016"];
 
+		var previousDates = getDatesBetween("2026-06-01", "2026-06-08");
+		var previousDates2 = getDatesBetween("2026-06-01", "2026-06-08");
+
+		for(var i=0;i<previousDates.length;i++){
+			previousDates[i] = getDateAsStringForDisplay(new Date(previousDates[i]));
+		}
+		for(var i=0;i<previousDates2.length;i++){
+			previousDates2[i] = getDateAsStringForInputObject(new Date(previousDates2[i]));
+		}
+		//
+   	var nalozi = await naloziDB.find({majstor:{$in:podizvodjaci},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje"]},"prijemnica.datum.datum":{$in:previousDates}}).toArray();
+   	var nalogIds = [];
+   	for(var i=0;i<nalozi.length;i++){
+   		nalogIds.push(nalozi[i].broj)
+   	}
+   	var reversi = await magacinReversiDB.find({nalog:{$in:nalogIds}}).toArray();
+   	var proizvodi = await proizvodiDB.find({}).toArray();
+   	for(var i=0;i<reversi.length;i++){
+   		for(var j=0;j<nalozi.length;j++){
+   			if(nalozi[j].broj==reversi[i].nalog){
+   				reversi[i].radnaJedinica = nalozi[j].radnaJedinica;
+   			}
+   		}
+   	}
+   	for(var i=0;i<reversi.length;i++){
+   		reversi[i].iznosReversa = 0;
+   		for(var j=0;j<reversi[i].zaduzenje.length;j++){
+   			//reversi[i].zaduzenje[j].cenaProizvoda = 0;
+   			for(var k=0;k<proizvodi.length;k++){
+   				if(proizvodi[k].uniqueId==reversi[i].zaduzenje[j].uniqueId){
+   					var cena = isNaN(parseFloat(proizvodi[k].price)) ? 0 : parseFloat(proizvodi[k].price);
+   					reversi[i].zaduzenje[j].cenaProizvoda = cena;
+   				}
+   			}
+   			var kolicina = parseFloat(reversi[i].zaduzenje[j].quantity) - parseFloat(reversi[i].zaduzenje[j].quantity2);
+   			reversi[i].zaduzenje[j].cena = kolicina * cena;
+   			reversi[i].iznosReversa = reversi[i].iznosReversa + kolicina*cena
+   		}
+   	}
+
+   	var dnevniIzvestaji = await dnevniIzvestajiDB.find({date:{$in:previousDates2}}).toArray()
+   	var majstori = await majstoriDB.find({}).toArray();
+   	for(var i=0;i<dnevniIzvestaji.length;i++){
+   		for(var j=0;j<majstori.length;j++){
+   			if(majstori[j].uniqueId==dnevniIzvestaji[i].majstor){
+   				dnevniIzvestaji[i].majstorRegion = majstori[j].region;
+   			}
+   		}
+   	}
+
+   	var naloziTrecihLica = await naloziTrecihLicaDB.find({datumRadova:{$in:previousDates2}}).toArray()
+   	for(var i=0;i<naloziTrecihLica.length;i++){
+   		naloziTrecihLica[i].region = "BEOGRAD";
+   		for(var j=0;j<majstori.length;j++){
+   			if(naloziTrecihLica[i].majstor==majstori[j].uniqueId){
+   				naloziTrecihLica[i].region=majstori[j].region;
+   			}
+   		}
+   	}
 
 		var opseg = radneJedinice;
 		var json = {};
+		json.trecaLica = 0;
+		json.trecaLicaBroj = 0;
+		json.ekipe = 0;
 		json.konstatacija = 0;
+		json.konstatacijaBroj = 0;
 		json.woma = 0;
+		json.womaBroj = 0;
 		json.crpljenje = 0;
+		json.crpljenjeBroj = 0;
 		json.rucnokopanje = 0;
+		json.rucnokopanjeBroj = 0;
 		json.bager = 0;
+		json.bagerBroj = 0;
 		json.odgusenja = 0;
+		json.odgusenjaBroj = 0;
 		json.finalizacija = 0;
+		json.finalizacijaBroj = 0;
 		json.zamene = 0;
+		json.zameneBroj = 0;
 		json.nalog010 = 0;
+		json.nalog010Iznos = 0;
 		json.nalog1030 = 0;
+		json.nalog1030Iznos = 0;
 		json.nalog3060 = 0;
-		json.nalog60100=0;
+		json.nalog3060Iznos = 0;
+		json.nalog60100 = 0;
+		json.nalog60100Iznos = 0;
 		json.nalog100150 = 0;
+		json.nalog100150Iznos = 0;
 		json.nalog150250 = 0;
+		json.nalog150250Iznos = 0;
 		json.nalog250 = 0;
+		json.nalog250Iznos = 0;
 		json.ukupno = 0;
 		json.ukupnoNaloga = 0;
-		for(var i=0;i<nalozi.length;i++){
-			var nalog = nalozi[i];
-			if(opseg.indexOf(nalog.radnaJedinica)>=0){
-				json.ukupno = json.ukupno + parseFloat(nalozi[i].ukupanIznos);
-				json.ukupnoNaloga++;
-				for(var j=0;j<nalozi[i].obracun.length;j++){
-					var cenaPoCenovniku = 0;
-					for(var k=0;k<cenovnik.length;k++){
-						if(cenovnik[k].code==nalozi[i].obracun[j].code){
-							cenaPoCenovniku = cenovnik[k].price
-						}
-					}
-					var iznos = parseFloat(nalozi[i].obracun[j].quantity)*cenaPoCenovniku;
-					if(isNaN(iznos)){
-						console.log("Ne valja iznos stavke za nalog: " + nalog.broj);
-						console.log(cenaPoCenovniku)
-						console.log(nalozi[i].obracun[j].quantity)
-					}
-					if(sifraKonstatacija.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.konstatacija = json.konstatacija + iznos;
-					}else if(sifraWoma.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.woma = json.woma + iznos;
-					}else if(sifraCrpljenje.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.crpljenje = json.crpljenje + iznos;
-					}else if(sifraKopanje.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.rucnokopanje = json.rucnokopanje + iznos;
-					}else if(sifraBager.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.bager = json.bager + iznos;
-					}else if(sifraOdgusenja.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.odgusenja = json.odgusenja + iznos;
-					}else if(sifraFinalizacija.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.finalizacija = json.finalizacija + iznos;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.zamene = json.zamene + iznos;
-					}
 
-
-				}
-				for(var j=0;j<nalozi[i].obracun.length;j++){
-					if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)<10000){
-						json.nalog010++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=10000 && parseFloat(nalozi[i].ukupanIznos)<=30000){
-						json.nalog1030++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=30000 && parseFloat(nalozi[i].ukupanIznos)<=60000){
-						json.nalog3060++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=30000 && parseFloat(nalozi[i].ukupanIznos)<60000){
-						json.nalog3060++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=60000 && parseFloat(nalozi[i].ukupanIznos)<100000){
-						json.nalog60100++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=100000 && parseFloat(nalozi[i].ukupanIznos)<150000){
-						json.nalog100150++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=150000 && parseFloat(nalozi[i].ukupanIznos)<250000){
-						json.nalog150250++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=250000){
-						json.nalog250++;
-						//console.log("ISTOK VELIKI ("+nalozi[i].vrstaRada+"): "+brojSaRazmacima(parseFloat(nalozi[i].ukupanIznos)))
-						break;
-					}
-				}
-			}
-		}
-
-
-		console.log("UKUPNO")
-		console.log("  Ukupno: "+brojSaRazmacima(json.ukupno))
-		console.log("  Naloga: "+json.ukupnoNaloga)
-		console.log("  Ukupan broj ekipa: "+95)
-		console.log("  Zamena 0-10: "+json.nalog010)
-		console.log("  Zamena 10-30: "+json.nalog1030)
-		console.log("  Zamena 30-60: "+json.nalog3060)
-		console.log("  Zamena 60-100: "+json.nalog60100)
-		console.log("  Zamena 100-150: "+json.nalog100150)
-		console.log("  Zamena 150-250: "+json.nalog150250)
-		console.log("  Zamena 250-: "+json.nalog250)
-		console.log("  Zagusenja: "+brojSaRazmacima(json.odgusenja)+" rsd")
-		console.log("  Crpljenje: "+brojSaRazmacima(json.crpljenje)+" rsd")
-		console.log("  Vome: "+brojSaRazmacima(json.woma)+" rsd")
-		console.log("  Rovovi: "+brojSaRazmacima(json.bager)+" rsd")
-		console.log("  Kopanje: "+brojSaRazmacima(json.rucnokopanje)+" rsd")
-		console.log("  Finalizacija: "+brojSaRazmacima(json.finalizacija)+" rsd")
-		console.log("  Zamene: "+brojSaRazmacima(json.zamene)+" rsd")
-
-
-		console.log("--------------------------------------")
-		console.log("--------------------------------------")
-		console.log("--------------------------------------")
-
-
-
-
-		var opseg = istok;
-		var json = {};
-		json.konstatacija = 0;
-		json.woma = 0;
-		json.crpljenje = 0;
-		json.rucnokopanje = 0;
-		json.bager = 0;
-		json.odgusenja = 0;
-		json.finalizacija = 0;
-		json.zamene = 0;
-		json.nalog010 = 0;
-		json.nalog1030 = 0;
-		json.nalog3060 = 0;
-		json.nalog60100=0;
-		json.nalog100150 = 0;
-		json.nalog150250 = 0;
-		json.nalog250 = 0;
-		json.ukupno = 0;
-		json.ukupnoNaloga = 0;
-		for(var i=0;i<nalozi.length;i++){
-			var nalog = nalozi[i];
-			if(opseg.indexOf(nalog.radnaJedinica)>=0){
-				json.ukupno = json.ukupno + parseFloat(nalozi[i].ukupanIznos);
-				json.ukupnoNaloga++;
-				for(var j=0;j<nalozi[i].obracun.length;j++){
-					var cenaPoCenovniku = 0;
-					for(var k=0;k<cenovnik.length;k++){
-						if(cenovnik[k].code==nalozi[i].obracun[j].code){
-							cenaPoCenovniku = cenovnik[k].price
-						}
-					}
-					var iznos = parseFloat(nalozi[i].obracun[j].quantity)*cenaPoCenovniku;
-					if(isNaN(iznos)){
-						console.log("Ne valja iznos stavke za nalog: " + nalog.broj);
-						console.log(cenaPoCenovniku)
-						console.log(nalozi[i].obracun[j].quantity)
-					}
-					if(sifraKonstatacija.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.konstatacija = json.konstatacija + iznos;
-					}else if(sifraWoma.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.woma = json.woma + iznos;
-					}else if(sifraCrpljenje.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.crpljenje = json.crpljenje + iznos;
-					}else if(sifraKopanje.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.rucnokopanje = json.rucnokopanje + iznos;
-					}else if(sifraBager.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.bager = json.bager + iznos;
-					}else if(sifraOdgusenja.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.odgusenja = json.odgusenja + iznos;
-					}else if(sifraFinalizacija.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.finalizacija = json.finalizacija + iznos;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.zamene = json.zamene + iznos;
-					}
-
-
-				}
-				for(var j=0;j<nalozi[i].obracun.length;j++){
-					if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)<10000){
-						json.nalog010++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=10000 && parseFloat(nalozi[i].ukupanIznos)<=30000){
-						json.nalog1030++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=30000 && parseFloat(nalozi[i].ukupanIznos)<=60000){
-						json.nalog3060++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=30000 && parseFloat(nalozi[i].ukupanIznos)<60000){
-						json.nalog3060++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=60000 && parseFloat(nalozi[i].ukupanIznos)<100000){
-						json.nalog60100++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=100000 && parseFloat(nalozi[i].ukupanIznos)<150000){
-						json.nalog100150++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=150000 && parseFloat(nalozi[i].ukupanIznos)<250000){
-						json.nalog150250++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=250000){
-						json.nalog250++;
-						//console.log("ISTOK VELIKI ("+nalozi[i].vrstaRada+"): "+brojSaRazmacima(parseFloat(nalozi[i].ukupanIznos)))
-						break;
-					}
-				}
-			}
-		}
-
-
-		console.log("ISTOK")
-		console.log("  Ukupno: "+brojSaRazmacima(json.ukupno))
-		console.log("  Naloga: "+json.ukupnoNaloga)
-		console.log("  Ukupan broj ekipa: "+95)
-		console.log("  Zamena 0-10: "+json.nalog010)
-		console.log("  Zamena 10-30: "+json.nalog1030)
-		console.log("  Zamena 30-60: "+json.nalog3060)
-		console.log("  Zamena 60-100: "+json.nalog60100)
-		console.log("  Zamena 100-150: "+json.nalog100150)
-		console.log("  Zamena 150-250: "+json.nalog150250)
-		console.log("  Zamena 250-: "+json.nalog250)
-		console.log("  Zagusenja: "+brojSaRazmacima(json.odgusenja)+" rsd")
-		console.log("  Crpljenje: "+brojSaRazmacima(json.crpljenje)+" rsd")
-		console.log("  Vome: "+brojSaRazmacima(json.woma)+" rsd")
-		console.log("  Rovovi: "+brojSaRazmacima(json.bager)+" rsd")
-		console.log("  Kopanje: "+brojSaRazmacima(json.rucnokopanje)+" rsd")
-		console.log("  Finalizacija: "+brojSaRazmacima(json.finalizacija)+" rsd")
-		console.log("  Zamene: "+brojSaRazmacima(json.zamene)+" rsd")
-
-
-		console.log("--------------------------------------")
-		console.log("--------------------------------------")
-		console.log("--------------------------------------")
-
-
-		var opseg = zapad;
-		var json = {};
-		json.konstatacija = 0;
-		json.woma = 0;
-		json.crpljenje = 0;
-		json.rucnokopanje = 0;
-		json.bager = 0;
-		json.odgusenja = 0;
-		json.finalizacija = 0;
-		json.zamene = 0;
-		json.nalog010 = 0;
-		json.nalog1030 = 0;
-		json.nalog3060 = 0;
-		json.nalog60100=0;
-		json.nalog100150 = 0;
-		json.nalog150250 = 0;
-		json.nalog250 = 0;
-		json.ukupno = 0;
-		json.ukupnoNaloga = 0;
-		for(var i=0;i<nalozi.length;i++){
-			var nalog = nalozi[i];
-			if(opseg.indexOf(nalog.radnaJedinica)>=0){
-				json.ukupno = json.ukupno + parseFloat(nalozi[i].ukupanIznos);
-				json.ukupnoNaloga++;
-				for(var j=0;j<nalozi[i].obracun.length;j++){
-					var cenaPoCenovniku = 0;
-					for(var k=0;k<cenovnik.length;k++){
-						if(cenovnik[k].code==nalozi[i].obracun[j].code){
-							cenaPoCenovniku = cenovnik[k].price
-						}
-					}
-					var iznos = parseFloat(nalozi[i].obracun[j].quantity)*cenaPoCenovniku;
-					if(isNaN(iznos)){
-						console.log("Ne valja iznos stavke za nalog: " + nalog.broj);
-						console.log(cenaPoCenovniku)
-						console.log(nalozi[i].obracun[j].quantity)
-					}
-					if(sifraKonstatacija.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.konstatacija = json.konstatacija + iznos;
-					}else if(sifraWoma.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.woma = json.woma + iznos;
-					}else if(sifraCrpljenje.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.crpljenje = json.crpljenje + iznos;
-					}else if(sifraKopanje.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.rucnokopanje = json.rucnokopanje + iznos;
-					}else if(sifraBager.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.bager = json.bager + iznos;
-					}else if(sifraOdgusenja.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.odgusenja = json.odgusenja + iznos;
-					}else if(sifraFinalizacija.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.finalizacija = json.finalizacija + iznos;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0){
-						json.zamene = json.zamene + iznos;
-					}
-
-
-				}
-				for(var j=0;j<nalozi[i].obracun.length;j++){
-					if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)<10000){
-						json.nalog010++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=10000 && parseFloat(nalozi[i].ukupanIznos)<=30000){
-						json.nalog1030++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=30000 && parseFloat(nalozi[i].ukupanIznos)<=60000){
-						json.nalog3060++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=30000 && parseFloat(nalozi[i].ukupanIznos)<60000){
-						json.nalog3060++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=60000 && parseFloat(nalozi[i].ukupanIznos)<100000){
-						json.nalog60100++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=100000 && parseFloat(nalozi[i].ukupanIznos)<150000){
-						json.nalog100150++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=150000 && parseFloat(nalozi[i].ukupanIznos)<250000){
-						json.nalog150250++;
-						break;
-					}else if(sifraZamene.indexOf(nalozi[i].obracun[j].code)>=0 && parseFloat(nalozi[i].ukupanIznos)>=250000){
-						json.nalog250++;
-						//console.log("ZAPAD VELIKI ("+nalozi[i].vrstaRada+"): "+brojSaRazmacima(parseFloat(nalozi[i].ukupanIznos)))
-						break;
-					}
-				}
-			}
-		}
-		console.log("ZAPAD")
-		console.log("  Ukupno: "+brojSaRazmacima(json.ukupno))
-		console.log("  Naloga: "+json.ukupnoNaloga);
-		console.log("  Ukupan broj ekipa: "+90)
-		console.log("  Zamena 0-10: "+json.nalog010)
-		console.log("  Zamena 10-30: "+json.nalog1030)
-		console.log("  Zamena 30-60: "+json.nalog3060)
-		console.log("  Zamena 60-100: "+json.nalog60100)
-		console.log("  Zamena 100-150: "+json.nalog100150)
-		console.log("  Zamena 150-250: "+json.nalog150250)
-		console.log("  Zamena 250-: "+json.nalog250)
-		console.log("  Zagusenja: "+brojSaRazmacima(json.odgusenja)+" rsd")
-		console.log("  Crpljenje: "+brojSaRazmacima(json.crpljenje)+" rsd")
-		console.log("  Vome: "+brojSaRazmacima(json.woma)+" rsd")
-		console.log("  Rovovi: "+brojSaRazmacima(json.bager)+" rsd")
-		console.log("  Kopanje: "+brojSaRazmacima(json.rucnokopanje)+" rsd")
-		console.log("  Finalizacija: "+brojSaRazmacima(json.finalizacija)+" rsd")
-		console.log("  Zamene: "+brojSaRazmacima(json.zamene)+" rsd")
-
-
-		console.log("--------------------------------------")
-		console.log("--------------------------------------")
-		console.log("--------------------------------------")*/
-
+		handleData(opseg,json,"BEOGRAD")
+		logResults("BEOGRAD",json)
+		handleData(istok,json,"ISTOK")
+		logResults("ISTOK",json)
+		handleData(zapad,json,"ZAPAD")
+		logResults("ZAPAD",json)*/
 
 
 		//STATISTIKA ZA PODCAST
@@ -7754,6 +7980,382 @@ http.listen(process.env.PORT, async function(){
 		console.log("  Kopanje: "+json.rucnokopanjeBroj)
 		console.log("  Finalizacija: "+json.finalizacijaBroj)
 		console.log("  Zamene: "+json.zameneBroj)*/
+
+		/*var ucinak = await dnevniIzvestajiDB.find({date:{$regex:"2026-"}}).toArray();
+		//console.log(ucinak)
+
+		//Dalibor iutrjGH--1671396783060, Goran stoiljkovic yrBvvde--1738667377791, Goran stojnovic ZeIPtKT--1778054384098, Igor bakic hG888mw--1771937088671, ivan janjicijevic EjBkaSU--1780384970602
+		//Mahendra gdsadsat--16713932e82060, Milos Dekanj Ykmt2tx--1768979009214, Sasa Jovanoski pXex0--1695972399077, Sinisa zivancic 2UGO4Wj--1776751949948
+		//Tomislav Maksimovic PS9fh--1692263743552, 
+		var majstori = await majstoriDB.find({tipMajstora:"Мајстор"}).toArray();
+		//console.log(majstori)
+		for(var i=0;i<majstori.length;i++){
+			majstori[i].ucinak = [];
+			for(var j=0;j<5;j++){
+				var json = {};
+				json.mesec = "0"+eval(j+1);
+				json.ucinci = [];
+				majstori[i].ucinak.push(json)
+			}
+
+			for(var j=0;j<majstori[i].ucinak.length;j++){
+				for(var k=0;k<ucinak.length;k++){
+					if(ucinak[k].date.includes("2026-"+majstori[i].ucinak[j].mesec) && majstori[i].uniqueId==ucinak[k].majstor){
+						majstori[i].ucinak[j].ucinci.push(ucinak[k])
+					}
+				}
+			}
+		}
+		fs.writeFileSync("output.json", JSON.stringify(majstori, null, 2), "utf8");
+
+		for(var i=0;i<majstori.length;i++){
+			for(var j=0;j<majstori[i].ucinak.length;j++){
+				majstori[i].ucinak[j].zamene = 0;
+				majstori[i].ucinak[j].zameneBroj = 0;
+				majstori[i].ucinak[j].zamene010 = 0;
+				majstori[i].ucinak[j].zamene010Broj = 0;
+				majstori[i].ucinak[j].zamene1030 = 0;
+				majstori[i].ucinak[j].zamene1030Broj = 0;
+				majstori[i].ucinak[j].zamene3060 = 0;
+				majstori[i].ucinak[j].zamene3060Broj = 0;
+				majstori[i].ucinak[j].zamene60100 = 0;
+				majstori[i].ucinak[j].zamene60100Broj = 0;
+				majstori[i].ucinak[j].zamene100150 = 0;
+				majstori[i].ucinak[j].zamene100150Broj = 0;
+				majstori[i].ucinak[j].zamene150250 = 0;
+				majstori[i].ucinak[j].zamene150250Broj = 0;
+				majstori[i].ucinak[j].zamene250 = 0;
+				majstori[i].ucinak[j].zamene250Broj = 0;
+				majstori[i].ucinak[j].popis = 0;
+				majstori[i].ucinak[j].popisBroj = 0;
+				majstori[i].ucinak[j].konstatacija = 0;
+				majstori[i].ucinak[j].konstatacijaBroj = 0;
+				majstori[i].ucinak[j].odgusenje = 0;
+				majstori[i].ucinak[j].odgusenjeBroj = 0;
+				majstori[i].ucinak[j].radniDani = 0;
+				majstori[i].ucinak[j].ukupanUcinak = 0;
+				majstori[i].ucinak[j].naloga = 0;
+
+				for(var k=0;k<majstori[i].ucinak[j].ucinci.length;k++){
+					//if(majstori[i].ucinak[j].ucinci[k].tipoviRada)
+					if(majstori[i].ucinak[j].ucinci[k].odsustvo=="Присутан"){
+						majstori[i].ucinak[j].radniDani++;
+					}
+					for(var l=0;l<majstori[i].ucinak[j].ucinci[k].nalozi.length;l++){
+						var nalog = majstori[i].ucinak[j].ucinci[k].nalozi[l]
+						var iznosNaloga = isNaN(parseFloat(nalog.ucinak.trim().replace(/,/g, "."))) ? 0 : parseFloat(nalog.ucinak.trim().replace(/,/g, "."));
+						majstori[i].ucinak[j].ukupanUcinak  = majstori[i].ucinak[j].ukupanUcinak + iznosNaloga;
+						majstori[i].ucinak[j].naloga++;
+
+						if(majstori[i].ucinak[j].ucinci[k].nalozi[l].tipoviRada?.indexOf("Замена")>=0){
+							majstori[i].ucinak[j].zamene = majstori[i].ucinak[j].zamene + iznosNaloga;
+							majstori[i].ucinak[j].zameneBroj++;
+
+							if(iznosNaloga>0 && iznosNaloga<10000){
+								majstori[i].ucinak[j].zamene010 = majstori[i].ucinak[j].zamene010 + iznosNaloga;
+								majstori[i].ucinak[j].zamene010Broj++;
+							}else if(iznosNaloga>10000 && iznosNaloga<30000){
+								majstori[i].ucinak[j].zamene1030 = majstori[i].ucinak[j].zamene1030 + iznosNaloga;
+								majstori[i].ucinak[j].zamene1030Broj++;
+							}else if(iznosNaloga>30000 && iznosNaloga<60000){
+								majstori[i].ucinak[j].zamene3060 = majstori[i].ucinak[j].zamene3060 + iznosNaloga;
+								majstori[i].ucinak[j].zamene3060Broj++;
+							}else if(iznosNaloga>60000 && iznosNaloga<100000){
+								majstori[i].ucinak[j].zamene60100 = majstori[i].ucinak[j].zamene60100 + iznosNaloga;
+								majstori[i].ucinak[j].zamene60100Broj++;
+							}else if(iznosNaloga>100000 && iznosNaloga<150000){
+								majstori[i].ucinak[j].zamene100150 = majstori[i].ucinak[j].zamene100150 + iznosNaloga;
+								majstori[i].ucinak[j].zamene100150Broj++;
+							}else if(iznosNaloga>150000 && iznosNaloga<250000){
+								majstori[i].ucinak[j].zamene150250 = majstori[i].ucinak[j].zamene150250 + iznosNaloga;
+								majstori[i].ucinak[j].zamene150250Broj++;
+							}else if(iznosNaloga>250000){
+								majstori[i].ucinak[j].zamene250 = majstori[i].ucinak[j].zamene250 + iznosNaloga;
+								majstori[i].ucinak[j].zamene250Broj++;
+							}
+						}else if(majstori[i].ucinak[j].ucinci[k].nalozi[l].tipoviRada?.indexOf("Одгушење")>=0){
+							majstori[i].ucinak[j].odgusenje = majstori[i].ucinak[j].odgusenje + iznosNaloga;
+							majstori[i].ucinak[j].odgusenjeBroj++;
+						}else if(majstori[i].ucinak[j].ucinci[k].nalozi[l].tipoviRada?.indexOf("Констатација")>=0){
+							majstori[i].ucinak[j].konstatacija = majstori[i].ucinak[j].konstatacija + iznosNaloga;
+							majstori[i].ucinak[j].konstatacijaBroj++;
+						}else if(majstori[i].ucinak[j].ucinci[k].nalozi[l].tipoviRada?.indexOf("Попис")>=0){
+							majstori[i].ucinak[j].popis = majstori[i].ucinak[j].popis+ iznosNaloga;
+							majstori[i].ucinak[j].popisBroj++;
+						}
+					}
+					
+				}
+			}
+		}
+
+		for(var i=0;i<majstori.length;i++){
+			console.log(majstori[i].ime)
+			for(var j=0;j<majstori[i].ucinak.length;j++){
+				console.log(majstori[i].ucinak[j].mesec+".2026")
+				console.log(majstori[i].ucinak[j])
+				console.log("------")
+			}
+			console.log("----------------------------------------------------------------")
+			console.log("----------------------------------------------------------------")
+		}*/
+
+		/*const workbook = new ExcelJS.Workbook();
+		const sheet = workbook.addWorksheet("Učinak 2026");
+
+		sheet.columns = [
+		  { header: "Majstor", key: "majstor", width: 25 },
+		  { header: "Mesec", key: "mesec", width: 12 },
+		  { header: "Radni dani", key: "radniDani", width: 12 },
+		  { header: "Naloga", key: "naloga", width: 10 },
+		  { header: "Ukupan učinak", key: "ukupanUcinak", width: 16 },
+
+		  { header: "Zamene", key: "zamene", width: 14 },
+		  { header: "Zamene broj", key: "zameneBroj", width: 14 },
+
+		  { header: "Zamene 0-10k", key: "zamene010", width: 14 },
+		  { header: "Broj 0-10k", key: "zamene010Broj", width: 14 },
+
+		  { header: "Zamene 10-30k", key: "zamene1030", width: 16 },
+		  { header: "Broj 10-30k", key: "zamene1030Broj", width: 14 },
+
+		  { header: "Zamene 30-60k", key: "zamene3060", width: 16 },
+		  { header: "Broj 30-60k", key: "zamene3060Broj", width: 14 },
+
+		  { header: "Zamene 60-100k", key: "zamene60100", width: 16 },
+		  { header: "Broj 60-100k", key: "zamene60100Broj", width: 14 },
+
+		  { header: "Zamene 100-150k", key: "zamene100150", width: 18 },
+		  { header: "Broj 100-150k", key: "zamene100150Broj", width: 16 },
+
+		  { header: "Zamene 150-250k", key: "zamene150250", width: 18 },
+		  { header: "Broj 150-250k", key: "zamene150250Broj", width: 16 },
+
+		  { header: "Zamene 250k+", key: "zamene250", width: 16 },
+		  { header: "Broj 250k+", key: "zamene250Broj", width: 14 },
+
+		  { header: "Odgušenje", key: "odgusenje", width: 14 },
+		  { header: "Odgušenje broj", key: "odgusenjeBroj", width: 16 },
+
+		  { header: "Konstatacija", key: "konstatacija", width: 16 },
+		  { header: "Konstatacija broj", key: "konstatacijaBroj", width: 18 },
+
+		  { header: "Popis", key: "popis", width: 14 },
+		  { header: "Popis broj", key: "popisBroj", width: 14 }
+		];
+
+		for (var i = 0; i < majstori.length; i++) {
+		  for (var j = 0; j < majstori[i].ucinak.length; j++) {
+		    var mesec = majstori[i].ucinak[j];
+
+		    sheet.addRow({
+		      majstor: majstori[i].ime,
+		      mesec: mesec.mesec + ".2026",
+		      radniDani: mesec.radniDani,
+		      naloga: mesec.naloga,
+		      ukupanUcinak: mesec.ukupanUcinak,
+
+		      zamene: mesec.zamene,
+		      zameneBroj: mesec.zameneBroj,
+
+		      zamene010: mesec.zamene010,
+		      zamene010Broj: mesec.zamene010Broj,
+
+		      zamene1030: mesec.zamene1030,
+		      zamene1030Broj: mesec.zamene1030Broj,
+
+		      zamene3060: mesec.zamene3060,
+		      zamene3060Broj: mesec.zamene3060Broj,
+
+		      zamene60100: mesec.zamene60100,
+		      zamene60100Broj: mesec.zamene60100Broj,
+
+		      zamene100150: mesec.zamene100150,
+		      zamene100150Broj: mesec.zamene100150Broj,
+
+		      zamene150250: mesec.zamene150250,
+		      zamene150250Broj: mesec.zamene150250Broj,
+
+		      zamene250: mesec.zamene250,
+		      zamene250Broj: mesec.zamene250Broj,
+
+		      odgusenje: mesec.odgusenje,
+		      odgusenjeBroj: mesec.odgusenjeBroj,
+
+		      konstatacija: mesec.konstatacija,
+		      konstatacijaBroj: mesec.konstatacijaBroj,
+
+		      popis: mesec.popis,
+		      popisBroj: mesec.popisBroj
+		    });
+		  }
+		}
+		await workbook.xlsx.writeFile("ucinak-majstora-2026.xlsx");*/
+		/*const workbook = new ExcelJS.Workbook();
+
+		function safeSheetName(name) {
+		  return String(name || "Majstor")
+		    .replace(/[\\/*?:[\]]/g, "")
+		    .substring(0, 31);
+		}
+
+		function formatNumber(value) {
+		  return Number(value || 0).toLocaleString("en-US");
+		}
+
+		const rows = [
+		  { label: "Radni dani", key: "radniDani" },
+		  { label: "Naloga", key: "naloga" },
+		  { label: "Ukupan učinak", key: "ukupanUcinak" },
+
+		  { label: "Zamene - ukupno", key: "zamene", countKey: "zameneBroj" },
+
+		  { label: "Odgušenje", key: "odgusenje", countKey: "odgusenjeBroj" },
+
+		  { label: "Konstatacija", key: "konstatacija", countKey: "konstatacijaBroj" },
+
+		  { label: "Popis", key: "popis", countKey: "popisBroj" },
+
+		  { label: "Zamene 0-10k", key: "zamene010", countKey: "zamene010Broj" },
+		  { label: "Zamene 10-30k", key: "zamene1030", countKey: "zamene1030Broj" },
+		  { label: "Zamene 30-60k", key: "zamene3060", countKey: "zamene3060Broj" },
+		  { label: "Zamene 60-100k", key: "zamene60100", countKey: "zamene60100Broj" },
+		  { label: "Zamene 100-150k", key: "zamene100150", countKey: "zamene100150Broj" },
+		  { label: "Zamene 150-250k", key: "zamene150250", countKey: "zamene150250Broj" },
+		  { label: "Zamene 250k+", key: "zamene250", countKey: "zamene250Broj" }
+		];
+
+		for (var i = 0; i < majstori.length; i++) {
+		  const majstor = majstori[i];
+
+		  const sheet = workbook.addWorksheet(safeSheetName(majstor.ime));
+
+		  sheet.pageSetup = {
+		    paperSize: 9, // A4
+		    orientation: "portrait",
+		    fitToPage: true,
+		    fitToWidth: 1,
+		    fitToHeight: 1,
+		    margins: {
+		      left: 0.25,
+		      right: 0.25,
+		      top: 0.35,
+		      bottom: 0.35,
+		      header: 0.1,
+		      footer: 0.1
+		    }
+		  };
+
+		  sheet.views = [
+		    { state: "frozen", ySplit: 3 }
+		  ];
+
+		  sheet.mergeCells("A1:F1");
+		  sheet.getCell("A1").value = "Učinak majstora 2026";
+		  sheet.getCell("A1").font = { bold: true, size: 16 };
+		  sheet.getCell("A1").alignment = { horizontal: "center" };
+
+		  sheet.mergeCells("A2:F2");
+		  sheet.getCell("A2").value = majstor.ime || "";
+		  sheet.getCell("A2").font = { bold: true, size: 13 };
+		  sheet.getCell("A2").alignment = { horizontal: "center" };
+
+		  sheet.getCell("A4").value = "Stavka";
+
+		  for (var j = 0; j < majstor.ucinak.length; j++) {
+		    const col = j + 2;
+		    sheet.getRow(4).getCell(col).value = majstor.ucinak[j].mesec + ".2026";
+		  }
+
+		  for (var r = 0; r < rows.length; r++) {
+		  const rowNumber = r + 5;
+
+		  sheet.getRow(rowNumber).getCell(1).value = rows[r].label;
+
+		  for (var m = 0; m < majstor.ucinak.length; m++) {
+		    const monthData = majstor.ucinak[m];
+		    const col = m + 2;
+
+		    const value = monthData[rows[r].key] || 0;
+
+		    const cell = sheet.getRow(rowNumber).getCell(col);
+
+				if (rows[r].countKey) {
+				  const count = monthData[rows[r].countKey] || 0;
+				  cell.value = `${formatNumber(value)} (${count})`;
+				} else {
+				  cell.value = value;
+
+				  if (rows[r].key === "ukupanUcinak") {
+				    cell.numFmt = "#,##0";
+				  }
+				}
+		  }
+		}
+
+		  sheet.columns = [
+		    { width: 15 },
+		    { width: 16 },
+		    { width: 16 },
+		    { width: 16 },
+		    { width: 16 },
+		    { width: 16 }
+		  ];
+
+		  sheet.getRow(4).font = { bold: true };
+		  sheet.getRow(4).alignment = { horizontal: "center" };
+
+		  sheet.getRow(4).eachCell(function(cell) {
+		    cell.fill = {
+		      type: "pattern",
+		      pattern: "solid",
+		      fgColor: { argb: "FFD9EAF7" }
+		    };
+		  });
+
+		  sheet.eachRow(function(row, rowNumber) {
+		    row.eachCell(function(cell, colNumber) {
+		      cell.border = {
+		        top: { style: "thin" },
+		        left: { style: "thin" },
+		        bottom: { style: "thin" },
+		        right: { style: "thin" }
+		      };
+
+		      cell.alignment = {
+		        vertical: "middle",
+		        horizontal: colNumber === 1 ? "left" : "center"
+		      };
+		    });
+		  });
+
+		  // Make important rows bold
+		  const importantLabels = [
+		    "Radni dani",
+		    "Naloga",
+		    "Ukupan učinak",
+		    "Zamene - ukupno",
+		    "Odgušenje",
+		    "Konstatacija",
+		    "Popis"
+		  ];
+
+		  for (var r = 0; r < rows.length; r++) {
+		    if (importantLabels.includes(rows[r].label)) {
+		      const rowNumber = r + 5;
+		      sheet.getRow(rowNumber).font = { bold: true };
+		    }
+		  }
+
+		  // Optional: print area
+		  sheet.pageSetup.printArea = "A1:F" + (rows.length + 4);
+		}
+
+		await workbook.xlsx.writeFile("ucinak-majstora-2026-4.xlsx");
+
+		console.log("Excel fajl je napravljen.");
+		console.log("DONE")*/
+
 
 
 	})

@@ -258,6 +258,13 @@
 					}else{
 						document.getElementById("bageristi-zapad").appendChild(row);
 					}
+				}else if(majstori[i].tipMajstora=="Одгушивач"){
+					console.log("AASDASD")
+					if(majstori[i].region=="ISTOK"){
+						document.getElementById("odgusivaci-istok").appendChild(row);
+					}else{
+						document.getElementById("odgusivaci-zapad").appendChild(row);
+					}
 				}else if(majstori[i].tipMajstora=="Копач"){
 					if(majstori[i].region=="ISTOK"){
 						document.getElementById("kopaci-istok").appendChild(row);
