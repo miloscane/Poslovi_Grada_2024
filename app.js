@@ -7300,7 +7300,7 @@ http.listen(process.env.PORT, async function(){
 
 
 		//ZA IVANA
-		function getPreviousWeekDates(date = new Date()) {
+		/*function getPreviousWeekDates(date = new Date()) {
 		  const d = new Date(date);
 
 		  // Monday = 0, Tuesday = 1, ..., Sunday = 6
@@ -7785,7 +7785,7 @@ http.listen(process.env.PORT, async function(){
 		handleData(istok,json,"ISTOK")
 		logResults("ISTOK",json)
 		handleData(zapad,json,"ZAPAD")
-		logResults("ZAPAD",json)
+		logResults("ZAPAD",json)*/
 
 
 		//STATISTIKA ZA PODCAST
@@ -19238,8 +19238,9 @@ server.get('/prisustvo/:datum', async (req, res)=> {
 		var year = new Date().getFullYear();
 		var month = eval(date.getMonth()+1).toString().length>1 ? eval(date.getMonth()+1).toString() : "0" + eval(date.getMonth()+1);  
 		var dateStr = date.getDate().toString().length>1 ? date.getDate() : "0" + date.getDate(); 
-		var checkIns = await checkInMajstoraDB.find({year:year,month:month,date:dateStr}).toArray()
 
+		var checkIns = await checkInMajstoraDB.find({year:year,month:month,date:{$in:[String(dateStr),Number(dateStr)]}}).toArray()
+		
 		var majstori = await majstoriDB.find({aktivan:true,fake:{$exists: false}}).toArray();
 		var pomocnici = await pomocniciDB.find({aktivan:true}).toArray();
 		var users = await usersDB.find({role:{$nin:["30","40","70"]},fake:{$exists: false}}).toArray();

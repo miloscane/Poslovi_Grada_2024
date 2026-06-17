@@ -10,7 +10,14 @@
 		users.sort((a, b) => a.ime.localeCompare(b.ime));
 		var checkIns = <%-JSON.stringify(checkIns)%>;
 		checkIns.sort((a, b) => Number(a.datetime) - Number(b.datetime));
-
+		for(var i=0;i<checkIns.length;i++){
+			if(checkIns[i].uniqueId=="AQR9Gbc--1757593310527"){
+				console.log("shjkdhjksafhjkds")
+			}
+			if(checkIns[i].brojKartice=="auto"){
+				console.log(checkIns[i])
+			}
+		}
 		function formatTime(date) {
 			return date.getHours().toString().padStart(2, "0") + ":" +
 				   date.getMinutes().toString().padStart(2, "0");
