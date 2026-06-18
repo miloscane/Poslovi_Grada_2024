@@ -6451,7 +6451,7 @@ http.listen(process.env.PORT, async function(){
 
 
 		//ZA MARINU
-		var mesec = 6;
+		/*var mesec = 6;
 		var nalozi = await naloziDB.find({"datum.datum":{$regex:"0"+mesec+".2026"},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
 		var nalozi2 = await client.db("Hausmajstor").collection('Nalozi').find({"datum.datum":{$regex:"0"+mesec+".2026"},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
 		for(var i=0;i<nalozi.length;i++){
@@ -6484,7 +6484,7 @@ http.listen(process.env.PORT, async function(){
     }
 
     await workbook.xlsx.writeFile("./marina.xlsx");
-    console.log('✅ Excel file written');
+    console.log('✅ Excel file written');*/
 
 
 
@@ -18628,14 +18628,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				//POSTOJECI NALOG, nalogHausMajstora==1 znaci hausmajstor
 				await portalStambenoTestDB.insertOne(stambenoJson)
 
-				res.status(200).json({
-					code: "200",
-					message: "Primio sam podatke za nalog.",
-					warnings: {
-						vrsta_promene: "Missing type of change",
-						broj_ugovora: "Contract number is missing"
-					}
-				});
+				
 
 				var nalog = nalozi[0];
 				if(nalog.statusNaloga!="Fakturisan" && nalogHausMajstora==0){
@@ -18816,6 +18809,15 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						});
 					}
 				}
+				res.status(200).json({
+					code: "200",
+					message: "Primio sam podatke za nalog.",
+					warnings: {
+						vrsta_promene: "Missing type of change",
+						broj_ugovora: "Contract number is missing"
+					}
+				});
+
 			}
 
 		}catch(err){
