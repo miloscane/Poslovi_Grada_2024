@@ -18685,7 +18685,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 							await naloziDB.updateOne({uniqueId:nalog.uniqueId},setObj);
 						}
 
-						var mailTo = podizvodjaci.indexOf(nalozi[0].majstor)>=0 ? "marija.slijepcevic@poslovigrada.rs,milica.radun@poslovigrada.rs" : "marija.slijepcevic@poslovigrada.rs";
+						var mailTo = podizvodjaci.indexOf(nalozi[0].majstor)>=0 ? "marija.slijepcevic@poslovigrada.rs,milica.radun@poslovigrada.rs,marina@ghm.rs" : "marija.slijepcevic@poslovigrada.rs,marina@ghm.rs";
 						var mailOptions = {
 							from: '"ВиК Портал Послова Града" <admin@poslovigrada.rs>',
 							to: mailTo,
