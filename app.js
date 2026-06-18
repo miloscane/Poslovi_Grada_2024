@@ -6450,14 +6450,22 @@ http.listen(process.env.PORT, async function(){
 
 
 
-
-		//var nalozi = await naloziDB.find({"datum.datum":{$regex:"04.2026"},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
-		//var nalozi = await client.db("Hausmajstor").collection('Nalozi').find({"datum.datum":{$regex:"05.2026"},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
-
-		/*const workbook = new ExcelJS.Workbook();
+		//ZA MARINU
+		var mesec = 6;
+		var nalozi = await naloziDB.find({"datum.datum":{$regex:"0"+mesec+".2026"},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
+		var nalozi2 = await client.db("Hausmajstor").collection('Nalozi').find({"datum.datum":{$regex:"0"+mesec+".2026"},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]}}).toArray();
+		for(var i=0;i<nalozi.length;i++){
+			nalozi[i].TIP = "VIK";
+		}
+		for(var i=0;i<nalozi2.length;i++){
+			nalozi2[i].TIP = "HM";
+			nalozi.push(nalozi2[i])
+		}
+		const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Nalozi');
     sheet.columns = [
       { header: 'Nalog', key: 'nalog', width: 20 },
+      { header: 'Tip', key: 'tip', width: 20 },
       { header: 'Adresa', key: 'adresa', width: 30 },
       { header: 'Datum', key: 'datum', width: 30 },
       { header: 'Zahtevalac', key: 'zahtevalac', width: 20 },
@@ -6467,6 +6475,7 @@ http.listen(process.env.PORT, async function(){
     for(var i=0;i<nalozi.length;i++){
     	const row = sheet.addRow({
 	      nalog: nalozi[i].broj,
+	      tip: nalozi[i].TIP,
 	      adresa: nalozi[i].adresa+" , "+nalozi[i].radnaJedinica,
 	      datum: nalozi[i].datum.datum,
 	      zahtevalac: nalozi[i].zahtevalac,
@@ -6474,8 +6483,8 @@ http.listen(process.env.PORT, async function(){
 	    });
     }
 
-    await workbook.xlsx.writeFile("./April-vik.xlsx");
-    console.log('✅ Excel file written');*/
+    await workbook.xlsx.writeFile("./marina.xlsx");
+    console.log('✅ Excel file written');
 
 
 
@@ -18722,7 +18731,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 					}
 				}else if(nalog.statusNaloga!="Fakturisan" && nalogHausMajstora==1){
 					//Hausmajstorski nalog koji vec postoji
-					await client.db("Hausmajstor").collection('Nalozi').insertOne(nalogJson);
+					/*await client.db("Hausmajstor").collection('Nalozi').insertOne(nalogJson);
 					var tokenCRM = "T232KMObLMcZxAWp2141ab3c4d5e6f";
 					var configCRM = {
 						url: 'https://floumaster.com/majstori_grada/api.php',
@@ -18737,7 +18746,8 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				  	var response = await axios(configCRM);
 				  }catch(err){
 				  	logError(err);
-				  }
+				  }*/
+
 					if(stambenoJson.vrsta_promene=="STATUS" && stambenoJson.status_code=="NA_ODOBRENJU"){
 						var obracun = [];
 						for(var i=0;i<stambenoJson.order_lines.length;i++){
