@@ -18776,7 +18776,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 						}};
 						await client.db("Hausmajstor").collection('Nalozi').updateOne({uniqueId:nalog.uniqueId},setObj);
 
-						var mailTo = podizvodjaci.indexOf(nalozi[0].majstor)>=0 ? "milica.radun@poslovigrada.rs,vladeta.stamenkovic@poslovigrada.rs" : "milica.radun@poslovigrada.rs,vladeta.stamenkovic@poslovigrada.rs";
+						var mailTo = podizvodjaci.indexOf(nalozi[0].majstor)>=0 ? "milica.radun@poslovigrada.rs,vladeta.stamenkovic@poslovigrada.rs,marin@ghm.rs" : "milica.radun@poslovigrada.rs,vladeta.stamenkovic@poslovigrada.rs,marina@ghm.rs";
 						var mailOptions = {
 							from: '"Portal HitnoApp" <admin@hitnoapp.rs>',
 							to: mailTo,
