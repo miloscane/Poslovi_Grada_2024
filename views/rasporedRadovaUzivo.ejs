@@ -567,9 +567,12 @@ function layoutNoOverlap(container) {
 											if(otvoreniNalozi[j].radnaJedinica==radneJedinice[i] && podizvodjaci.indexOf(otvoreniNalozi[j].majstor)<0){
 												var today = new Date();
 												//today.setDate(today.getDate() - 1);
-												if(istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum)) && otvoreniNalozi[j].statusNaloga=="Primljen"){
-													generateNalogRow(table,otvoreniNalozi[j]);
+												if(otvoreniNalozi[j].digitalizacija.stambeno){
+													if(istiDatum(today,new Date(otvoreniNalozi[j].digitalizacija.stambeno.datum)) && otvoreniNalozi[j].statusNaloga=="Primljen"){
+														generateNalogRow(table,otvoreniNalozi[j]);
+													}
 												}
+												
 											}
 										}
 										nalozi.appendChild(table);
