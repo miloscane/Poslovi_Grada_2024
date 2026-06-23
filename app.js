@@ -18743,6 +18743,16 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 								logError(error);
 							}
 						});
+					}else if(stambenoJson.vrsta_promene=="STATUS" && stambenoJson.status_code=="IZVRSEN_PRIJEM"){
+						var setObj	=	{ $set: {
+							statusNaloga: "Spreman za fakturisanje"
+						}};
+						var nalozi2024 = await nalozi2024DB.find({uniqueId:nalog.uniqueId}).toArray();
+						if(nalozi2024.length>0){
+							await nalozi2024DB.updateOne({uniqueId:nalog.uniqueId},setObj);
+						}else{
+							await naloziDB.updateOne({uniqueId:nalog.uniqueId},setObj);
+						}
 					}
 				}else if(nalog.statusNaloga!="Fakturisan" && nalogHausMajstora==1){
 					//Hausmajstorski nalog koji vec postoji
@@ -18815,6 +18825,11 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 								logError(error);
 							}
 						});
+					}else if(stambenoJson.vrsta_promene=="STATUS" && stambenoJson.status_code=="IZVRSEN_PRIJEM"){
+						var setObj	=	{ $set: {
+							statusNaloga: "Spreman za fakturisanje"
+						}};
+						await client.db("Hausmajstor").collection('Nalozi').updateOne({uniqueId:nalog.uniqueId},setObj)
 					}
 
 					var tokenCRM = "T232KMObLMcZxAWp2141ab3c4d5e6f";
