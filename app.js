@@ -955,6 +955,14 @@ http.listen(process.env.PORT, async function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
+		/*var proizvodi = await proizvodiDB.find({}).toArray();
+		var csvString = "Sifra;Naziv;Cena\r\n";
+		for(var i=0;i<proizvodi.length;i++){
+			var cena = proizvodi[i].price ? proizvodi[i].price : 0;
+			csvString += proizvodi[i].uniqueId+";"+proizvodi[i].name+";"+cena+"\r\n"
+		}
+		fs.writeFileSync("proizvodi.csv",csvString,{encoding:"utf8"});*/
+
 
 		/*var nalozi = await naloziDB.find({}).toArray();//obracun
 		var nalozi2024 = await nalozi2024DB.find({}).toArray();//obracun
@@ -18840,7 +18848,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 							'Content-Type': 'application/json',
 							'Authorization': `Bearer ${tokenCRM}`
 						},
-						data: { 'nalog': nalogJson }
+						data: { 'nalog': nalogJSON }
 				  };
 				  try{
 				  	var response = await axios(configCRM);
