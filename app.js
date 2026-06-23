@@ -18764,7 +18764,7 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 					}
 				}else if(nalog.statusNaloga!="Fakturisan" && nalogHausMajstora==1){
 					//Hausmajstorski nalog koji vec postoji
-					await client.db("Hausmajstor").collection('Nalozi').insertOne(nalogJson);
+					//await client.db("Hausmajstor").collection('Nalozi').insertOne(nalogJson);
 					
 
 					if(stambenoJson.vrsta_promene=="STATUS" && stambenoJson.status_code=="NA_ODOBRENJU"){
