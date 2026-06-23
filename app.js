@@ -18852,8 +18852,12 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				  };
 				  try{
 				  	var response = await axios(configCRM);
+				  	console.log("FLOUMASTER RESPONSE")
+				  	console.log(response.status)
 				  }catch(err){
 				  	logError(err);
+				  	console.log("FLOUMASTER ERROR")
+				  	console.log(err)
 				  }
 				}
 				res.status(200).json({
