@@ -18765,7 +18765,6 @@ server.post('/portalStambenoNalozi', async (req, res)=> {
 				}else if(nalog.statusNaloga!="Fakturisan" && nalogHausMajstora==1){
 					//Hausmajstorski nalog koji vec postoji
 					//await client.db("Hausmajstor").collection('Nalozi').insertOne(nalogJson);
-					
 
 					if(stambenoJson.vrsta_promene=="STATUS" && stambenoJson.status_code=="NA_ODOBRENJU"){
 						var obracun = [];
@@ -20485,6 +20484,31 @@ server.post('/nalozi/:stringdata',async (req,res)=>{
 			for(var j=0;j<nalozi.length;j++){
 				if(naloziArray[i]==nalozi[j].broj){
 					iznosNaloga = nalozi[j].ukupanIznos;
+					break;
+				}
+			}
+			sendString 	=	sendString + iznosNaloga + ":";
+		}
+		sendString = sendString.substring(0,sendString.length-1)
+		res.send(sendString);
+	})
+	.catch((error)=>{
+		console.log(error);
+		res.send("Greska u bazi podataka");
+	})
+});
+
+server.post('/statusi/:stringdata',async (req,res)=>{
+	var receivedString	=	req.params.stringdata;
+	var naloziArray		=	receivedString.split("_");
+	naloziDB.find({broj:{$in:naloziArray}}).toArray()
+	.then((nalozi)=>{
+		var sendString = "ODGOVOR#";
+		for(var i=0;i<naloziArray.length;i++){
+			var iznosNaloga = "0";
+			for(var j=0;j<nalozi.length;j++){
+				if(naloziArray[i]==nalozi[j].broj){
+					iznosNaloga = nalozi[j].statusNaloga;
 					break;
 				}
 			}
