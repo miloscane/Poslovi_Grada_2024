@@ -955,6 +955,21 @@ http.listen(process.env.PORT, async function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
+		/*var setObj = {
+			$set:{
+				"faktura.penal":100,
+			}
+		}
+
+		var response = await naloziDB.updateMany(
+			{
+				"prijemnica.broj": { $ne: "" },
+				"faktura.penal": 0
+			},
+			setObj
+		);
+		console.log(response)*/
+
 		/*var proizvodi = await proizvodiDB.find({}).toArray();
 		var csvString = "Sifra;Naziv;Cena\r\n";
 		for(var i=0;i<proizvodi.length;i++){

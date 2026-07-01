@@ -546,7 +546,7 @@ parentPort.on("message", receiveObject => {
 	})*/
 
 	var options = {
-	    url: 'https://efaktura.mfin.gov.rs/api/publicApi/sales-invoice/ubl?requestId='+new Date().getTime()+'&sendToCir=No',
+	    url: 'https://efaktura.mfin.gov.rs/api/publicApi/sales-invoice/ubl?requestId='+new Date().getTime()+'&sendToCir=Yes',
 	    method: 'POST',
 	    headers: premijusHeader,
 	    body: bodyString
