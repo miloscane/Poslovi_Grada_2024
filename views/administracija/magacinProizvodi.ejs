@@ -1,0 +1,135 @@
+<%- include ("partials/header") -%>
+	<script>
+		var magacinProizvodi = <%-JSON.stringify(proizvodi)%>;
+		console.log(magacinProizvodi)
+	</script>
+	<div class="pageWidth">
+		<div class="administracijaProizvoda">
+			<div class="filter"><input type="text" placeholder="Filter naziva" oninput="filtriraj(this)"></div>
+			<script>
+				function filtriraj(elem){
+					var filterValue = elem.value.toLowerCase();
+					var proizvodiElems = document.getElementById("elems").getElementsByClassName("elem");
+					for(var i=0;i<proizvodiElems.length;i++){
+						if(proizvodiElems[i].innerHTML.toLowerCase().includes(filterValue)){
+							proizvodiElems[i].style.display = "block"
+						}else{
+							proizvodiElems[i].style.display = "none"
+						}
+					}
+				}
+			</script>
+			<div class="proizvodi">
+				<div class="elems" id="elems">
+					
+				</div>
+				<script>
+					for(var i=0;i<magacinProizvodi.length;i++){
+						var proizvod = magacinProizvodi[i];
+						var elem = document.createElement("DIV");
+						elem.setAttribute("class","elem");
+						elem.setAttribute("data-id",proizvod.uniqueId);
+						elem.setAttribute("onclick","pickProizvod(this)");
+						elem.innerHTML = proizvod.name;
+						document.getElementById("elems").appendChild(elem);
+					}
+
+					function pickProizvod(elem){
+						var proizvod = {};
+						for(var i=0;i<magacinProizvodi.length;i++){
+							if(magacinProizvodi[i].uniqueId==elem.dataset.id){
+								proizvod = magacinProizvodi[i];
+								break
+							}
+						}
+						if(!proizvod.name){
+							alert("Wtf nema takvog proizvoda");
+							return
+						}else{
+							document.getElementById("id").value = proizvod.uniqueId
+							document.getElementById("naziv").value = proizvod.name ? proizvod.name : "";
+							document.getElementById("sifra").value = proizvod.code ? proizvod.code : "";
+							document.getElementById("jedinica").value = proizvod.unit ? proizvod.unit : "";
+							document.getElementById("cena").value = proizvod.price ? proizvod.price : "";
+							document.getElementById("sifra-stambeno").value = proizvod.codes[0] ? proizvod.codes[0] : "";
+						}
+					}
+				</script>
+				<div class="form">
+					<div class="inputWrap">
+						<div class="title">ID</div>
+						<div class="inputWrapper">
+							<input type="text" id="id">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Naziv</div>
+						<div class="inputWrapper">
+							<input type="text" id="naziv">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Sifra</div>
+						<div class="inputWrapper">
+							<input type="text" id="sifra">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Jedinica mere</div>
+						<div class="inputWrapper">
+							<input type="text" id="jedinica">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Cena</div>
+						<div class="inputWrapper">
+							<input type="number" id="cena">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Sifra za stambeno</div>
+						<div class="inputWrapper">
+							<input type="text" id="sifra-stambeno">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="button" onclick="sacuvaj(this)">Sacuvaj</div>
+						<form style="display:none" id="form" method="POST" action="/izmenaProizvodaAdmin">
+							<input type="text" id="json" name="json">
+						</form>
+						<script>
+							function sacuvaj(elem){
+								var json = {};
+								json.uniqueId = document.getElementById("id").value;
+								json.name = document.getElementById("naziv").value;
+								json.code = document.getElementById("sifra").value;
+								json.unit = document.getElementById("jedinica").value;
+								json.price = document.getElementById("cena").value;
+								json.codes = [document.getElementById("sifra-stambeno").value];
+
+								var idFound = false;
+								for(var i=0;i<magacinProizvodi.length;i++){
+									if(magacinProizvodi[i].uniqueId==json.uniqueId){
+										idFound = true;
+									}
+								}
+
+								var response = false;
+								if(idFound){
+									response = confirm("IZMENA PROIZVODA?")
+								}else{
+									response = confirm("DODATI NOVI PROIZVOD")
+								}
+								
+								if(response){
+									document.getElementById("json").value = JSON.stringify(json);
+									document.getElementById("form").submit();
+								}
+							}
+						</script>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+<%- include ("partials/footer") -%>

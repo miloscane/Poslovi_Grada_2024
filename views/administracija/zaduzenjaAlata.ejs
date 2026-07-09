@@ -1,0 +1,32 @@
+<%- include ("partials/header") -%>
+	<script>
+		var alati = <%-JSON.stringify(alati)%>;
+		var majstori = <%-JSON.stringify(majstori)%>;
+		var zaduzenja = <%-JSON.stringify(zaduzenja)%>;
+		console.log(zaduzenja)
+		var vrste = ["Машина за одгушење","Нарезница","Брусилице","Бушилица","Миксер","Пумпа","Шрафилица"];
+	</script>
+	<div class="pageWidth">
+		<div class="zaduzenjaAlata">
+			<div class="filter"><input type="text" placeholder="Filter naziva" oninput="filtriraj(this)"></div>
+			<div class="tableWrap">
+				<table id="table"></table>
+				<script>
+					for(var i=0;i<zaduzenja.length;i++){
+						var zaduzenje = zaduzenja[i];
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+							td.innerHTML = "<div class=\"value\">"+eval(i+1)+".</div>";
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+							td.innerHTML = "<div class=\"value\">"+getDateAsStringForDisplay(new Date(zaduzenje.date))+" "+getTimestamp(new Date(zaduzenje.date))+"</div>";
+							tr.appendChild(td);
+
+						document.getElementById("table").appendChild(tr);
+					}
+				</script>
+			</div>
+		</div>
+	</div>	
+<%- include ("partials/footer") -%>

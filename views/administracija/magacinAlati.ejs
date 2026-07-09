@@ -1,0 +1,183 @@
+<%- include ("partials/header") -%>
+	<script>
+		var alati = <%-JSON.stringify(alati)%>;
+		var vrste = ["Машина за одгушење","Нарезница","Брусилице","Бушилица","Миксер","Пумпа","Шрафилица"];
+	</script>
+	<div class="pageWidth">
+		<div class="administracijaAlata">
+			<div class="filter"><input type="text" placeholder="Filter naziva" oninput="filtriraj(this)"></div>
+			<script>
+				function filtriraj(elem){
+					var filterValue = elem.value.toLowerCase();
+					var proizvodiElems = document.getElementById("elems").getElementsByClassName("elem");
+					for(var i=0;i<proizvodiElems.length;i++){
+						if(proizvodiElems[i].innerHTML.toLowerCase().includes(filterValue)){
+							proizvodiElems[i].style.display = "block"
+						}else{
+							proizvodiElems[i].style.display = "none"
+						}
+					}
+				}
+			</script>
+			<div class="proizvodi">
+				<div class="elems" id="elems">
+					
+				</div>
+				<script>
+					for(var i=0;i<alati.length;i++){
+						var alat = alati[i];
+						var elem = document.createElement("DIV");
+						elem.setAttribute("class","elem");
+						elem.setAttribute("data-id",alat.uniqueId);
+						elem.setAttribute("onclick","pickAlat(this)");
+						elem.innerHTML = "<span class=\"naziv\">"+alat.naziv+"</span><br><span class=\"marka\">"+alat.marka+"</span><br><span class=\"vrsta\">"+vrste[Number(alat.vrsta)-1]+"</span><br><span class=\"serijskiBroj\">"+alat.serijskiBroj+"</span>";
+						document.getElementById("elems").appendChild(elem);
+					}
+
+					function pickAlat(elem){
+						var alat = {};
+						for(var i=0;i<alati.length;i++){
+							if(alati[i].uniqueId==elem.dataset.id){
+								alat = alati[i];
+								break
+							}
+						}
+						if(!alat.naziv){
+							alert("Wtf nema takvog alata");
+							return;
+						}else{
+							document.getElementById("id").value = alat.uniqueId
+							document.getElementById("naziv").value = alat.naziv ? alat.naziv : "";
+							document.getElementById("redni-broj").value = alat.redniBroj ? alat.redniBroj : "";
+							document.getElementById("serijski-broj").value = alat.serijskiBroj ? alat.serijskiBroj : "";
+							document.getElementById("marka").value = alat.marka ? alat.marka : "";
+							document.getElementById("model").value = alat.model ? alat.model : "";
+							document.getElementById("cena").value = alat.cena ? alat.cena : "";
+							document.getElementById("region").value = alat.region ? alat.region : "";
+							document.getElementById("vrsta").value = alat.vrsta ? alat.vrsta : "";
+							document.getElementById("podvrsta").value = alat.podvrsta ? alat.podvrsta : "";
+						}
+					}
+				</script>
+				<div class="form">
+					<div class="inputWrap">
+						<div class="title">ID</div>
+						<div class="inputWrapper">
+							<input type="text" id="id">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Redni broj</div>
+						<div class="inputWrapper">
+							<input type="text" id="redni-broj" disabled>
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Serijski broj</div>
+						<div class="inputWrapper">
+							<input type="text" id="serijski-broj">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Naziv</div>
+						<div class="inputWrapper">
+							<input type="text" id="naziv">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Marka</div>
+						<div class="inputWrapper">
+							<input type="text" id="marka">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Model</div>
+						<div class="inputWrapper">
+							<input type="text" id="model">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Cena</div>
+						<div class="inputWrapper">
+							<input type="number" id="cena">
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Region</div>
+						<div class="inputWrapper">
+							<select id="region">
+								<option value="I">Istok</option>
+								<option value="Z">Zapad</option>
+							</select>
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Vrsta</div>
+						<div class="inputWrapper">
+							<select id="vrsta"></select>
+							<script>
+								for(var i=0;i<vrste.length;i++){
+									var option = document.createElement("OPTION");
+									option.setAttribute("value",eval(i+1));
+									option.innerHTML = vrste[i];
+									document.getElementById("vrsta").appendChild(option)
+								}
+							</script>
+						</div>
+					</div>
+					<div class="inputWrap">
+						<div class="title">Podvrsta</div>
+						<div class="inputWrapper">
+							<select id="podvrsta">
+								<option value="1">Електрични</option>
+								<option value="2">Аку</option>
+								<option value="3">Ручни</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="inputWrap">
+						<div class="button" onclick="sacuvaj(this)">Sacuvaj</div>
+						<form style="display:none" id="form" method="POST" action="/izmenaAlataAdmin">
+							<input type="text" id="json" name="json">
+						</form>
+						<script>
+							function sacuvaj(elem){
+								var json = {};
+								json.uniqueId = document.getElementById("id").value;
+								json.naziv = document.getElementById("naziv").value;
+								json.redniBroj = document.getElementById("redni-broj").value;
+								json.serijskiBroj = document.getElementById("serijski-broj").value;
+								json.marka = document.getElementById("marka").value;
+								json.model = document.getElementById("model").value;
+								json.cena = document.getElementById("cena").value;
+								json.region = document.getElementById("region").value;
+								json.vrsta = document.getElementById("vrsta").value;
+								json.podvrsta = document.getElementById("podvrsta").value;
+
+								var idFound = false;
+								for(var i=0;i<alati.length;i++){
+									if(alati[i].uniqueId==json.uniqueId){
+										idFound = true;
+									}
+								}
+
+								var response = false;
+								if(idFound){
+									response = confirm("IZMENA ALATA?")
+								}else{
+									response = confirm("DODATI NOVI ALAT")
+								}
+								
+								if(response){
+									document.getElementById("json").value = JSON.stringify(json);
+									document.getElementById("form").submit();
+								}
+							}
+						</script>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+<%- include ("partials/footer") -%>
