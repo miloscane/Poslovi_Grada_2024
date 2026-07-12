@@ -60,9 +60,11 @@
 							document.getElementById("podvrsta").value = podvrste[Number(alat.podvrsta)-1];
 							document.getElementById("serijski-broj").value = alat.serijskiBroj;
 							//nadji zaduzenje
-							if(zaduzenje.length>0){
-								console.log(zaduzenje[zaduzenje.length - 1])
-								document.getElementById("zaduzenje").value = zaduzenje[zaduzenje.length - 1].zaduzenje;
+							document.getElementById("zaduzenje").value = "Nijedan";
+							for(var i=0;i<zaduzenje.length;i++){
+								if(zaduzenje[i].uniqueIdAlata==alat.uniqueId){
+									document.getElementById("zaduzenje").value = zaduzenje[i].zaduzenje;
+								}
 							}
 						}
 					}
@@ -115,7 +117,9 @@
 						<div class="title">Majstor</div>
 						<div class="inputWrapper">
 							<select id="zaduzenje">
+								<option value="Nijedan">Nijedan</option>
 								<option value="U magacinu">U magacinu</option>
+								<option value="U kvaru">U kvaru</option>
 								<option value="U servisu">U servisu</option>
 							</select>
 							<script>
