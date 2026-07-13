@@ -1,0 +1,67 @@
+<%- include ("partials/header") -%>
+	<script>
+		var nalozi = <%-JSON.stringify(nalozi)%>;
+	</script>
+	<div class="pageWidth odobrenje">
+		<div style="margin-bottom:20px;padding-top:30px">
+			Датум <input type="date" id="datum" value="<%=datum%>"><br>
+			<button onclick="loadGif();window.location.href='/zaOcenu/'+document.getElementById('datum').value">Pretrazi</button>
+		</div>
+		<div style="margin-top:20px;">Filteri</div>
+		<select id="radna-jedinica" oninput="generateTable()">
+			<option value="sve" default>SVE</option>
+		</select>
+		<script>
+			for(var i=0;i<radneJedinice.length;i++){
+				var option = document.createElement("OPTION");
+				option.setAttribute("value",radneJedinice[i]);
+				option.innerHTML = radneJedinice[i];
+				document.getElementById("radna-jedinica").appendChild(option)
+			}
+		</script>
+		<table id="table">
+			<tr>
+				<td>Nalog</td>
+				<td>Radna jedinica</td>
+				<td>Ocenjen</td>
+			</tr>
+		</table>
+		<script>
+			function generateTable(){
+				var trs = document.getElementById("table").getElementsByTagName("TR");
+				for(var i=1;i<trs.length;i++){
+					if(trs[i]){
+						trs[i].remove();
+						i--
+					}
+					
+				}
+				var filterValue = document.getElementById("radna-jedinica").value;
+				for(var i=0;i<nalozi.length;i++){
+					var nalog = nalozi[i];
+
+					if(filterValue=="sve" || (filterValue==nalog.radnaJedinica)){
+						var tr = document.createElement("TR");
+							var td = document.createElement("TD");
+							td.innerHTML = "<a href=\"/nalog/"+nalog.broj+"\" target=\"_blank\" onclick=\"this.parentElement.parentElement.style.backgroundColor='green';this.parentElement.parentElement.style.color='white'\">"+nalog.broj+"</a>";
+							tr.appendChild(td);
+
+							var td = document.createElement("TD");
+							td.innerHTML = nalog.radnaJedinica;
+							tr.appendChild(td)
+
+							var td = document.createElement("TD");
+							td.innerHTML = nalog.ocena ? "Da" : "NE";
+							tr.appendChild(td)
+						document.getElementById("table").appendChild(tr);
+					}
+					
+				}
+			}
+
+			generateTable()
+			
+			
+		</script>
+	</div>
+<%- include ("partials/footer") -%>

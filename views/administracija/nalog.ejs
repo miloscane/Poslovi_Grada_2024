@@ -275,6 +275,169 @@
 						</script>
 					</div>
 				</div>
+				<div style="width:100%"></div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/statusIcon.png"></div>
+					<div class="info">
+						<div class="title">Оцена корисника</div>
+						<div class="tableWrap">
+							<table>
+								<tr>
+									<td>Ocena?</td>
+									<td>
+										<div class="flexBoxes">
+											<div class="flexBox">
+												<div class="flexTitle">Nezadovoljan</div>
+												<div class="checkbox">
+													<input type="radio" class="zadovoljstvo" value="1" name="zadovoljstvo">
+												</div>
+											</div>
+											<div class="flexBox">
+												<div class="flexTitle">Ravnodusan</div>
+												<div class="checkbox">
+													<input type="radio" class="zadovoljstvo" value="3" name="zadovoljstvo">
+												</div>
+											</div>
+											<div class="flexBox">
+												<div class="flexTitle">Zadovoljan</div>
+												<div class="checkbox">
+													<input type="radio" class="zadovoljstvo" value="5" name="zadovoljstvo">
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>Google?</td>
+									<td><input type="checkbox" id="recenzija"></td>
+								</tr>
+								<tr>
+									<td>Sugestija?</td>
+									<td><textarea id="sugestija"></textarea></td>
+								</tr>
+							</table>
+						</div>
+						<script>
+							var ocene = document.getElementsByClassName("zadovoljstvo");
+							if(nalog.ocena){
+								
+								for(var i=0;i<ocene.length;i++){
+									if(ocene[i].value.toString()==nalog.ocena.ocena.toString()){
+										ocene[i].checked = true;
+									}else{
+										ocene[i].checked = false;
+									}
+
+								}
+								document.getElementById("recenzija").checked = nalog.ocena.recenzija;
+								document.getElementById("sugestija").value = nalog.ocena.sugestija;
+							}
+							<%if(!user.ocenjivac){%>
+								for(var i=0;i<ocene.length;i++){
+									ocene[i].style.pointerEvents = "none";
+								}
+								document.getElementById("recenzija").style.pointerEvents = "none";
+								document.getElementById("sugestija").style.pointerEvents = "none";
+							<%}%>
+						</script>
+					</div>
+				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/statusIcon.png"></div>
+					<div class="info">
+						<div class="title">Уредност налога</div>
+						<div class="tableWrap">
+							<table>
+								<tr>
+									<td>&nbsp;</td>
+									<td>
+										<div class="flexBoxes">
+											<div class="flexBox">
+												<div class="flexTitle">Лоше</div>
+												<div class="checkbox">
+													<input type="radio" class="ocenaUrednosti" value="1" name="urednost">
+												</div>
+											</div>
+											<div class="flexBox">
+												<div class="flexTitle">Средње</div>
+												<div class="checkbox">
+													<input type="radio" class="ocenaUrednosti" value="3" name="urednost">
+												</div>
+											</div>
+											<div class="flexBox">
+												<div class="flexTitle">Одлично</div>
+												<div class="checkbox">
+													<input type="radio" class="ocenaUrednosti" value="5" name="urednost">
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>Примедба / Похвала</td>
+									<td><textarea id="sugestija-dispecer"></textarea></td>
+								</tr>
+							</table>
+						</div>
+						<script>
+							var urednost = document.getElementsByClassName("ocenaUrednosti");
+							if(nalog.ocena){
+								for(var i=0;i<urednost.length;i++){
+									if(urednost[i].value.toString()==nalog.ocena.urednost.toString()){
+										urednost[i].checked = true;
+									}else{
+										urednost[i].checked = false;
+									}
+								}
+								document.getElementById("sugestija-dispecer").value = nalog.ocena.sugestijaDispecer;
+							}
+							<%if(!user.ocenjivac){%>
+								for(var i=0;i<urednost.length;i++){
+									urednost[i].style.pointerEvents = "none";
+									
+								}
+								document.getElementById("sugestija-dispecer").style.pointerEvents = "none";
+							<%}%>
+						</script>
+					</div>
+				</div>
+				<%if(user.ocenjivac){%>
+					<div class="box" style="width:100%"></div>
+					<div class="box">
+						<div class="inputWrap">
+							<div class="button" onclick="saveOcenu()">Sacuvaj ocenu</div>
+							<form style="display:none" method="POST" action="/ocena-naloga" id="form-ocena">
+								<input type="text" id="json-ocena" name="json">
+							</form>
+							<script>
+								function saveOcenu(){
+									var json = {};
+									json.nalog = nalog.broj;
+									json.ocena = {};
+									json.ocena.ocena = 0;
+									json.ocena.urednost = 0;
+									json.ocena.recenzija = document.getElementById("recenzija").checked;
+									json.ocena.sugestija = document.getElementById("sugestija").value;
+									json.ocena.sugestijaDispecer = document.getElementById("sugestija-dispecer").value;
+									for(var i=0;i<ocene.length;i++){
+										if(ocene[i].checked){
+											json.ocena.ocena = ocene[i].value;
+										}
+									}
+
+									for(var i=0;i<urednost.length;i++){
+										if(urednost[i].checked){
+											json.ocena.urednost = urednost[i].value;
+										}
+									}
+									document.getElementById("json-ocena").value = JSON.stringify(json)
+									loadGif();
+									document.getElementById("form-ocena").submit();
+								}
+							</script>
+						</div>
+					</div>
+				<%}%>
 			</div>
 			<% if(podizvodjac==0){ %>
 				<%- include ("partials/obracunNaloga") -%>
@@ -576,9 +739,11 @@
 									</script>
 								</div>
 							</div>
-							<div class="majstorNaNalogu" onclick="majstorNaNalogu()">
-								Пошаљи мајстора на налог
-							</div>
+							<%if(!user.ocenjivac){%>
+								<div class="majstorNaNalogu" onclick="majstorNaNalogu()">
+									Пошаљи мајстора на налог
+								</div>
+							<%}%>
 							<form style="display:none" method="POST" action="/majstorNaNalogu" id="majstor-na-nalogu-form">
 								<input type="text" id="majstor-na-nalogu-input" name="json">
 							</form>
@@ -776,13 +941,16 @@
 						</script>
 					</div>
 				</div>
-				<div class="saveNalog">
-					<div class="inputWrapper">
-						<div class="inputWrap">
-							<div class="button" onclick="saveNalog()">САЧУВАЈ ИЗМЕНЕ НА НАЛОГУ</div>
+				<%if(!user.ocenjivac){%>
+					<div class="saveNalog">
+						<div class="inputWrapper">
+							<div class="inputWrap">
+								<div class="button" onclick="saveNalog()">САЧУВАЈ ИЗМЕНЕ НА НАЛОГУ</div>
+							</div>
 						</div>
 					</div>
-				</div>
+				<%}%>
+				
 			</div>
 			<script>
 				function showNalog(nalogJson){

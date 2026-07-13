@@ -9472,6 +9472,41 @@ server.get('/odobrenjePodizvodjaci/:datum1/:datum2',async (req,res)=>{
 	}
 })
 
+server.get('/zaOcenu',async (req,res)=>{
+	res.redirect("/zaOcenu/"+getDateAsStringForInputObject(new Date()))
+})
+
+server.get('/zaOcenu/:datum',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var nalozi = await naloziDB.find({"prijemnica.datum.datum":reshuffleDate(req.params.datum)}).toArray()
+				res.render("administracija/zaOcenu",{
+					pageTitle:"Za ocenu datum: "+reshuffleDate(req.params.datum),
+					nalozi: nalozi,
+					datum: req.params.datum,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 1849.</div>"
+				});
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+})
+
 server.get('/login',async (req,res)=>{
 	if(req.session.user){
 		res.redirect("/")
@@ -18695,6 +18730,39 @@ server.get('/cuprija/stanje',async (req,res)=>{
 		}
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.post('/ocena-naloga', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==10 && req.session.user.ocenjivac){
+			try{
+				var json = JSON.parse(req.body.json);
+				var setObj = {
+					$set:{
+						ocena: json.ocena
+					}
+				}
+				var response = await naloziDB.updateOne({broj:json.nalog},setObj)
+				res.redirect("/nalog/"+json.nalog);
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 16617.</div>"
+				})
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
 	}
 });
 

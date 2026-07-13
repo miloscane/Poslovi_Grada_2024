@@ -1185,6 +1185,46 @@ input[type=number] {
     position:relative;
 }
 
+.nalog .boxesWrap .box .tableWrap table{
+    border-collapse: collapse;
+    margin-top:20px;
+}
+
+.nalog .boxesWrap .box .tableWrap table td{
+    border:1px solid rgb(255,255,255);
+    text-align: left;
+    padding:5px 10px;
+}
+
+.nalog .boxesWrap .box .tableWrap table .flexBoxes{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap:20px;
+}
+
+.nalog .boxesWrap .box .tableWrap table .flexBoxes input[type="radio"]{
+    width:30px;
+    height:30px;
+    margin:0 auto;
+    display:block;
+    margin-top:4px;
+}
+
+.nalog .boxesWrap .box .tableWrap table input[type=checkbox]{
+    width:30px;
+    height:30px;
+    margin:0 auto;
+    display:block;
+}
+
+.nalog .boxesWrap .box .tableWrap table textarea{
+    color:black;
+    width:100%;
+    height:90px;
+    resize:none;
+}
+
 .nalog .tekuce .box{
     background-color:rgb(234,201,0) !important;
 }

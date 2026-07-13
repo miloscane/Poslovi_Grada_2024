@@ -36,8 +36,13 @@
 				}
 				var filterValue = document.getElementById("select").value;
 				var ukupanIznos = 0;
+				var processedBrojevi = new Set();
 				for(var i=0;i<stambenoInfo.length;i++){
 					var nalog = stambenoInfo[i];
+					if (processedBrojevi.has(String(nalog.broj_naloga))) {
+						continue;
+					}
+
 					if(filterValue=="sve" || (filterValue=="istok" && istok.indexOf(nalog.radna_jedinica)>=0) || (filterValue=="zapad" && zapad.indexOf(nalog.radna_jedinica)>=0)){
 						var tr = document.createElement("TR");
 							var td = document.createElement("TD");
@@ -65,6 +70,7 @@
 							td.innerHTML = brojSaRazmacima(iznos);
 							tr.appendChild(td)
 						document.getElementById("table").appendChild(tr);
+						processedBrojevi.add(String(nalog.broj_naloga));
 					}
 					
 				}
