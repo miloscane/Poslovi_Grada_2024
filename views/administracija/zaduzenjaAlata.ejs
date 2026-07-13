@@ -2,28 +2,168 @@
 	<script>
 		var alati = <%-JSON.stringify(alati)%>;
 		var majstori = <%-JSON.stringify(majstori)%>;
+
+		majstori.sort((a, b) => a.ime.localeCompare(b.ime));
 		var zaduzenja = <%-JSON.stringify(zaduzenja)%>;
-		console.log(zaduzenja)
+		zaduzenja.sort((a, b) => b.datetime - a.datetime);
 		var vrste = ["Машина за одгушење","Нарезница","Брусилице","Бушилица","Миксер","Пумпа","Шрафилица"];
+		var podvrste = ["Електрични","Аку","Ручни"];
+		function getAlatByCode(code){
+			for(var i=0;i<alati.length;i++){
+				if(alati[i].uniqueId==code){
+					return alati[i]
+				}
+			}
+			return {}
+		}
 	</script>
 	<div class="pageWidth">
 		<div class="zaduzenjaAlata">
 			<div class="filter"><input type="text" placeholder="Filter naziva" oninput="filtriraj(this)"></div>
 			<div class="tableWrap">
-				<table id="table"></table>
+				<table id="table">
+					<thead>
+						<tr>
+							<th>&nbsp;</th>
+							<th>&nbsp;</th>
+							<th>
+								<select id="filter-majstora" oninput="filterMajstora()">
+									<option value="Svi">Svi</option>
+									<option value="U magacinu">U magacinu</option>
+									<option value="U kvaru">U kvaru</option>
+									<option value="U servisu">U servisu</option>
+								</select>
+								<script>
+									for(var i=0;i<majstori.length;i++){
+										var option = document.createElement("OPTION");
+										option.setAttribute("value",majstori[i].uniqueId)
+										option.innerHTML = majstori[i].ime;
+										document.getElementById("filter-majstora").appendChild(option);
+									}
+								</script>
+							</th>
+							<th>&nbsp;</th>
+							<th>
+								<select id="vrsta-alata" oninput="filterAlata()">
+									<option value="Svi">Svi</option>
+								</select>
+								<script>
+									for(var i=0;i<vrste.length;i++){
+										var option = document.createElement("OPTION");
+										option.setAttribute("value",eval(i+1))
+										option.innerHTML = vrste[i];
+										document.getElementById("vrsta-alata").appendChild(option);
+									}
+								</script>
+							</th>
+							<th>&nbsp;</th>
+							<th><input type="text" oninput="filterSerijski()" id="serijski"></th>
+							<th>&nbsp;</th>
+						</tr>
+						<tr>
+							<th>&nbsp;</th>
+							<th>Датум и време</th>
+							<th>Задужио</th>
+							<th>Назив алата</th>
+							<th>Врста алата</th>
+							<th>Подврста алата</th>
+							<th>Серијски број</th>
+							<th>&nbsp;</th>
+						</tr>
+					</thead>
+					<tbody id="tbody">
+					</tbody>
+				</table>
 				<script>
-					for(var i=0;i<zaduzenja.length;i++){
-						var zaduzenje = zaduzenja[i];
-						var tr = document.createElement("TR");
-							var td = document.createElement("TD");
-							td.innerHTML = "<div class=\"value\">"+eval(i+1)+".</div>";
-							tr.appendChild(td);
 
-							var td = document.createElement("TD");
-							td.innerHTML = "<div class=\"value\">"+getDateAsStringForDisplay(new Date(zaduzenje.date))+" "+getTimestamp(new Date(zaduzenje.date))+"</div>";
-							tr.appendChild(td);
+					function generateTable(zaduzenja){
+						document.getElementById("tbody").innerHTML = "";
+						for(var i=0;i<zaduzenja.length;i++){
+							var zaduzenje = zaduzenja[i];
+							var tr = document.createElement("TR");
+							tr.setAttribute("class","row");
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+eval(i+1)+".</div>";
+								tr.appendChild(td);
 
-						document.getElementById("table").appendChild(tr);
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+getDateAsStringForDisplay(new Date(zaduzenje.date))+" "+getTimestamp(new Date(zaduzenje.date))+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								var zaduzio = zaduzenje.zaduzenje.includes("--") ? getMajstorByCode(zaduzenje.zaduzenje).ime : zaduzenje.zaduzenje; 
+								td.innerHTML = "<div class=\"value\" class=\"majstor\">"+zaduzio+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+getAlatByCode(zaduzenje.uniqueIdAlata).naziv+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+vrste[Number(getAlatByCode(zaduzenje.uniqueIdAlata).vrsta) - 1]+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+podvrste[Number(getAlatByCode(zaduzenje.uniqueIdAlata).podvrsta) - 1]+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\">"+getAlatByCode(zaduzenje.uniqueIdAlata).serijskiBroj+"</div>";
+								tr.appendChild(td);
+
+								var td = document.createElement("TD");
+								td.innerHTML = "<div class=\"value\"><button class=\"button\">Штампај</button></div>";
+								tr.appendChild(td);
+
+							document.getElementById("tbody").appendChild(tr);
+						}
+					}
+					generateTable(zaduzenja)
+					
+
+					function filterMajstora(){
+						var filterValue = document.getElementById("filter-majstora").value;
+						var zaduzenjaJson = [];
+						for(var i=0;i<zaduzenja.length;i++){
+							if(filterValue=="Svi"){
+								zaduzenjaJson.push(zaduzenja[i])
+							}else{
+								if(filterValue==zaduzenja[i].zaduzenje){
+									zaduzenjaJson.push(zaduzenja[i])
+								}
+							}
+						}
+						generateTable(zaduzenjaJson)
+					}
+
+					function filterAlata(){
+						var filterValue = document.getElementById("vrsta-alata").value;
+						var zaduzenjaJson = [];
+						for(var i=0;i<zaduzenja.length;i++){
+							if(filterValue=="Svi"){
+								zaduzenjaJson.push(zaduzenja[i])
+							}else{
+								if(filterValue.toString() == getAlatByCode(zaduzenja[i].uniqueIdAlata).vrsta.toString()){
+									zaduzenjaJson.push(zaduzenja[i])
+								}
+							}
+						}
+						generateTable(zaduzenjaJson)
+					}
+
+					function filterSerijski(){
+						var filterValue = document.getElementById("serijski").value;
+						var zaduzenjaJson = [];
+						for(var i=0;i<zaduzenja.length;i++){
+							if(filterValue==""){
+								zaduzenjaJson.push(zaduzenja[i])
+							}else{
+								if(getAlatByCode(zaduzenja[i].uniqueIdAlata).serijskiBroj.toString().includes(filterValue.toString())){
+									zaduzenjaJson.push(zaduzenja[i])
+								}
+							}
+						}
+						generateTable(zaduzenjaJson)
 					}
 				</script>
 			</div>

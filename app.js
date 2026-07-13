@@ -16847,7 +16847,7 @@ server.get('/magacin/zaduzenjaAlata',async (req,res)=>{
 				var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
 				var zaduzenja = await alatZaduzenjaDB.find({}).toArray();
 				res.render("administracija/zaduzenjaAlata",{
-					pageTitle:"Задуживање алата",
+					pageTitle:"Задужења алата",
 					alati: alati,
 					majstori: majstori,
 					zaduzenja: zaduzenja,
