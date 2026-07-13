@@ -1451,7 +1451,7 @@ http.listen(process.env.PORT, async function(){
 		}
 
 		var naloziToExport = [];
-		var month = 5;
+		var month = 6;
 		for(var i=0;i<nalozi.length;i++){
 			if(nalozi[i].faktura.broj){
 				if(nalozi[i].faktura.broj.length>3){

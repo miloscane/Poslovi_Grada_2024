@@ -25,9 +25,7 @@
 				}
 			</script>
 			<div class="proizvodi">
-				<div class="elems" id="elems">
-					
-				</div>
+				<div class="elems" id="elems"></div>
 				<script>
 					for(var i=0;i<alati.length;i++){
 						var alat = alati[i];
@@ -35,7 +33,7 @@
 						elem.setAttribute("class","elem");
 						elem.setAttribute("data-id",alat.uniqueId);
 						elem.setAttribute("onclick","pickAlat(this)");
-						elem.innerHTML = "<span class=\"naziv\">"+alat.naziv+"</span><br><span class=\"marka\">"+alat.marka+"</span><br><span class=\"vrsta\">"+vrste[Number(alat.vrsta)]+"</span><br><span class=\"serijskiBroj\">"+alat.serijskiBroj+"</span>";
+						elem.innerHTML = "<span class=\"naziv\">"+alat.naziv+"</span><br><span class=\"marka\">"+alat.marka+"</span><br><span class=\"vrsta\">"+vrste[Number(alat.vrsta)-1]+"</span><br><span class=\"serijskiBroj\">"+alat.serijskiBroj+"</span>";
 						document.getElementById("elems").appendChild(elem);
 					}
 
@@ -58,6 +56,7 @@
 							document.getElementById("model").value = alat.model;
 							document.getElementById("vrsta").value = vrste[Number(alat.vrsta)-1];
 							document.getElementById("podvrsta").value = podvrste[Number(alat.podvrsta)-1];
+							console.log(alat)
 							document.getElementById("serijski-broj").value = alat.serijskiBroj;
 							//nadji zaduzenje
 							document.getElementById("zaduzenje").value = "Nijedan";
@@ -132,8 +131,6 @@
 							</script>
 						</div>
 					</div>
-					
-
 					<div class="inputWrap">
 						<div class="button" onclick="sacuvaj(this)">Sacuvaj</div>
 						<form style="display:none" id="form" method="POST" action="/zaduzenjeAlata">
