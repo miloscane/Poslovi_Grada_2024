@@ -24,6 +24,8 @@
 				<td>Nalog</td>
 				<td>Radna jedinica</td>
 				<td>Ocenjen</td>
+				<td>Zahtevalac</td>
+				<td>Opis</td>
 			</tr>
 		</table>
 		<script>
@@ -52,6 +54,14 @@
 
 							var td = document.createElement("TD");
 							td.innerHTML = nalog.ocena ? "Da" : "NE";
+							tr.appendChild(td)
+
+							var td = document.createElement("TD");
+							td.innerHTML = nalog.zahtevalac;
+							tr.appendChild(td)
+
+							var td = document.createElement("TD");
+							td.innerHTML = nalog.opis;
 							tr.appendChild(td)
 						document.getElementById("table").appendChild(tr);
 					}
