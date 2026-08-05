@@ -15852,7 +15852,7 @@ server.get('/dispecer/mapaUzivo2', async (req, res)=> {
 
 				var config = {
 					method: 'post',
-					url: baseUrl+'/token', // Replace with your actual URL
+					url: baseUrl+'/token', 
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					},
@@ -21659,6 +21659,35 @@ server.get("/nedeljniIzvestaj/:start/:end/:opseg/:podizvodjaci", checkBearerToke
     
 });
 
+
+server.get("/izvestajNalozi/:vozilo", checkBearerToken, async (req, res) => {
+    try{
+    	var nalozi = await naloziDB.find({"datum.datum":getDateAsStringForDisplay(new Date())}).toArray();
+    	var json = [];
+    	for(var i=0;i<nalozi.length;i++){
+    		var nalog = nalozi[i]
+    		var tempJson = {};
+    		tempJson.broj = nalog.broj;
+    		tempJson.adresa = nalog.adresa;
+    		tempJson.punaAdresa = nalog.punaAdresa;
+    		tempJson.radnaJedinica = nalog.radnaJedinica;
+    		tempJson.statusNaloga = nalog.statusNaloga;
+    		json.puhs(tempJson);
+    	}
+			res.json({
+	      success: true,
+	      data: json,
+	      message: "Bravo nalozi"
+	    });
+    }catch(err){
+    	logError(err);
+    	res.json({
+	      success: false,
+	      message: "Izvinjavamo se ali iamo gresku bazi podataka sa brojem 20870"
+	    });
+    }
+    
+});
 
 /*request(ntsOptions, (error,response,body)=>{
 	if(error){
