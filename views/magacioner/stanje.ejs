@@ -26,8 +26,13 @@
 			<script>
 				var ukupnaVrednostMagacina = 0;
 				for(var i=0;i<proizvodi.length;i++){
+					console.log(proizvodi[i]["datumPopisa"+popisSlug])
+					if(!proizvodi[i]["datumPopisa"+popisSlug]){
+						proizvodi[i]["datumPopisa"+popisSlug] = reshuffleDateInverse2(proizvodi[i]["datumPopisa"+capitalizeFirstLetter(popisSlug)]);
+					}else{
+						proizvodi[i]["datumPopisa"+popisSlug] = reshuffleDateInverse2(proizvodi[i]["datumPopisa"+popisSlug]);	
+					}
 					
-					proizvodi[i]["datumPopisa"+popisSlug] = reshuffleDateInverse2(proizvodi[i]["datumPopisa"+popisSlug]);
 					proizvodi[i].realnoStanje = parseFloat(proizvodi[i]["stanje"+popisSlug]);
 					proizvodi[i].obracunStanja = [];
 					

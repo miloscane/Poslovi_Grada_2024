@@ -21660,7 +21660,7 @@ server.get("/nedeljniIzvestaj/:start/:end/:opseg/:podizvodjaci", checkBearerToke
 });
 
 
-server.get("/izvestajNalozi/:vozilo", checkBearerToken, async (req, res) => {
+server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) => {
     try{
     	var nalozi = await naloziDB.find({"datum.datum":getDateAsStringForDisplay(new Date())}).toArray();
     	var json = [];
@@ -21686,7 +21686,6 @@ server.get("/izvestajNalozi/:vozilo", checkBearerToken, async (req, res) => {
 	      message: "Izvinjavamo se ali iamo gresku bazi podataka sa brojem 20870"
 	    });
     }
-    
 });
 
 /*request(ntsOptions, (error,response,body)=>{
