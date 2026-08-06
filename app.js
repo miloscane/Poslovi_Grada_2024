@@ -21657,6 +21657,13 @@ server.get("/nedeljniIzvestaj/:start/:end/:opseg/:podizvodjaci", checkBearerToke
     
 });
 
+function getTimestamp(date){
+  var currentDate = new Date(date);
+  var currentHour = currentDate.getHours().toString().length==1 ? "0"+currentDate.getHours() : currentDate.getHours();
+  var currentMinute = currentDate.getMinutes().toString().length==1 ? "0"+currentDate.getMinutes() : currentDate.getMinutes();
+  return  currentHour +":"+currentMinute;
+}
+
 
 server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) => {
     try{
@@ -21701,6 +21708,7 @@ server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) 
 				tempJson.adresa = nalog.adresa;
 				tempJson.punaAdresa = nalog.punaAdresa;
 				tempJson.radnaJedinica = nalog.radnaJedinica;
+				tempJson.vremeNaloga = getTimestamp(nalog.datum.datetime);
     		json.nalozi.push(tempJson);
     	}
 			res.json({
