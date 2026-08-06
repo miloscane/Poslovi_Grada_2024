@@ -21662,17 +21662,48 @@ server.get("/nedeljniIzvestaj/:start/:end/:opseg/:podizvodjaci", checkBearerToke
 
 server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) => {
     try{
-    	var nalozi = await naloziDB.find({"datum.datum":getDateAsStringForDisplay(new Date())}).toArray();
-    	var json = [];
+    	var datum = new Date(req.params.datum)
+    	var dnevneEkipe = await dnevneEkipeDB.find({datum:getDateAsStringForDisplay(datum)}).toArray();
+    	var warning = "";
+    	var imaEkipa = true;
+    	if(dnevneEkipe.length==0){
+    		dnevneEkipe = await dnevneEkipeDB.findOne({},{ sort: { _id: -1 } });
+    		imaEkipa = false;
+    		warning = "Nema unete ekipe za ovaj datum. Koristim poslednji unos a to je bilo datuma "+dnevneEkipe.datum;
+    	}
+    	var ekipa = imaEkipa == true ? dnevneEkipe[0] : dnevneEkipe;
+    	var majstorId = "";
+    	var vozilo = req.params.vozilo;
+    	for(var i=0;i<ekipa.ekipe.length;i++){
+    		if(vozilo==ekipa.ekipe[i].vozilo){
+    			majstorId = ekipa.ekipe[i].majstor;
+    		}
+    	}
+
+    	var majstor = await majstoriDB.find({uniqueId:majstorId}).toArray();
+    	if(majstor.length==0){
+    		return res.json({
+		      success: false,
+		      message: "Nijedan majstor nije dodeljen tom vozilu za datum: "+ req.params.datum
+		    });
+    	}
+
+    	var nalozi = await naloziDB.find({"datum.datum":getDateAsStringForDisplay(datum)}).toArray();
+    	
+    	var json = {};
+    	json.nalozi = [];
+    	json.majstor = majstor[0].ime;
+    	json.vozilo = req.params.vozilo;
+    	json.datum = req.params.datum;
+    	json.warning = warning;
     	for(var i=0;i<nalozi.length;i++){
-    		var nalog = nalozi[i]
+    		var nalog = nalozi[i];
     		var tempJson = {};
-    		tempJson.broj = nalog.broj;
-    		tempJson.adresa = nalog.adresa;
-    		tempJson.punaAdresa = nalog.punaAdresa;
-    		tempJson.radnaJedinica = nalog.radnaJedinica;
-    		tempJson.statusNaloga = nalog.statusNaloga;
-    		json.puhs(tempJson);
+				tempJson.broj = nalog.broj;
+				tempJson.adresa = nalog.adresa;
+				tempJson.punaAdresa = nalog.punaAdresa;
+				tempJson.radnaJedinica = nalog.radnaJedinica;
+    		json.nalozi.push(tempJson);
     	}
 			res.json({
 	      success: true,
