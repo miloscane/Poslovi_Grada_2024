@@ -741,6 +741,18 @@
 				}
 
 				function printTable(){
+
+					var doc = new jsPDF({
+						orientation: 'p',
+						unit: 'mm',
+						format: 'a4',
+						compress: true
+						//putOnlyUsedFonts:true
+					});
+					pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+					pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+					var yPos = 12;
+					var xPos = 12;
 					doc.setFontSize(10);
 				    doc.setFontType("bold");
 				    var xOffset = 10;
