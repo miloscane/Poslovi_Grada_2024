@@ -21709,6 +21709,7 @@ server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) 
 				tempJson.punaAdresa = nalog.punaAdresa;
 				tempJson.radnaJedinica = nalog.radnaJedinica;
 				tempJson.vremeNaloga = getTimestamp(nalog.datum.datetime);
+				tempJson.coordinates = nalog.coordinates;
     		json.nalozi.push(tempJson);
     	}
 			res.json({
