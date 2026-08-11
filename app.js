@@ -21726,6 +21726,54 @@ server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) 
     }
 });
 
+
+server.get("/aktuelniNalozi", checkBearerToken, async (req, res) => {
+    try{
+    	var nalozi = await naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje"]},majstor:{$nin:podizvodjaci}}).toArray();
+    	var brojeviNaloga = [];
+    	for(var i=0;i<nalozi.length;i++){
+    		brojeviNaloga.push(nalozi[i].broj)
+    	}
+    	var izvestaji = await izvestajiDB.find({nalog:{$in:brojeviNaloga}}).toArray();
+    	for(var i=0;i<nalozi.length;i++){
+    		nalozi[i].izvestaji = [];
+    		for(var j=0;j<izvestaji.length;j++){
+    			if(izvestaji[j].nalog==nalozi[i].broj){
+    				nalozi[i].izvestaji.push({date:new Date(izvestaji[j].datetime),izvestaj:izvestaji[j].izvestaj,korisnik:izvestaji[j].user.name})
+    			}
+    		}
+    	}
+    	var naloziJson = [];
+    	for(var i=0;i<nalozi.length;i++){
+    		var nalog = nalozi[i];
+    		var nalogJson = {};
+    		nalogJson.broj = nalog.broj;
+    		nalogJson.adresa = nalog.adresa;
+    		nalogJson.originalnaAdresa = nalog.punaAdresa;
+    		nalogJson.opis = nalog.opis;
+    		nalogJson.vrstaRada = nalog.vrstaRada;
+    		nalogJson.radnaJedinica = nalog.radnaJedinica;
+    		nalogJson.zahtevalac = nalog.zahtevalac;
+    		nalogJson.statusNaloga = nalog.statusNaloga;
+    		nalogJson.izvestaji = nalog.izvestaji;
+    		nalogJson.datum = nalog.datum.datetime;
+    		naloziJson.push(nalogJson)
+    	}
+
+			res.json({
+	      success: true,
+	      data: json,
+	      message: "Nema na cemu"
+	    });
+    }catch(err){
+    	logError(err);
+    	res.json({
+	      success: false,
+	      message: "Izvinjavamo se ali iamo gresku bazi podataka sa brojem 21772"
+	    });
+    }
+});
+
 /*request(ntsOptions, (error,response,body)=>{
 	if(error){
 		logError(error);
