@@ -874,6 +874,8 @@ function checkBearerToken(req, res, next) {
     next();
 }
 
+
+
 var navigacijaInfo = [];
 var cenovnik;
 var cenovnik2024;
@@ -981,6 +983,14 @@ http.listen(process.env.PORT, async function(){
 		stariProizvodiDB			=	client.db("Poslovi-Grada").collection('magacin-proizvodi-4');
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
+
+		const response = await axios.get("https://vik2024.poslovigrada.rs/aktuelniNalozi", {
+    headers: {
+		        Authorization: `Bearer ${process.env.API_BEARER_TOKEN}`
+		    }
+		});
+
+		console.log(response.data);
 
 		/*var setObj = {
 			$set:{
@@ -21729,7 +21739,7 @@ server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) 
 
 server.get("/aktuelniNalozi", checkBearerToken, async (req, res) => {
     try{
-    	var nalozi = await naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje"]},majstor:{$nin:podizvodjaci}}).toArray();
+    	var nalozi = await naloziDB.find({statusNaloga:{$nin:["Fakturisan","Spreman za fakturisanje","Storniran"]},majstor:{$nin:podizvodjaci}}).toArray();
     	var brojeviNaloga = [];
     	for(var i=0;i<nalozi.length;i++){
     		brojeviNaloga.push(nalozi[i].broj)
