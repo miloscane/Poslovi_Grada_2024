@@ -21739,7 +21739,11 @@ server.get("/aktuelniNalozi", checkBearerToken, async (req, res) => {
     		nalozi[i].izvestaji = [];
     		for(var j=0;j<izvestaji.length;j++){
     			if(izvestaji[j].nalog==nalozi[i].broj){
-    				nalozi[i].izvestaji.push({date:new Date(izvestaji[j].datetime),izvestaj:izvestaji[j].izvestaj,korisnik:izvestaji[j].user.name})
+    				nalozi[i].izvestaji.push({
+    					date:new Date(izvestaji[j].datetime),
+    					izvestaj:izvestaji[j].izvestaj,
+    					korisnik:izvestaji[j].user.name
+    				})
     			}
     		}
     	}
@@ -21756,13 +21760,13 @@ server.get("/aktuelniNalozi", checkBearerToken, async (req, res) => {
     		nalogJson.zahtevalac = nalog.zahtevalac;
     		nalogJson.statusNaloga = nalog.statusNaloga;
     		nalogJson.izvestaji = nalog.izvestaji;
-    		nalogJson.datum = nalog.datum.datetime;
+    		nalogJson.date = new Date(nalog.datum.datetime);
     		naloziJson.push(nalogJson)
     	}
 
 			res.json({
 	      success: true,
-	      data: json,
+	      data: naloziJson,
 	      message: "Nema na cemu"
 	    });
     }catch(err){
