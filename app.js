@@ -15257,7 +15257,6 @@ server.post('/zaduziVozilo', async (req,res)=>{
 			message: "<div class=\"text\">Грешка у бази података 15229.</div>"
 		});
 	}
-	res.send("Ok");
 });
 
 server.get('/danasnjiRasporedRadova', async (req,res)=>{
