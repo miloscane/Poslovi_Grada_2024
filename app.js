@@ -984,13 +984,6 @@ http.listen(process.env.PORT, async function(){
 		stariMagacinUlaziDB		=	client.db("Poslovi-Grada").collection('magacin-ulazi-4');
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
-		const response = await axios.get("https://vik2024.poslovigrada.rs/aktuelniNalozi", {
-    headers: {
-		        Authorization: `Bearer ${process.env.API_BEARER_TOKEN}`
-		    }
-		});
-
-		console.log(response.data);
 
 		/*var setObj = {
 			$set:{
