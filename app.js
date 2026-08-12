@@ -920,6 +920,8 @@ var cuprijaObrisaniReversiDB;
 var cuprijaUlaziDB;
 var alatDB;
 var alatZaduzenjaDB;
+var vozilaDB;
+var zaduzenjaVozilaDB;
 
 http.listen(process.env.PORT, async function(){
 	console.log("Poslovi Grada 2024");
@@ -974,6 +976,8 @@ http.listen(process.env.PORT, async function(){
 		cuprijaUlaziDB				=	client.db("Poslovi_Grada_2024").collection('cuprijaUlazi');
 		alatDB	=	client.db("Poslovi_Grada_2024").collection('alati');
 		alatZaduzenjaDB	=	client.db("Poslovi_Grada_2024").collection('alatiZaduzenja');
+		vozilaDB	=	client.db("Poslovi_Grada_2024").collection('Vozila');
+		zaduzenjaVozilaDB	=	client.db("Poslovi_Grada_2024").collection('Zaduzenja Vozila');
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
 		nalozi2022DB					=	client.db("Poslovi-Grada").collection('nalozi2022');
@@ -1454,7 +1458,7 @@ http.listen(process.env.PORT, async function(){
 		}
 
 		var naloziToExport = [];
-		var month = 6;
+		var month = 7;
 		for(var i=0;i<nalozi.length;i++){
 			if(nalozi[i].faktura.broj){
 				if(nalozi[i].faktura.broj.length>3){
@@ -1513,7 +1517,6 @@ http.listen(process.env.PORT, async function(){
 		fs.writeFileSync("./PG-Premijus-"+month+"-2026.csv",csvString,"utf8");
 		console.log("Written Premijus")*/
 
-		//ZA PREMIJUS
 
 		/*var nalozi = await naloziDB.find({}).toArray();
 		var nalozi2024 = await nalozi2024DB.find({}).toArray();
@@ -8469,6 +8472,13 @@ http.listen(process.env.PORT, async function(){
 		console.log("Excel fajl je napravljen.");
 		console.log("DONE")*/
 
+		/*var vozila = await vozilaDB.find({}).toArray();
+		for(var i=0;i<vozila.length;i++){
+			console.log(vozila[i].Name)
+			console.log("https://vik2024.poslovigrada.rs/vozilo/"+encodeURIComponent(vozila[i].Name));
+			console.log("-------------------------")
+		}*/
+
 
 
 	})
@@ -15127,9 +15137,128 @@ server.get('/rasporedRadovaUzivo', async (req,res)=>{
 	}
 })
 
+					/*axios(config)
+					.then(async response => {
+					  token = response.data.access_token;
+					  var json = {};
+
+						config = {
+					      url: baseUrl + '/api/Client/GetClient',
+					      method: 'POST', // If necessary
+					      headers: { 
+					          'Content-Type': 'application/json',
+					          'Authorization': `Bearer ${token}`
+					      },
+					      data: { 'ClientId': telematicsId }
+					  };
+
+					  //Client data
+					  var response = await axios(config);
+					  //console.log(response.data)
+					  json.clientInfo = response.data.client[0];
+
+					  
+					  config = {
+					      url: baseUrl + '/api/Asset/GetDevicesCurrentData',
+					      method: 'POST', // If necessary
+					      headers: { 
+					          'Content-Type': 'application/json',
+					          'Authorization': `Bearer ${token}`
+					      },
+					      data: { 'ClientId': telematicsId }
+					  };
+					  var response = await axios(config);
+					  json.vozila = response.data;*/
 
 
 
+//Update vozila
+/*var config = {
+		method: 'post',
+		url: baseUrl+'/token', // Replace with your actual URL
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded'
+		},
+		data: data
+	};
+
+	var response = await axios(config);
+	var token = response.data.access_token.toString();
+	var clientInfo = process.env.telematicsid;
+	config = {
+		url: baseUrl + '/api/Asset/GetAllAssets',
+    method: 'POST', // If necessary
+    headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    },
+    data: { 'ClientId': telematicsId }
+	}
+	var response = await axios(config);
+	var vozila = response.data.Asset
+	for(var i=0;i<vozila.length;i++){
+		if(vozila[i].TrackerType!=3){
+			vozila.splice(i,1);
+			i--;
+		}
+	}
+	console.log("Client info:")
+	//console.log(vozila);
+	var response = await vozilaDB.insertMany(vozila);
+	console.log(response)
+	*/
+
+
+server.get('/vozilo/:id', async (req,res)=>{
+	try{
+		if(!req.session.user){
+			return res.redirect("/login?url="+encodeURIComponent(req.url));
+		}
+		var vozilo = await vozilaDB.find({Name:decodeURIComponent(req.params.id)}).toArray();
+		if(vozilo.length==0){
+			res.render("message",{
+				pageTitle: "Недефинисано возило",
+				user: req.session.user,
+				message: "<div class=\"text\">Пријавите детаље магационеру.</div>"
+			});
+		}
+		res.render("majstor/vozilo",{
+			pageTitle: "Vozilo "+vozilo[0].Name,
+			user: req.session.user,
+			vozilo: vozilo[0]
+		});
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Грешка у бази података 15229.</div>"
+		});
+	}
+});
+
+server.post('/zaduziVozilo', async (req,res)=>{
+	try{
+		if(!req.session.user){
+			return res.redirect("/login");
+		}
+		var zaduzenjeJson = {};
+		zaduzenjeJson.user = req.session.user.email ? req.session.user.email : req.session.user.username;
+		zaduzenjeJson.vozilo = req.body.vozilo;
+		zaduzenjeJson.date = new Date();
+		zaduzenjeJson.datum = getDateAsStringForDisplay(new Date());
+		await zaduzenjaVozilaDB.insertOne(zaduzenjeJson);
+		res.redirect("/majstor/nalozi");
+	}catch(err){
+		logError(err);
+		res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Грешка у бази података 15229.</div>"
+		});
+	}
+	res.send("Ok");
+});
 
 server.get('/danasnjiRasporedRadova', async (req,res)=>{
 	if(req.session.user){

@@ -1,0 +1,20 @@
+<%- include ("partials/header") -%>
+	<script>
+		var vozilo = <%-JSON.stringify(vozilo)%>;
+	</script>
+	<div class="pageWidth">
+		<div class="majstorVozilo">
+			<div class="inputWrap">
+				<div class="button" onclick="zaduzi(this)">Zaduzi vozilo</div>
+			</div>
+		</div>
+	</div>
+	<form method="POST" action="/zaduziVozilo" id="form"><input type="text" name="vozilo" value="<%=vozilo.Name%>"></form>
+	<script>
+		function zaduzi(elem){
+			elem.setAttribute("onclick","");
+			loadGif();
+			document.getElementById("form").submit();
+		}
+	</script>
+<%- include ("partials/footer") -%>
