@@ -21797,64 +21797,136 @@ function getTimestamp(date){
 
 
 server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) => {
-    try{
-    	var datum = new Date(req.params.datum)
-    	var dnevneEkipe = await dnevneEkipeDB.find({datum:getDateAsStringForDisplay(datum)}).toArray();
-    	var warning = "";
-    	var imaEkipa = true;
-    	if(dnevneEkipe.length==0){
-    		dnevneEkipe = await dnevneEkipeDB.findOne({},{ sort: { _id: -1 } });
-    		imaEkipa = false;
-    		warning = "Nema unete ekipe za ovaj datum. Koristim poslednji unos a to je bilo datuma "+dnevneEkipe.datum;
-    	}
-    	var ekipa = imaEkipa == true ? dnevneEkipe[0] : dnevneEkipe;
-    	var majstorId = "";
-    	var vozilo = req.params.vozilo;
-    	for(var i=0;i<ekipa.ekipe.length;i++){
-    		if(vozilo==ekipa.ekipe[i].vozilo){
-    			majstorId = ekipa.ekipe[i].majstor;
-    		}
-    	}
+  try{
+  	var datum = new Date(req.params.datum)
+  	var dnevneEkipe = await dnevneEkipeDB.find({datum:getDateAsStringForDisplay(datum)}).toArray();
+  	var warning = "";
+  	var imaEkipa = true;
+  	if(dnevneEkipe.length==0){
+  		dnevneEkipe = await dnevneEkipeDB.findOne({},{ sort: { _id: -1 } });
+  		imaEkipa = false;
+  		warning = "Nema unete ekipe za ovaj datum. Koristim poslednji unos a to je bilo datuma "+dnevneEkipe.datum;
+  	}
+  	var ekipa = imaEkipa == true ? dnevneEkipe[0] : dnevneEkipe;
+  	var majstorId = "";
+  	var vozilo = req.params.vozilo;
+  	for(var i=0;i<ekipa.ekipe.length;i++){
+  		if(vozilo==ekipa.ekipe[i].vozilo){
+  			majstorId = ekipa.ekipe[i].majstor;
+  		}
+  	}
 
-    	var majstor = await majstoriDB.find({uniqueId:majstorId}).toArray();
-    	if(majstor.length==0){
-    		return res.json({
-		      success: false,
-		      message: "Nijedan majstor nije dodeljen tom vozilu za datum: "+ req.params.datum
-		    });
-    	}
-
-    	var nalozi = await naloziDB.find({"datum.datum":getDateAsStringForDisplay(datum)}).toArray();
-    	
-    	var json = {};
-    	json.nalozi = [];
-    	json.majstor = majstor[0].ime;
-    	json.vozilo = req.params.vozilo;
-    	json.datum = req.params.datum;
-    	json.warning = warning;
-    	for(var i=0;i<nalozi.length;i++){
-    		var nalog = nalozi[i];
-    		var tempJson = {};
-				tempJson.broj = nalog.broj;
-				tempJson.adresa = nalog.adresa;
-				tempJson.punaAdresa = nalog.punaAdresa;
-				tempJson.radnaJedinica = nalog.radnaJedinica;
-				tempJson.vremeNaloga = getTimestamp(nalog.datum.datetime);
-				tempJson.coordinates = nalog.coordinates;
-    		json.nalozi.push(tempJson);
-    	}
-			res.json({
-	      success: true,
-	      data: json,
-	      message: "Bravo nalozi"
-	    });
-    }catch(err){
-    	logError(err);
-    	res.json({
+  	var majstor = await majstoriDB.find({uniqueId:majstorId}).toArray();
+  	if(majstor.length==0){
+  		return res.json({
 	      success: false,
-	      message: "Izvinjavamo se ali iamo gresku bazi podataka sa brojem 20870"
+	      message: "Nijedan majstor nije dodeljen tom vozilu za datum: "+ req.params.datum
 	    });
-    }
+  	}
+
+  	var nalozi = await naloziDB.find({"datum.datum":getDateAsStringForDisplay(datum)}).toArray();
+  	
+  	var json = {};
+  	json.nalozi = [];
+  	json.majstor = majstor[0].ime;
+  	json.vozilo = req.params.vozilo;
+  	json.datum = req.params.datum;
+  	json.warning = warning;
+  	for(var i=0;i<nalozi.length;i++){
+  		var nalog = nalozi[i];
+  		var tempJson = {};
+			tempJson.broj = nalog.broj;
+			tempJson.adresa = nalog.adresa;
+			tempJson.punaAdresa = nalog.punaAdresa;
+			tempJson.radnaJedinica = nalog.radnaJedinica;
+			tempJson.vremeNaloga = getTimestamp(nalog.datum.datetime);
+			tempJson.coordinates = nalog.coordinates;
+  		json.nalozi.push(tempJson);
+  	}
+		res.json({
+      success: true,
+      data: json,
+      message: "Bravo nalozi"
+    });
+  }catch(err){
+  	logError(err);
+  	res.json({
+      success: false,
+      message: "Izvinjavamo se ali iamo gresku bazi podataka sa brojem 20870"
+    });
+  }
+});
+
+server.get("/mesecnoFakturisanje/:mesec/:godina", checkBearerToken, async (req, res) => {//mesec nije padded, znaci januar je 1 a ne 01, od 8og do 15og u mesecu da stize u 7 ujutru 
+  try{
+  	var mesec = Number(req.params.mesec);
+		var godina = Number(req.params.godina);
+
+		var startDate = new Date(godina, mesec - 1, 1).getTime();
+		var endDate = new Date(godina, mesec, 1).getTime();
+
+		var query = {
+			"faktura.broj": {
+				$exists: true,
+				$ne: ""
+			},
+			"prijemnica.datum.datetime": {
+				$gte: startDate,
+				$lt: endDate
+			}
+		};
+
+
+  	var nalozi = await naloziDB.find(query).toArray();
+		var hmNalozi = await client.db("Hausmajstor").collection('Nalozi').find(query).toArray();
+
+		var naloziToExport = nalozi.concat(hmNalozi);
+
+		naloziToExport.sort((a, b) =>
+			b.prijemnica.datum.datetime - a.prijemnica.datum.datetime
+		);
+
+
+		var csvString = "Broj Fakture;Datum PDV;Iznos/Osnovica;Penal;PDV;Iznos sa penalom i PDV;PG Iznos/Osnovica;PG PDV;PG Penal;PG Iznos sa PDVom;Vrsta Naloga\r\n";
+		var data = [];
+
+		for(var i=0;i<naloziToExport.length;i++){
+			var json = {};
+			var osnovica = parseFloat(naloziToExport[i].ukupanIznos);
+			var iznosPenala = eval(osnovica* (100 - naloziToExport[i].faktura.penal)/100);
+			var pdv = osnovica<=500000 ? osnovica*0.2 : 0;
+			var iznosSaPenalomIPdv = osnovica + pdv - iznosPenala;
+			var umanjenje = naloziToExport[i].vrstaRada=="HAUSMAJSTOR" ? 1 : 0.675;
+			var pgOsnovica = osnovica * umanjenje;
+			var pgPdv = pgOsnovica <=500000 ? pgOsnovica*0.2 : 0;
+			var pgPenal = iznosPenala;
+			var pgIznosSaPDVom = pgOsnovica + pgPdv - pgPenal;
+
+			json.brojFakture = naloziToExport[i].faktura.broj;
+			json.datumPDV = naloziToExport[i].prijemnica.datum.datum;
+			json.osnovica = osnovica.toFixed(2);
+			json.iznosPenala = iznosPenala.toFixed(2);
+			json.pdv = pdv.toFixed(2);
+			json.iznosSaPenalomIPdv = iznosSaPenalomIPdv.toFixed(2);
+			json.pgOsnovica = pgOsnovica.toFixed(2);
+			json.pgPdv = pgPdv.toFixed(2);
+			json.pgPenal = pgPenal.toFixed(2);
+			json.pgIznosSaPDVom = pgIznosSaPDVom.toFixed(2);
+			json.vrstaRada = naloziToExport[i].vrstaRada;
+			data.push(json);
+		}
+		res.json({
+      success: true,
+      data: data,
+      message: "Bravo nalozi"
+    });
+  }catch(err){
+  	logError(err);
+  	res.json({
+      success: false,
+      message: "Izvinjavamo se ali iamo gresku bazi podataka sa brojem 21931"
+    });
+  }
 });
 
 
