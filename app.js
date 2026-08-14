@@ -9081,7 +9081,6 @@ const saveStops = async () => {
   })
 };
 
-
 //setTimeout(function(){saveStops();},11000)
 
 schedule.scheduleJob('59 23 * * *', sendEmail);
@@ -9104,7 +9103,7 @@ server.get('/',async (req,res)=>{
 		}else if(Number(req.session.user.role)==50){
 			res.redirect("/magacioner/stanje")
 		}else if(Number(req.session.user.role)==60){
-			res.redirect("/majstor/mesec")
+			res.redirect("/majstor/nalozi")
 		}else if(Number(req.session.user.role)==70){
 			res.redirect("/cuprija/stanje")
 		}else{
@@ -9118,6 +9117,8 @@ server.get('/',async (req,res)=>{
 		res.redirect("/login");
 	}
 });
+
+
  
 server.get('/administracija',async (req,res)=>{
 	if(req.session.user){
