@@ -21981,6 +21981,8 @@ server.get("/aktuelniNalozi", checkBearerToken, async (req, res) => {
     }
 });
 
+
+
 /*request(ntsOptions, (error,response,body)=>{
 	if(error){
 		logError(error);
