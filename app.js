@@ -21887,6 +21887,29 @@ server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) 
   }
 });
 
+server.get("/naloziMajstora/:majstor/:datum", checkBearerToken, async (req, res) => {
+  try{
+  	var datum = new Date(req.params.datum)
+  	var dodeljivaniNalozi = await dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(datum)}).toArray();
+
+  	for(var i=0;i<dodeljeniNalozi.length;i++){
+  		delete dodeljivaniNalozi[i]._id;
+  	}
+
+		res.json({
+      success: true,
+      data: dodeljivaniNalozi,
+      message: "Bravo nalozi"
+    });
+  }catch(err){
+  	logError(err);
+  	res.json({
+      success: false,
+      message: "Izvinjavamo se ali iamo gresku bazi podataka sa brojem 20870"
+    });
+  }
+});
+
 server.get("/mesecnoFakturisanje/:mesec/:godina", checkBearerToken, async (req, res) => {//mesec nije padded, znaci januar je 1 a ne 01, od 8og do 15og u mesecu da stize u 7 ujutru 
   try{
   	var mesec = Number(req.params.mesec);
