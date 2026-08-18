@@ -21890,7 +21890,7 @@ server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) 
 server.get("/naloziMajstora/:majstor/:datum", checkBearerToken, async (req, res) => {
   try{
   	var datum = new Date(req.params.datum)
-  	var dodeljivaniNalozi = await dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(datum)}).toArray();
+  	var dodeljivaniNalozi = await dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(datum),majstor:req.params.majstor}).toArray();
   	var brojeviNaloga = []
   	for(var i=0;i<dodeljivaniNalozi.length;i++){
   		delete dodeljivaniNalozi[i]._id;
