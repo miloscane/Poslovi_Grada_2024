@@ -21796,6 +21796,35 @@ function getTimestamp(date){
   return  currentHour +":"+currentMinute;
 }
 
+server.get("/dajMajstore", checkBearerToken, async (req, res) => {
+  try{
+
+  	var majstori = await majstoriDB.find({uniqueId:{$nin:podizvodjaci}}).toArray();
+  	var json = [];
+  	for(var i=0;i<majstori.length;i++){
+  		var tempJson = {};
+  		tempJson.id = majstori[i].uniqueId;
+  		tempJson.name = majstori[i].ime;
+  		tempJson.type = majstori[i].tipMajstora;
+  		tempJson.region = majstori[i].region;
+  		tempJson.active = majstori[i].aktivan;
+  		json.push(tempJson)
+  	}
+
+		res.json({
+      success: true,
+      data: json,
+      message: "Bravo majstori"
+    });
+  }catch(err){
+  	logError(err);
+  	res.json({
+      success: false,
+      message: "Izvinjavamo se ali iamo gresku bazi podataka sa brojem 20870"
+    });
+  }
+});
+
 
 server.get("/izvestajNalozi/:vozilo/:datum", checkBearerToken, async (req, res) => {
   try{
