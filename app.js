@@ -21891,11 +21891,22 @@ server.get("/naloziMajstora/:majstor/:datum", checkBearerToken, async (req, res)
   try{
   	var datum = new Date(req.params.datum)
   	var dodeljivaniNalozi = await dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(datum)}).toArray();
-
+  	var brojeviNaloga = []
   	for(var i=0;i<dodeljivaniNalozi.length;i++){
   		delete dodeljivaniNalozi[i]._id;
+  		brojeviNaloga.push(dodeljeniNalozi[i].nalog)
   	}
 
+  	var nalozi = await naloziDB.find({broj:{$in:brojeviNaloga}}).toArray();
+  	for(var i=0;i<dodeljivaniNalozi.length;i++){
+  		dodeljivaniNalozi[i].koordinate = {};
+  		for(var j=0;j<nalozi.length;j++){
+  			if(nalozi[j].broj==dodeljivaniNalozi[i].nalog){
+  				dodeljivaniNalozi[i].koordinate = nalozi[j].coordinates;
+  				break
+  			}
+  		}
+  	}
 		res.json({
       success: true,
       data: dodeljivaniNalozi,
