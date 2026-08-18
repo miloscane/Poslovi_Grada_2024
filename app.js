@@ -21894,7 +21894,7 @@ server.get("/naloziMajstora/:majstor/:datum", checkBearerToken, async (req, res)
   	var brojeviNaloga = []
   	for(var i=0;i<dodeljivaniNalozi.length;i++){
   		delete dodeljivaniNalozi[i]._id;
-  		brojeviNaloga.push(dodeljeniNalozi[i].nalog)
+  		brojeviNaloga.push(dodeljivaniNalozi[i].nalog)
   	}
 
   	var nalozi = await naloziDB.find({broj:{$in:brojeviNaloga}}).toArray();
