@@ -21892,7 +21892,7 @@ server.get("/naloziMajstora/:majstor/:datum", checkBearerToken, async (req, res)
   	var datum = new Date(req.params.datum)
   	var dodeljivaniNalozi = await dodeljivaniNaloziDB.find({"datum.datum":getDateAsStringForDisplay(datum)}).toArray();
 
-  	for(var i=0;i<dodeljeniNalozi.length;i++){
+  	for(var i=0;i<dodeljivaniNalozi.length;i++){
   		delete dodeljivaniNalozi[i]._id;
   	}
 
