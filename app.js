@@ -922,6 +922,8 @@ var alatDB;
 var alatZaduzenjaDB;
 var vozilaDB;
 var zaduzenjaVozilaDB;
+var cuprijaAlatDB;
+var cuprijaAlatZaduzenjaDB;
 
 http.listen(process.env.PORT, async function(){
 	console.log("Poslovi Grada 2024");
@@ -978,6 +980,8 @@ http.listen(process.env.PORT, async function(){
 		alatZaduzenjaDB	=	client.db("Poslovi_Grada_2024").collection('alatiZaduzenja');
 		vozilaDB	=	client.db("Poslovi_Grada_2024").collection('Vozila');
 		zaduzenjaVozilaDB	=	client.db("Poslovi_Grada_2024").collection('Zaduzenja Vozila');
+		cuprijaAlatDB	=	client.db("Poslovi_Grada_2024").collection('cuprija alati');
+		cuprijaAlatZaduzenjaDB	=	client.db("Poslovi_Grada_2024").collection('cuprija alatiZaduzenja');
 
 		nalozi2023DB					=	client.db("Poslovi-Grada").collection('nalozi');
 		nalozi2022DB					=	client.db("Poslovi-Grada").collection('nalozi2022');
@@ -18162,6 +18166,330 @@ server.get('/magacioner/utroseniMaterijal',async (req,res)=>{
 		res.redirect("/login?url="+encodeURIComponent(req.url));
 	}
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+server.get('/cuprija/stavke',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
+				res.render("cuprija/magacinProizvodi",{
+					pageTitle:"Админситрација производа",
+					proizvodi: proizvodi,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2626.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.post('/cuprija/izmenaProizvodaAdmin', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var json = JSON.parse(req.body.json);
+				if(json.uniqueId){
+
+					var setObj	=	{ $set: {
+								name: json.name,
+								code: json.code,
+								unit: json.unit,
+								price:json.price,
+								codes: json.codes
+							}
+					};
+					var response = await cuprijaMaterijalDB.updateOne({uniqueId:json.uniqueId},setObj)
+
+				}else{
+					json.uniqueId = generateId(5)+"--"+new Date().getTime();
+					json.stanje = 0;
+					json.alarm = "";
+					json.datumPopisa = "01.01.1970";
+					json.datetimePopisa =  0;
+					json.datumPopisaIstok = "01.01.1970";
+					json.datetimePopisaIstok =  0;
+					json.stanjeistok = 0;
+					var response = await cuprijaMaterijalDB.insertOne(json);
+				}
+				res.redirect("/cuprija/stavke?id="+json.uniqueId);
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 16617.</div>"
+				})
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+
+server.get('/cuprija/alati',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var alati = await cuprijaAlatDB.find({}).toArray();
+				res.render("cuprija/magacinAlati",{
+					pageTitle:"Админситрација алата",
+					alati: alati,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2626.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.post('/cuprija/izmenaAlataAdmin', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var json = JSON.parse(req.body.json);
+				if(json.uniqueId){
+					var setObj	=	{ $set: {
+								naziv: json.naziv,
+								marka: json.marka,
+								model: json.model,
+								cena: json.cena,
+								region: json.region,
+								serijskiBroj: json.serijskiBroj,
+								vrsta: json.vrsta,
+								podvrsta: json.podvrsta
+							}
+					};
+					var response = await cuprijaAlatDB.updateOne({uniqueId:json.uniqueId},setObj)
+				}else{
+					json.uniqueId = generateId(5)+"--"+new Date().getTime();
+					var broj = await cuprijaAlatDB.countDocuments();
+					broj = broj+1;
+					json.redniBroj = broj.toString().padStart(4,"0");
+					json.regionName = json.region == "I" ? "istok" : "zapad";
+					var response = await cuprijaAlatDB.insertOne(json);
+					
+				}
+				res.redirect("/cuprija/alati?id="+json.uniqueId);
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 16617.</div>"
+				})
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.get('/cuprija/zaduzivanjeAlata',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var alati = await cuprijaAlatDB.find({}).toArray();
+				var zaduzenje = await cuprijaAlatZaduzenjaDB.find({}).toArray();
+				res.render("cuprija/zaduzivanjeAlata",{
+					pageTitle:"Задуживање алата",
+					alati: alati,
+					zaduzenje: zaduzenje,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2626.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+server.post('/cuprija/zaduzenjeAlata', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var json = JSON.parse(req.body.json);
+				json.date = new Date();
+				json.datetime = new Date().getTime();
+				json.uniqueId = generateId(5)+"--"+new Date().getTime();
+				var response = await cuprijaAlatZaduzenjaDB.insertOne(json);
+				res.redirect("/cuprija/zaduzenjaAlata?id="+json.uniqueId);
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 16617.</div>"
+				})
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.get('/cuprija/zaduzenjaAlata',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var alati = await cuprijaAlatDB.find({}).toArray();
+				var zaduzenja = await cuprijaAlatZaduzenjaDB.find({}).toArray();
+				res.render("cuprija/zaduzenjaAlata",{
+					pageTitle:"Задужења алата",
+					alati: alati,
+					zaduzenja: zaduzenja,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 2626.</div>"
+				})
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 server.post('/fakturisi', async (req, res)=> {
 	if(req.session.user){

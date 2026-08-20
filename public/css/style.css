@@ -8569,7 +8569,7 @@ input[type=number] {
 
 .administracijaProizvoda .proizvodi .elems{
     display:grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     width:70%;
     gap:10px;
     padding-right:40px;
