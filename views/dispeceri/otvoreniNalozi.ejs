@@ -419,7 +419,7 @@
 						var urgencija = false;
 						naloziToShow[i].urgencije = 0;
 						for(var j=0;j<naloziToShow[i].izvestaji.length;j++){
-							if(naloziToShow[i].izvestaji[j].izvestaj.toLowerCase().includes("urg")){
+							if(naloziToShow[i].izvestaji[j]?.izvestaj?.toLowerCase().includes("urg")){
 								urgencija = true;
 								naloziToShow[i].urgencije++;
 							}
