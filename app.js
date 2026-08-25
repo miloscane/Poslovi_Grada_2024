@@ -8492,7 +8492,15 @@ http.listen(process.env.PORT, async function(){
 			console.log("-------------------------")
 		}*/
 
-
+		/*var nalozi = await naloziDB.find({statusNaloga:"Fakturisan"}).toArray()
+		var ukupanIznos = 0;
+		for(var i=0;i<nalozi.length;i++){
+			if(parseFloat(nalozi[i].ukupanIznos)==0){
+				console.log("Nalog ima nulu: "+nalozi[i].broj)
+			}
+			ukupanIznos = ukupanIznos + parseFloat(nalozi[i].ukupanIznos)
+		}
+		console.log(brojSaRazmacima(ukupanIznos))*/
 
 	})
 	.catch(error => {
