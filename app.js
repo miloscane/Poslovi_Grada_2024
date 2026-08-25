@@ -995,6 +995,15 @@ http.listen(process.env.PORT, async function(){
 
 		/*var setObj = {
 			$set:{
+				deleted: true
+			}
+		}
+
+		var response = await cuprijaMaterijalDB.updateMany({"name":""},setObj);
+		console.log(response)*/
+
+		/*var setObj = {
+			$set:{
 				"faktura.penal":100,
 			}
 		}
@@ -17316,7 +17325,7 @@ server.get('/cuprija/noviRevers',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==70){
 			try{
-				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
+				var proizvodi = await cuprijaMaterijalDB.find({deleted:{$exists:false}}).toArray();
 				res.render("cuprija/noviRevers",{
 					pageTitle:"Нови реверс",
 					proizvodi: proizvodi,
@@ -18193,7 +18202,7 @@ server.get('/cuprija/stavke',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==70){
 			try{
-				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
+				var proizvodi = await cuprijaMaterijalDB.find({deleted:{ $exists: false }}).toArray();
 				res.render("cuprija/magacinProizvodi",{
 					pageTitle:"Админситрација производа",
 					proizvodi: proizvodi,
@@ -18248,6 +18257,37 @@ server.post('/cuprija/izmenaProizvodaAdmin', async (req, res)=> {
 					var response = await cuprijaMaterijalDB.insertOne(json);
 				}
 				res.redirect("/cuprija/stavke?id="+json.uniqueId);
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 16617.</div>"
+				})
+			}
+			
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login");	
+	}
+});
+
+server.post('/cuprija/brisanjeProizvodaAdmin', async (req, res)=> {
+	if(req.session.user){
+		if(Number(req.session.user.role)==70){
+			try{
+				var setObj	=	{ $set: {
+							deleted: true
+						}
+				};
+				var response = await cuprijaMaterijalDB.updateOne({uniqueId:req.body.id},setObj)
+				res.redirect("/cuprija/stavke?id="+req.body.id);
 			}catch(err){
 				logError(err);
 				res.render("message",{
@@ -19160,7 +19200,7 @@ server.get('/cuprija/stanje',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==70){
 			try{
-				var proizvodi = await cuprijaMaterijalDB.find({}).toArray();
+				var proizvodi = await cuprijaMaterijalDB.find({deleted:{ $exists: false }}).toArray();
 				var ulazi = await cuprijaUlaziDB.find({}).toArray();
 				var reversi = await cuprijaReversiDB.find({}).toArray();
 				res.render("cuprija/stanje",{

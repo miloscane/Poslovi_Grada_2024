@@ -85,9 +85,13 @@
 						</div>
 					</div>
 					<div class="inputWrap">
-						<div class="button" onclick="sacuvaj(this)">Sacuvaj</div>
+						<div class="button" onclick="sacuvaj(this)">Sačuvaj</div>
+						<div class="button" style="margin-top:40px;background-color:red" onclick="obrisi(this)">Obriši</div>
 						<form style="display:none" id="form" method="POST" action="/cuprija/izmenaProizvodaAdmin">
 							<input type="text" id="json" name="json">
+						</form>
+						<form style="display:none" id="form-obrisi" method="POST" action="/cuprija/brisanjeProizvodaAdmin">
+							<input type="text" id="json-obrisi" name="id">
 						</form>
 						<script>
 							function sacuvaj(elem){
@@ -115,6 +119,30 @@
 								if(response){
 									document.getElementById("json").value = JSON.stringify(json);
 									document.getElementById("form").submit();
+								}
+							}
+
+							function obrisi(elem){
+								var json = {};
+								json.uniqueId = document.getElementById("id").value;
+								json.name = document.getElementById("naziv").value;
+								json.code = document.getElementById("sifra").value;
+								json.unit = document.getElementById("jedinica").value;
+								json.price = document.getElementById("cena").value;
+
+								var idFound = false;
+								for(var i=0;i<magacinProizvodi.length;i++){
+									if(magacinProizvodi[i].uniqueId==json.uniqueId){
+										idFound = true;
+									}
+								}
+
+								var response = false;
+								response = confirm("OBRISATI PROIZVOD?")
+								
+								if(response){
+									document.getElementById("json-obrisi").value = document.getElementById("id").value;
+									document.getElementById("form-obrisi").submit();
 								}
 							}
 						</script>
