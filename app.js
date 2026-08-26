@@ -10561,6 +10561,47 @@ server.get('/spremniNalozi',async (req,res)=>{
 	}
 });
 
+server.get('/naloziUStambenom',async (req,res)=>{
+	if(req.session.user){
+		if(Number(req.session.user.role)==10){
+			try{
+				var nalozi = await naloziDB.find({statusNaloga:"Nalog u Stambenom"}).toArray();
+				for(var i=0;i<nalozi.length;i++){
+					delete nalozi[i]._id;
+					delete nalozi[i].uniqueId;
+					//delete nalozi[i].digitalizacija;
+					delete nalozi[i].opis;
+					delete nalozi[i].vrstaRada;
+					delete nalozi[i].kategorijeRadova;
+					delete nalozi[i].punaAdresa;
+					delete nalozi[i].obracun;
+					delete nalozi[i].prijemnica;
+				}
+				res.render("administracija/spremniNalozi",{
+					pageTitle: "Налози у стамбеном",
+					nalozi: nalozi,
+					user: req.session.user
+				})
+			}catch(err){
+				logError(err);
+				res.render("message",{
+					pageTitle: "Програмска грешка",
+					user: req.session.user,
+					message: "<div class=\"text\">Дошло је до грешке у бази податка 1443.</div>"
+				});
+			}
+		}else{
+			res.render("message",{
+				pageTitle: "Грешка",
+				user: req.session.user,
+				message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+			});
+		}
+	}else{
+		res.redirect("/login?url="+encodeURIComponent(req.url));
+	}
+});
+
 server.get('/storniraniNalozi',async (req,res)=>{
 	if(req.session.user){
 		if(Number(req.session.user.role)==10 || Number(req.session.user.role)==40){
