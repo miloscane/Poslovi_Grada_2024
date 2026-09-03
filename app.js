@@ -993,6 +993,80 @@ http.listen(process.env.PORT, async function(){
 		stariMagacinReversiDB	=	client.db("Poslovi-Grada").collection('magacin-reversi-4');
 
 
+		/*var nalozi = await naloziDB.find({}).toArray();
+		var izvestaji = await dnevniIzvestajiDB.find({}).toArray();
+		var majstori = await majstoriDB.find({}).toArray();
+		var cenovnik = await pricesDB.find({}).toArray();
+
+		for(var i=0;i<izvestaji.length;i++){
+			var izvestaj = izvestaji[i];
+			delete izvestaj.vremeDolaska
+    	delete izvestaj.vremeOdlaska
+    	delete izvestaj.izlazak
+    	delete izvestaj.prviNalog
+    	delete izvestaj.odsustvo
+    	delete izvestaj.komentarVremena
+    	delete izvestaj.komentarKontrole
+    	delete izvestaj.nagrada
+    	delete izvestaj.nagradaRazlog
+			for(var j=0;j<majstori.length;j++){
+				if(izvestaj.majstor==majstori[j].uniqueId){
+					izvestaj.majstor= majstori[j].ime;
+				}
+			}
+			delete izvestaj._id;
+			delete izvestaj.uniqueId;
+			delete izvestaj.vozilo;
+			delete izvestaj.kazna;
+			delete izvestaj.kaznaRazlog;
+			for(var j=0;j<izvestaj.nalozi.length;j++){
+				var nalog = izvestaj.nalozi[j];
+				nalog.ucinakMajstora = nalog.iznos;
+				delete nalog.iznos;
+				delete nalog.radnaJedinica;
+				delete nalog.adresa;
+				nalog.obracunNaloga = [];
+				nalog.obracunatIznosNaloga = 0;
+				for(var k=0;k<nalozi.length;k++){
+					if(nalozi[k].broj==nalog.broj){
+						nalog.obracunNaloga = nalozi[k].obracun;
+						nalog.obracunatIznosNaloga = nalozi[k].ukupanIznos
+					}
+				}
+				if(nalog.obracunNaloga.length==0){
+					izvestaj.nalozi.splice(j,1);
+					j--;
+				}else{
+					for(var k=0;k<nalog.obracunNaloga.length;k++){
+
+						for(var l=0;l<cenovnik.length;l++){
+							if(cenovnik[l].code==nalog.obracunNaloga[k].code){
+								nalog.obracunNaloga[k].nazivStavke = cenovnik[l].name;
+								nalog.obracunNaloga[k].jedinicaMere = cenovnik[l].unit;
+								nalog.obracunNaloga[k].iznosPoJediniciMere = cenovnik[l].price;
+							}
+						}
+						delete nalog.obracunNaloga[k].code;
+						nalog.obracunNaloga[k].ukupanIznos = nalog.obracunNaloga[k].price;
+						nalog.obracunNaloga[k].kolicina = nalog.obracunNaloga[k].quantity;
+						delete nalog.obracunNaloga[k].price;
+						delete nalog.obracunNaloga[k].quantity;
+						delete nalog.obracunNaloga[k].priceCenovnik;
+					}
+				}
+			}
+			if(izvestaj.nalozi.length==0){
+				izvestaji.splice(i,1);
+				i--;
+			}
+		}
+		fs.writeFileSync(
+		    "izvestaji.json",
+		    JSON.stringify(izvestaji, null, 2),
+		    "utf8"
+		);
+		console.log("Wrote")*/
+
 		/*var setObj = {
 			$set:{
 				deleted: true
@@ -8502,6 +8576,9 @@ http.listen(process.env.PORT, async function(){
 		}
 		console.log(brojSaRazmacima(ukupanIznos))*/
 
+
+
+
 	})
 	.catch(error => {
 		logError(error);
@@ -10566,6 +10643,13 @@ server.get('/naloziUStambenom',async (req,res)=>{
 		if(Number(req.session.user.role)==10){
 			try{
 				var nalozi = await naloziDB.find({statusNaloga:"Nalog u Stambenom"}).toArray();
+				var brojeviNaloga = [];
+				for(var i=0;i<nalozi.length;i++){
+					brojeviNaloga.push(Number(nalozi[i].broj))
+				}
+				//console.log(brojeviNaloga)
+				var stambenoInfo = await portalStambenoTestDB.find({"vrsta_promene":"STATUS","status_code":"NA_ODOBRENJU","broj_naloga":{$in:brojeviNaloga}}).toArray()//"reqBody.order_headers.vrsta_promene":"STATUS","reqBody.order_headers.status_code":"NA_ODOBRENJU"}).toArray();//,"reqBody.order_headers.broj_naloga":{$in:brojeviNaloga}
+				//console.log(stambenoInfo)
 				for(var i=0;i<nalozi.length;i++){
 					delete nalozi[i]._id;
 					delete nalozi[i].uniqueId;
@@ -10576,8 +10660,14 @@ server.get('/naloziUStambenom',async (req,res)=>{
 					delete nalozi[i].punaAdresa;
 					delete nalozi[i].obracun;
 					delete nalozi[i].prijemnica;
+					nalozi[i].datumIzmene = null;
+					for(var j=0;j<stambenoInfo.length;j++){
+						if(stambenoInfo[j].broj_naloga.toString()==nalozi[i].broj){
+							nalozi[i].datumIzmene = new Date(stambenoInfo[j].datum_azuriranja);
+						}
+					}
 				}
-				res.render("administracija/spremniNalozi",{
+				res.render("administracija/naloziUStambenom",{
 					pageTitle: "Налози у стамбеном",
 					nalozi: nalozi,
 					user: req.session.user
