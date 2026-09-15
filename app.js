@@ -8576,7 +8576,63 @@ http.listen(process.env.PORT, async function(){
 		}
 		console.log(brojSaRazmacima(ukupanIznos))*/
 
+		/*var setObj = {
+			$set:{
+				deleted:true,
+				cane:1
+			}
+		}
+		var response = await cuprijaMaterijalDB.updateMany({"datumPopisa":"06.03.2026","stanje":0},setObj)
+		console.log(response)*/
 
+		/*var nalozi = await naloziDB.find({statusNaloga:"Fakturisan"}).toArray();
+		for(var i=0;i<nalozi.length;i++){
+			delete nalozi[i].digitalizacija;
+			delete nalozi[i].izmenio;
+			delete nalozi[i].coordinates;
+			delete nalozi[i].prijemnica;
+			delete nalozi[i].faktura;
+			delete nalozi[i].izmenio;
+			delete nalozi[i].uniqueId;
+			var nalog = nalozi[i];
+			for(var j=0;j<nalog.obracun.length;j++){
+				var stavka = nalog.obracun[j];
+				stavka.name = "??";
+				stavka.unit = "???"
+				for(var k=0;k<cenovnik.length;k++){
+					if(stavka.code==cenovnik[k].code){
+						stavka.name = cenovnik[k].name;
+						stavka.unit = cenovnik[k].unit;
+					}
+				}
+			}
+		}
+		fs.writeFileSync("nalozi.json",JSON.stringify(nalozi),{encoding:"utf8"})
+
+		var nalozi = await nalozi2024DB.find({"statusNaloga":"Fakturisan"}).toArray();
+		for(var i=0;i<nalozi.length;i++){
+			delete nalozi[i].digitalizacija;
+			delete nalozi[i].izmenio;
+			delete nalozi[i].coordinates;
+			delete nalozi[i].prijemnica;
+			delete nalozi[i].faktura;
+			delete nalozi[i].izmenio;
+			delete nalozi[i].uniqueId;
+			var nalog = nalozi[i];
+			for(var j=0;j<nalog.obracun.length;j++){
+				var stavka = nalog.obracun[j];
+				stavka.name = "??";
+				stavka.unit = "???"
+				for(var k=0;k<cenovnik2024.length;k++){
+					if(stavka.code==cenovnik2024[k].code){
+						stavka.name = cenovnik2024[k].name;
+						stavka.unit = cenovnik2024[k].unit;
+					}
+				}
+			}
+		}
+		fs.writeFileSync("nalozi2024.json",JSON.stringify(nalozi),{encoding:"utf8"})
+		console.log("Done")*/
 
 
 	})
