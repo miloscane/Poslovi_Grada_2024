@@ -865,6 +865,71 @@ function layoutNoOverlap(container) {
 			.otvoreniNaloziUzivo .radnaJedinica{
 				overflow-y: scroll;
 			}
+
+			.otvoreniNaloziUzivo .value{
+				cursor:pointer;
+			}
+
+			.nalogTooltip{
+				position: relative;
+			}
+
+			.nalogTooltip::after{
+				content: attr(data-tooltip);
+
+				position: absolute;
+				left: 50%;
+				top: calc(100% + 4px);
+				transform: translateX(-50%);
+
+				background: rgba(20,20,20,0.95);
+				color: white;
+
+				padding: 8px 10px;
+				border-radius: 6px;
+
+				font-size: 8px;
+				line-height: 1.4;
+				font-weight: normal;
+
+				white-space: pre-line;
+
+				width: max-content;
+				max-width: 140px;
+
+				opacity: 0;
+				visibility: hidden;
+				pointer-events: none;
+
+				z-index: 99999;
+
+				box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+
+				transition: opacity 0.15s ease;
+			}
+
+			.nalogTooltip::before{
+				content: "";
+
+				position: absolute;
+				left: 50%;
+				top: calc(100% + 2px);
+				transform: translateX(-50%);
+
+				border: 6px solid transparent;
+				border-bottom-color: rgba(20,20,20,0.95);
+
+				opacity: 0;
+				visibility: hidden;
+
+				z-index: 99999;
+			}
+
+			.nalogTooltip:hover::after,
+			.nalogTooltip:hover::before{
+				opacity: 1;
+				visibility: visible;
+			}
 		</style>
 		<div class="otvoreniNaloziUzivo" id="otvoreni-nalozi" style="display:none">
 
@@ -882,8 +947,22 @@ function layoutNoOverlap(container) {
 				}
 					var td = document.createElement("TD");
 					td.setAttribute("class","brojNaloga");
+
 					var extraInfo = Number(nalog.zatvorenaVoda == 1) ? "⚠️⚠️" : "";
-					td.innerHTML = "<div class=\"value\">"+nalog.broj+extraInfo+"</div>";
+
+					var value = document.createElement("DIV");
+					value.setAttribute("class", "value nalogTooltip");
+
+					value.innerHTML = nalog.broj + extraInfo;
+
+					value.setAttribute(
+						"data-tooltip",
+						"Adresa: " + (nalog.adresa || "-") + "\n" +
+						"Opis: " + (nalog.opis || "-") + "\n" +
+						"Status: " + (nalog.statusNaloga || "-")
+					);
+
+					td.appendChild(value);
 					tr.appendChild(td);
 					if(!tip){
 						var td = document.createElement("TD");
