@@ -117,6 +117,29 @@
 						</script>
 					</div>
 				</div>
+				<div class="box">
+					<div class="icon"><img src="https://poslovi-grada-2024.fra1.digitaloceanspaces.com/images/iznosIcon.png"></div>
+					<div class="info">
+						<div class="title">ИСТОК</div>
+						<div class="text"><span id="iznos-istok"></span></div>
+						<div class="title">ЗАПАД</div>
+						<div class="text"><span id="iznos-zapad"></span></div>
+						<script>
+							var istokIznos = 0;
+							var zapadIznos = 0;
+							for(var i=0;i<specifikacija.nalozi.length;i++){
+								if(istok.indexOf(specifikacija.nalozi[i].radnaJedinica)>=0){
+									istokIznos = istokIznos + parseFloat(specifikacija.nalozi[i].ukupanIznos)
+								}else{
+									zapadIznos = zapadIznos + parseFloat(specifikacija.nalozi[i].ukupanIznos)
+								}
+							}
+
+							document.getElementById("iznos-istok").innerHTML = brojSaRazmacima(istokIznos) + " дин."
+							document.getElementById("iznos-zapad").innerHTML = brojSaRazmacima(zapadIznos) + " дин."
+						</script>
+					</div>
+				</div>
 			</div>
 			<div class="specifikacija">
 				<div class="rows" id="rows"></div>
