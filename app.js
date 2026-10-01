@@ -7452,7 +7452,7 @@ http.listen(process.env.PORT, async function(){
 
 
 		//ZA IVANA
-		function getPreviousWeekDates(date = new Date()) {
+		/*function getPreviousWeekDates(date = new Date()) {
 		  const d = new Date(date);
 
 		  // Monday = 0, Tuesday = 1, ..., Sunday = 6
