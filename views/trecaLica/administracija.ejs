@@ -138,7 +138,7 @@
 						<table>
 							<tr>
 								<td><div class="value redniBroj">Редни број</div></td>
-								<td><div class="value brojNaloga">Број налога</div></td>
+								<td style="width:200px"><div class="value brojNaloga">Број налога</div></td>
 								<td><div class="value datumNaloga">Датум радова</div></td>
 								<td><div class="value adresa">Адреса</div></td>
 								<td><div class="value status">Статус</div></td>
@@ -160,6 +160,7 @@
 								tr.appendChild(td);
 
 								var td = document.createElement("TD");
+								td.style.width = "200px"
 									var div = document.createElement("DIV");
 									div.setAttribute("class","value brojNaloga");
 										var a = document.createElement("A");
