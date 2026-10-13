@@ -129,6 +129,10 @@
 								<option value="Potrebna WOMA">ВОМА</option>
 								<option value="Kombinovano">Комбиновано</option>
 								<option value="Zagušenje">Загушење</option>
+								<option value="ZamenaC">Замена (10-50)</option>
+								<option value="ZamenaB">Замена (50-100)</option>
+								<option value="ZamenaA">Замена (100-200)</option>
+								<option value="ZamenaA+">Замена (>200)</option>
 								<option value="Zamena">Спремна замена</option>
 								<option value="Crpljenje">Црпљење</option>
 								<option value="Dezinfekcija">Дезинфекција</option>
@@ -312,10 +316,14 @@
 					<div class="inputWrap">
 						<input type="number" id="novo-stanje" placeholder="0 дин.">
 					</div>
+					<div class="title"><div style="display:inline-block;vertical-align: middle;">Нема финализације:</div><div style="margin-left:10px;display: inline-block;vertical-align: middle;"><input type="checkbox" id="nema-finalizacije" style="width:20px;height:20px"></div></div>
 					<div class="title"><div style="display:inline-block;vertical-align: middle;">Затворена вода?</div><div style="margin-left:10px;display: inline-block;vertical-align: middle;"><input type="checkbox" id="zatvorena-voda" style="width:20px;height:20px"></div></div>
 					<script>
 						if(Number(nalog.zatvorenaVoda)==1){
 							document.getElementById("zatvorena-voda").checked = true;
+						}
+						if(Number(nalog.nemaFin)==1){
+							document.getElementById("nema-finalizacije").checked = true;
 						}
 					</script>
 				</div>
@@ -964,6 +972,7 @@
 					nalogJson.status = document.getElementById("status-naloga").value;
 					nalogJson.majstor = document.getElementById("majstor-naloga").value;
 					nalogJson.zatvorenaVoda = document.getElementById("zatvorena-voda").checked ? 1 : 0;
+					nalogJson.nemaFin = document.getElementById("nema-finalizacije").checked ? 1 : 0;
 					if(document.getElementById("novo-stanje").value){
 						nalogJson.novoStanje = document.getElementById("novo-stanje").value;
 					}

@@ -7833,7 +7833,7 @@ http.listen(process.env.PORT, async function(){
 		}
 		//
    	//var nalozi = await naloziDB.find({majstor:{$in:podizvodjaci},statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]},"prijemnica.datum.datum":{$in:previousDates}}).toArray();
-   	var nalozi = await naloziDB.find({majstor:"IIwY4--1672650358507",statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]},"prijemnica.datum.datum":{$in:previousDates}}).toArray();
+   	var nalozi = await naloziDB.find({majstor:"eupy8--1676039178890",statusNaloga:{$in:["Fakturisan","Spreman za fakturisanje","Nalog u Stambenom"]},"prijemnica.datum.datum":{$in:previousDates}}).toArray();
    	var nalogIds = [];
    	for(var i=0;i<nalozi.length;i++){
    		nalogIds.push(nalozi[i].broj)
@@ -7956,7 +7956,7 @@ http.listen(process.env.PORT, async function(){
 		json.ukupnoNaloga = 0;
 
 		handleData(opseg,json,"BEOGRAD");
-   	fs.writeFileSync("koliks.json",JSON.stringify(json),{encoding:"utf8"})
+   	fs.writeFileSync("merso.json",JSON.stringify(json),{encoding:"utf8"})
 		logResults("BEOGRAD",json)
 		
 		/*handleData(zapad,json,"ZAPAD")
@@ -9241,6 +9241,7 @@ const saveStops = async () => {
 
 schedule.scheduleJob('59 23 * * *', sendEmail);
 schedule.scheduleJob('00 23 * * *', saveStops);
+
 
 server.get('/',async (req,res)=>{
 	if(req.session.user){
@@ -13121,7 +13122,8 @@ server.post('/edit-nalog', async (req, res)=> {
 				    	await izvestajiDB.insertOne(izvestajJson);
 				    }
 				    var setObj = {$set:{
-				    	zatvorenaVoda: nalogJson.zatvorenaVoda
+				    	zatvorenaVoda: nalogJson.zatvorenaVoda,
+				    	nemaFin: nalogJson.nemaFin
 				    }}
 				    await naloziDB.updateOne({broj:nalogJson.broj},setObj);
 				    
@@ -15815,6 +15817,85 @@ server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 	}else{
 		res.redirect("/login?url="+encodeURIComponent(req.url))
 	}*/
+});
+
+server.get('/dispecer/otvoreniNaloziNovo',async (req,res)=>{
+	if(!req.session.user){
+		return res.redirect("/login?url="+encodeURIComponent(req.url))
+	}
+
+	if(["10","20"].indexOf(req.session.user.role)<0){
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+		});
+	}
+	try{
+		var skriveniStatusi = ["Završeno","Nalog u Stambenom","Storniran","Spreman za fakturisanje","Fakturisan","Spreman za obračun"];
+		var opstinaFilter = {};
+		var prikazOpstina = [];
+		if(req.session.user.region=="istok" || req.session.user.region=="ISTOK"){
+			opstinaFilter = {
+				radnaJedinica:{$in:istok}
+			}
+			prikazOpstina = istok;
+		}else if(req.session.user.region=="zapad" || req.session.user.region=="ZAPAD"){
+			opstinaFilter = {
+				radnaJedinica:{$in:zapad}
+			}
+			prikazOpstina = zapad;
+		}else{
+			opstinaFilter = {
+				radnaJedinica:{$in:radneJedinice}
+			}
+			prikazOpstina = radneJedinice;
+		}
+		var majstori = await majstoriDB.find({}).toArray();
+		var nalozi = await naloziDB.find({...opstinaFilter,statusNaloga:{$nin:skriveniStatusi}}).toArray();
+		var brojeviNaloga = [];
+		for(var i=0;i<nalozi.length;i++){
+			delete nalozi[i]._id;
+			delete nalozi[i].uniqueId;
+			delete nalozi[i].digitalizacija;
+			delete nalozi[i].opis;
+			delete nalozi[i].vrstaRada;
+			brojeviNaloga.push(nalozi[i].broj)
+		}
+		var izvestaji = await izvestajiDB.find({nalog:{$in:brojeviNaloga}}).toArray();
+		for(var i=0;i<nalozi.length;i++){
+			nalozi[i].izvestaji = [];
+			for(var j=0;j<izvestaji.length;j++){
+				if(nalozi[i].broj==izvestaji[j].nalog){
+					nalozi[i].izvestaji.push(izvestaji[j]);
+				}
+			}
+		}
+		var dodele = await dodeljivaniNaloziDB.find({nalog:{$in:brojeviNaloga}}).toArray();
+
+		for(var i=0;i<nalozi.length;i++){
+			nalozi[i].dodele = [];
+			for(var j=0;j<dodele.length;j++){
+				if(nalozi[i].broj==dodele[j].nalog){
+					nalozi[i].dodele.push(dodele[j]);
+				}
+			}
+		}
+		res.render("dispeceri/otvoreniNaloziNovo",{
+			pageTitle:"Отворени налози",
+			user: req.session.user,
+			majstori: majstori,
+			prikazOpstina: prikazOpstina,
+			nalozi: nalozi
+		});
+	}catch(err){
+		logError(err);
+		return res.render("message",{
+			pageTitle: "Грешка",
+			user: req.session.user,
+			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+		});
+	}
 });
 
 server.get('/dispecer/storniraniNalozi',async (req,res)=>{

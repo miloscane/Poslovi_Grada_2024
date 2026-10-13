@@ -1,0 +1,809 @@
+<%- include("partials/header") -%>
+<link rel="stylesheet" href="/css/otvoreniNaloziNovo.css?v=3">
+
+<script>
+    // Podaci ostaju isti kao u postojećoj Express/EJS ruti.
+    var nalozi = <%- JSON.stringify(nalozi || []).replace(/</g, "\\u003c") %>;
+    var majstori = <%- JSON.stringify(majstori || []).replace(/</g, "\\u003c") %>;
+    var prikazOpstina = <%- JSON.stringify(prikazOpstina || []).replace(/</g, "\\u003c") %>;
+</script>
+
+<!-- Lokalna biblioteka ikonica: bez eksternih fajlova i ikoničnih fontova. -->
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="on-i-pipe" viewBox="0 0 24 24">
+        <path d="M4 4v6a4 4 0 0 0 4 4h8a4 4 0 0 1 4 4v2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M2 4h4M18 20h4M8 11v6M6 17h4M16 14v-3M14 11h4" fill="none" stroke="currentColor" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="on-i-clipboard" viewBox="0 0 24 24">
+        <rect x="5" y="4" width="14" height="18" rx="2" fill="none" stroke="currentColor"/>
+        <rect x="9" y="2" width="6" height="4" rx="1" fill="none" stroke="currentColor"/>
+        <path d="M9 11h6M9 15h6M9 19h4" fill="none" stroke="currentColor" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="on-i-calendar" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor"/>
+        <path d="M7 3v4m10-4v4M3 10h18M8 15h3" fill="none" stroke="currentColor" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="on-i-alert" viewBox="0 0 24 24">
+        <path d="m10.3 4.4-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-2.6l-8-14a2 2 0 0 0-3.4 0Z" fill="none" stroke="currentColor" stroke-linejoin="round"/>
+        <path d="M12 9v5m0 3h.01" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"/>
+    </symbol>
+    <symbol id="on-i-layers" viewBox="0 0 24 24">
+        <path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="on-i-filter" viewBox="0 0 24 24">
+        <path d="M4 7h16M7 12h10m-7 5h4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"/>
+    </symbol>
+    <symbol id="on-i-search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor"/>
+        <path d="m16 16 5 5" fill="none" stroke="currentColor" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="on-i-reset" viewBox="0 0 24 24">
+        <path d="M4 11a8 8 0 1 1 2 6m-2 3v-7h7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="on-i-download" viewBox="0 0 24 24">
+        <path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="on-i-print" viewBox="0 0 24 24">
+        <path d="M6 9V3h12v6M6 18H4V9h16v9h-2" fill="none" stroke="currentColor" stroke-linejoin="round"/>
+        <path d="M6 14h12v8H6zM17 12h.01" fill="none" stroke="currentColor"/>
+    </symbol>
+    <symbol id="on-i-external" viewBox="0 0 24 24">
+        <path d="M13 5h6v6m0-6-9 9M19 14v5H5V5h5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="on-i-check" viewBox="0 0 24 24">
+        <path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+</svg>
+
+<main class="on-page otvoreniNaloziNovo">
+    <div class="on-container">
+        <header class="on-hero">
+            <div>
+                <div class="on-eyebrow">Теренске интервенције / Оперативни преглед</div>
+                <h1>Отворени радни налози</h1>
+                <p>Преглед интервенција, распореда мајстора и стања налога по радним јединицама.</p>
+            </div>
+            <div class="on-hero-aside">
+                <div class="on-hero-emblem"><svg><use href="#on-i-pipe"></use></svg></div>
+                <div>
+                    <strong>Оперативни центар</strong>
+                    <small id="on-current-date">Преглед радних налога</small>
+                </div>
+            </div>
+        </header>
+
+        <section class="on-stats" aria-label="Статистика налога">
+            <article class="on-stat on-stat-total">
+                <div class="on-stat-icon"><svg><use href="#on-i-clipboard"></use></svg></div>
+                <div>
+                    <div class="on-stat-label">Приказани налози</div>
+                    <div class="on-stat-number" id="ukupno-prikazanih-naloga">0</div>
+                    <div class="on-stat-detail">Према одабраним филтерима</div>
+                </div>
+            </article>
+            <article class="on-stat on-stat-schedule">
+                <div class="on-stat-icon"><svg><use href="#on-i-calendar"></use></svg></div>
+                <div>
+                    <div class="on-stat-label">Незаказани налози</div>
+                    <div class="on-stat-number" id="nezakazani-nalozi">0</div>
+                    <div class="on-stat-detail">Без будућег термина</div>
+                </div>
+            </article>
+            <article class="on-stat on-stat-urgent">
+                <div class="on-stat-icon"><svg><use href="#on-i-alert"></use></svg></div>
+                <div>
+                    <div class="on-stat-label">Ургирани налози</div>
+                    <div class="on-stat-number" id="urgencije">0</div>
+                    <div class="on-stat-detail">Са евидентираном ургенцијом</div>
+                </div>
+            </article>
+            <article class="on-stat on-stat-initial">
+                <div class="on-stat-icon"><svg><use href="#on-i-layers"></use></svg></div>
+                <div>
+                    <div class="on-stat-label">Налози у почетној фази</div>
+                    <div class="on-stat-number" id="nepoznato">0</div>
+                    <div class="on-stat-detail">Примљени или додељени</div>
+                </div>
+            </article>
+        </section>
+
+        <section class="on-panel on-filters" aria-labelledby="on-filters-title">
+            <div class="on-panel-head">
+                <div class="on-panel-heading">
+                    <div class="on-heading-icon"><svg><use href="#on-i-filter"></use></svg></div>
+                    <div>
+                        <h2 class="on-panel-title" id="on-filters-title">Филтери претраге</h2>
+                        <p class="on-panel-subtitle">Изаберите јединице, статус и извршиоце за приказ налога</p>
+                    </div>
+                </div>
+                <button type="button" class="on-button on-button-quiet" id="on-reset-filters">
+                    <svg><use href="#on-i-reset"></use></svg> Поништи филтере
+                </button>
+            </div>
+            <div class="on-divider"></div>
+            <div class="on-filter-content">
+                <div class="on-municipality-head">
+                    <label class="on-field-label">Приказане радне јединице</label>
+                    <span class="on-field-hint">Десни клик на јединицу приказује само њене налоге</span>
+                </div>
+                <div class="on-municipalities" id="filter-opstine-checkboxes"></div>
+
+                <div class="on-filter-grid">
+                    <div class="on-field">
+                        <label class="on-field-label" for="status-naloga">Статус налога</label>
+                        <select id="status-naloga" class="on-control on-select">
+                            <option value="Svi">Сви статуси</option>
+                            <option value="Primljen">Примљен</option>
+                            <option value="Dodeljen majstoru">Додељен мајстору</option>
+                            <option value="Potreban pristup">Потребан приступ</option>
+                            <option value="Potrebna WOMA">ВОМА</option>
+                            <option value="Kombinovano">Комбиновано</option>
+                            <option value="Zagušenje">Загушење</option>
+                            <option value="Zamena">Спремна замена</option>
+                            <option value="Crpljenje">Црпљење</option>
+                            <option value="Dezinfekcija">Дезинфекција</option>
+                            <option value="Masinsko kopanje">Машинско копање</option>
+                            <option value="Rucno kopanje">Ручно копање</option>
+                            <option value="Finalizacija">Финализација</option>
+                            <option value="Betonaža">Бетонажа</option>
+                            <option value="Asfalt">Асфалт</option>
+                            <option value="Bekaton">Бекатон</option>
+                            <option value="Preventivno čišćenje">Превентивно чишћење</option>
+                            <option value="Snimanje kamerom">Снимање камером</option>
+                            <option value="Vraćen">Враћен</option>
+                            <option value="Završeno">Завршено</option>
+                        </select>
+                    </div>
+                    <div class="on-field">
+                        <label class="on-field-label" for="majstor-naloga">Задужени мајстор</label>
+                        <select id="majstor-naloga" class="on-control on-select"></select>
+                    </div>
+                    <div class="on-field">
+                        <div class="on-field-label">Подизвођачи</div>
+                        <label class="on-switch-wrap" for="podizvodjaci-checkbox">
+                            <span class="on-switch-title">Прикажи подизвођаче</span>
+                            <span class="on-switch-control">
+                                <input type="checkbox" id="podizvodjaci-checkbox" checked>
+                                <span class="on-switch-track"></span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="on-field">
+                        <label class="on-field-label" for="adresa-filter">Адреса</label>
+                        <div class="on-control-with-icon">
+                            <svg><use href="#on-i-search"></use></svg>
+                            <input class="on-control" type="search" id="adresa-filter" placeholder="Претрага адресе..." autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="on-field">
+                        <label class="on-field-label" for="broj-filter">Број налога</label>
+                        <div class="on-control-with-icon">
+                            <svg><use href="#on-i-search"></use></svg>
+                            <input class="on-control" type="search" id="broj-filter" placeholder="Унесите број..." autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="on-panel on-table-panel" aria-labelledby="on-table-title">
+            <div class="on-panel-head on-list-header">
+                <div class="on-panel-heading">
+                    <div class="on-heading-icon"><svg><use href="#on-i-clipboard"></use></svg></div>
+                    <div>
+                        <h2 class="on-panel-title" id="on-table-title">Списак радних налога</h2>
+                        <p class="on-panel-subtitle">Сортирано од најстаријег налога ка најновијем</p>
+                    </div>
+                </div>
+                <div class="on-table-actions">
+                    <span class="on-count"><span class="on-count-dot"></span><span id="on-table-count">0 приказаних</span></span>
+                    <button class="on-button" type="button" onclick="printTable()"><svg><use href="#on-i-print"></use></svg> Штампај PDF</button>
+                    <button class="on-button on-button-primary" type="button" onclick="printCSV()"><svg><use href="#on-i-download"></use></svg> Excel / CSV</button>
+                </div>
+            </div>
+            <div id="table" class="on-table-scroll">
+                <table class="on-table" aria-label="Преглед радних налога">
+                    <thead>
+                        <tr>
+                            <th class="on-col-no">Бр.</th>
+                            <th class="on-col-broj">Број налога</th>
+                            <th class="on-col-datum">Датум налога</th>
+                            <th class="on-col-opstina">Радна јединица</th>
+                            <th class="on-col-adresa">Адреса</th>
+                            <th class="on-col-status">Статус</th>
+                            <th class="on-col-majstor">Мајстор</th>
+                            <th class="on-col-urg">Ургенције</th>
+                            <th class="on-col-zakazan">Заказано</th>
+                            <th class="on-col-datum-komentara">Датум коментара</th>
+                            <th class="on-col-komentar">Последњи коментар</th>
+                        </tr>
+                    </thead>
+                    <tbody id="on-table-body"></tbody>
+                </table>
+            </div>
+            <div class="on-table-bottom">
+                <span>Приказују се налози који одговарају изабраним филтерима.</span>
+                <span>Укупно: <strong id="on-bottom-count">0</strong></span>
+            </div>
+        </section>
+    </div>
+</main>
+
+<%- include("partials/printer") -%>
+
+<script>
+    // Ostavljen kao globalna promenljiva – koriste je i izvoz i štampanje.
+    var naloziToShow = [];
+
+    var onSubcontractorIds = new Set(
+        (typeof podizvodjaci !== "undefined" && Array.isArray(podizvodjaci) ? podizvodjaci : []).map(String)
+    );
+    var onRegion = (typeof user !== "undefined" && user && user.region)
+        ? String(user.region).toUpperCase() : "ISTOK";
+    var onMajstorMap = new Map(majstori.map(m => [String(m.uniqueId), m]));
+    var onOrderMeta = new WeakMap();
+    var onDateFormat = new Intl.DateTimeFormat("sr-RS", {day:"2-digit",month:"2-digit",year:"numeric"});
+    var onNumberFormat = new Intl.NumberFormat("sr-RS");
+
+    function onSafeText(value, fallback = "") {
+        return value === null || value === undefined ? fallback : String(value);
+    }
+
+    function onMajstorName(id) {
+        var m = onMajstorMap.get(String(id));
+        return m && m.ime ? m.ime : "Није додељен";
+    }
+
+    function onGetDateOfOrder(nalog) {
+        return onSafeText(nalog?.datum?.datum, "—");
+    }
+
+    // Datumi sa servera mogu biti Date/ISO, 2026-10-14, 14.10.2026, Unix timestamp
+    // ili objekat {datum, datetime}. Datum bez vremena se tretira kao lokalni dan.
+    function onParseDate(value) {
+        if (value === null || value === undefined || value === "") return null;
+        if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+        if (typeof value === "object") {
+            for (var field of ["datetime", "datum", "createdAt", "timestamp", "date"]) {
+                if (value[field] !== undefined) {
+                    var nested = onParseDate(value[field]);
+                    if (nested) return nested;
+                }
+            }
+            return null;
+        }
+        if (typeof value === "number" || /^\d{10,13}$/.test(String(value).trim())) {
+            var ms = Number(value);
+            if (!Number.isFinite(ms)) return null;
+            if (ms < 100000000000) ms *= 1000; // Unix vreme u sekundama
+            var numericDate = new Date(ms);
+            return Number.isNaN(numericDate.getTime()) ? null : numericDate;
+        }
+        var str = String(value).trim();
+        var sr = str.match(/^(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})\.?[\s,]*(\d{1,2})?:?(\d{2})?/);
+        if (sr) {
+            var day = Number(sr[1]), month = Number(sr[2]), year = Number(sr[3]);
+            var hour = Number(sr[4] || 0), minute = Number(sr[5] || 0);
+            var parsed = new Date(year, month - 1, day, hour, minute);
+            return parsed.getFullYear() === year && parsed.getMonth() === month - 1 && parsed.getDate() === day && hour < 24 && minute < 60 ? parsed : null;
+        }
+        var iso = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+        if (iso && !/[zZ]|[+-]\d{2}:?\d{2}$/.test(str)) {
+            var year = Number(iso[1]), month = Number(iso[2]), day = Number(iso[3]);
+            var hour = Number(iso[4] || 0), minute = Number(iso[5] || 0);
+            var parsed = new Date(year, month - 1, day, hour, minute);
+            return parsed.getFullYear() === year && parsed.getMonth() === month - 1 && parsed.getDate() === day && hour < 24 && minute < 60 ? parsed : null;
+        }
+        var parsed = new Date(str);
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    function onOrderTime(nalog) {
+        var datum = nalog && nalog.datum;
+        // Precizan datum unosa ako postoji, inače vidljivi datum naloga.
+        var date = onParseDate(datum?.datetime) || onParseDate(datum?.datum) || onParseDate(datum);
+        return date ? date.getTime() : Number.POSITIVE_INFINITY;
+    }
+
+    function onCommentDate(report) {
+        if (!report) return null;
+        // Ako je ime polja datuma drugačije, dodati ga u ovu listu.
+        var candidates = [
+            report.datetime, report.datumIzvestaja, report.datumUnosa,
+            report.datumKreiranja, report.datumVreme, report.dateTime,
+            report.createdAt, report.created_at, report.created,
+            report.datum_izvestaja, report.datum_unosa, report.datum,
+            report.date, report.timestamp, report.vremeUnosa, report.time, report.vreme
+        ];
+        for (var value of candidates) {
+            var parsed = onParseDate(value);
+            if (parsed) {
+                // Ako je vreme posebno sačuvano, spoji datum i HH:mm.
+                var separateTime = onSafeText(report.vreme || report.sat).match(/^(\d{1,2}):(\d{2})/);
+                if (separateTime && ![report.datetime, report.createdAt, report.created_at].includes(value)) {
+                    parsed.setHours(Number(separateTime[1]), Number(separateTime[2]), 0, 0);
+                }
+                return parsed;
+            }
+        }
+        return null;
+    }
+
+    function onGetLatestComment(nalog) {
+        var reports = Array.isArray(nalog?.izvestaji) ? nalog.izvestaji : [];
+        // Zadrži originalno značenje: poslednji upisani izveštaj sa tekstom.
+        for (var i = reports.length - 1; i >= 0; i--) {
+            var comment = onSafeText(reports[i]?.izvestaj).trim();
+            if (comment) return { text: comment, date: onCommentDate(reports[i]), index: i };
+        }
+        return null;
+    }
+
+    function onCommentState(comment, now) {
+        if (!comment) return "critical"; // Nijedan komentar nikada nije unet
+        if (!comment.date) return "undated"; // Ne tvrditi da je star >48h bez datuma
+        return now.getTime() - comment.date.getTime() >= 48 * 60 * 60 * 1000 ? "stale" : "recent";
+    }
+
+    // Podržava ISO (YYYY-MM-DD), srpski datum (DD.MM.YYYY) i Date/ISO timestamp.
+    function onParseAssignment(entry) {
+        if (!entry || !entry.datumRadova) return null;
+        var raw = onSafeText(entry.datumRadova);
+        var matchISO = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        var matchSR = raw.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+        var result;
+
+        if (matchISO) {
+            result = new Date(Number(matchISO[1]), Number(matchISO[2]) - 1, Number(matchISO[3]));
+        } else if (matchSR) {
+            result = new Date(Number(matchSR[3]), Number(matchSR[2]) - 1, Number(matchSR[1]));
+        } else {
+            result = new Date(entry.datumRadova);
+        }
+        if (Number.isNaN(result.getTime())) return null;
+
+        var parts = onSafeText(entry.vremeDolaska).match(/^(\d{1,2}):(\d{2})/);
+        if (!parts) return null;
+        var hour = Number(parts[1]);
+        var minute = Number(parts[2]);
+        if (hour > 23 || minute > 59) return null;
+        result.setHours(hour, minute, 0, 0);
+        return result;
+    }
+
+    function onGetMeta(nalog, now) {
+        var reports = Array.isArray(nalog.izvestaji) ? nalog.izvestaji : [];
+        var allocations = Array.isArray(nalog.dodele) ? nalog.dodele : [];
+        var urgent = reports.filter(r => onSafeText(r?.izvestaj).toLowerCase().includes("urg")).length;
+        var next = null;
+        for (var allocation of allocations) {
+            var date = onParseAssignment(allocation);
+            if (date && date.getTime() >= now.getTime() && (!next || date < next)) next = date;
+        }
+        var lastComment = onGetLatestComment(nalog);
+        return { urgent, next, hadAssignments: allocations.length > 0,
+            lastComment, commentState: onCommentState(lastComment, now) };
+    }
+
+    function onDateTime(date) {
+        if (!date) return "";
+        return onDateFormat.format(date) + " " +
+            String(date.getHours()).padStart(2,"0") + ":" + String(date.getMinutes()).padStart(2,"0");
+    }
+
+    function onBookingText(meta) {
+        return meta.next ? onDateTime(meta.next)
+            : meta.hadAssignments ? "Термин истекао" : "Није заказан";
+    }
+
+    function onStatusStyle(status) {
+        if (["Završeno"].includes(status)) return "on-pill-green";
+        if (["Vraćen"].includes(status)) return "on-pill-red";
+        if (["Potreban pristup","Potrebna WOMA","Zagušenje","Crpljenje"].includes(status)) return "on-pill-amber";
+        if (["Dodeljen majstoru","Kombinovano","Zamena","Finalizacija","Betonaža","Asfalt","Bekaton","Snimanje kamerom"].includes(status)) return "on-pill-blue";
+        return "on-pill-neutral";
+    }
+
+    function onCell(row, text, className = "") {
+        var td = document.createElement("td");
+        if (className) td.className = className;
+        td.textContent = onSafeText(text);
+        row.appendChild(td);
+        return td;
+    }
+
+    function onCreateRow(nalog, i, meta) {
+        var tr = document.createElement("tr");
+        onCell(tr, i + 1, "on-col-no on-muted");
+
+        var orderCell = onCell(tr, "", "on-col-broj");
+        var link = document.createElement("a");
+        link.href = "/nalog/" + encodeURIComponent(onSafeText(nalog.broj));
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.className = "on-order-link";
+        link.textContent = onSafeText(nalog.broj, "—");
+        link.addEventListener("click", () => tr.classList.add("on-row-opened"));
+        var linkIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        var use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+        use.setAttribute("href", "#on-i-external");
+        linkIcon.appendChild(use);
+        link.appendChild(linkIcon);
+        orderCell.appendChild(link);
+
+        onCell(tr, onGetDateOfOrder(nalog), "on-col-datum");
+        onCell(tr, nalog.radnaJedinica || "—", "on-col-opstina");
+        onCell(tr, nalog.adresa || "—", "on-col-adresa on-address");
+
+        var statusCell = onCell(tr, "", "on-col-status");
+        var pill = document.createElement("span");
+        pill.className = "on-pill " + onStatusStyle(nalog.statusNaloga);
+        pill.textContent = nalog.statusNaloga || "Непознат статус";
+        statusCell.appendChild(pill);
+
+        var majstorCell = onCell(tr, onMajstorName(nalog.majstor), "on-col-majstor");
+        if (!onMajstorMap.has(String(nalog.majstor))) majstorCell.classList.add("on-muted");
+
+        var urgencyCell = onCell(tr, "", "on-col-urg");
+        var urgency = document.createElement("span");
+        urgency.className = "on-urgency" + (meta.urgent > 0 ? " is-urgent" : "");
+        urgency.textContent = meta.urgent;
+        urgencyCell.appendChild(urgency);
+
+        var bookingCell = onCell(tr, onBookingText(meta), "on-col-zakazan on-booking");
+        if (!meta.next) bookingCell.classList.add(meta.hadAssignments ? "on-booking-old" : "on-booking-missing");
+
+        // Naglašavamo komentare kojima je potrebna pažnja.
+        if (meta.commentState === "critical") tr.classList.add("on-row-no-comment");
+        if (meta.commentState === "stale") tr.classList.add("on-row-old-comment");
+
+        var commentDateCell = onCell(tr, "", "on-col-datum-komentara");
+        var dateLabel = document.createElement("span");
+        dateLabel.className = "on-comment-date";
+        if (meta.commentState === "critical") {
+            dateLabel.classList.add("on-comment-critical");
+            dateLabel.textContent = "БЕЗ КОМЕНТАРА";
+        } else if (meta.commentState === "stale") {
+            dateLabel.classList.add("on-comment-stale");
+            dateLabel.textContent = onDateTime(meta.lastComment.date);
+            var oldNote = document.createElement("small");
+            oldNote.textContent = "Преко 48 сати";
+            dateLabel.appendChild(oldNote);
+        } else if (meta.commentState === "undated") {
+            dateLabel.classList.add("on-comment-undated");
+            dateLabel.textContent = "Датум није евидентиран";
+        } else {
+            dateLabel.textContent = onDateTime(meta.lastComment.date);
+        }
+        commentDateCell.appendChild(dateLabel);
+
+        var commentCell = onCell(tr, "", "on-col-komentar");
+        var commentSpan = document.createElement("span");
+        commentSpan.className = "on-last-comment";
+        if (meta.commentState === "critical") {
+            commentSpan.classList.add("on-last-comment-critical");
+            commentSpan.textContent = "Није унет ниједан коментар!";
+        } else {
+            commentSpan.textContent = meta.lastComment.text;
+            commentSpan.title = meta.lastComment.text;
+            if (meta.commentState === "stale") commentSpan.classList.add("on-last-comment-stale");
+        }
+        commentCell.appendChild(commentSpan);
+        return tr;
+    }
+
+    function onBuildMunicipalities() {
+        var container = document.getElementById("filter-opstine-checkboxes");
+        for (var opstina of prikazOpstina) {
+            var label = document.createElement("label");
+            label.className = "on-check-chip";
+            var input = document.createElement("input");
+            input.type = "checkbox";
+            input.className = "radnaJedinicaCheckbox";
+            input.value = opstina;
+            input.checked = true;
+            var content = document.createElement("span");
+            content.className = "on-chip-content";
+            var check = document.createElement("span");
+            check.className = "on-checkmark";
+            check.innerHTML = '<svg aria-hidden="true"><use href="#on-i-check"></use></svg>';
+            var labelText = document.createElement("span");
+            labelText.textContent = opstina;
+            content.append(check, labelText);
+            label.append(input, content);
+            container.appendChild(label);
+        }
+        container.addEventListener("change", generateTable);
+        container.addEventListener("contextmenu", function(event) {
+            var chip = event.target.closest(".on-check-chip");
+            if (!chip) return;
+            event.preventDefault();
+            var chosen = chip.querySelector("input");
+            container.querySelectorAll("input").forEach(input => { input.checked = input === chosen; });
+            generateTable();
+        });
+    }
+
+    function onBuildMajstori() {
+        var select = document.getElementById("majstor-naloga");
+        select.add(new Option("Сви мајстори", "Svi"));
+        select.add(new Option("Без мајстора", "Nijedan"));
+
+        var groups = new Map();
+        var regions = onRegion === "ZAPAD" ? ["ZAPAD", "ISTOK"] : ["ISTOK", "ZAPAD"];
+        var types = ["Мајстор", "Финализер", "Одгушивач", "Вомаш", "Багериста", "Копач"];
+        var names = {"Мајстор":"Мајстори", "Финализер":"Финализери", "Одгушивач":"Одгушивачи", "Вомаш":"Вомаши", "Багериста":"Багеристи", "Копач":"Копачи"};
+        groups.set("ПОДИЗВОЂАЧИ", []);
+        for (var region of regions) {
+            for (var type of types) groups.set(region + " — " + names[type], []);
+        }
+        groups.set("ОСТАЛИ", []);
+        groups.set("НЕАКТИВНИ", []);
+
+        for (var m of [...majstori].sort((a,b) => onSafeText(a.ime).localeCompare(onSafeText(b.ime),"sr"))) {
+            var group;
+            if (onSubcontractorIds.has(String(m.uniqueId))) {
+                group = "ПОДИЗВОЂАЧИ";
+            } else if (m.aktivan != true) {
+                group = "НЕАКТИВНИ";
+            } else {
+                var region = String(m.region || "").toUpperCase() === "ISTOK" ? "ISTOK" : "ZAPAD";
+                var typeLabel = names[m.tipMajstora];
+                group = typeLabel ? region + " — " + typeLabel : "ОСТАЛИ";
+            }
+            groups.get(group).push(m);
+        }
+
+        for (var [name, members] of groups) {
+            if (!members.length) continue;
+            var optgroup = document.createElement("optgroup");
+            optgroup.label = name;
+            for (var m of members) optgroup.appendChild(new Option(m.ime || "Непознат", String(m.uniqueId)));
+            select.appendChild(optgroup);
+        }
+    }
+
+    function generateTable() {
+        var includedUnits = new Set(
+            [...document.querySelectorAll(".radnaJedinicaCheckbox:checked")].map(e => e.value)
+        );
+        var status = document.getElementById("status-naloga").value;
+        var master = document.getElementById("majstor-naloga").value;
+        var subcontractors = document.getElementById("podizvodjaci-checkbox").checked;
+        var address = document.getElementById("adresa-filter").value.trim().toLocaleLowerCase("sr");
+        var orderNumber = document.getElementById("broj-filter").value.trim().toLocaleLowerCase("sr");
+        var now = new Date();
+
+        naloziToShow = nalozi.filter(nalog => {
+            if (!includedUnits.has(nalog.radnaJedinica)) return false;
+            if (status !== "Svi" && nalog.statusNaloga !== status) return false;
+            if (master === "Nijedan") {
+                if (nalog.majstor && nalog.majstor !== "Nijedan") return false;
+            } else if (master !== "Svi" && String(nalog.majstor) !== master) return false;
+            if (!subcontractors && onSubcontractorIds.has(String(nalog.majstor))) return false;
+            if (address && !onSafeText(nalog.adresa).toLocaleLowerCase("sr").includes(address)) return false;
+            if (orderNumber && !onSafeText(nalog.broj).toLocaleLowerCase("sr").includes(orderNumber)) return false;
+            return true;
+        });
+
+        // Najstariji nalog prvi. Nalozi bez ispravnog datuma idu na kraj.
+        naloziToShow.sort((a, b) => onOrderTime(a) - onOrderTime(b) || 0);
+
+        var unscheduled = 0;
+        var urgentOrders = 0;
+        var initial = 0;
+        var tbody = document.getElementById("on-table-body");
+        var fragment = document.createDocumentFragment();
+        onOrderMeta = new WeakMap();
+
+        naloziToShow.forEach((nalog, i) => {
+            var meta = onGetMeta(nalog, now);
+            onOrderMeta.set(nalog, meta);
+            if (!meta.next) unscheduled++;
+            if (meta.urgent > 0) urgentOrders++;
+            if (["Primljen", "Dodeljen majstoru"].includes(nalog.statusNaloga)) initial++;
+            fragment.appendChild(onCreateRow(nalog, i, meta));
+        });
+
+        if (!naloziToShow.length) {
+            var tr = document.createElement("tr");
+            var td = document.createElement("td");
+            td.colSpan = 11;
+            td.className = "on-empty";
+            td.innerHTML = '<span class="on-empty-icon"><svg><use href="#on-i-search"></use></svg></span><strong>Нема налога за изабране филтере</strong><p>Промените критеријуме или поништите филтере.</p>';
+            tr.appendChild(td);
+            fragment.appendChild(tr);
+        }
+        tbody.replaceChildren(fragment);
+
+        var count = onNumberFormat.format(naloziToShow.length);
+        document.getElementById("ukupno-prikazanih-naloga").textContent = count;
+        document.getElementById("nezakazani-nalozi").textContent = onNumberFormat.format(unscheduled);
+        document.getElementById("urgencije").textContent = onNumberFormat.format(urgentOrders);
+        document.getElementById("nepoznato").textContent = onNumberFormat.format(initial);
+        document.getElementById("on-table-count").textContent = count + " приказаних";
+        document.getElementById("on-bottom-count").textContent = count;
+    }
+
+    function onResetFilters() {
+        document.querySelectorAll(".radnaJedinicaCheckbox").forEach(cb => cb.checked = true);
+        document.getElementById("status-naloga").value = "Svi";
+        document.getElementById("majstor-naloga").value = "Svi";
+        document.getElementById("podizvodjaci-checkbox").checked = true;
+        document.getElementById("adresa-filter").value = "";
+        document.getElementById("broj-filter").value = "";
+        generateTable();
+    }
+
+    function onExportRow(nalog, i) {
+        var meta = onOrderMeta.get(nalog) || onGetMeta(nalog, new Date());
+        return [i + 1, nalog.broj, onGetDateOfOrder(nalog), nalog.radnaJedinica,
+            nalog.adresa, nalog.statusNaloga, onMajstorName(nalog.majstor), meta.urgent,
+            onBookingText(meta), meta.lastComment?.date ? onDateTime(meta.lastComment.date) : "",
+            meta.lastComment?.text || "Нема коментара"];
+    }
+
+    function onCsvCell(value) {
+        var s = onSafeText(value).replace(/\r?\n/g, " ");
+        // Zaštita od pokretanja formula kada CSV otvori Excel.
+        if (/^[\s]*[=+@-]/.test(s)) s = "'" + s;
+        return '"' + s.replace(/"/g, '""') + '"';
+    }
+
+    function printCSV() {
+        var header = ["Бр.", "Број налога", "Датум налога", "Радна јединица", "Адреса", "Статус", "Мајстор", "Ургенције", "Заказано", "Датум коментара", "Последњи коментар"];
+        var lines = [header.map(onCsvCell).join(";")];
+        naloziToShow.forEach((nalog, i) => lines.push(onExportRow(nalog, i).map(onCsvCell).join(";")));
+        var blob = new Blob(["\uFEFF" + lines.join("\r\n")], {type:"text/csv;charset=utf-8;"});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "otvoreni-nalozi-" + new Date().toLocaleDateString("sv-SE") + ".csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function printTable() {
+        if (!naloziToShow.length) return alert("Нема налога за штампу.");
+
+        // A4 uspravno, istih 6 kolona kao na staroj stranici.
+        var JsPDF = (typeof jsPDF !== "undefined" && jsPDF) ||
+            (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+        if (typeof JsPDF !== "function") {
+            return alert("Није учитана jsPDF библиотека (partials/printer).");
+        }
+
+        try {
+            var doc = new JsPDF({ orientation: "p", unit: "mm", format: "a4", compress: true });
+            if (typeof PTSans === "undefined" || typeof PTSansBold === "undefined") {
+                return alert("Нису учитани PTSans фонтови (partials/printer).");
+            }
+            doc.addFileToVFS("PTSans.ttf", PTSans);
+            doc.addFileToVFS("PTSansBold.ttf", PTSansBold);
+            doc.addFont("PTSans.ttf", "PTSans", "normal");
+            doc.addFont("PTSansBold.ttf", "PTSans", "bold");
+
+            var margin = 10;
+            var pageWidth = doc.internal.pageSize.getWidth();
+            var pageHeight = doc.internal.pageSize.getHeight();
+            var widths = [9, 24, 27, 31, 55, 44]; // ukupno 190 mm
+            var headers = ["Бр.", "Број налога", "Датум налога", "Радна јединица", "Адреса", "Статус"];
+            var y = 0;
+            var page = 0;
+            var rowHeight = 8;
+
+            // Važno: splitTextToSize() na nekim verzijama jsPDF-a pogrešno
+            // prelama ćirilicu slovo-po-slovo zbog metrika custom TTF fonta.
+            // Svako polje šaljemo kao JEDAN string, nikad niz linija.
+            // Dug tekst skraćujemo umesto da ga lomimo vertikalno.
+            function pdfOneLine(value, availableWidth) {
+                var valueStr = onSafeText(value).replace(/\s+/g, " ").trim() || "—";
+                var suffix = "…";
+
+                // Proveri da li jsPDF vraća realne mere širine teksta.
+                // Ako TTF nema ispravne metrike, koristi konzervativan broj znakova.
+                var testWidth = doc.getTextWidth("MMMMMMMMMM");
+                if (Number.isFinite(testWidth) && testWidth >= 5 && testWidth <= 45) {
+                    if (doc.getTextWidth(valueStr) <= availableWidth) return valueStr;
+                    var lo = 0;
+                    var hi = valueStr.length;
+                    while (lo < hi) {
+                        var mid = Math.ceil((lo + hi) / 2);
+                        if (doc.getTextWidth(valueStr.slice(0, mid) + suffix) <= availableWidth) lo = mid;
+                        else hi = mid - 1;
+                    }
+                    return lo > 0 ? valueStr.slice(0, lo).trimEnd() + suffix : suffix;
+                }
+
+                // Rezervna putanja: procena na osnovu veličine fonta u pt.
+                //var maxChars = Math.max(1, Math.floor(availableWidth / (doc.getFontSize() * 0.24)));
+                var maxChars = Math.max(1, Math.floor(availableWidth / (8 * 0.24)));
+                return valueStr.length > maxChars
+                    ? valueStr.slice(0, Math.max(1, maxChars - 1)).trimEnd() + suffix
+                    : valueStr;
+            }
+
+            function pdfPageHeader() {
+                if (page > 0) doc.addPage();
+                page++;
+                y = 12;
+                doc.setFont("PTSans", "bold");
+                doc.setFontSize(11);
+                doc.setTextColor(22, 57, 93);
+                doc.text("ПРЕГЛЕД ОТВОРЕНИХ НАЛОГА", margin, y);
+
+                doc.setFont("PTSans", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(95, 112, 128);
+                doc.text("Укупно: " + naloziToShow.length + "  |  Страна " + page,
+                    pageWidth - margin, y, { align: "right" });
+                y += 7;
+
+                doc.setFillColor(235, 242, 248);
+                doc.rect(margin, y, pageWidth - margin * 2, 11, "F");
+                doc.setFont("PTSans", "bold");
+                doc.setFontSize(7.2);
+                doc.setTextColor(43, 67, 92);
+                var x = margin;
+                headers.forEach((header, i) => {
+                    doc.text(pdfOneLine(header, widths[i] - 2), x + 1, y + 6);
+                    x += widths[i];
+                });
+                y += 11;
+            }
+
+            pdfPageHeader();
+            naloziToShow.forEach((nalog, index) => {
+                if (y + rowHeight > pageHeight - margin) pdfPageHeader();
+                if (index % 2 === 0) {
+                    doc.setFillColor(249, 251, 253);
+                    doc.rect(margin, y, pageWidth - margin * 2, rowHeight, "F");
+                }
+
+                var values = [
+                    String(index + 1) + ".",
+                    onSafeText(nalog.broj),
+                    onGetDateOfOrder(nalog),
+                    onSafeText(nalog.radnaJedinica),
+                    onSafeText(nalog.adresa),
+                    onSafeText(nalog.statusNaloga)
+                ];
+                doc.setFont("PTSans", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(47, 59, 73);
+                var x = margin;
+                values.forEach((value, i) => {
+                    doc.text(pdfOneLine(value, widths[i] - 2), x + 1, y + 5.2);
+                    x += widths[i];
+                });
+
+                doc.setDrawColor(229, 235, 241);
+                doc.line(margin, y + rowHeight, pageWidth - margin, y + rowHeight);
+                y += rowHeight;
+            });
+
+            // Isti način kao u staroj verziji: PDF pregled u novom tabu.
+            var pdfUrl = doc.output("bloburl");
+            var opened = window.open(pdfUrl, "_blank");
+            if (!opened) doc.save("otvoreni-nalozi.pdf");
+        } catch (error) {
+            console.error("Грешка приликом штампе PDF-а:", error);
+            alert("Грешка приликом израде PDF-а. Погледајте Console за детаље.");
+        }
+    }
+
+    // Inicijalizacija: bez dodatnih server poziva.
+    onBuildMunicipalities();
+    onBuildMajstori();
+    document.getElementById("on-current-date").textContent = "Датум прегледа: " + onDateFormat.format(new Date());
+    ["status-naloga","majstor-naloga","podizvodjaci-checkbox","adresa-filter","broj-filter"].forEach(id => {
+        var el = document.getElementById(id);
+        el.addEventListener(id === "status-naloga" || id === "majstor-naloga" || id === "podizvodjaci-checkbox" ? "change" : "input", generateTable);
+    });
+    document.getElementById("on-reset-filters").addEventListener("click", onResetFilters);
+    generateTable();
+</script>
+
+<%- include("partials/footer") -%>
