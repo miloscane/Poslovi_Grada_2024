@@ -4490,7 +4490,7 @@ http.listen(process.env.PORT, async function(){
 		console.log(response)*/
 
 
-		/*var nalozi = await naloziDB.find({"coordinates.lat": { $exists: false }}).toArray()
+		var nalozi = await naloziDB.find({"coordinates.lat": { $exists: false },statusNaloga:{$nin:["Fakturisan","Nalog u Stambenom","Storniran","Završeno","Spreman za fakturisanje"]}}).toArray()
 		//console.log(nalozi)
 		for(var i=0;i<nalozi.length;i++){
 			try{
@@ -4523,7 +4523,7 @@ http.listen(process.env.PORT, async function(){
 			}
 			
 			
-		}*/
+		}
 
 
 		/*const config = {
@@ -22690,6 +22690,153 @@ server.get("/aktuelniNalozi", checkBearerToken, async (req, res) => {
 	    });
     }
 });
+
+
+server.get("/stambeno/:datum1/:datum2/:status", checkBearerToken, async (req, res) => {
+    try {
+        var datum1 = req.params.datum1;
+        var datum2 = req.params.datum2;
+        var status = Number(req.params.status);
+
+        // Expected format: YYYY-MM-DD
+        if (
+            !/^\d{4}-\d{2}-\d{2}$/.test(datum1) ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(datum2) ||
+            ![0, 1].includes(status)
+        ) {
+            return res.json({
+                success: false,
+                message: "Neispravni parametri"
+            });
+        }
+
+        var startDate = new Date(datum1 + "T00:00:00Z");
+        var endDate = new Date(datum2 + "T00:00:00Z");
+
+        if (
+            isNaN(startDate.getTime()) ||
+            isNaN(endDate.getTime()) ||
+            startDate > endDate ||
+            startDate.toISOString().slice(0, 10) !== datum1 ||
+            endDate.toISOString().slice(0, 10) !== datum2
+        ) {
+            return res.json({
+                success: false,
+                message: "Neispravan raspon datuma"
+            });
+        }
+
+        // Include the entire last day
+        endDate.setUTCDate(endDate.getUTCDate() + 1);
+
+        var query = {
+            "datum.datetime": {
+                $gte: startDate.getTime(),
+                $lt: endDate.getTime()
+            }
+        };
+
+        var statusiFakturisanja = [
+            "Fakturisan",
+            "Nalog u Stambenom",
+            "Spreman za fakturisanje"
+        ];
+
+        if (status === 0) {
+            query.statusNaloga = {
+                $in: statusiFakturisanja
+            };
+        } else if (status === 1) {
+            query.statusNaloga = {
+                $nin: [...statusiFakturisanja, "Storniran"]
+            };
+        }
+
+        var nalozi = await client.db("Hausmajstor")
+            .collection("Nalozi")
+            .find(query)
+            .toArray();
+
+        var naloziToSend = [];
+
+        for (var i = 0; i < nalozi.length; i++) {
+            var nalog = nalozi[i];
+
+            var nalogJson = {};
+
+            nalogJson.broj = nalog.broj;
+            nalogJson.statusNaloga = nalog.statusNaloga;
+            nalogJson.ukupanIznos = nalog.ukupanIznos;
+            nalogJson.majstor = nalog.majstor;
+            nalogJson.dispecer = nalog.dispecer;
+
+            naloziToSend.push(nalogJson);
+        }
+
+        res.json({
+            success: true,
+            data: naloziToSend,
+            message: "Bravo nalozi"
+        });
+
+    } catch (err) {
+        logError(err);
+
+        res.json({
+            success: false,
+            message: "Izvinjavamo se, ali imamo grešku u bazi podataka sa brojem 22729"
+        });
+    }
+});
+
+server.get("/hmUser/:username", checkBearerToken, async (req, res) => {
+    try {
+    		var korisnici = await client.db("Hausmajstor")
+            .collection("Korisnici")
+            .find({"email":req.params.username})
+            .toArray();
+        if(korisnici.length==0){
+        	return res.json({
+	            success: false,
+	            message: "Nepostojeci korisnik"
+	        });
+        }
+        var korisnik = korisnici[0];
+        delete korisnik.password;
+        delete korisnik.role;
+        delete korisnik.resetPassDate;
+        delete korisnik.resetPassId;
+        delete korisnik.resetPassTime;
+        delete korisnik.kontakt;
+        delete korisnik.umanjenje;
+        korisnik.majstori = [];
+        var majstori = await client.db("Hausmajstor")
+            .collection("Majstori")
+            .find({"dispecer":req.params.username})
+            .toArray();
+        for(var i=0;i<majstori.length;i++){
+        	delete majstori[i].password;
+        	delete majstori[i].telefon;
+        	delete majstori[i].deviceid;
+        	delete majstori[i].kontakt;
+        	delete majstori[i].deviceId;
+        }
+        korisnik.majstori = majstori;
+
+        res.json({
+            success: true,
+            data: korisnik,
+            message: "Bravo nalozi"
+        });
+    } catch (err) {
+        logError(err);
+        res.json({
+            success: false,
+            message: "Izvinjavamo se, ali imamo grešku u bazi podataka sa brojem 22729"
+        });
+    }
+});
+
 
 
 
