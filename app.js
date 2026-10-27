@@ -22769,6 +22769,7 @@ server.get("/stambeno/:datum1/:datum2/:status", checkBearerToken, async (req, re
             nalogJson.ukupanIznos = nalog.ukupanIznos;
             nalogJson.majstor = nalog.majstor;
             nalogJson.dispecer = nalog.dispecer;
+            nalogJson.iznosFakturePodizvodjaca = nalog.iznosFakturePodizvodjaca;
 
             naloziToSend.push(nalogJson);
         }
