@@ -571,7 +571,8 @@
         var includedUnits = new Set(
             [...document.querySelectorAll(".radnaJedinicaCheckbox:checked")].map(e => e.value)
         );
-        var status = document.getElementById("status-naloga").value;
+        //var status = document.getElementById("status-naloga").value;
+        var selectedStatuses = onGetSelectedStatuses();
         var master = document.getElementById("majstor-naloga").value;
         var subcontractors = document.getElementById("podizvodjaci-checkbox").checked;
         var address = document.getElementById("adresa-filter").value.trim().toLocaleLowerCase("sr");
@@ -580,7 +581,13 @@
 
         naloziToShow = nalozi.filter(nalog => {
             if (!includedUnits.has(nalog.radnaJedinica)) return false;
-            if (status !== "Svi" && nalog.statusNaloga !== status) return false;
+            //if (status !== "Svi" && nalog.statusNaloga !== status) return false;
+            if (
+                selectedStatuses.size > 0 &&
+                !selectedStatuses.has(nalog.statusNaloga)
+            ) {
+                return false;
+            }
             if (master === "Nijedan") {
                 if (nalog.majstor && nalog.majstor !== "Nijedan") return false;
             } else if (master !== "Svi" && String(nalog.majstor) !== master) return false;
@@ -629,9 +636,133 @@
         document.getElementById("on-bottom-count").textContent = count;
     }
 
+    function onBuildStatusFilter() {
+        var select = document.getElementById("status-naloga");
+
+        // Sakrij originalni select, ali zadrži njegove opcije.
+        select.style.display = "none";
+
+        var wrapper = document.createElement("details");
+        wrapper.className = "on-status-multiselect";
+
+        wrapper.innerHTML = `
+            <summary class="on-control on-status-summary">
+                <span id="on-status-title">Сви статуси</span>
+                <span class="on-status-arrow">⌄</span>
+            </summary>
+
+            <div class="on-status-dropdown">
+                <label class="on-status-option on-status-all">
+                    <input type="checkbox" id="on-status-all" checked>
+                    <span>Сви статуси</span>
+                </label>
+
+                <div class="on-status-options" id="on-status-options"></div>
+            </div>
+        `;
+
+        select.after(wrapper);
+
+        var container = document.getElementById("on-status-options");
+        var allCheckbox = document.getElementById("on-status-all");
+
+        Array.from(select.options).forEach(function(option) {
+            if (option.value === "Svi") return;
+
+            var label = document.createElement("label");
+            label.className = "on-status-option";
+
+            var checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "on-status-checkbox";
+            checkbox.value = option.value;
+
+            var text = document.createElement("span");
+            text.textContent = option.textContent;
+
+            label.append(checkbox, text);
+            container.appendChild(label);
+
+            checkbox.addEventListener("change", function() {
+                if (checkbox.checked) {
+                    allCheckbox.checked = false;
+                }
+
+                onUpdateStatusFilter();
+            });
+        });
+
+        allCheckbox.addEventListener("change", function() {
+            if (allCheckbox.checked) {
+                container.querySelectorAll("input").forEach(function(cb) {
+                    cb.checked = false;
+                });
+            }
+
+            onUpdateStatusFilter();
+        });
+
+        // Zatvori dropdown kada se klikne van njega.
+        document.addEventListener("click", function(event) {
+            if (!wrapper.contains(event.target)) {
+                wrapper.open = false;
+            }
+        });
+
+        // Zatvori dropdown tasterom Escape.
+        wrapper.addEventListener("keydown", function(event) {
+            if (event.key === "Escape") {
+                wrapper.open = false;
+                wrapper.querySelector("summary").focus();
+            }
+        });
+    }
+
+
+    function onUpdateStatusFilter() {
+        var selected = Array.from(
+            document.querySelectorAll(".on-status-checkbox:checked")
+        );
+
+        var allCheckbox = document.getElementById("on-status-all");
+        var title = document.getElementById("on-status-title");
+
+        if (selected.length === 0) {
+            allCheckbox.checked = true;
+            title.textContent = "Сви статуси";
+        } else {
+            allCheckbox.checked = false;
+
+            if (selected.length === 1) {
+                title.textContent = selected[0].parentElement.querySelector("span").textContent;
+            } else {
+                title.textContent = "Изабрано: " + selected.length + " статуса";
+            }
+        }
+
+        generateTable();
+    }
+
+
+    function onGetSelectedStatuses() {
+        return new Set(
+            Array.from(
+                document.querySelectorAll(".on-status-checkbox:checked")
+            ).map(function(checkbox) {
+                return checkbox.value;
+            })
+        );
+    }
+
     function onResetFilters() {
         document.querySelectorAll(".radnaJedinicaCheckbox").forEach(cb => cb.checked = true);
-        document.getElementById("status-naloga").value = "Svi";
+        //document.getElementById("status-naloga").value = "Svi";
+        document.querySelectorAll(".on-status-checkbox").forEach(function(cb) {
+            cb.checked = false;
+        });
+
+        document.getElementById("on-status-all").checked = true;
+        document.getElementById("on-status-title").textContent = "Сви статуси";
         document.getElementById("majstor-naloga").value = "Svi";
         document.getElementById("podizvodjaci-checkbox").checked = true;
         document.getElementById("adresa-filter").value = "";
@@ -801,8 +932,10 @@
     // Inicijalizacija: bez dodatnih server poziva.
     onBuildMunicipalities();
     onBuildMajstori();
+    onBuildStatusFilter();
     document.getElementById("on-current-date").textContent = "Датум прегледа: " + onDateFormat.format(new Date());
-    ["status-naloga","majstor-naloga","podizvodjaci-checkbox","adresa-filter","broj-filter"].forEach(id => {
+    //["status-naloga","majstor-naloga","podizvodjaci-checkbox","adresa-filter","broj-filter"].forEach(id => {
+    ["majstor-naloga","podizvodjaci-checkbox","adresa-filter","broj-filter"].forEach(id => {
         var el = document.getElementById(id);
         el.addEventListener(id === "status-naloga" || id === "majstor-naloga" || id === "podizvodjaci-checkbox" ? "change" : "input", generateTable);
     });

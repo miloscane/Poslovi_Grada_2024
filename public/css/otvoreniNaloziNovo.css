@@ -237,3 +237,107 @@
     .on-table-actions .on-count { width: 100%; }
     .on-table-bottom { padding: 12px 15px; }
 }
+
+/* MULTI STATUS FILTER */
+
+.on-status-multiselect {
+    position: relative;
+    width: 100%;
+}
+
+.on-status-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.on-status-summary::-webkit-details-marker {
+    display: none;
+}
+
+.on-status-summary::marker {
+    content: "";
+}
+
+.on-status-arrow {
+    font-size: 20px;
+    color: #64748b;
+    transition: transform 0.2s;
+}
+
+.on-status-multiselect[open] .on-status-arrow {
+    transform: rotate(180deg);
+}
+
+.on-status-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    z-index: 100;
+
+    background: #fff;
+    border: 1px solid #dbe3ec;
+    border-radius: 12px;
+
+    box-shadow: 0 12px 30px rgba(20, 40, 70, 0.14);
+
+    padding: 6px;
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.on-status-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 9px 12px;
+    border-radius: 7px;
+
+    font-size: 13px;
+    color: #334155;
+    cursor: pointer;
+
+    transition: background 0.15s;
+}
+
+.on-status-option:hover {
+    background: #f1f5f9;
+}
+
+.on-status-option:has(input:checked) {
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+.on-status-option input {
+    width: 16px;
+    height: 16px;
+    accent-color: #2563eb;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.on-status-all {
+    font-weight: 700;
+    border-bottom: 1px solid #e2e8f0;
+    border-radius: 0;
+    margin-bottom: 5px;
+    padding-bottom: 12px;
+}
+
+.on-status-options {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Omogući dropdown-u da izađe iz filter panela. */
+.on-filters {
+    overflow: visible;
+}
