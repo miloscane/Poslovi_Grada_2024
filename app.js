@@ -22834,6 +22834,8 @@ server.get("/stambenoHM", checkBearerToken, async (req, res) => {
             "Fakturisan",
             "Nalog u Stambenom",
             "Spreman za fakturisanje",
+            "Možete fakturisati",
+            "Vraćen",
             "Završeno",
             "Storniran"
         ];
