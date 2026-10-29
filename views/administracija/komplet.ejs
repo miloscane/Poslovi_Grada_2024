@@ -1,0 +1,476 @@
+<%- include("partials/header") -%>
+<link rel="stylesheet" href="/css/administracijaKomplet.css?v=1">
+
+<script>
+    var akRadneJedinice = <%- JSON.stringify(prikazOpstina || []).replace(/</g, "\\u003c") %>;
+    var akGrupe = <%- JSON.stringify(opstinaGrupe || {}).replace(/</g, "\\u003c") %>;
+    var akRegija = <%- JSON.stringify(pocetnaRegija || "BEOGRAD").replace(/</g, "\\u003c") %>;
+</script>
+
+<main class="ak-page">
+    <div class="ak-container">
+        <header class="ak-hero">
+            <div>
+                <div class="ak-eyebrow">АДМИНИСТРАЦИЈА / ФИНАНСИЈЕ</div>
+                <h1>Финансијски преглед налога</h1>
+                <p>Износи, пенали, подизвођачи, фактуре и пријемнице — по датуму пријемнице.</p>
+            </div>
+            <div class="ak-hero-stamp">КОМПЛЕТ<br><small>ОБРАЧУН НАЛОГА</small></div>
+        </header>
+
+        <section class="ak-card ak-filters" aria-labelledby="ak-filters-title">
+            <div class="ak-section-head">
+                <div>
+                    <h2 id="ak-filters-title">Филтери за анализу</h2>
+                    <p>Налози се учитавају тек када притиснете „Повуци налоге”.</p>
+                </div>
+            </div>
+
+            <div class="ak-period-controls">
+                <div class="ak-field ak-period-switch">
+                    <span class="ak-label">Период пријемнице</span>
+                    <div class="ak-segments" role="group" aria-label="Начин избора периода">
+                        <label><input type="radio" name="ak-period" value="mesec" checked><span>Месец</span></label>
+                        <label><input type="radio" name="ak-period" value="opseg"><span>Од – до</span></label>
+                    </div>
+                </div>
+                <div class="ak-field" id="ak-month-wrap">
+                    <label class="ak-label" for="ak-mesec">Изаберите месец</label>
+                    <input id="ak-mesec" type="month" class="ak-input">
+                </div>
+                <div class="ak-date-range" id="ak-range-wrap" hidden>
+                    <div class="ak-field">
+                        <label class="ak-label" for="ak-od">Од датума</label>
+                        <input id="ak-od" type="date" class="ak-input">
+                    </div>
+                    <div class="ak-field">
+                        <label class="ak-label" for="ak-do">До датума</label>
+                        <input id="ak-do" type="date" class="ak-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="ak-separator"></div>
+
+            <div class="ak-label-row">
+                <span class="ak-label">Радне јединице</span>
+                <small>Десни клик на јединицу бира само њу</small>
+            </div>
+            <div class="ak-region-groups" id="ak-region-groups">
+                <label class="ak-region-group"><input type="checkbox" data-ak-region="ISTOK"><span>ИСТОК</span></label>
+                <label class="ak-region-group"><input type="checkbox" data-ak-region="ZAPAD"><span>ЗАПАД</span></label>
+                <label class="ak-region-group"><input type="checkbox" data-ak-region="BEOGRAD"><span>БЕОГРАД (СВЕ)</span></label>
+            </div>
+            <div class="ak-units" id="ak-units"></div>
+
+            <div class="ak-separator"></div>
+
+            <div class="ak-label-row">
+                <span class="ak-label">Статуси налога</span>
+                <small>Можете означити више статуса</small>
+            </div>
+            <div class="ak-statuses" id="ak-statuses">
+                <label><input type="checkbox" value="Završeno" checked><span>Завршено</span></label>
+                <label><input type="checkbox" value="Nalog u Stambenom" checked><span>Налог у Стамбеном</span></label>
+                <label><input type="checkbox" value="Spreman za fakturisanje" checked><span>Спреман за фактурисање</span></label>
+                <label><input type="checkbox" value="Fakturisan" checked><span>Фактурисан</span></label>
+                <label><input type="checkbox" value="Spreman za obračun" checked><span>Спреман за обрачун</span></label>
+            </div>
+
+            <div class="ak-filter-row">
+                <div class="ak-field">
+                    <label class="ak-label" for="ak-podizvodjac">Извршилац</label>
+                    <select id="ak-podizvodjac" class="ak-input">
+                        <option value="svi">Сви налози</option>
+                        <option value="da">Само подизвођачи</option>
+                        <option value="ne">Без подизвођача</option>
+                    </select>
+                </div>
+                <div class="ak-field">
+                    <label class="ak-label" for="ak-adresa">Адреса</label>
+                    <input id="ak-adresa" type="search" class="ak-input" placeholder="Унесите део адресе" autocomplete="off">
+                </div>
+                <div class="ak-field">
+                    <label class="ak-label" for="ak-broj">Број налога</label>
+                    <input id="ak-broj" type="search" class="ak-input" placeholder="Претрага броја" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="ak-form-footer">
+                <button type="button" id="ak-reset" class="ak-button ak-button-light">Поништи филтере</button>
+                <div class="ak-fetch-side">
+                    <span class="ak-fetch-message" id="ak-message" role="status" aria-live="polite">Изаберите филтере и повуците налоге.</span>
+                    <button type="button" id="ak-fetch" class="ak-button ak-button-primary">
+                        <span class="ak-spinner" id="ak-spinner" hidden></span>
+                        <span id="ak-fetch-text">Повуци налоге</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="ak-metrics" aria-label="Финансијски показатељи">
+            <article class="ak-metric"><span>Број налога</span><strong id="ak-total-orders">—</strong><small>Изабрани период и филтери</small></article>
+            <article class="ak-metric"><span>Укупан износ</span><strong id="ak-total-amount">—</strong><small>Пре умањења за пенал</small></article>
+            <article class="ak-metric ak-metric-danger"><span>Умањење — пенали</span><strong id="ak-total-penalties">—</strong><small>100% у фактури = без пенала</small></article>
+            <article class="ak-metric"><span>Износ после пенала</span><strong id="ak-total-after">—</strong><small>Укупан износ − пенали</small></article>
+            <article class="ak-metric"><span>Трошак подизвођача</span><strong id="ak-total-subcontract">—</strong><small>Укупан износ подизвођача</small></article>
+            <article class="ak-metric ak-metric-profit"><span>Обрачуната добит</span><strong id="ak-total-profit">—</strong><small>После пенала − подизвођачи</small></article>
+        </section>
+
+        <section class="ak-card ak-results" aria-labelledby="ak-table-title">
+            <div class="ak-section-head ak-results-head">
+                <div>
+                    <h2 id="ak-table-title">Налози — финансијски детаљи</h2>
+                    <p>Сортирано по датуму пријемнице, од најновијег.</p>
+                </div>
+                <div class="ak-invoice-counters">
+                    <span>Подизвођачи: <b id="ak-count-subcontract">—</b></span>
+                    <span>Премијус: <b id="ak-count-premijus">—</b></span>
+                    <span>Послови града: <b id="ak-count-pg">—</b></span>
+                </div>
+            </div>
+            <div class="ak-status-summary" id="ak-status-summary"></div>
+            <div class="ak-table-scroll">
+                <table class="ak-table">
+                    <thead>
+                        <tr>
+                            <th>Број налога</th>
+                            <th>Датум пријемнице</th>
+                            <th>Радна јединица</th>
+                            <th>Адреса</th>
+                            <th>Статус</th>
+                            <th>Подизвођач</th>
+                            <th class="ak-right">Укупан износ</th>
+                            <th class="ak-right">Трошак подизвођача</th>
+                            <th class="ak-right">Пенал</th>
+                            <th class="ak-right">После пенала</th>
+                            <th class="ak-right">Добит</th>
+                            <th>Премијус</th>
+                            <th>Послови града</th>
+                            <th>Фактура</th>
+                            <th>Пријемница</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ak-table-body">
+                        <tr><td colspan="15" class="ak-empty">Налози још нису учитани. Подесите филтере и притисните „Повуци налоге”.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="ak-table-footer"><span id="ak-footer-count">Чека се учитавање</span><span>Износи су без додатног обрачуна ПДВ-а.</span></div>
+        </section>
+    </div>
+</main>
+
+<script>
+(function() {
+    var akStatuses = [
+        { value: "Završeno", title: "Завршено" },
+        { value: "Nalog u Stambenom", title: "Налог у Стамбеном" },
+        { value: "Spreman za fakturisanje", title: "Спреман за фактурисање" },
+        { value: "Fakturisan", title: "Фактурисан" },
+        { value: "Spreman za obračun", title: "Спреман за обрачун" }
+    ];
+    var akNumber = new Intl.NumberFormat("sr-RS", { maximumFractionDigits: 2 });
+    var akUnitContainer = document.getElementById("ak-units");
+    var akMessage = document.getElementById("ak-message");
+    var akFetchButton = document.getElementById("ak-fetch");
+
+    function akMoney(value) {
+        return akNumber.format(Number(value) || 0) + " дин.";
+    }
+
+    function akCount(value) {
+        return akNumber.format(Number(value) || 0);
+    }
+
+    function akSelectedUnits() {
+        return Array.from(akUnitContainer.querySelectorAll("input:checked")).map(input => input.value);
+    }
+
+    function akRegionSet(region) {
+        return new Set(region === "BEOGRAD" ? akRadneJedinice : (akGrupe[region] || []));
+    }
+
+    function akSyncRegions() {
+        var inputs = Array.from(akUnitContainer.querySelectorAll("input"));
+        document.querySelectorAll("[data-ak-region]").forEach(function(group) {
+            var unitSet = akRegionSet(group.dataset.akRegion);
+            var relevant = inputs.filter(input => unitSet.has(input.value));
+            var checked = relevant.filter(input => input.checked).length;
+            group.checked = relevant.length > 0 && relevant.length === checked;
+            group.indeterminate = checked > 0 && checked < relevant.length;
+            group.disabled = relevant.length === 0;
+        });
+    }
+
+    function akDefaultUnits() {
+        var region = String(akRegija || "BEOGRAD").toUpperCase();
+        if (region !== "ISTOK" && region !== "ZAPAD") region = "BEOGRAD";
+        var chosen = akRegionSet(region);
+        akUnitContainer.querySelectorAll("input").forEach(input => input.checked = chosen.has(input.value));
+        akSyncRegions();
+    }
+
+    function akMarkChanged() {
+        if (!akFetchButton.disabled) {
+            akMessage.classList.remove("ak-error");
+            akMessage.textContent = "Филтери су промењени. Кликните „Повуци налоге”.";
+        }
+    }
+
+    akRadneJedinice.forEach(function(unit) {
+        var label = document.createElement("label");
+        label.className = "ak-unit";
+        var checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = unit;
+        var span = document.createElement("span");
+        span.textContent = unit;
+        label.append(checkbox, span);
+        akUnitContainer.appendChild(label);
+    });
+
+    akUnitContainer.addEventListener("change", function() {
+        akSyncRegions();
+        akMarkChanged();
+    });
+    akUnitContainer.addEventListener("contextmenu", function(event) {
+        var label = event.target.closest(".ak-unit");
+        if (!label) return;
+        event.preventDefault();
+        var target = label.querySelector("input");
+        akUnitContainer.querySelectorAll("input").forEach(input => input.checked = input === target);
+        akSyncRegions();
+        akMarkChanged();
+    });
+    document.querySelectorAll("[data-ak-region]").forEach(function(group) {
+        group.addEventListener("change", function() {
+            var units = akRegionSet(group.dataset.akRegion);
+            akUnitContainer.querySelectorAll("input").forEach(function(input) {
+                if (units.has(input.value)) input.checked = group.checked;
+            });
+            akSyncRegions();
+            akMarkChanged();
+        });
+    });
+
+    function akLocalDate() {
+        var parts = new Intl.DateTimeFormat("en-GB", {
+            timeZone: "Europe/Belgrade", year: "numeric", month: "2-digit", day: "2-digit"
+        }).formatToParts(new Date());
+        var get = type => parts.find(p => p.type === type).value;
+        return get("year") + "-" + get("month") + "-" + get("day");
+    }
+
+    var akToday = akLocalDate();
+    document.getElementById("ak-mesec").value = akToday.slice(0, 7);
+    document.getElementById("ak-od").value = akToday.slice(0, 7) + "-01";
+    document.getElementById("ak-do").value = akToday;
+
+    function akTogglePeriod() {
+        var mode = document.querySelector('input[name="ak-period"]:checked').value;
+        document.getElementById("ak-month-wrap").hidden = mode !== "mesec";
+        document.getElementById("ak-range-wrap").hidden = mode !== "opseg";
+        akMarkChanged();
+    }
+    document.querySelectorAll('input[name="ak-period"]').forEach(input => input.addEventListener("change", akTogglePeriod));
+
+    document.querySelectorAll(".ak-filters input:not([data-ak-region]), .ak-filters select").forEach(function(input) {
+        if (akUnitContainer.contains(input)) return;
+        input.addEventListener("input", akMarkChanged);
+        input.addEventListener("change", akMarkChanged);
+    });
+
+    document.getElementById("ak-reset").addEventListener("click", function() {
+        akDefaultUnits();
+        document.querySelector('input[name="ak-period"][value="mesec"]').checked = true;
+        document.getElementById("ak-mesec").value = akToday.slice(0, 7);
+        document.getElementById("ak-od").value = akToday.slice(0, 7) + "-01";
+        document.getElementById("ak-do").value = akToday;
+        document.querySelectorAll("#ak-statuses input").forEach(input => input.checked = true);
+        document.getElementById("ak-podizvodjac").value = "svi";
+        document.getElementById("ak-adresa").value = "";
+        document.getElementById("ak-broj").value = "";
+        akTogglePeriod();
+        akMarkChanged();
+    });
+
+    function akSetMetric(id, value) {
+        document.getElementById(id).textContent = value;
+    }
+
+    function akBuildTag(text, className, title) {
+        var tag = document.createElement("span");
+        tag.className = "ak-tag " + className;
+        tag.textContent = text;
+        if (title) tag.title = title;
+        return tag;
+    }
+
+    function akAddCell(row, content, className) {
+        var td = document.createElement("td");
+        if (className) td.className = className;
+        if (content instanceof Node) td.appendChild(content);
+        else td.textContent = content === null || content === undefined ? "" : String(content);
+        row.appendChild(td);
+        return td;
+    }
+
+    function akInvoiceCell(row, invoice) {
+        var present = invoice && invoice.postoji;
+        akAddCell(row, akBuildTag(present ? "Има" : "Нема", present ? "ak-tag-yes" : "ak-tag-no", invoice?.detalji || ""));
+    }
+
+    function akRenderRow(item) {
+        var tr = document.createElement("tr");
+        var link = document.createElement("a");
+        link.href = "/nalog/" + encodeURIComponent(item.broj);
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.className = "ak-order-link";
+        link.textContent = item.broj || "—";
+        akAddCell(tr, link, "ak-order-cell");
+        akAddCell(tr, item.prijemnicaDatum || "—");
+        akAddCell(tr, item.radnaJedinica);
+        akAddCell(tr, item.adresa || "—", "ak-address-cell");
+        akAddCell(tr, akBuildTag(item.status, "ak-tag-status"));
+        akAddCell(tr, akBuildTag(item.podizvodjac ? "ДА" : "НЕ", item.podizvodjac ? "ak-tag-sub" : "ak-tag-no"));
+        akAddCell(tr, akMoney(item.ukupanIznos), "ak-right ak-num");
+        akAddCell(tr, akMoney(item.ukupanIznosPodizvodjaca), "ak-right ak-num");
+
+        var penaltyCell = document.createElement("div");
+        penaltyCell.className = "ak-two-lines";
+        var mainPenalty = document.createElement("strong");
+        mainPenalty.textContent = akNumber.format(item.penalProcenat) + "%";
+        var secondary = document.createElement("small");
+        secondary.textContent = akMoney(item.penalIznos);
+        penaltyCell.append(mainPenalty, secondary);
+        akAddCell(tr, penaltyCell, "ak-right");
+
+        akAddCell(tr, akMoney(item.iznosPoslePenala), "ak-right ak-num");
+        var profit = akAddCell(tr, akMoney(item.dobit), "ak-right ak-num ak-profit-cell");
+        if (item.dobit < 0) profit.classList.add("ak-negative");
+        akInvoiceCell(tr, item.premijus);
+        akInvoiceCell(tr, item.pg);
+
+        var invoice = document.createElement("div");
+        invoice.className = "ak-two-lines";
+        var invoiceNumber = document.createElement("strong");
+        invoiceNumber.textContent = item.fakturaBroj || "—";
+        var invoiceDate = document.createElement("small");
+        invoiceDate.textContent = item.fakturaDatum || "";
+        invoice.append(invoiceNumber, invoiceDate);
+        akAddCell(tr, invoice);
+
+        if (item.imaPrijemnicu) {
+            var download = document.createElement("a");
+            download.href = "/administracija/komplet/prijemnica/" + encodeURIComponent(item.broj);
+            download.className = "ak-download";
+            download.textContent = "Преузми PDF";
+            akAddCell(tr, download);
+        } else {
+            akAddCell(tr, "—", "ak-muted");
+        }
+        return tr;
+    }
+
+    function akRender(data) {
+        var s = data.summary;
+        akSetMetric("ak-total-orders", akCount(s.brojNaloga));
+        akSetMetric("ak-total-amount", akMoney(s.ukupanIznos));
+        akSetMetric("ak-total-penalties", akMoney(s.penalIznos));
+        akSetMetric("ak-total-after", akMoney(s.iznosPoslePenala));
+        akSetMetric("ak-total-subcontract", akMoney(s.iznosPodizvodjaca));
+        akSetMetric("ak-total-profit", akMoney(s.dobit));
+        akSetMetric("ak-count-subcontract", akCount(s.brojPodizvodjaca));
+        akSetMetric("ak-count-premijus", akCount(s.premijusFakture));
+        akSetMetric("ak-count-pg", akCount(s.pgFakture));
+        akSetMetric("ak-footer-count", "Укупно приказано: " + akCount(s.brojNaloga));
+
+        var statusContainer = document.getElementById("ak-status-summary");
+        statusContainer.replaceChildren();
+        akStatuses.forEach(function(status) {
+            var pill = document.createElement("div");
+            pill.className = "ak-status-stat";
+            var label = document.createElement("span");
+            label.textContent = status.title;
+            var number = document.createElement("strong");
+            number.textContent = akCount(s.poStatusima[status.value]);
+            pill.append(label, number);
+            statusContainer.appendChild(pill);
+        });
+
+        var tbody = document.getElementById("ak-table-body");
+        var fragment = document.createDocumentFragment();
+        data.rows.forEach(item => fragment.appendChild(akRenderRow(item)));
+        if (!data.rows.length) {
+            var tr = document.createElement("tr");
+            var td = document.createElement("td");
+            td.colSpan = 15;
+            td.className = "ak-empty";
+            td.textContent = "Нема налога за изабране филтере и период пријемнице.";
+            tr.appendChild(td);
+            fragment.appendChild(tr);
+        }
+        tbody.replaceChildren(fragment);
+    }
+
+    async function akFetch() {
+        var period = document.querySelector('input[name="ak-period"]:checked').value;
+        var payload = {
+            period: period,
+            mesec: document.getElementById("ak-mesec").value,
+            od: document.getElementById("ak-od").value,
+            do: document.getElementById("ak-do").value,
+            jedinice: akSelectedUnits(),
+            statusi: Array.from(document.querySelectorAll("#ak-statuses input:checked")).map(input => input.value),
+            podizvodjac: document.getElementById("ak-podizvodjac").value,
+            adresa: document.getElementById("ak-adresa").value.trim(),
+            broj: document.getElementById("ak-broj").value.trim()
+        };
+
+        if (period === "mesec" && !/^\d{4}-(0[1-9]|1[0-2])$/.test(payload.mesec)) {
+            akMessage.textContent = "Изаберите исправан месец.";
+            akMessage.classList.add("ak-error");
+            return;
+        }
+        if (period === "opseg" && (!payload.od || !payload.do || payload.od > payload.do)) {
+            akMessage.textContent = "Проверите почетни и крајњи датум.";
+            akMessage.classList.add("ak-error");
+            return;
+        }
+
+        akFetchButton.disabled = true;
+        document.getElementById("ak-spinner").hidden = false;
+        document.getElementById("ak-fetch-text").textContent = "Учитавање...";
+        akMessage.classList.remove("ak-error");
+        akMessage.textContent = "Преузимање и обрачун налога у току...";
+
+        try {
+            var response = await fetch("/administracija/komplet/nalozi", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            var result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.message || "Није могуће учитати налоге.");
+            akRender(result);
+            akMessage.textContent = "Учитано " + akCount(result.summary.brojNaloga) + " налога.";
+        } catch (error) {
+            akMessage.classList.add("ak-error");
+            akMessage.textContent = error.message || "Грешка у комуникацији са сервером.";
+        } finally {
+            akFetchButton.disabled = false;
+            document.getElementById("ak-spinner").hidden = true;
+            document.getElementById("ak-fetch-text").textContent = "Повуци налоге";
+        }
+    }
+
+    document.getElementById("ak-fetch").addEventListener("click", akFetch);
+    akDefaultUnits();
+    akTogglePeriod();
+    akMessage.textContent = "Изаберите филтере и притисните „Повуци налоге”.";
+})();
+</script>
+<%- include("partials/footer") -%>

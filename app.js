@@ -4490,7 +4490,8 @@ http.listen(process.env.PORT, async function(){
 		console.log(response)*/
 
 
-		var nalozi = await naloziDB.find({"coordinates.lat": { $exists: false },statusNaloga:{$nin:["Fakturisan","Nalog u Stambenom","Storniran","Završeno","Spreman za fakturisanje"]}}).toArray()
+		// POVLACENJE LOKACIJA!!!!!
+		/*var nalozi = await naloziDB.find({"coordinates.lat": { $exists: false },statusNaloga:{$nin:["Fakturisan","Nalog u Stambenom","Storniran","Završeno","Spreman za fakturisanje"]}}).toArray()
 		//console.log(nalozi)
 		for(var i=0;i<nalozi.length;i++){
 			try{
@@ -4523,7 +4524,7 @@ http.listen(process.env.PORT, async function(){
 			}
 			
 			
-		}
+		}*/
 
 
 		/*const config = {
@@ -23016,7 +23017,279 @@ server.get("/hmUser/:username", checkBearerToken, async (req, res) => {
     }
 });
 
+// Zalepiti u app.js nakon definisanja naloziDB i ostalih Mongo kolekcija.
+// Pretpostavlja se da Express vec koristi express.json().
+// Finansijski pregled je dostupan samo ulozi 10.
 
+var kompletStatusi = [
+    "Završeno",
+    "Nalog u Stambenom",
+    "Spreman za fakturisanje",
+    "Fakturisan",
+    "Spreman za obračun"
+];
+
+function kompletAdmin(req, res) {
+    if (!req.session || !req.session.user) {
+        res.status(401).json({ success: false, message: "Morate biti prijavljeni." });
+        return false;
+    }
+    if (Number(req.session.user.role) !== 10) {
+        res.status(403).json({ success: false, message: "Nemate ovlašćenje za finansijski pregled." });
+        return false;
+    }
+    return true;
+}
+
+function kompletBroj(value) {
+    if (value === null || value === undefined || value === "") return 0;
+    var parsed = Number(String(value).replace(/\s/g, "").replace(",", "."));
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function kompletNovac(value) {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+function kompletIspravanDatum(value) {
+    if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    var [year, month, day] = value.split("-").map(Number);
+    var date = new Date(Date.UTC(year, month - 1, day));
+    return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+// Pocetak kalendarskog dana u Srbiji, nezavisno od TZ podešavanja Ubuntu servera.
+// Koristi GMT+1 / GMT+2 offset za konkretan dan (uključujući letnje vreme).
+function kompletPocetakDana(datum) {
+    if (!kompletIspravanDatum(datum)) throw new Error("Neispravan datum");
+    var [year, month, day] = datum.split("-").map(Number);
+    var midnightUtc = Date.UTC(year, month - 1, day);
+    var parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "Europe/Belgrade",
+        timeZoneName: "shortOffset"
+    }).formatToParts(new Date(midnightUtc));
+    var zone = parts.find(p => p.type === "timeZoneName")?.value || "";
+    var match = zone.match(/^GMT([+-])(\d{1,2})(?::(\d{2}))?$/);
+    if (!match) throw new Error("Nije moguće odrediti vremensku zonu");
+    var offsetMinutes = (Number(match[2]) * 60 + Number(match[3] || 0)) * (match[1] === "+" ? 1 : -1);
+    return midnightUtc - offsetMinutes * 60000;
+}
+
+function kompletSledeciDan(datum) {
+    var [year, month, day] = datum.split("-").map(Number);
+    return new Date(Date.UTC(year, month - 1, day + 1)).toISOString().slice(0, 10);
+}
+
+function kompletOpsegDatuma(body) {
+    var od, doEkskluzivno;
+    if (body.period === "mesec") {
+        if (typeof body.mesec !== "string" || !/^\d{4}-(0[1-9]|1[0-2])$/.test(body.mesec)) return null;
+        od = body.mesec + "-01";
+        var [year, month] = body.mesec.split("-").map(Number);
+        doEkskluzivno = new Date(Date.UTC(year, month, 1)).toISOString().slice(0, 10);
+    } else if (body.period === "opseg") {
+        if (!kompletIspravanDatum(body.od) || !kompletIspravanDatum(body.do) || body.od > body.do) return null;
+        od = body.od;
+        doEkskluzivno = kompletSledeciDan(body.do);
+    } else {
+        return null;
+    }
+    return { odMs: kompletPocetakDana(od), doMs: kompletPocetakDana(doEkskluzivno) };
+}
+
+function kompletEscapeRegex(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function kompletFakturaInfo(object) {
+    if (!object || typeof object !== "object") return { postoji: false, detalji: "" };
+    var fields = ["InvoiceId", "PurchaseInvoiceId", "SalesInvoiceId"];
+    var values = fields.filter(field => object[field] !== undefined && object[field] !== null && object[field] !== "")
+        .map(field => field + ": " + String(object[field]));
+    return { postoji: values.length > 0, detalji: values.join(" | ") };
+}
+
+function kompletPrijemnicaUrl(value) {
+    if (typeof value !== "string") return null;
+    try {
+        var parsed = new URL(value);
+        // Dozvoljen je samo postojeći DO Spaces host za prijemnice.
+        return parsed.protocol === "https:" && parsed.hostname === "hausmajstor.ams3.digitaloceanspaces.com" ? parsed.href : null;
+    } catch (err) {
+        return null;
+    }
+}
+
+server.get("/administracija/komplet", (req, res) => {
+    if (!req.session || !req.session.user) {
+        return res.redirect("/login?url=" + encodeURIComponent(req.url));
+    }
+    if (Number(req.session.user.role) !== 10) {
+        return res.status(403).render("message", {
+            pageTitle: "Грешка",
+            user: req.session.user,
+            message: '<div class="text">Ваш налог није овлашћен за финансијски преглед.</div>'
+        });
+    }
+
+    return res.render("administracija/komplet", {
+        pageTitle: "Финансијски преглед налога",
+        user: req.session.user,
+        prikazOpstina: Array.from(new Set(radneJedinice)),
+        opstinaGrupe: { ISTOK: istok, ZAPAD: zapad, BEOGRAD: radneJedinice },
+        pocetnaRegija: String(req.session.user.region || "BEOGRAD").toUpperCase(),
+        kompletStatusi: kompletStatusi
+    });
+});
+
+server.post("/administracija/komplet/nalozi", async (req, res) => {
+    if (!kompletAdmin(req, res)) return;
+
+    try {
+        var body = req.body || {};
+        var opseg = kompletOpsegDatuma(body);
+        if (!opseg) return res.status(400).json({ success: false, message: "Izaberite ispravan mesec ili datum od–do." });
+
+        var dozvoljeneJedinice = new Set(radneJedinice);
+        var jedinice = Array.isArray(body.jedinice)
+            ? [...new Set(body.jedinice.filter(j => typeof j === "string" && dozvoljeneJedinice.has(j)))]
+            : [];
+        var statusi = Array.isArray(body.statusi)
+            ? [...new Set(body.statusi.filter(s => kompletStatusi.includes(s)))]
+            : [];
+        if (!statusi.length) statusi = kompletStatusi.slice();
+
+        var rows = [];
+        if (jedinice.length) {
+            var query = {
+                radnaJedinica: { $in: jedinice },
+                statusNaloga: { $in: statusi },
+                "prijemnica.datum.datetime": { $gte: opseg.odMs, $lt: opseg.doMs }
+            };
+
+            var adresa = typeof body.adresa === "string" ? body.adresa.trim().slice(0, 150) : "";
+            var brojNaloga = typeof body.broj === "string" ? body.broj.trim().slice(0, 80) : "";
+            if (adresa) {
+                var addressPattern = kompletEscapeRegex(adresa);
+                query.$or = [
+                    { adresa: { $regex: addressPattern, $options: "i" } },
+                    { punaAdresa: { $regex: addressPattern, $options: "i" } }
+                ];
+            }
+            if (brojNaloga) query.broj = { $regex: kompletEscapeRegex(brojNaloga), $options: "i" };
+
+            var nalozi = await naloziDB.find(query, {
+                projection: {
+                    _id: 0, broj: 1, adresa: 1, punaAdresa: 1, radnaJedinica: 1,
+                    statusNaloga: 1, majstor: 1, ukupanIznos: 1,
+                    ukupanIznosPodizvodjaca: 1, prijemnica: 1, faktura: 1
+                }
+            }).sort({ "prijemnica.datum.datetime": -1, broj: -1 }).toArray();
+
+            var poznatiPodizvodjaci = new Set(
+                (typeof podizvodjaci !== "undefined" && Array.isArray(podizvodjaci) ? podizvodjaci : []).map(String)
+            );
+
+            for (var i = 0; i < nalozi.length; i++) {
+                var n = nalozi[i];
+                var iznos = kompletBroj(n.ukupanIznos);
+                var trosak = kompletBroj(n.ukupanIznosPodizvodjaca);
+                var penalKoeficijent = n.faktura && n.faktura.penal !== undefined && n.faktura.penal !== null
+                    ? kompletBroj(n.faktura.penal) : 100;
+                penalKoeficijent = Math.max(0, Math.min(100, penalKoeficijent));
+                var penalProcenat = kompletNovac(100 - penalKoeficijent);
+                var penalIznos = kompletNovac(iznos * penalProcenat / 100);
+                var iznosPoslePenala = kompletNovac(iznos - penalIznos);
+                var dobit = kompletNovac(iznosPoslePenala - trosak);
+                var premijus = kompletFakturaInfo(n.faktura?.premijus);
+                var pg = kompletFakturaInfo(n.faktura?.pg);
+                var podFaktura = kompletFakturaInfo(n.faktura?.podizvodjac);
+                var podizvodjac = trosak > 0 || poznatiPodizvodjaci.has(String(n.majstor)) || podFaktura.postoji;
+
+                if (body.podizvodjac === "da" && !podizvodjac) continue;
+                if (body.podizvodjac === "ne" && podizvodjac) continue;
+
+                rows.push({
+                    broj: String(n.broj || ""),
+                    adresa: String(n.adresa || n.punaAdresa || ""),
+                    radnaJedinica: String(n.radnaJedinica || ""),
+                    status: String(n.statusNaloga || ""),
+                    prijemnicaDatum: String(n.prijemnica?.datum?.datum || ""),
+                    prijemnicaBroj: String(n.prijemnica?.broj || ""),
+                    imaPrijemnicu: !!kompletPrijemnicaUrl(n.prijemnica?.lokacija),
+                    fakturaBroj: String(n.faktura?.broj || ""),
+                    fakturaDatum: String(n.faktura?.datum?.datum || ""),
+                    podizvodjac: podizvodjac,
+                    ukupanIznos: kompletNovac(iznos),
+                    ukupanIznosPodizvodjaca: kompletNovac(trosak),
+                    penalKoeficijent: penalKoeficijent,
+                    penalProcenat: penalProcenat,
+                    penalIznos: penalIznos,
+                    iznosPoslePenala: iznosPoslePenala,
+                    dobit: dobit,
+                    premijus: premijus,
+                    pg: pg
+                });
+            }
+        }
+
+        var summary = {
+            brojNaloga: rows.length,
+            ukupanIznos: 0, penalIznos: 0, iznosPoslePenala: 0,
+            iznosPodizvodjaca: 0, dobit: 0, brojPodizvodjaca: 0,
+            premijusFakture: 0, pgFakture: 0, poStatusima: {}
+        };
+        for (var status of kompletStatusi) summary.poStatusima[status] = 0;
+        for (var row of rows) {
+            summary.ukupanIznos += row.ukupanIznos;
+            summary.penalIznos += row.penalIznos;
+            summary.iznosPoslePenala += row.iznosPoslePenala;
+            summary.iznosPodizvodjaca += row.ukupanIznosPodizvodjaca;
+            summary.dobit += row.dobit;
+            if (row.podizvodjac) summary.brojPodizvodjaca++;
+            if (row.premijus.postoji) summary.premijusFakture++;
+            if (row.pg.postoji) summary.pgFakture++;
+            summary.poStatusima[row.status]++;
+        }
+        for (var field of ["ukupanIznos", "penalIznos", "iznosPoslePenala", "iznosPodizvodjaca", "dobit"]) {
+            summary[field] = kompletNovac(summary[field]);
+        }
+
+        return res.json({ success: true, rows: rows, summary: summary });
+    } catch (err) {
+        logError(err);
+        return res.status(500).json({ success: false, message: "Greška prilikom učitavanja finansijskih podataka." });
+    }
+});
+
+// Prijemnicu isporučujemo kao attachment, jer `download` na eksternom linku
+// (DigitalOcean Spaces) često otvori PDF umesto da ga preuzme.
+server.get("/administracija/komplet/prijemnica/:broj", async (req, res) => {
+    if (!kompletAdmin(req, res)) return;
+
+    try {
+        var nalog = await naloziDB.findOne({ broj: req.params.broj }, { projection: { "prijemnica.lokacija": 1 } });
+        var url = kompletPrijemnicaUrl(nalog?.prijemnica?.lokacija);
+        if (!url) return res.status(404).send("Prijemnica nije dostupna za preuzimanje.");
+
+        var response = await fetch(url, { redirect: "error", signal: AbortSignal.timeout(20000) });
+        if (!response.ok || !response.body) return res.status(502).send("Nije moguće preuzeti prijemnicu.");
+
+        var safeBroj = String(req.params.broj).replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 70);
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", 'attachment; filename="prijemnica-' + safeBroj + '.pdf"');
+        res.setHeader("Cache-Control", "private, no-store");
+        var Readable = require("stream").Readable;
+        Readable.fromWeb(response.body).on("error", function(err) {
+            logError(err);
+            res.destroy(err);
+        }).pipe(res);
+    } catch (err) {
+        logError(err);
+        if (!res.headersSent) return res.status(502).send("Greška prilikom preuzimanja prijemnice.");
+        res.destroy(err);
+    }
+});
 
 
 /*request(ntsOptions, (error,response,body)=>{
