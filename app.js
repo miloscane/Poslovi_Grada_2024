@@ -22767,6 +22767,94 @@ server.get("/stambeno/:datum1/:datum2/:status", checkBearerToken, async (req, re
             nalogJson.broj = nalog.broj;
             nalogJson.statusNaloga = nalog.statusNaloga;
             nalogJson.ukupanIznos = nalog.ukupanIznos;
+            nalogJson.radnaJedinica = nalog.radnaJedinica;
+            nalogJson.majstor = nalog.majstor;
+            nalogJson.dispecer = nalog.dispecer;
+            nalogJson.iznosFakturePodizvodjaca = nalog.iznosFakturePodizvodjaca;
+
+            naloziToSend.push(nalogJson);
+        }
+
+        res.json({
+            success: true,
+            data: naloziToSend,
+            message: "Bravo nalozi"
+        });
+
+    } catch (err) {
+        logError(err);
+
+        res.json({
+            success: false,
+            message: "Izvinjavamo se, ali imamo grešku u bazi podataka sa brojem 22729"
+        });
+    }
+});
+
+server.get("/stambenoFakturisan/:datum1/:datum2", checkBearerToken, async (req, res) => {
+    try {
+        var datum1 = req.params.datum1;
+        var datum2 = req.params.datum2;
+
+        // Expected format: YYYY-MM-DD
+        if (
+            !/^\d{4}-\d{2}-\d{2}$/.test(datum1) ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(datum2)
+        ) {
+            return res.json({
+                success: false,
+                message: "Neispravni parametri"
+            });
+        }
+
+        var startDate = new Date(datum1 + "T00:00:00Z");
+        var endDate = new Date(datum2 + "T00:00:00Z");
+
+        if (
+            isNaN(startDate.getTime()) ||
+            isNaN(endDate.getTime()) ||
+            startDate > endDate ||
+            startDate.toISOString().slice(0, 10) !== datum1 ||
+            endDate.toISOString().slice(0, 10) !== datum2
+        ) {
+            return res.json({
+                success: false,
+                message: "Neispravan raspon datuma"
+            });
+        }
+
+        // Include the entire last day
+        endDate.setUTCDate(endDate.getUTCDate() + 1);
+
+        var query = {
+            "prijemnica.datum.datetime": {
+                $gte: startDate.getTime(),
+                $lt: endDate.getTime()
+            },
+            statusNaloga: {
+                $in: [
+                    "Fakturisan",
+                    "Spreman za fakturisanje"
+                ]
+            }
+        };
+
+        var nalozi = await client.db("Hausmajstor")
+            .collection("Nalozi")
+            .find(query)
+            .toArray();
+
+        var naloziToSend = [];
+
+        for (var i = 0; i < nalozi.length; i++) {
+            var nalog = nalozi[i];
+
+            var nalogJson = {};
+
+            nalogJson.broj = nalog.broj;
+            nalogJson.statusNaloga = nalog.statusNaloga;
+            nalogJson.ukupanIznos = nalog.ukupanIznos;
+            nalogJson.radnaJedinica = nalog.radnaJedinica;
             nalogJson.majstor = nalog.majstor;
             nalogJson.dispecer = nalog.dispecer;
             nalogJson.iznosFakturePodizvodjaca = nalog.iznosFakturePodizvodjaca;
