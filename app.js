@@ -15819,7 +15819,7 @@ server.get('/dispecer/otvoreniNalozi',async (req,res)=>{
 	}*/
 });
 
-server.get('/dispecer/otvoreniNaloziNovo',async (req,res)=>{
+/*server.get('/dispecer/otvoreniNaloziNovo',async (req,res)=>{
 	if(!req.session.user){
 		return res.redirect("/login?url="+encodeURIComponent(req.url))
 	}
@@ -15896,6 +15896,141 @@ server.get('/dispecer/otvoreniNaloziNovo',async (req,res)=>{
 			message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
 		});
 	}
+});*/
+
+server.get('/dispecer/otvoreniNaloziNovo', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/login?url=" + encodeURIComponent(req.url));
+    }
+
+    if (["10", "20"].indexOf(String(req.session.user.role)) < 0) {
+        return res.render("message", {
+            pageTitle: "Грешка",
+            user: req.session.user,
+            message: "<div class=\"text\">Ваш налог није овлашћен да види ову страницу.</div>"
+        });
+    }
+
+    try {
+        var skriveniStatusi = [
+            "Završeno",
+            "Nalog u Stambenom",
+            "Storniran",
+            "Spreman za fakturisanje",
+            "Fakturisan",
+            "Spreman za obračun"
+        ];
+
+        // Uvek učitavamo sve radne jedinice.
+        // Region korisnika određuje samo početni izbor na frontendu.
+        var prikazOpstina = Array.from(new Set(radneJedinice));
+
+        // Grupe radnih jedinica za checkboxove.
+        var opstinaGrupe = {
+            ISTOK: istok.filter(rj => prikazOpstina.includes(rj)),
+            ZAPAD: zapad.filter(rj => prikazOpstina.includes(rj)),
+            BEOGRAD: prikazOpstina
+        };
+
+        // Podrazumevani region prijavljenog korisnika.
+        var pocetnaRegija = String(
+            req.session.user.region || "BEOGRAD"
+        ).toUpperCase();
+
+        // Svi majstori.
+        var majstori = await majstoriDB.find({}).toArray();
+
+        // Svi otvoreni nalozi, bez podele na ISTOK i ZAPAD.
+        var nalozi = await naloziDB.find({
+            radnaJedinica: {
+                $in: prikazOpstina
+            },
+            statusNaloga: {
+                $nin: skriveniStatusi
+            }
+        }).toArray();
+
+        var brojeviNaloga = [];
+
+        for (var i = 0; i < nalozi.length; i++) {
+            delete nalozi[i]._id;
+            delete nalozi[i].uniqueId;
+            delete nalozi[i].digitalizacija;
+            delete nalozi[i].opis;
+            delete nalozi[i].vrstaRada;
+
+            brojeviNaloga.push(nalozi[i].broj);
+        }
+
+        // Učitavanje izveštaja za sve pronađene naloge.
+        var izvestaji = await izvestajiDB.find({
+            nalog: {
+                $in: brojeviNaloga
+            }
+        }).toArray();
+
+        // Učitavanje dodela za sve pronađene naloge.
+        var dodele = await dodeljivaniNaloziDB.find({
+            nalog: {
+                $in: brojeviNaloga
+            }
+        }).toArray();
+
+        // Grupisanje izveštaja po broju naloga.
+        // Koristimo Map da izbegnemo duple for petlje.
+        var izvestajiPoNalogu = new Map();
+
+        for (var i = 0; i < izvestaji.length; i++) {
+            var broj = String(izvestaji[i].nalog);
+
+            if (!izvestajiPoNalogu.has(broj)) {
+                izvestajiPoNalogu.set(broj, []);
+            }
+
+            izvestajiPoNalogu.get(broj).push(izvestaji[i]);
+        }
+
+        // Grupisanje dodela po broju naloga.
+        var dodelePoNalogu = new Map();
+
+        for (var i = 0; i < dodele.length; i++) {
+            var broj = String(dodele[i].nalog);
+
+            if (!dodelePoNalogu.has(broj)) {
+                dodelePoNalogu.set(broj, []);
+            }
+
+            dodelePoNalogu.get(broj).push(dodele[i]);
+        }
+
+        // Dodavanje izveštaja i dodela svakom nalogu.
+        for (var i = 0; i < nalozi.length; i++) {
+            var broj = String(nalozi[i].broj);
+
+            nalozi[i].izvestaji = izvestajiPoNalogu.get(broj) || [];
+            nalozi[i].dodele = dodelePoNalogu.get(broj) || [];
+        }
+
+        // Renderovanje stranice.
+        return res.render("dispeceri/otvoreniNaloziNovo", {
+            pageTitle: "Отворени налози",
+            user: req.session.user,
+            majstori: majstori,
+            prikazOpstina: prikazOpstina,
+            opstinaGrupe: opstinaGrupe,
+            pocetnaRegija: pocetnaRegija,
+            nalozi: nalozi
+        });
+
+    } catch (err) {
+        logError(err);
+
+        return res.render("message", {
+            pageTitle: "Грешка",
+            user: req.session.user,
+            message: "<div class=\"text\">Дошло је до грешке приликом учитавања налога.</div>"
+        });
+    }
 });
 
 server.get('/dispecer/storniraniNalozi',async (req,res)=>{

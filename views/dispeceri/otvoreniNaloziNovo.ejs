@@ -1,14 +1,18 @@
 <%- include("partials/header") -%>
-<link rel="stylesheet" href="/css/otvoreniNaloziNovo.css?v=3">
+
+<link rel="stylesheet" href="/css/otvoreniNaloziNovo.css?v=4">
 
 <script>
     // Podaci ostaju isti kao u postojećoj Express/EJS ruti.
     var nalozi = <%- JSON.stringify(nalozi || []).replace(/</g, "\\u003c") %>;
     var majstori = <%- JSON.stringify(majstori || []).replace(/</g, "\\u003c") %>;
     var prikazOpstina = <%- JSON.stringify(prikazOpstina || []).replace(/</g, "\\u003c") %>;
+    var opstinaGrupe = <%- JSON.stringify(opstinaGrupe || {}).replace(/</g, "\\u003c") %>;
+    var pocetnaRegija = <%- JSON.stringify(pocetnaRegija || "BEOGRAD").replace(/</g, "\\u003c") %>;
 </script>
 
 <!-- Lokalna biblioteka ikonica: bez eksternih fajlova i ikoničnih fontova. -->
+
 <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
     <symbol id="on-i-pipe" viewBox="0 0 24 24">
         <path d="M4 4v6a4 4 0 0 0 4 4h8a4 4 0 0 1 4 4v2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
@@ -72,165 +76,171 @@
             </div>
         </header>
 
-        <section class="on-stats" aria-label="Статистика налога">
-            <article class="on-stat on-stat-total">
-                <div class="on-stat-icon"><svg><use href="#on-i-clipboard"></use></svg></div>
-                <div>
-                    <div class="on-stat-label">Приказани налози</div>
-                    <div class="on-stat-number" id="ukupno-prikazanih-naloga">0</div>
-                    <div class="on-stat-detail">Према одабраним филтерима</div>
-                </div>
-            </article>
-            <article class="on-stat on-stat-schedule">
-                <div class="on-stat-icon"><svg><use href="#on-i-calendar"></use></svg></div>
-                <div>
-                    <div class="on-stat-label">Незаказани налози</div>
-                    <div class="on-stat-number" id="nezakazani-nalozi">0</div>
-                    <div class="on-stat-detail">Без будућег термина</div>
-                </div>
-            </article>
-            <article class="on-stat on-stat-urgent">
-                <div class="on-stat-icon"><svg><use href="#on-i-alert"></use></svg></div>
-                <div>
-                    <div class="on-stat-label">Ургирани налози</div>
-                    <div class="on-stat-number" id="urgencije">0</div>
-                    <div class="on-stat-detail">Са евидентираном ургенцијом</div>
-                </div>
-            </article>
-            <article class="on-stat on-stat-initial">
-                <div class="on-stat-icon"><svg><use href="#on-i-layers"></use></svg></div>
-                <div>
-                    <div class="on-stat-label">Налози у почетној фази</div>
-                    <div class="on-stat-number" id="nepoznato">0</div>
-                    <div class="on-stat-detail">Примљени или додељени</div>
-                </div>
-            </article>
-        </section>
+    <section class="on-stats" aria-label="Статистика налога">
+        <article class="on-stat on-stat-total">
+            <div class="on-stat-icon"><svg><use href="#on-i-clipboard"></use></svg></div>
+            <div>
+                <div class="on-stat-label">Приказани налози</div>
+                <div class="on-stat-number" id="ukupno-prikazanih-naloga">0</div>
+                <div class="on-stat-detail">Према одабраним филтерима</div>
+            </div>
+        </article>
+        <article class="on-stat on-stat-schedule">
+            <div class="on-stat-icon"><svg><use href="#on-i-calendar"></use></svg></div>
+            <div>
+                <div class="on-stat-label">Незаказани налози</div>
+                <div class="on-stat-number" id="nezakazani-nalozi">0</div>
+                <div class="on-stat-detail">Без будућег термина</div>
+            </div>
+        </article>
+        <article class="on-stat on-stat-urgent">
+            <div class="on-stat-icon"><svg><use href="#on-i-alert"></use></svg></div>
+            <div>
+                <div class="on-stat-label">Ургирани налози</div>
+                <div class="on-stat-number" id="urgencije">0</div>
+                <div class="on-stat-detail">Са евидентираном ургенцијом</div>
+            </div>
+        </article>
+        <article class="on-stat on-stat-initial">
+            <div class="on-stat-icon"><svg><use href="#on-i-layers"></use></svg></div>
+            <div>
+                <div class="on-stat-label">Налози у почетној фази</div>
+                <div class="on-stat-number" id="nepoznato">0</div>
+                <div class="on-stat-detail">Примљени или додељени</div>
+            </div>
+        </article>
+    </section>
 
-        <section class="on-panel on-filters" aria-labelledby="on-filters-title">
-            <div class="on-panel-head">
-                <div class="on-panel-heading">
-                    <div class="on-heading-icon"><svg><use href="#on-i-filter"></use></svg></div>
-                    <div>
-                        <h2 class="on-panel-title" id="on-filters-title">Филтери претраге</h2>
-                        <p class="on-panel-subtitle">Изаберите јединице, статус и извршиоце за приказ налога</p>
-                    </div>
+    <section class="on-panel on-filters" aria-labelledby="on-filters-title">
+        <div class="on-panel-head">
+            <div class="on-panel-heading">
+                <div class="on-heading-icon"><svg><use href="#on-i-filter"></use></svg></div>
+                <div>
+                    <h2 class="on-panel-title" id="on-filters-title">Филтери претраге</h2>
+                    <p class="on-panel-subtitle">Изаберите јединице, статус и извршиоце за приказ налога</p>
                 </div>
-                <button type="button" class="on-button on-button-quiet" id="on-reset-filters">
-                    <svg><use href="#on-i-reset"></use></svg> Поништи филтере
-                </button>
             </div>
-            <div class="on-divider"></div>
-            <div class="on-filter-content">
-                <div class="on-municipality-head">
-                    <label class="on-field-label">Приказане радне јединице</label>
-                    <span class="on-field-hint">Десни клик на јединицу приказује само њене налоге</span>
-                </div>
-                <div class="on-municipalities" id="filter-opstine-checkboxes"></div>
+            <button type="button" class="on-button on-button-quiet" id="on-reset-filters">
+                <svg><use href="#on-i-reset"></use></svg> Поништи филтере
+            </button>
+        </div>
+        <div class="on-divider"></div>
+        <div class="on-filter-content">
+            <div class="on-municipality-head">
+                <label class="on-field-label">Приказане радне јединице</label>
+                <span class="on-field-hint">Десни клик на јединицу приказује само њене налоге</span>
+            </div>
+            <div class="on-region-groups" id="on-region-groups" aria-label="Групни избор радних јединица">
+                <label class="on-region-group"><input type="checkbox" data-on-region="ISTOK"><span>ИСТОК</span></label>
+                <label class="on-region-group"><input type="checkbox" data-on-region="ZAPAD"><span>ЗАПАД</span></label>
+                <label class="on-region-group"><input type="checkbox" data-on-region="BEOGRAD"><span>БЕОГРАД (све)</span></label>
+            </div>
+            <div class="on-municipalities" id="filter-opstine-checkboxes"></div>
 
-                <div class="on-filter-grid">
-                    <div class="on-field">
-                        <label class="on-field-label" for="status-naloga">Статус налога</label>
-                        <select id="status-naloga" class="on-control on-select">
-                            <option value="Svi">Сви статуси</option>
-                            <option value="Primljen">Примљен</option>
-                            <option value="Dodeljen majstoru">Додељен мајстору</option>
-                            <option value="Potreban pristup">Потребан приступ</option>
-                            <option value="Potrebna WOMA">ВОМА</option>
-                            <option value="Kombinovano">Комбиновано</option>
-                            <option value="Zagušenje">Загушење</option>
-                            <option value="ZamenaC">Замена (10-50)</option>
-                            <option value="ZamenaB">Замена (50-100)</option>
-                            <option value="ZamenaA">Замена (100-200)</option>
-                            <option value="ZamenaA+">Замена (>200)</option>
-                            <option value="Zamena">Спремна замена</option>
-                            <option value="Crpljenje">Црпљење</option>
-                            <option value="Dezinfekcija">Дезинфекција</option>
-                            <option value="Masinsko kopanje">Машинско копање</option>
-                            <option value="Rucno kopanje">Ручно копање</option>
-                            <option value="Finalizacija">Финализација</option>
-                            <option value="Betonaža">Бетонажа</option>
-                            <option value="Asfalt">Асфалт</option>
-                            <option value="Bekaton">Бекатон</option>
-                            <option value="Preventivno čišćenje">Превентивно чишћење</option>
-                            <option value="Snimanje kamerom">Снимање камером</option>
-                            <option value="Vraćen">Враћен</option>
-                            <option value="Završeno">Завршено</option>
-                        </select>
+            <div class="on-filter-grid">
+                <div class="on-field">
+                    <label class="on-field-label" for="status-naloga">Статус налога</label>
+                    <select id="status-naloga" class="on-control on-select">
+                        <option value="Svi">Сви статуси</option>
+                        <option value="Primljen">Примљен</option>
+                        <option value="Dodeljen majstoru">Додељен мајстору</option>
+                        <option value="Potreban pristup">Потребан приступ</option>
+                        <option value="Potrebna WOMA">ВОМА</option>
+                        <option value="Kombinovano">Комбиновано</option>
+                        <option value="Zagušenje">Загушење</option>
+                        <option value="ZamenaC">Замена (10-50)</option>
+                        <option value="ZamenaB">Замена (50-100)</option>
+                        <option value="ZamenaA">Замена (100-200)</option>
+                        <option value="ZamenaA+">Замена (>200)</option>
+                        <option value="Zamena">Спремна замена</option>
+                        <option value="Crpljenje">Црпљење</option>
+                        <option value="Dezinfekcija">Дезинфекција</option>
+                        <option value="Masinsko kopanje">Машинско копање</option>
+                        <option value="Rucno kopanje">Ручно копање</option>
+                        <option value="Finalizacija">Финализација</option>
+                        <option value="Betonaža">Бетонажа</option>
+                        <option value="Asfalt">Асфалт</option>
+                        <option value="Bekaton">Бекатон</option>
+                        <option value="Preventivno čišćenje">Превентивно чишћење</option>
+                        <option value="Snimanje kamerom">Снимање камером</option>
+                        <option value="Vraćen">Враћен</option>
+                        <option value="Završeno">Завршено</option>
+                    </select>
+                </div>
+                <div class="on-field">
+                    <label class="on-field-label" for="majstor-naloga">Задужени мајстор</label>
+                    <select id="majstor-naloga" class="on-control on-select"></select>
+                </div>
+                <div class="on-field">
+                    <div class="on-field-label">Подизвођачи</div>
+                    <label class="on-switch-wrap" for="podizvodjaci-checkbox">
+                        <span class="on-switch-title">Прикажи подизвођаче</span>
+                        <span class="on-switch-control">
+                            <input type="checkbox" id="podizvodjaci-checkbox" checked>
+                            <span class="on-switch-track"></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="on-field">
+                    <label class="on-field-label" for="adresa-filter">Адреса</label>
+                    <div class="on-control-with-icon">
+                        <svg><use href="#on-i-search"></use></svg>
+                        <input class="on-control" type="search" id="adresa-filter" placeholder="Претрага адресе..." autocomplete="off">
                     </div>
-                    <div class="on-field">
-                        <label class="on-field-label" for="majstor-naloga">Задужени мајстор</label>
-                        <select id="majstor-naloga" class="on-control on-select"></select>
-                    </div>
-                    <div class="on-field">
-                        <div class="on-field-label">Подизвођачи</div>
-                        <label class="on-switch-wrap" for="podizvodjaci-checkbox">
-                            <span class="on-switch-title">Прикажи подизвођаче</span>
-                            <span class="on-switch-control">
-                                <input type="checkbox" id="podizvodjaci-checkbox" checked>
-                                <span class="on-switch-track"></span>
-                            </span>
-                        </label>
-                    </div>
-                    <div class="on-field">
-                        <label class="on-field-label" for="adresa-filter">Адреса</label>
-                        <div class="on-control-with-icon">
-                            <svg><use href="#on-i-search"></use></svg>
-                            <input class="on-control" type="search" id="adresa-filter" placeholder="Претрага адресе..." autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="on-field">
-                        <label class="on-field-label" for="broj-filter">Број налога</label>
-                        <div class="on-control-with-icon">
-                            <svg><use href="#on-i-search"></use></svg>
-                            <input class="on-control" type="search" id="broj-filter" placeholder="Унесите број..." autocomplete="off">
-                        </div>
+                </div>
+                <div class="on-field">
+                    <label class="on-field-label" for="broj-filter">Број налога</label>
+                    <div class="on-control-with-icon">
+                        <svg><use href="#on-i-search"></use></svg>
+                        <input class="on-control" type="search" id="broj-filter" placeholder="Унесите број..." autocomplete="off">
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="on-panel on-table-panel" aria-labelledby="on-table-title">
-            <div class="on-panel-head on-list-header">
-                <div class="on-panel-heading">
-                    <div class="on-heading-icon"><svg><use href="#on-i-clipboard"></use></svg></div>
-                    <div>
-                        <h2 class="on-panel-title" id="on-table-title">Списак радних налога</h2>
-                        <p class="on-panel-subtitle">Сортирано од најстаријег налога ка најновијем</p>
-                    </div>
-                </div>
-                <div class="on-table-actions">
-                    <span class="on-count"><span class="on-count-dot"></span><span id="on-table-count">0 приказаних</span></span>
-                    <button class="on-button" type="button" onclick="printTable()"><svg><use href="#on-i-print"></use></svg> Штампај PDF</button>
-                    <button class="on-button on-button-primary" type="button" onclick="printCSV()"><svg><use href="#on-i-download"></use></svg> Excel / CSV</button>
+    <section class="on-panel on-table-panel" aria-labelledby="on-table-title">
+        <div class="on-panel-head on-list-header">
+            <div class="on-panel-heading">
+                <div class="on-heading-icon"><svg><use href="#on-i-clipboard"></use></svg></div>
+                <div>
+                    <h2 class="on-panel-title" id="on-table-title">Списак радних налога</h2>
+                    <p class="on-panel-subtitle">Сортирано од најстаријег налога ка најновијем</p>
                 </div>
             </div>
-            <div id="table" class="on-table-scroll">
-                <table class="on-table" aria-label="Преглед радних налога">
-                    <thead>
-                        <tr>
-                            <th class="on-col-no">Бр.</th>
-                            <th class="on-col-broj">Број налога</th>
-                            <th class="on-col-datum">Датум налога</th>
-                            <th class="on-col-opstina">Радна јединица</th>
-                            <th class="on-col-adresa">Адреса</th>
-                            <th class="on-col-status">Статус</th>
-                            <th class="on-col-majstor">Мајстор</th>
-                            <th class="on-col-urg">Ургенције</th>
-                            <th class="on-col-zakazan">Заказано</th>
-                            <th class="on-col-datum-komentara">Датум коментара</th>
-                            <th class="on-col-komentar">Последњи коментар</th>
-                        </tr>
-                    </thead>
-                    <tbody id="on-table-body"></tbody>
-                </table>
+            <div class="on-table-actions">
+                <span class="on-count"><span class="on-count-dot"></span><span id="on-table-count">0 приказаних</span></span>
+                <button class="on-button" type="button" onclick="printTable()"><svg><use href="#on-i-print"></use></svg> Штампај PDF</button>
+                <button class="on-button on-button-primary" type="button" onclick="printCSV()"><svg><use href="#on-i-download"></use></svg> Excel / CSV</button>
             </div>
-            <div class="on-table-bottom">
-                <span>Приказују се налози који одговарају изабраним филтерима.</span>
-                <span>Укупно: <strong id="on-bottom-count">0</strong></span>
-            </div>
-        </section>
-    </div>
+        </div>
+        <div id="table" class="on-table-scroll">
+            <table class="on-table" aria-label="Преглед радних налога">
+                <thead>
+                    <tr>
+                        <th class="on-col-no">Бр.</th>
+                        <th class="on-col-broj">Број налога</th>
+                        <th class="on-col-datum">Датум налога</th>
+                        <th class="on-col-opstina">Радна јединица</th>
+                        <th class="on-col-adresa">Адреса</th>
+                        <th class="on-col-status">Статус</th>
+                        <th class="on-col-majstor">Мајстор</th>
+                        <th class="on-col-urg">Ургенције</th>
+                        <th class="on-col-zakazan">Заказано</th>
+                        <th class="on-col-datum-komentara">Датум коментара</th>
+                        <th class="on-col-komentar">Последњи коментар</th>
+                    </tr>
+                </thead>
+                <tbody id="on-table-body"></tbody>
+            </table>
+        </div>
+        <div class="on-table-bottom">
+            <span>Приказују се налози који одговарају изабраним филтерима.</span>
+            <span>Укупно: <strong id="on-bottom-count">0</strong></span>
+        </div>
+    </section>
+</div>
+
 </main>
 
 <%- include("partials/printer") -%>
@@ -242,8 +252,7 @@
     var onSubcontractorIds = new Set(
         (typeof podizvodjaci !== "undefined" && Array.isArray(podizvodjaci) ? podizvodjaci : []).map(String)
     );
-    var onRegion = (typeof user !== "undefined" && user && user.region)
-        ? String(user.region).toUpperCase() : "ISTOK";
+    var onRegion = String(pocetnaRegija || "BEOGRAD").toUpperCase();
     var onMajstorMap = new Map(majstori.map(m => [String(m.uniqueId), m]));
     var onOrderMeta = new WeakMap();
     var onDateFormat = new Intl.DateTimeFormat("sr-RS", {day:"2-digit",month:"2-digit",year:"numeric"});
@@ -496,6 +505,36 @@
         return tr;
     }
 
+    function onMunicipalityCheckboxes() {
+        return Array.from(document.querySelectorAll(".radnaJedinicaCheckbox"));
+    }
+
+    function onRegionUnits(region) {
+        // BEOGRAD je zajednički checkbox za sve radne jedinice.
+        return new Set(region === "BEOGRAD" ? prikazOpstina : (opstinaGrupe[region] || []));
+    }
+
+    function onSyncRegionCheckboxes() {
+        var units = onMunicipalityCheckboxes();
+        document.querySelectorAll("[data-on-region]").forEach(function(groupCheckbox) {
+            var allowed = onRegionUnits(groupCheckbox.dataset.onRegion);
+            var relevant = units.filter(function(input) { return allowed.has(input.value); });
+            var checkedCount = relevant.filter(function(input) { return input.checked; }).length;
+            groupCheckbox.checked = relevant.length > 0 && checkedCount === relevant.length;
+            groupCheckbox.indeterminate = checkedCount > 0 && checkedCount < relevant.length;
+            groupCheckbox.disabled = relevant.length === 0;
+        });
+    }
+
+    function onSetDefaultMunicipalities() {
+        var defaultRegion = onRegion === "ISTOK" || onRegion === "ZAPAD" ? onRegion : "BEOGRAD";
+        var selected = onRegionUnits(defaultRegion);
+        onMunicipalityCheckboxes().forEach(function(input) {
+            input.checked = selected.has(input.value);
+        });
+        onSyncRegionCheckboxes();
+    }
+
     function onBuildMunicipalities() {
         var container = document.getElementById("filter-opstine-checkboxes");
         for (var opstina of prikazOpstina) {
@@ -505,7 +544,6 @@
             input.type = "checkbox";
             input.className = "radnaJedinicaCheckbox";
             input.value = opstina;
-            input.checked = true;
             var content = document.createElement("span");
             content.className = "on-chip-content";
             var check = document.createElement("span");
@@ -517,15 +555,34 @@
             label.append(input, content);
             container.appendChild(label);
         }
-        container.addEventListener("change", generateTable);
+
+        document.querySelectorAll("[data-on-region]").forEach(function(groupCheckbox) {
+            groupCheckbox.addEventListener("change", function() {
+                var selectedUnits = onRegionUnits(groupCheckbox.dataset.onRegion);
+                onMunicipalityCheckboxes().forEach(function(input) {
+                    if (selectedUnits.has(input.value)) input.checked = groupCheckbox.checked;
+                });
+                onSyncRegionCheckboxes();
+                generateTable();
+            });
+        });
+
+        container.addEventListener("change", function() {
+            onSyncRegionCheckboxes();
+            generateTable();
+        });
         container.addEventListener("contextmenu", function(event) {
             var chip = event.target.closest(".on-check-chip");
             if (!chip) return;
             event.preventDefault();
             var chosen = chip.querySelector("input");
-            container.querySelectorAll("input").forEach(input => { input.checked = input === chosen; });
+            onMunicipalityCheckboxes().forEach(function(input) {
+                input.checked = input === chosen;
+            });
+            onSyncRegionCheckboxes();
             generateTable();
         });
+        onSetDefaultMunicipalities();
     }
 
     function onBuildMajstori() {
@@ -755,7 +812,7 @@
     }
 
     function onResetFilters() {
-        document.querySelectorAll(".radnaJedinicaCheckbox").forEach(cb => cb.checked = true);
+        onSetDefaultMunicipalities();
         //document.getElementById("status-naloga").value = "Svi";
         document.querySelectorAll(".on-status-checkbox").forEach(function(cb) {
             cb.checked = false;
