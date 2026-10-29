@@ -22829,20 +22829,19 @@ server.get("/aktuelniNalozi", checkBearerToken, async (req, res) => {
 
 server.get("/stambenoHM", checkBearerToken, async (req, res) => {
     try {
-
-        var query = {
-            "statusNaloga": {
-                $nin: [...statusiFakturisanja, "Storniran"]
-            }
-        };
-
-        var statusiFakturisanja = [
+    		var statusi = [
             "Fakturisan",
             "Nalog u Stambenom",
             "Spreman za fakturisanje",
-            "Završeno"
+            "Završeno",
+            "Storniran"
         ];
 
+        var query = {
+            "statusNaloga": {
+                $nin: statusi
+            }
+        };
         var nalozi = await client.db("Hausmajstor")
             .collection("Nalozi")
             .find(query)
