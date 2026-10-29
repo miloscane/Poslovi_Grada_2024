@@ -22929,7 +22929,7 @@ server.get("/stambenoFakturisan/:datum1/:datum2", checkBearerToken, async (req, 
                     "Fakturisan",
 				            "Možete fakturisati",
 				            "Nalog u Stambenom",
-                    "Spreman za fakturisanje",
+                    "Spreman za fakturisanje"
                 ]
             }
         };
