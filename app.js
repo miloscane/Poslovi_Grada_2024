@@ -22928,7 +22928,8 @@ server.get("/stambenoFakturisan/:datum1/:datum2", checkBearerToken, async (req, 
                 $in: [
                     "Fakturisan",
 				            "Možete fakturisati",
-                    "Spreman za fakturisanje"
+				            "Nalog u Stambenom",
+                    "Spreman za fakturisanje",
                 ]
             }
         };
